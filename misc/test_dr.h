@@ -1,7 +1,7 @@
 /*****************************************************************************
  * test_dr.h
  * (c)2001-2002 VideoLAN
- * $Id: test_dr.h,v 1.1 2002/05/09 17:00:03 bozo Exp $
+ * $Id: test_dr.h,v 1.2 2002/05/09 19:59:20 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -24,7 +24,7 @@
 
 #define BOZO_VARS(sname)                                                \
   int i_err = 0;                                                        \
-  long long unsigned int i_loop_count = 0;                              \
+  long long unsigned int i_loop_count;                                  \
   dvbpsi_##sname##_dr_t s_decoded, *p_new_decoded;                      \
   dvbpsi_descriptor_t * p_descriptor;
 
@@ -33,8 +33,7 @@
 
 #define BOZO_DOJOB(fname)                                               \
   if(!(i_loop_count & 0xffff))                                          \
-    fprintf(stdout, "\r  iteration count: %22llu [%llu]",               \
-            i_loop_count, (uint64_t)(-1));                              \
+    fprintf(stdout, "\r  iteration count: %22llu", i_loop_count);       \
   i_loop_count++;                                                       \
   p_descriptor = dvbpsi_Gen##fname##Dr(&s_decoded, 0);                  \
   p_new_decoded = dvbpsi_Decode##fname##Dr(p_descriptor);
@@ -43,34 +42,36 @@
   fprintf(stdout, "\"%s\" descriptor check:\n", #name);
 
 #define BOZO_END(name)                                                  \
-  fprintf(stdout, "\r  iteration count: %22llu [%llu]\n",               \
-          i_loop_count, (uint64_t)(-1));                                \
   if(i_err)                                                             \
-    fprintf(stderr, "\"%s\" descriptor check FAILED\n\n", #name);       \
+    fprintf(stderr, "\"%s\" descriptor check FAILED !!!\n\n", #name);   \
   else                                                                  \
     fprintf(stdout, "\"%s\" descriptor check succeeded\n\n", #name);
 
 
 /* integer */
-#define BOZO_begin_integer(name, bitcount)                              \
-  s_decoded.name = 0;                                                   \
-  do                                                                    \
-  {
+#define BOZO_init_integer(name, default)                                \
+  s_decoded.name = default;
 
-#define BOZO_end_integer(name, bitcount)                                \
-    s_decoded.name++;                                                   \
-  } while(!i_err                                                        \
-       && ((s_decoded.name & ((1 << bitcount) - 1)) != 0));
+#define BOZO_begin_integer(name, bitcount, min)                         \
+  if(!i_err)                                                            \
+  {                                                                     \
+    fprintf(stdout, "  \"%s\" %u bit(s) integer check\n",               \
+            #name, bitcount);                                           \
+    i_loop_count = 0;                                                   \
+    s_decoded.name = min;                                               \
+    do                                                                  \
+    {
 
-#define BOZO_end_integer32(name, bitcount)                              \
-    s_decoded.name++;                                                   \
-  } while(!i_err                                                        \
-       && ((s_decoded.name & 0xffffffff) != 0));
-
-#define BOZO_end_integer64(name, bitcount)                              \
-    s_decoded.name++;                                                   \
-  } while(!i_err                                                        \
-       && ((s_decoded.name & 0xffffffffffffffff) != 0));
+#define BOZO_end_integer(name, bitcount, max, step)                     \
+      s_decoded.name += step;                                           \
+    } while(!i_err                                                      \
+         && (s_decoded.name != max + step));                            \
+    fprintf(stdout, "\r  iteration count: %22llu", i_loop_count);       \
+    if(i_err)                                                           \
+      fprintf(stdout, "    FAILED !!!\n");                              \
+    else                                                                \
+      fprintf(stdout, "    Ok.\n");                                     \
+  }
 
 #define BOZO_check_integer(name, bitcount)                              \
   if(!i_err && (s_decoded.name != p_new_decoded->name))                 \
@@ -119,14 +120,27 @@
 
 
 /* boolean */
+#define BOZO_init_boolean(name, default)                                \
+  s_decoded.name = default;
+
 #define BOZO_begin_boolean(name)                                        \
-  s_decoded.name = 0;                                                   \
-  do                                                                    \
-  {
+  if(!i_err)                                                            \
+  {                                                                     \
+    fprintf(stdout, "  \"%s\" boolean check\n", #name);                 \
+    i_loop_count = 0;                                                   \
+    s_decoded.name = 0;                                                 \
+    do                                                                  \
+    {
 
 #define BOZO_end_boolean(name)                                          \
-    s_decoded.name += 12;                                               \
-  } while(!i_err && (s_decoded.name <= 12));
+      s_decoded.name += 12;                                             \
+    } while(!i_err && (s_decoded.name <= 12));                          \
+    fprintf(stdout, "\r  iteration count: %22llu", i_loop_count);       \
+    if(i_err)                                                           \
+      fprintf(stdout, "    FAILED !!!\n");                              \
+    else                                                                \
+      fprintf(stdout, "    Ok.\n");                                     \
+  }
 
 #define BOZO_check_boolean(name)                                        \
   if(    !i_err                                                         \

@@ -20,84 +20,222 @@
 #include "test_dr.h"
 
   
-/* video stream */
-int main_vstream()
+/* video stream (b_mpeg2 = false) */
+int main_vstream_1()
 {
   BOZO_VARS(vstream);
-  BOZO_START(video stream);
+  BOZO_START(video stream (b_mpeg2 = false));
 
-  /* BEGIN start */
+  
+  /* check b_multiple_frame_rate */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 0;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
   BOZO_begin_boolean(b_multiple_frame_rate)
-  BOZO_begin_integer(i_frame_rate_code, 4)
-  BOZO_begin_boolean(b_mpeg2)
-  BOZO_begin_boolean(b_constrained_parameter)
-  BOZO_begin_boolean(b_still_picture)
-  BOZO_begin_integer(i_profile_level_indication, 8)
-  BOZO_begin_integer(i_chroma_format, 2)
-  BOZO_begin_boolean(b_frame_rate_extension)
-  /* BEGIN end */
-
     BOZO_DOJOB(VStream);
-
-    /* CHECK start */
     BOZO_check_boolean(b_multiple_frame_rate)
-    BOZO_check_integer(i_frame_rate_code, 4)
-    BOZO_check_boolean(b_mpeg2)
-    BOZO_check_boolean(b_constrained_parameter)
-    BOZO_check_boolean(b_still_picture)
-    if(s_decoded.b_mpeg2)
-    {
-    BOZO_check_integer(i_profile_level_indication, 8)
-    BOZO_check_integer(i_chroma_format, 2)
-    BOZO_check_boolean(b_frame_rate_extension)
-    }
-    /* CHECK end */
-
     BOZO_CLEAN();
-
-  /* END start */
-  BOZO_end_boolean(b_frame_rate_extension)
-  BOZO_end_integer(i_chroma_format, 2)
-  BOZO_end_integer(i_profile_level_indication, 8)
-  BOZO_end_boolean(b_still_picture)
-  BOZO_end_boolean(b_constrained_parameter)
-  BOZO_end_boolean(b_mpeg2)
-  BOZO_end_integer(i_frame_rate_code, 4)
   BOZO_end_boolean(b_multiple_frame_rate)
-  /* END end */
 
-  BOZO_END(video stream);
+  /* check i_frame_rate_code */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 0;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
+  BOZO_begin_integer(i_frame_rate_code, 4, 0)
+    BOZO_DOJOB(VStream);
+    BOZO_check_integer(i_frame_rate_code, 4)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_frame_rate_code, 4, (1 << 4) - 1, 1)
+
+  /* check b_constrained_parameter */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 0;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
+  BOZO_begin_boolean(b_constrained_parameter)
+    BOZO_DOJOB(VStream);
+    BOZO_check_boolean(b_constrained_parameter)
+    BOZO_CLEAN();
+  BOZO_end_boolean(b_constrained_parameter)
+
+  /* check b_still_picture */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 0;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
+  BOZO_begin_boolean(b_still_picture)
+    BOZO_DOJOB(VStream);
+    BOZO_check_boolean(b_still_picture)
+    BOZO_CLEAN();
+  BOZO_end_boolean(b_still_picture)
+
+
+  BOZO_END(video stream (b_mpeg2 = false));
+
+  return i_err;
+}
+
+/* video stream (b_mpeg2 = true) */
+int main_vstream_2()
+{
+  BOZO_VARS(vstream);
+  BOZO_START(video stream (b_mpeg2 = true));
+
+  
+  /* check b_multiple_frame_rate */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 12;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
+  BOZO_init_integer(i_profile_level_indication, 0);
+  BOZO_init_integer(i_chroma_format, 0);
+  BOZO_init_boolean(b_frame_rate_extension, 0);
+  BOZO_begin_boolean(b_multiple_frame_rate)
+    BOZO_DOJOB(VStream);
+    BOZO_check_boolean(b_multiple_frame_rate)
+    BOZO_CLEAN();
+  BOZO_end_boolean(b_multiple_frame_rate)
+
+  /* check i_frame_rate_code */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 12;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
+  BOZO_init_integer(i_profile_level_indication, 0);
+  BOZO_init_integer(i_chroma_format, 0);
+  BOZO_init_boolean(b_frame_rate_extension, 0);
+  BOZO_begin_integer(i_frame_rate_code, 4, 0)
+    BOZO_DOJOB(VStream);
+    BOZO_check_integer(i_frame_rate_code, 4)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_frame_rate_code, 4, (1 << 4) - 1, 1)
+
+  /* check b_constrained_parameter */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 12;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
+  BOZO_init_integer(i_profile_level_indication, 0);
+  BOZO_init_integer(i_chroma_format, 0);
+  BOZO_init_boolean(b_frame_rate_extension, 0);
+  BOZO_begin_boolean(b_constrained_parameter)
+    BOZO_DOJOB(VStream);
+    BOZO_check_boolean(b_constrained_parameter)
+    BOZO_CLEAN();
+  BOZO_end_boolean(b_constrained_parameter)
+
+  /* check b_still_picture */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 12;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
+  BOZO_init_integer(i_profile_level_indication, 0);
+  BOZO_init_integer(i_chroma_format, 0);
+  BOZO_init_boolean(b_frame_rate_extension, 0);
+  BOZO_begin_boolean(b_still_picture)
+    BOZO_DOJOB(VStream);
+    BOZO_check_boolean(b_still_picture)
+    BOZO_CLEAN();
+  BOZO_end_boolean(b_still_picture)
+
+  /* check i_profile_level_indication */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 12;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
+  BOZO_init_integer(i_profile_level_indication, 0);
+  BOZO_init_integer(i_chroma_format, 0);
+  BOZO_init_boolean(b_frame_rate_extension, 0);
+  BOZO_begin_integer(i_profile_level_indication, 8, 0)
+    BOZO_DOJOB(VStream);
+    BOZO_check_integer(i_profile_level_indication, 8)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_profile_level_indication, 8, 0xff - 1, 1)
+
+  /* check i_chroma_format */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 12;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
+  BOZO_init_integer(i_profile_level_indication, 0);
+  BOZO_init_integer(i_chroma_format, 0);
+  BOZO_init_boolean(b_frame_rate_extension, 0);
+  BOZO_begin_integer(i_chroma_format, 2, 0)
+    BOZO_DOJOB(VStream);
+    BOZO_check_integer(i_chroma_format, 2)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_chroma_format, 2, (1 << 2) - 1, 1)
+
+  /* check b_frame_rate_extension */
+  BOZO_init_boolean(b_multiple_frame_rate, 0);
+  BOZO_init_integer(i_frame_rate_code, 0);
+  s_decoded.b_mpeg2 = 12;
+  BOZO_init_boolean(b_constrained_parameter, 0);
+  BOZO_init_boolean(b_still_picture, 0);
+  BOZO_init_integer(i_profile_level_indication, 0);
+  BOZO_init_integer(i_chroma_format, 0);
+  BOZO_init_boolean(b_frame_rate_extension, 0);
+  BOZO_begin_boolean(b_frame_rate_extension)
+    BOZO_DOJOB(VStream);
+    BOZO_check_boolean(b_frame_rate_extension)
+    BOZO_CLEAN();
+  BOZO_end_boolean(b_frame_rate_extension)
+
+
+  BOZO_END(video stream (b_mpeg2 = true));
 
   return i_err;
 }
 
 /* audio stream */
-int main_astream()
+int main_astream_()
 {
   BOZO_VARS(astream);
   BOZO_START(audio stream);
 
-  /* BEGIN start */
+  
+  /* check b_free_format */
+  BOZO_init_boolean(b_free_format, 0);
+  BOZO_init_integer(i_id, 0);
+  BOZO_init_integer(i_layer, 0);
   BOZO_begin_boolean(b_free_format)
-  BOZO_begin_integer(i_id, 1)
-  BOZO_begin_integer(i_layer, 2)
-  /* BEGIN end */
-
     BOZO_DOJOB(AStream);
-
-    /* CHECK start */
     BOZO_check_boolean(b_free_format)
-    BOZO_check_integer(i_id, 1)
-    BOZO_check_integer(i_layer, 2)
-    /* CHECK end */
-
     BOZO_CLEAN();
-
-  /* END start */
-  BOZO_end_integer(i_layer, 2)
-  BOZO_end_integer(i_id, 1)
   BOZO_end_boolean(b_free_format)
-  /* END end */
+
+  /* check i_id */
+  BOZO_init_boolean(b_free_format, 0);
+  BOZO_init_integer(i_id, 0);
+  BOZO_init_integer(i_layer, 0);
+  BOZO_begin_integer(i_id, 1, 0)
+    BOZO_DOJOB(AStream);
+    BOZO_check_integer(i_id, 1)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_id, 1, (1 << 1) - 1, 1)
+
+  /* check i_layer */
+  BOZO_init_boolean(b_free_format, 0);
+  BOZO_init_integer(i_id, 0);
+  BOZO_init_integer(i_layer, 0);
+  BOZO_begin_integer(i_layer, 2, 0)
+    BOZO_DOJOB(AStream);
+    BOZO_check_integer(i_layer, 2)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_layer, 2, (1 << 2) - 1, 1)
+
 
   BOZO_END(audio stream);
 
@@ -105,35 +243,56 @@ int main_astream()
 }
 
 /* hierarchy */
-int main_hierarchy()
+int main_hierarchy_()
 {
   BOZO_VARS(hierarchy);
   BOZO_START(hierarchy);
 
-  /* BEGIN start */
-  BOZO_begin_integer(i_h_type, 4)
-  BOZO_begin_integer(i_h_layer_index, 6)
-  BOZO_begin_integer(i_h_embedded_layer, 6)
-  BOZO_begin_integer(i_h_priority, 6)
-  /* BEGIN end */
-
+  
+  /* check i_h_type */
+  BOZO_init_integer(i_h_type, 0);
+  BOZO_init_integer(i_h_layer_index, 0);
+  BOZO_init_integer(i_h_embedded_layer, 0);
+  BOZO_init_integer(i_h_priority, 0);
+  BOZO_begin_integer(i_h_type, 4, 0)
     BOZO_DOJOB(Hierarchy);
-
-    /* CHECK start */
     BOZO_check_integer(i_h_type, 4)
-    BOZO_check_integer(i_h_layer_index, 6)
-    BOZO_check_integer(i_h_embedded_layer, 6)
-    BOZO_check_integer(i_h_priority, 6)
-    /* CHECK end */
-
     BOZO_CLEAN();
+  BOZO_end_integer(i_h_type, 4, (1 << 4) - 1, 1)
 
-  /* END start */
-  BOZO_end_integer(i_h_priority, 6)
-  BOZO_end_integer(i_h_embedded_layer, 6)
-  BOZO_end_integer(i_h_layer_index, 6)
-  BOZO_end_integer(i_h_type, 4)
-  /* END end */
+  /* check i_h_layer_index */
+  BOZO_init_integer(i_h_type, 0);
+  BOZO_init_integer(i_h_layer_index, 0);
+  BOZO_init_integer(i_h_embedded_layer, 0);
+  BOZO_init_integer(i_h_priority, 0);
+  BOZO_begin_integer(i_h_layer_index, 6, 0)
+    BOZO_DOJOB(Hierarchy);
+    BOZO_check_integer(i_h_layer_index, 6)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_h_layer_index, 6, (1 << 6) - 1, 1)
+
+  /* check i_h_embedded_layer */
+  BOZO_init_integer(i_h_type, 0);
+  BOZO_init_integer(i_h_layer_index, 0);
+  BOZO_init_integer(i_h_embedded_layer, 0);
+  BOZO_init_integer(i_h_priority, 0);
+  BOZO_begin_integer(i_h_embedded_layer, 6, 0)
+    BOZO_DOJOB(Hierarchy);
+    BOZO_check_integer(i_h_embedded_layer, 6)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_h_embedded_layer, 6, (1 << 6) - 1, 1)
+
+  /* check i_h_priority */
+  BOZO_init_integer(i_h_type, 0);
+  BOZO_init_integer(i_h_layer_index, 0);
+  BOZO_init_integer(i_h_embedded_layer, 0);
+  BOZO_init_integer(i_h_priority, 0);
+  BOZO_begin_integer(i_h_priority, 6, 0)
+    BOZO_DOJOB(Hierarchy);
+    BOZO_check_integer(i_h_priority, 6)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_h_priority, 6, (1 << 6) - 1, 1)
+
 
   BOZO_END(hierarchy);
 
@@ -141,27 +300,32 @@ int main_hierarchy()
 }
 
 /* registration */
-int main_registration()
+int main_registration_()
 {
   BOZO_VARS(registration);
   BOZO_START(registration);
 
-  /* BEGIN start */
+  
+  /* check i_format_identifier */
   s_decoded.i_additional_length = 0;
-  BOZO_begin_integer(i_format_identifier, 32)
-  /* BEGIN end */
-
+  BOZO_init_integer(i_format_identifier, 0);
+  BOZO_init_integer(i_format_identifier, 0);
+  BOZO_begin_integer(i_format_identifier, 32, 0)
     BOZO_DOJOB(Registration);
-
-    /* CHECK start */
     BOZO_check_integer32(i_format_identifier, 32)
-    /* CHECK end */
-
     BOZO_CLEAN();
+  BOZO_end_integer(i_format_identifier, 32, 0xffff, 1)
 
-  /* END start */
-  BOZO_end_integer32(i_format_identifier, 32)
-  /* END end */
+  /* check i_format_identifier */
+  s_decoded.i_additional_length = 0;
+  BOZO_init_integer(i_format_identifier, 0);
+  BOZO_init_integer(i_format_identifier, 0);
+  BOZO_begin_integer(i_format_identifier, 32, 0)
+    BOZO_DOJOB(Registration);
+    BOZO_check_integer32(i_format_identifier, 32)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_format_identifier, 32, 0xffff0000, 0x10000)
+
 
   BOZO_END(registration);
 
@@ -169,26 +333,20 @@ int main_registration()
 }
 
 /* data stream alignment */
-int main_ds_alignment()
+int main_ds_alignment_()
 {
   BOZO_VARS(ds_alignment);
   BOZO_START(data stream alignment);
 
-  /* BEGIN start */
-  BOZO_begin_integer(i_alignment_type, 8)
-  /* BEGIN end */
-
+  
+  /* check i_alignment_type */
+  BOZO_init_integer(i_alignment_type, 0);
+  BOZO_begin_integer(i_alignment_type, 8, 0)
     BOZO_DOJOB(DSAlignment);
-
-    /* CHECK start */
     BOZO_check_integer(i_alignment_type, 8)
-    /* CHECK end */
-
     BOZO_CLEAN();
+  BOZO_end_integer(i_alignment_type, 8, 0xff - 1, 1)
 
-  /* END start */
-  BOZO_end_integer(i_alignment_type, 8)
-  /* END end */
 
   BOZO_END(data stream alignment);
 
@@ -196,32 +354,42 @@ int main_ds_alignment()
 }
 
 /* target background grid */
-int main_target_bg_grid()
+int main_target_bg_grid_()
 {
   BOZO_VARS(target_bg_grid);
   BOZO_START(target background grid);
 
-  /* BEGIN start */
-  BOZO_begin_integer(i_horizontal_size, 14)
-  BOZO_begin_integer(i_vertical_size, 14)
-  BOZO_begin_integer(i_pel_aspect_ratio, 4)
-  /* BEGIN end */
-
+  
+  /* check i_horizontal_size */
+  BOZO_init_integer(i_horizontal_size, 0);
+  BOZO_init_integer(i_vertical_size, 0);
+  BOZO_init_integer(i_pel_aspect_ratio, 0);
+  BOZO_begin_integer(i_horizontal_size, 14, 0)
     BOZO_DOJOB(TargetBgGrid);
-
-    /* CHECK start */
     BOZO_check_integer(i_horizontal_size, 14)
-    BOZO_check_integer(i_vertical_size, 14)
-    BOZO_check_integer(i_pel_aspect_ratio, 4)
-    /* CHECK end */
-
     BOZO_CLEAN();
+  BOZO_end_integer(i_horizontal_size, 14, (1 << 14) - 1, 1)
 
-  /* END start */
-  BOZO_end_integer(i_pel_aspect_ratio, 4)
-  BOZO_end_integer(i_vertical_size, 14)
-  BOZO_end_integer(i_horizontal_size, 14)
-  /* END end */
+  /* check i_vertical_size */
+  BOZO_init_integer(i_horizontal_size, 0);
+  BOZO_init_integer(i_vertical_size, 0);
+  BOZO_init_integer(i_pel_aspect_ratio, 0);
+  BOZO_begin_integer(i_vertical_size, 14, 0)
+    BOZO_DOJOB(TargetBgGrid);
+    BOZO_check_integer(i_vertical_size, 14)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_vertical_size, 14, (1 << 14) - 1, 1)
+
+  /* check i_pel_aspect_ratio */
+  BOZO_init_integer(i_horizontal_size, 0);
+  BOZO_init_integer(i_vertical_size, 0);
+  BOZO_init_integer(i_pel_aspect_ratio, 0);
+  BOZO_begin_integer(i_pel_aspect_ratio, 4, 0)
+    BOZO_DOJOB(TargetBgGrid);
+    BOZO_check_integer(i_pel_aspect_ratio, 4)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_pel_aspect_ratio, 4, (1 << 4) - 1, 1)
+
 
   BOZO_END(target background grid);
 
@@ -229,32 +397,42 @@ int main_target_bg_grid()
 }
 
 /* video window */
-int main_vwindow()
+int main_vwindow_()
 {
   BOZO_VARS(vwindow);
   BOZO_START(video window);
 
-  /* BEGIN start */
-  BOZO_begin_integer(i_horizontal_offset, 14)
-  BOZO_begin_integer(i_vertical_offset, 14)
-  BOZO_begin_integer(i_window_priority, 4)
-  /* BEGIN end */
-
+  
+  /* check i_horizontal_offset */
+  BOZO_init_integer(i_horizontal_offset, 0);
+  BOZO_init_integer(i_vertical_offset, 0);
+  BOZO_init_integer(i_window_priority, 0);
+  BOZO_begin_integer(i_horizontal_offset, 14, 0)
     BOZO_DOJOB(VWindow);
-
-    /* CHECK start */
     BOZO_check_integer(i_horizontal_offset, 14)
-    BOZO_check_integer(i_vertical_offset, 14)
-    BOZO_check_integer(i_window_priority, 4)
-    /* CHECK end */
-
     BOZO_CLEAN();
+  BOZO_end_integer(i_horizontal_offset, 14, (1 << 14) - 1, 1)
 
-  /* END start */
-  BOZO_end_integer(i_window_priority, 4)
-  BOZO_end_integer(i_vertical_offset, 14)
-  BOZO_end_integer(i_horizontal_offset, 14)
-  /* END end */
+  /* check i_vertical_offset */
+  BOZO_init_integer(i_horizontal_offset, 0);
+  BOZO_init_integer(i_vertical_offset, 0);
+  BOZO_init_integer(i_window_priority, 0);
+  BOZO_begin_integer(i_vertical_offset, 14, 0)
+    BOZO_DOJOB(VWindow);
+    BOZO_check_integer(i_vertical_offset, 14)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_vertical_offset, 14, (1 << 14) - 1, 1)
+
+  /* check i_window_priority */
+  BOZO_init_integer(i_horizontal_offset, 0);
+  BOZO_init_integer(i_vertical_offset, 0);
+  BOZO_init_integer(i_window_priority, 0);
+  BOZO_begin_integer(i_window_priority, 4, 0)
+    BOZO_DOJOB(VWindow);
+    BOZO_check_integer(i_window_priority, 4)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_window_priority, 4, (1 << 4) - 1, 1)
+
 
   BOZO_END(video window);
 
@@ -262,30 +440,32 @@ int main_vwindow()
 }
 
 /* conditional access */
-int main_ca()
+int main_ca_()
 {
   BOZO_VARS(ca);
   BOZO_START(conditional access);
 
-  /* BEGIN start */
+  
+  /* check i_ca_system_id */
   s_decoded.i_private_length = 0;
-  BOZO_begin_integer(i_ca_system_id, 16)
-  BOZO_begin_integer(i_ca_pid, 13)
-  /* BEGIN end */
-
+  BOZO_init_integer(i_ca_system_id, 0);
+  BOZO_init_integer(i_ca_pid, 0);
+  BOZO_begin_integer(i_ca_system_id, 16, 0)
     BOZO_DOJOB(CA);
-
-    /* CHECK start */
     BOZO_check_integer(i_ca_system_id, 16)
-    BOZO_check_integer(i_ca_pid, 13)
-    /* CHECK end */
-
     BOZO_CLEAN();
+  BOZO_end_integer(i_ca_system_id, 16, 0xffff - 1, 1)
 
-  /* END start */
-  BOZO_end_integer(i_ca_pid, 13)
-  BOZO_end_integer(i_ca_system_id, 16)
-  /* END end */
+  /* check i_ca_pid */
+  s_decoded.i_private_length = 0;
+  BOZO_init_integer(i_ca_system_id, 0);
+  BOZO_init_integer(i_ca_pid, 0);
+  BOZO_begin_integer(i_ca_pid, 13, 0)
+    BOZO_DOJOB(CA);
+    BOZO_check_integer(i_ca_pid, 13)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_ca_pid, 13, (1 << 13) - 1, 1)
+
 
   BOZO_END(conditional access);
 
@@ -293,27 +473,21 @@ int main_ca()
 }
 
 /* ISO 639 language */
-int main_iso639()
+int main_iso639_()
 {
   BOZO_VARS(iso639);
   BOZO_START(ISO 639 language);
 
-  /* BEGIN start */
+  
+  /* check i_audio_type */
   s_decoded.i_code_count = 0;
-  BOZO_begin_integer(i_audio_type, 8)
-  /* BEGIN end */
-
+  BOZO_init_integer(i_audio_type, 0);
+  BOZO_begin_integer(i_audio_type, 8, 0)
     BOZO_DOJOB(ISO639);
-
-    /* CHECK start */
     BOZO_check_integer(i_audio_type, 8)
-    /* CHECK end */
-
     BOZO_CLEAN();
+  BOZO_end_integer(i_audio_type, 8, 0xff - 1, 1)
 
-  /* END start */
-  BOZO_end_integer(i_audio_type, 8)
-  /* END end */
 
   BOZO_END(ISO 639 language);
 
@@ -326,15 +500,16 @@ int main()
 {
   int i_err = 0;
   
-  i_err |= main_vstream();
-  i_err |= main_astream();
-  i_err |= main_hierarchy();
-  i_err |= main_registration();
-  i_err |= main_ds_alignment();
-  i_err |= main_target_bg_grid();
-  i_err |= main_vwindow();
-  i_err |= main_ca();
-  i_err |= main_iso639();
+  i_err |= main_vstream_1();
+  i_err |= main_vstream_2();
+  i_err |= main_astream_();
+  i_err |= main_hierarchy_();
+  i_err |= main_registration_();
+  i_err |= main_ds_alignment_();
+  i_err |= main_target_bg_grid_();
+  i_err |= main_vwindow_();
+  i_err |= main_ca_();
+  i_err |= main_iso639_();
 
   return i_err;
 }

@@ -49,25 +49,12 @@ int main()
 
 <xsl:template match="descriptor" mode="code">
 /* <xsl:value-of select="@name" /> */
-int main_<xsl:value-of select="@sname" />()
+int main_<xsl:value-of select="@sname" />_<xsl:value-of select="@msuffix" />()
 {
   BOZO_VARS(<xsl:value-of select="@sname" />);
   BOZO_START(<xsl:value-of select="@name" />);
 
-  /* BEGIN start */<xsl:apply-templates mode="begin" />
-  /* BEGIN end */
-
-    BOZO_DOJOB(<xsl:value-of select="@fname" />);
-
-    /* CHECK start */<xsl:apply-templates mode="check" />
-    /* CHECK end */
-
-    BOZO_CLEAN();
-
-  /* END start */<xsl:apply-templates mode="end" >
-    <xsl:sort select="position()" data-type="number" order="descending" />
-  </xsl:apply-templates>
-  /* END end */
+  <xsl:apply-templates mode="check" />
 
   BOZO_END(<xsl:value-of select="@name" />);
 
@@ -77,31 +64,43 @@ int main_<xsl:value-of select="@sname" />()
 
 <xsl:template match="text()" mode="code" priority="-1"/>
 
-<!--                 -->
-<!-- begin templates -->
-<!--                 -->
+<!--                -->
+<!-- init templates -->
+<!--                -->
 
-<xsl:template match="integer" mode="begin">
-  BOZO_begin_integer(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />)</xsl:template>
+<xsl:template match="integer" mode="init">
+  BOZO_init_integer(<xsl:value-of select="@name" />, <xsl:value-of select="@default" />);</xsl:template>
 
-<xsl:template match="boolean" mode="begin">
-  BOZO_begin_boolean(<xsl:value-of select="@name" />)</xsl:template>
+<xsl:template match="boolean" mode="init">
+  BOZO_init_boolean(<xsl:value-of select="@name" />, <xsl:value-of select="@default" />);</xsl:template>
 
-<xsl:template match="insert" mode="begin">
+<xsl:template match="insert" mode="init">
   <xsl:value-of select="begin" />
 </xsl:template>
 
-<xsl:template match="text()" mode="begin" priority="-1"/>
+<xsl:template match="text()" mode="init" priority="-1"/>
 
 <!--                 -->
 <!-- check templates -->
 <!--                 -->
 
 <xsl:template match="integer" mode="check">
-    BOZO_check_integer<xsl:if test="@bitcount='32' or @bitcount='64'" ><xsl:value-of select="@bitcount" /></xsl:if>(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />)</xsl:template>
+  /* check <xsl:value-of select="@name" /> */<xsl:apply-templates select=".." mode="init" />
+  BOZO_begin_integer(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />, <xsl:choose><xsl:when test="@min != ''"><xsl:value-of select="@min" /></xsl:when><xsl:otherwise>0</xsl:otherwise></xsl:choose>)
+    BOZO_DOJOB(<xsl:value-of select="../@fname" />);
+    BOZO_check_integer<xsl:if test="@bitcount='32' or @bitcount='64'" ><xsl:value-of select="@bitcount" /></xsl:if>(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />)
+    BOZO_CLEAN();
+  BOZO_end_integer(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />, <xsl:choose><xsl:when test="@max != ''"><xsl:value-of select="@max" /></xsl:when><xsl:otherwise>(1 &lt;&lt; <xsl:value-of select="@bitcount" />) - 1</xsl:otherwise></xsl:choose>, <xsl:choose><xsl:when test="@step != ''"><xsl:value-of select="@step" /></xsl:when><xsl:otherwise>1</xsl:otherwise></xsl:choose>)
+</xsl:template>
 
 <xsl:template match="boolean" mode="check">
-    BOZO_check_boolean(<xsl:value-of select="@name" />)</xsl:template>
+  /* check <xsl:value-of select="@name" /> */<xsl:apply-templates select=".." mode="init" />
+  BOZO_begin_boolean(<xsl:value-of select="@name" />)
+    BOZO_DOJOB(<xsl:value-of select="../@fname" />);
+    BOZO_check_boolean(<xsl:value-of select="@name" />)
+    BOZO_CLEAN();
+  BOZO_end_boolean(<xsl:value-of select="@name" />)
+</xsl:template>
 
 <xsl:template match="insert" mode="check">
   <xsl:value-of select="check" />
@@ -109,28 +108,12 @@ int main_<xsl:value-of select="@sname" />()
 
 <xsl:template match="text()" mode="check" priority="-1"/>
 
-<!--               -->
-<!-- end templates -->
-<!--               -->
-
-<xsl:template match="integer" mode="end">
-  BOZO_end_integer<xsl:if test="@bitcount='32' or @bitcount='64'" ><xsl:value-of select="@bitcount" /></xsl:if>(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />)</xsl:template>
-
-<xsl:template match="boolean" mode="end">
-  BOZO_end_boolean(<xsl:value-of select="@name" />)</xsl:template>
-
-<xsl:template match="insert" mode="end">
-  <xsl:value-of select="end" />
-</xsl:template>
-
-<xsl:template match="text()" mode="end" priority="-1"/>
-
 <!--                -->
 <!-- main templates -->
 <!--                -->
 
 <xsl:template match="descriptor" mode="main">
-  i_err |= main_<xsl:value-of select="@sname" />();</xsl:template>
+  i_err |= main_<xsl:value-of select="@sname" />_<xsl:value-of select="@msuffix" />();</xsl:template>
 
 <xsl:template match="text()" mode="main" priority="-1"/>
 
