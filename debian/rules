@@ -70,7 +70,7 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 #	dh_installdebconf	
-	dh_installdocs AUTHORS README
+	dh_installdocs AUTHORS README NEWS
 #	dh_installexamples
 #	dh_installmenu
 #	dh_installemacsen
