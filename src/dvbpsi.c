@@ -2,7 +2,7 @@
  * dvbpsi.c: conversion from TS packets to PSI sections
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: dvbpsi.c,v 1.4 2002/10/07 14:15:14 sam Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -67,6 +67,14 @@ void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
   /* Continuity check */
   i_expected_counter = (h_dvbpsi->i_continuity_counter + 1) & 0xf;
   h_dvbpsi->i_continuity_counter = p_data[3] & 0xf;
+
+  if(i_expected_counter == ((h_dvbpsi->i_continuity_counter + 1) & 0xf))
+  {
+    DVBPSI_ERROR_ARG("PSI decoder",
+                     "TS duplicate (received %d, expected %d)",
+                     h_dvbpsi->i_continuity_counter, i_expected_counter);
+    return;
+  }
 
   if(i_expected_counter != h_dvbpsi->i_continuity_counter)
   {

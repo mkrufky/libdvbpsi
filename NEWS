@@ -6,6 +6,7 @@ Changes between 0.1.4 and 0.1.5:
   * src/tables/eit*: EIT decoder (no generator yet)
   * 0x55 (dvb parental rating) descriptor decoder
   * fixed a segfault in the subtitles descriptor decoder
+  * correctly handle duplicate packets
 
 Changes between 0.1.3 and 0.1.4:
 --------------------------------
