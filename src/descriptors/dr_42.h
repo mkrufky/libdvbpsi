@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_42.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_42.h,v 1.1 2002/12/11 13:14:42 jobi Exp $
+ * $Id: dr_42.h,v 1.2 2002/12/12 10:19:32 jobi Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -33,8 +33,8 @@
  * ETSI EN 300 468 section 6.2.35.
  */
 
-#ifndef _DVBPSI_DR_0F_H_
-#define _DVBPSI_DR_0F_H_
+#ifndef _DVBPSI_DR_42_H_
+#define _DVBPSI_DR_42_H_
 
 #ifdef __cplusplus
 extern "C" {

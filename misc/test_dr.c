@@ -639,6 +639,29 @@ int main_private_data_()
   return i_err;
 }
 
+/* service */
+int main_service_()
+{
+  BOZO_VARS(service);
+  BOZO_START(service);
+
+  
+  /* check i_service_type */
+  s_decoded.i_service_provider_name_length = 0;
+  s_decoded.i_service_name_length = 0;
+  BOZO_init_integer(i_service_type, 0);
+  BOZO_begin_integer(i_service_type, 8)
+    BOZO_DOJOB(Service);
+    BOZO_check_integer(i_service_type, 8)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_service_type, 8)
+
+
+  BOZO_END(service);
+
+  return i_err;
+}
+
 
 /* main function */
 int main()
@@ -660,6 +683,7 @@ int main()
   i_err |= main_copyright_();
   i_err |= main_max_bitrate_();
   i_err |= main_private_data_();
+  i_err |= main_service_();
 
   if(i_err)
     fprintf(stderr, "At least one test has FAILED !!!\n");

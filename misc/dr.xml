@@ -108,5 +108,31 @@
   <descriptor name="private data indicator" sname="private_data" fname="PrivateData">
     <integer name="i_private_data" bitcount="32" default="0" />
   </descriptor>
+<!--
+  <descriptor name="stuffing" sname="stuffing" fname="Stuffing">
+    <insert>
+      <begin>
+  s_decoded.i_stuffing_length = 0;</begin>
+    </insert>
+  </descriptor>
+
+  <descriptor name="bouquet name" sname="bouquet_name" fname="BouquetName">
+    <insert>
+      <begin>
+  s_decoded.i_name_length = 0;</begin>
+    </insert>
+  </descriptor>-->
+
+  <descriptor name="service" sname="service" fname="Service">
+    <insert>
+      <begin>
+  s_decoded.i_service_provider_name_length = 0;</begin>
+    </insert>
+    <insert>
+      <begin>
+  s_decoded.i_service_name_length = 0;</begin>
+    </insert>
+    <integer name="i_service_type" bitcount="8" default="0" />
+  </descriptor>
 
 </dr>

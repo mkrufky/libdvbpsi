@@ -20,6 +20,6 @@ noinst_HEADERS = test_dr.h
 
 EXTRA_DIST=dr.dtd dr.xml dr.xsl
 
-test_dr.c:
+test_dr.c: dr.dtd dr.xml dr.xsl
 	xsltproc -o test_dr.c dr.xsl dr.xml
 

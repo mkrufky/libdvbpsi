@@ -15,6 +15,12 @@
 
 #include &lt;stdio.h&gt;
 
+#if defined(HAVE_INTTYPES_H)
+#include &lt;inttypes.h&gt;
+#elif defined(HAVE_STDINT_H)
+#include &lt;stdint.h&gt;
+#endif
+
 /* the libdvbpsi distribution defines DVBPSI_DIST */
 #ifdef DVBPSI_DIST
 #include "../src/dvbpsi.h"
