@@ -1,7 +1,7 @@
 /*****************************************************************************
  * pat.h
  * (c)2001-2002 VideoLAN
- * $Id: pat.h,v 1.5 2002/05/08 13:00:40 bozo Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -157,9 +157,11 @@ void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
  * \return nothing.
  */
 #define dvbpsi_NewPAT(p_pat, i_ts_id, i_version, b_current_next)        \
+do {                                                                    \
   p_pat = (dvbpsi_pat_t*)malloc(sizeof(dvbpsi_pat_t));                  \
   if(p_pat != NULL)                                                     \
-    dvbpsi_InitPAT(p_pat, i_ts_id, i_version, b_current_next);
+    dvbpsi_InitPAT(p_pat, i_ts_id, i_version, b_current_next);          \
+} while(0);
 
 
 /*****************************************************************************
@@ -180,8 +182,10 @@ void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat);
  * \return nothing.
  */
 #define dvbpsi_DeletePAT(p_pat)                                         \
+do {                                                                    \
   dvbpsi_EmptyPAT(p_pat);                                               \
-  free(p_pat);
+  free(p_pat);                                                          \
+} while(0);
 
 
 /*****************************************************************************

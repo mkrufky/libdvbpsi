@@ -1,7 +1,7 @@
 /*****************************************************************************
  * pmt.h
  * (c)2001-2002 VideoLAN
- * $Id: pmt.h,v 1.5 2002/03/27 20:02:43 bozo Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -171,10 +171,12 @@ void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
  */
 #define dvbpsi_NewPMT(p_pmt, i_program_number,                          \
                       i_version, b_current_next, i_pcr_pid)             \
+do {                                                                    \
   p_pmt = (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));                  \
   if(p_pmt != NULL)                                                     \
     dvbpsi_InitPMT(p_pmt, i_program_number, i_version, b_current_next,  \
-                   i_pcr_pid);
+                   i_pcr_pid);                                          \
+} while(0);
 
 
 /*****************************************************************************
@@ -195,8 +197,10 @@ void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt);
  * \return nothing.
  */
 #define dvbpsi_DeletePMT(p_pmt)                                         \
+do {                                                                    \
   dvbpsi_EmptyPMT(p_pmt);                                               \
-  free(p_pmt);
+  free(p_pmt);                                                          \
+} while(0);
 
 
 /*****************************************************************************

@@ -177,9 +177,11 @@ void dvbpsi_InitSDT(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
  * \return nothing.
  */
 #define dvbpsi_NewSDT(p_sdt, i_ts_id, i_version, b_current_next,i_network_id) \
+do {                                                                    \
   p_sdt = (dvbpsi_sdt_t*)malloc(sizeof(dvbpsi_sdt_t));                  \
   if(p_sdt != NULL)                                                     \
-    dvbpsi_InitSDT(p_sdt, i_ts_id, i_version, b_current_next, i_network_id);
+    dvbpsi_InitSDT(p_sdt, i_ts_id, i_version, b_current_next, i_network_id); \
+} while(0);
 
 
 /*****************************************************************************
@@ -200,8 +202,10 @@ void dvbpsi_EmptySDT(dvbpsi_sdt_t *p_sdt);
  * \return nothing.
  */
 #define dvbpsi_DeleteSDT(p_sdt)                                         \
+do {                                                                    \
   dvbpsi_EmptySDT(p_sdt);                                               \
-  free(p_sdt);
+  free(p_sdt);                                                          \
+} while(0);
 
 
 /*****************************************************************************

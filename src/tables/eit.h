@@ -185,9 +185,11 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
  * \return nothing.
  */
 #define dvbpsi_NewEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id) \
+do {                                                                    \
   p_eit = (dvbpsi_eit_t*)malloc(sizeof(dvbpsi_eit_t));                  \
   if(p_eit != NULL)                                                     \
-    dvbpsi_InitEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id);
+    dvbpsi_InitEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id); \
+} while(0);
 
 
 /*****************************************************************************
@@ -208,8 +210,10 @@ void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit);
  * \return nothing.
  */
 #define dvbpsi_DeleteEIT(p_eit)                                         \
+do {                                                                    \
   dvbpsi_EmptyEIT(p_eit);                                               \
-  free(p_eit);
+  free(p_eit);                                                          \
+} while(0);
 
 
 /*****************************************************************************
