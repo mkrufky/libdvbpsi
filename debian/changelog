@@ -1,3 +1,9 @@
+libdvbpsi (0.1.2-2) unstable; urgency=low
+
+  * Package that can also be installed on Woody and Sarge, not juste Sid.
+
+ -- Alexis de Lattre <alexis@videolan.org>  Mon, 13 Oct 2002 11:14:21 +0200
+
 libdvbpsi (0.1.2-1) unstable; urgency=low
 
   * New upstream release.
