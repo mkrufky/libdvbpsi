@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_07.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_07.c,v 1.1 2002/05/08 15:55:32 bozo Exp $
+ * $Id: dr_07.c,v 1.2 2002/05/09 17:00:03 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -93,7 +93,7 @@ dvbpsi_descriptor_t * dvbpsi_GenTargetBgGridDr(
                                         int b_duplicate)
 {
   /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x06, 4, NULL);
+  dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x07, 4, NULL);
 
   if(p_descriptor)
   {
@@ -101,7 +101,7 @@ dvbpsi_descriptor_t * dvbpsi_GenTargetBgGridDr(
     p_descriptor->p_data[0] = p_decoded->i_horizontal_size >> 6;
     p_descriptor->p_data[1] =   (((uint8_t)p_decoded->i_horizontal_size) << 2)
                               | (p_decoded->i_vertical_size >> 12);
-    p_descriptor->p_data[2] = ((uint8_t)p_decoded->i_vertical_size) >> 4;
+    p_descriptor->p_data[2] = p_decoded->i_vertical_size >> 4;
     p_descriptor->p_data[3] =   (((uint8_t)p_decoded->i_vertical_size) << 4)
                               | (p_decoded->i_pel_aspect_ratio & 0x0f);
 

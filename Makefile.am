@@ -9,3 +9,6 @@ doc-dummy:
 doc: doc-dummy
 	$(MAKE) -C doc doc
 
+test_dr.c:
+	$(MAKE) -C misc test_dr.c
+

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_0a.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_0a.c,v 1.1 2002/05/08 16:45:33 bozo Exp $
+ * $Id: dr_0a.c,v 1.2 2002/05/09 17:00:03 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -90,7 +90,7 @@ dvbpsi_descriptor_t * dvbpsi_GenISO639Dr(dvbpsi_iso639_dr_t * p_decoded,
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x06, p_decoded->i_code_count * 3 + 1, NULL);
+        dvbpsi_NewDescriptor(0x0a, p_decoded->i_code_count * 3 + 1, NULL);
 
   if(p_descriptor)
   {

@@ -4,3 +4,4 @@ Makefile
 gen_crc
 gen_pat
 gen_pmt
+test_dr

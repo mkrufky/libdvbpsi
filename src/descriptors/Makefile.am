@@ -22,5 +22,6 @@ pkginclude_HEADERS = dr_02.h \
                      dr_07.h \
                      dr_08.h \
                      dr_09.h \
-                     dr_0a.h
+                     dr_0a.h \
+                     dr.h
 

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_02.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_02.c,v 1.4 2002/05/08 14:56:28 bozo Exp $
+ * $Id: dr_02.c,v 1.5 2002/05/09 17:00:03 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -115,6 +115,7 @@ dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(dvbpsi_vstream_dr_t * p_decoded,
 
     if(p_decoded->b_mpeg2)
     {
+      p_descriptor->p_data[0] |= 0x04;
       p_descriptor->p_data[1] = p_decoded->i_profile_level_indication;
       p_descriptor->p_data[2] = 0x1f;
       p_descriptor->p_data[2] |= (p_decoded->i_chroma_format & 0x03) << 6;

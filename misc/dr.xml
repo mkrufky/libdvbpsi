@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE dr SYSTEM "dr.dtd">
+
+<dr>
+  <descriptor name="video stream" sname="vstream" fname="VStream">
+    <boolean name="b_multiple_frame_rate" />
+    <integer name="i_frame_rate_code" bitcount="4" />
+    <boolean name="b_mpeg2" />
+    <boolean name="b_constrained_parameter" />
+    <boolean name="b_still_picture" />
+    <insert>
+      <check>
+    if(s_decoded.b_mpeg2)
+    {</check>
+    </insert>
+    <integer name="i_profile_level_indication" bitcount="8" />
+    <integer name="i_chroma_format" bitcount="2" />
+    <boolean name="b_frame_rate_extension" />
+    <insert>
+      <check>
+    }</check>
+    </insert>
+  </descriptor>
+
+  <descriptor name="audio stream" sname="astream" fname="AStream">
+    <boolean name="b_free_format" />
+    <integer name="i_id" bitcount="1" />
+    <integer name="i_layer" bitcount="2" />
+  </descriptor>
+
+  <descriptor name="hierarchy" sname="hierarchy" fname="Hierarchy">
+    <integer name="i_h_type" bitcount="4" />
+    <integer name="i_h_layer_index" bitcount="6" />
+    <integer name="i_h_embedded_layer" bitcount="6" />
+    <integer name="i_h_priority" bitcount="6" />
+  </descriptor>
+
+  <descriptor name="registration" sname="registration" fname="Registration">
+    <insert>
+      <begin>
+  s_decoded.i_additional_length = 0;</begin>
+    </insert>
+    <integer name="i_format_identifier" bitcount="32" />
+  </descriptor>
+
+  <descriptor name="data stream alignment" sname="ds_alignment" fname="DSAlignment">
+    <integer name="i_alignment_type" bitcount="8" />
+  </descriptor>
+
+  <descriptor name="target background grid" sname="target_bg_grid" fname="TargetBgGrid">
+    <integer name="i_horizontal_size" bitcount="14" />
+    <integer name="i_vertical_size" bitcount="14" />
+    <integer name="i_pel_aspect_ratio" bitcount="4" />
+  </descriptor>
+
+  <descriptor name="video window" sname="vwindow" fname="VWindow">
+    <integer name="i_horizontal_offset" bitcount="14" />
+    <integer name="i_vertical_offset" bitcount="14" />
+    <integer name="i_window_priority" bitcount="4" />
+  </descriptor>
+
+  <descriptor name="conditional access" sname="ca" fname="CA">
+    <insert>
+      <begin>
+  s_decoded.i_private_length = 0;</begin>
+    </insert>
+    <integer name="i_ca_system_id" bitcount="16" />
+    <integer name="i_ca_pid" bitcount="13" />
+  </descriptor>
+
+  <descriptor name="ISO 639 language" sname="iso639" fname="ISO639">
+    <insert>
+      <begin>
+  s_decoded.i_code_count = 0;</begin>
+    </insert>
+    <integer name="i_audio_type" bitcount="8" />
+  </descriptor>
+</dr>

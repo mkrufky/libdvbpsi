@@ -336,6 +336,9 @@ doc-dummy:
 doc: doc-dummy
 	$(MAKE) -C doc doc
 
+test_dr.c:
+	$(MAKE) -C misc test_dr.c
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
