@@ -16,6 +16,8 @@ gen_pmt_LDFLAGS = -L../src -ldvbpsi
 test_dr_SOURCES = test_dr.c
 test_dr_LDFLAGS = -L../src -ldvbpsi
 
+noinst_HEADERS = test_dr.h
+
 EXTRA_DIST=dr.dtd dr.xml dr.xsl
 
 test_dr.c:

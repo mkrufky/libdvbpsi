@@ -2,6 +2,50 @@
 # ChangeLog for libsvbpsi #
 #=========================#
 
+0.1.1
+Sat, 18 May 2002 13:30:44 +0200
+  * src/descriptor.h, src/descriptor.c: added a p_decoded field to the
+    dvbpsi_descriptor_s structure.
+  * src/descriptor.h, src/descriptor.c, src/tables/pmt.c: added an 's' to the
+    dvbpsi_DeleteDescriptors function.
+  * src/descriptors/dr_02.h, src/descriptors/dr_02.c: MPEG2 "video stream"
+    descriptor decoder and generator.
+  * src/descriptors/dr_03.h, src/descriptors/dr_03.c: MPEG2 "audio stream"
+    descriptor decoder and generator.
+  * src/descriptors/dr_04.h, src/descriptors/dr_04.c: MPEG2 "hierarchy"
+    descriptor decoder and generator.
+  * src/descriptors/dr_05.h, src/descriptors/dr_05.c: MPEG2 "registration"
+    descriptor decoder and generator.
+  * src/descriptors/dr_06.h, src/descriptors/dr_06.c: MPEG2 "data stream
+    alignment" descriptor decoder and generator.
+  * src/descriptors/dr_07.h, src/descriptors/dr_07.c: MPEG2 "target background
+    grid" descriptor decoder and generator.
+  * src/descriptors/dr_08.h, src/descriptors/dr_08.c: MPEG2 "video window"
+    descriptor decoder and generator.
+  * src/descriptors/dr_09.h, src/descriptors/dr_09.c: MPEG2 "conditional
+    access" descriptor decoder and generator.
+  * src/descriptors/dr_0a.h, src/descriptors/dr_0a.c: MPEG2 "ISO 639 language"
+    descriptor decoder and generator.
+  * src/descriptors/dr_0b.h, src/descriptors/dr_0b.c: MPEG2 "system clock"
+    descriptor decoder and generator.
+  * src/descriptors/dr_0c.h, src/descriptors/dr_0c.c: MPEG2 "multiplex buffer
+    utilization" descriptor decoder and generator.
+  * src/descriptors/dr_0d.h, src/descriptors/dr_0d.c: MPEG2 "copyright"
+    descriptor decoder and generator.
+  * src/descriptors/dr_0e.h, src/descriptors/dr_0e.c: MPEG2 "maximum bitrate"
+    descriptor decoder and generator.
+  * src/descriptors/dr_0f.h, src/descriptors/dr_0f.c: MPEG2 "private data
+    indicator" descriptor decoder and generator.
+  * src/descriptors/dr.h: gathers all dr_*.h headers.
+  * misc/dr.xml: xml brief description of each descriptor to generate
+    "misc/test_dr.c".
+  * misc/dr.dtd: DTD against which misc/dr.xml validates.
+  * misc/dr.xsl: stylesheet used to generate "misc/test_dr.c".
+  * misc/test_dr.c: generated file.
+  * misc/test_dr.h: macros used by misc/test_dr.c.
+  * doc/doxygen.cfg: up to date documentation configuration.
+  * configure, configure.in: fixed MacOS X compilation.
+
 0.1.0
 Wed,  3 Apr 2002 01:42:12 +0200
 

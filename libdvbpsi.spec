@@ -1,7 +1,7 @@
 %define name		libdvbpsi
-%define version		0.1.0
+%define version		0.1.1
 %define release		1
-%define major		0
+%define major		1
 %define lib_name	%{name}%{major}
 
 Summary:	A library for decoding and generating MPEG 2 and DVB PSI sections.
@@ -78,6 +78,9 @@ rm -rf %buildroot
 %{_includedir}/*
 
 %changelog
+* Sat May 18 2002 Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+- 0.1.1 release.
+
 * Mon Apr 8 2002 Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
 - split into two separate packages.
 
