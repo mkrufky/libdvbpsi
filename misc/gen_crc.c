@@ -2,7 +2,7 @@
  * gen_crc.c: CRC_32 table generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: gen_crc.c,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: gen_crc.c,v 1.2 2002/06/02 23:04:08 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -25,8 +25,14 @@
  *****************************************************************************/
 
 
+#include "config.h"
+
 #include <stdio.h>
+#if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
+#elif defined(HAVE_STDINT_H)
+#include <stdint.h>
+#endif
 
 
 /*****************************************************************************
