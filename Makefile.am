@@ -1,8 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = src examples misc doc debian
+SUBDIRS = src examples misc
+DIST_SUBDIRS = doc debian
 
-EXTRA_DIST=libdvbpsi.spec
+EXTRA_DIST = libdvbpsi.spec bootstrap
 
 AUTOMAKE_OPTIONS = foreign dist-bzip2 subdir-objects
 

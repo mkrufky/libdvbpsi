@@ -5,6 +5,12 @@
 0.1.2
 **
 
+  * Makefile.am: added bootstrap to the distribution.
+  * bootstrap: we remove generated files before running the autotools, to
+    make sure we get the latest version.
+  * bootstrap, Makefile.am: moved the --foreign flag to Makefile.am.
+  * src/Makefile.am: renamed an unused _SOURCES variable to something
+    automake will not choke on.
   * configure.ac, bootstrap: removed redundant stuff from CVS such as the
     Makefile.in files, configure and config.*, and added a bootstrap script
     to generate them; renamed configure.in to configure.ac and moved config.h
