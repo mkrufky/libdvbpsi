@@ -1,8 +1,7 @@
 /*****************************************************************************
- * dvbpsi.h: main header
- *----------------------------------------------------------------------------
+ * dvbpsi.h
  * (c)2001-2002 VideoLAN
- * $Id: dvbpsi.h,v 1.4 2002/03/25 21:00:50 bozo Exp $
+ * $Id: dvbpsi.h,v 1.5 2002/03/27 20:02:43 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -20,9 +19,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- *----------------------------------------------------------------------------
- *
  *****************************************************************************/
+
+/*!
+ * \file <dvbpsi.h>
+ * \author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ * \brief Application interface for all DVB/PSI decoders.
+ *
+ * Application interface for all DVB/PSI decoders. The generic decoder
+ * structure is public so that external decoders are allowed.
+ */
 
 #ifndef _DVBPSI_DVBPSI_H_
 #define _DVBPSI_DVBPSI_H_
@@ -38,19 +44,25 @@ extern "C" {
 /*****************************************************************************
  * dvbpsi_handle
  *****************************************************************************/
-/*!Decoder abstration.
- *****************************************************************************/
+/*!
+ * \typedef struct dvbpsi_decoder_s * dvbpsi_handle
+ * \brief Decoder abstration.
+ */
 typedef struct dvbpsi_decoder_s * dvbpsi_handle;
 
 
 /*****************************************************************************
  * dvbpsi_PushPacket
  *****************************************************************************/
-/*!Injection of a TS packet into a PSI decoder.
+/*!
+ * \fn void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
+ * \brief Injection of a TS packet into a PSI decoder.
  * \param h_dvbpsi handle to the decoder
  * \param p_data pointer to a 188 bytes playload of a TS packet
  * \return nothing.
- *****************************************************************************/
+ *
+ * Injection of a TS packet into a PSI decoder.
+ */
 void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data);
 
 
@@ -59,13 +71,21 @@ void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data);
  * shouldn't be used for any other purpose.
  *****************************************************************************/
 
+/*!
+ * \typedef struct dvbpsi_psi_section_s dvbpsi_psi_section_t
+ * \brief dvbpsi_psi_section_t type definition.
+ */
 typedef struct dvbpsi_psi_section_s dvbpsi_psi_section_t;
+
 
 /*****************************************************************************
  * dvbpsi_callback
  *****************************************************************************/
-/*!Callback type definition.
- *****************************************************************************/
+/*!
+ * \typedef void (* dvbpsi_callback)(dvbpsi_handle p_decoder,
+                                     dvbpsi_psi_section_t* p_section)
+ * \brief Callback type definition.
+ */
 typedef void (* dvbpsi_callback)(dvbpsi_handle p_decoder,
                                  dvbpsi_psi_section_t* p_section);
 
@@ -73,22 +93,38 @@ typedef void (* dvbpsi_callback)(dvbpsi_handle p_decoder,
 /*****************************************************************************
  * dvbpsi_decoder_t
  *****************************************************************************/
-/*!PSI decoder.
- *****************************************************************************/
+/*!
+ * \struct dvbpsi_decoder_s
+ * \brief PSI decoder structure.
+ *
+ * This structure shouldn't be used but if you want to write an external
+ * decoder.
+ */
+/*!
+ * \typedef struct dvbpsi_decoder_s dvbpsi_decoder_t
+ * \brief dvbpsi_decoder_t type definition.
+ */
 typedef struct dvbpsi_decoder_s
 {
-  dvbpsi_callback               pf_callback;
+  dvbpsi_callback               pf_callback;            /*!< PSI decoder's
+                                                             callback */
 
-  void *                        p_private_decoder;
+  void *                        p_private_decoder;      /*!< specific
+                                                             decoder */
 
-  int                           i_section_max_size;
+  int                           i_section_max_size;     /*!< Max size of a
+                                                             section for this
+                                                             decoder */
 
-  uint8_t                       i_continuity_counter;
-  int                           b_discontinuity;
+  uint8_t                       i_continuity_counter;   /*!< Continuity
+                                                             counter */
+  int                           b_discontinuity;        /*!< Discontinuity
+                                                             flag */
 
-  dvbpsi_psi_section_t *        p_current_section;
-  int                           i_need;
-  int                           b_complete_header;
+  dvbpsi_psi_section_t *        p_current_section;      /*!< Current section */
+  int                           i_need;                 /*!< Bytes needed */
+  int                           b_complete_header;      /*!< Flag for header
+                                                             completion */
 
 } dvbpsi_decoder_t;
 

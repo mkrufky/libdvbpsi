@@ -1,8 +1,7 @@
 /*****************************************************************************
- * pat.h: PAT structures
- *----------------------------------------------------------------------------
+ * pat.h
  * (c)2001-2002 VideoLAN
- * $Id: pat.h,v 1.3 2002/03/25 21:00:50 bozo Exp $
+ * $Id: pat.h,v 1.4 2002/03/27 20:02:43 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -20,9 +19,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- *----------------------------------------------------------------------------
- *
  *****************************************************************************/
+
+/*!
+ * \file <pat.h>
+ * \author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ * \brief Application interface for the PAT decoder and the PAT generator.
+ *
+ * Application interface for the PAT decoder decoder and the PAT generator.
+ * New decoded PAT tables are sent by callback to the application. If a table
+ * wasn't active (b_current_next == 0) and the next is the same but active
+ * (b_current_next == 1) then the program list is empty and should be
+ * caught from the previous structure.
+ */
 
 #ifndef _DVBPSI_PAT_H_
 #define _DVBPSI_PAT_H_
@@ -35,9 +44,17 @@ extern "C" {
 /*****************************************************************************
  * dvbpsi_pat_program_t
  *****************************************************************************/
-/*!This structure is used to store a decoded PAT program.
+/*!
+ * \struct dvbpsi_pat_program_s
+ * \brief PAT program structure.
+ *
+ * This structure is used to store a decoded PAT program.
  * (ISO/IEC 13818-1 section 2.4.4.3).
- *****************************************************************************/
+ */
+/*!
+ * \typedef struct dvbpsi_pat_program_s dvbpsi_pat_program_t
+ * \brief dvbpsi_pat_program_t type definition.
+ */
 typedef struct dvbpsi_pat_program_s
 {
   uint16_t                      i_number;               /*!< program_number */
@@ -52,9 +69,17 @@ typedef struct dvbpsi_pat_program_s
 /*****************************************************************************
  * dvbpsi_pat_t
  *****************************************************************************/
-/*!This structure is used to store a decoded PAT.
+/*!
+ * \struct dvbpsi_pat_s
+ * \brief PAT structure.
+ *
+ * This structure is used to store a decoded PAT.
  * (ISO/IEC 13818-1 section 2.4.4.3).
- *****************************************************************************/
+ */
+/*!
+ * \typedef struct dvbpsi_pat_s dvbpsi_pat_t
+ * \brief dvbpsi_pat_t type definition.
+ */
 typedef struct dvbpsi_pat_s
 {
   uint16_t                  i_ts_id;            /*!< transport_stream_id */
@@ -69,19 +94,25 @@ typedef struct dvbpsi_pat_s
 /*****************************************************************************
  * dvbpsi_pat_callback
  *****************************************************************************/
-/*!Callback type definition.
- *****************************************************************************/
+/*!
+ * \typedef void (* dvbpsi_pat_callback)(void* p_cb_data,
+                                         dvbpsi_pat_t* p_new_pat)
+ * \brief Callback type definition.
+ */
 typedef void (* dvbpsi_pat_callback)(void* p_cb_data, dvbpsi_pat_t* p_new_pat);
 
 
 /*****************************************************************************
  * dvbpsi_AttachPAT
  *****************************************************************************/
-/*!Initialize a PAT decoder and return a handle on it.
+/*!
+ * \fn dvbpsi_handle dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback,
+                                      void* p_cb_data)
+ * \brief Creation and initialization of a PAT decoder.
  * \param pf_callback function to call back on new PAT
  * \param p_cb_data private data given in argument to the callback
  * \return a pointer to the decoder for future calls.
- *****************************************************************************/
+ */
 dvbpsi_handle dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback,
                                void* p_cb_data);
 
@@ -89,33 +120,42 @@ dvbpsi_handle dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback,
 /*****************************************************************************
  * dvbpsi_DetachPAT
  *****************************************************************************/
-/*!Close a PAT decoder. The handle isn't valid any more.
+/*!
+ * \fn void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi)
+ * \brief Destroy a PAT decoder.
  * \param h_dvbpsi handle to the decoder
  * \return nothing.
- *****************************************************************************/
+ *
+ * The handle isn't valid any more.
+ */
 void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi);
 
 
 /*****************************************************************************
  * dvbpsi_InitPAT/dvbpsi_NewPAT
  *****************************************************************************/
-/*!Initialize a user-allocated dvbpsi_pat_t structure.
- * \param p_pat PAT structure
+/*!
+ * \fn void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id,
+                           uint8_t i_version, int b_current_next)
+ * \brief Initialize a user-allocated dvbpsi_pat_t structure.
+ * \param p_pat pointer to the PAT structure
  * \param i_ts_id transport stream ID
  * \param i_version PAT version
  * \param b_current_next current next indicator
  * \return nothing.
- *****************************************************************************/
+ */
 void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
                     int b_current_next);
 
-/*!Allocate and initialize a new dvbpsi_pat_t structure.
- * \param p_pat PAT structure
+/*!
+ * \def dvbpsi_NewPAT(p_pat, i_ts_id, i_version, b_current_next)
+ * \brief Allocate and initialize a new dvbpsi_pat_t structure.
+ * \param p_pat pointer to the PAT structure
  * \param i_ts_id transport stream ID
  * \param i_version PAT version
  * \param b_current_next current next indicator
  * \return nothing.
- *****************************************************************************/
+ */
 #define dvbpsi_NewPAT(p_pat, i_ts_id, i_version, b_current_next)        \
   p_pat = (dvbpsi_pat_t*)malloc(sizeof(dvbpsi_pat_t));                  \
   if(p_pat != NULL)                                                     \
@@ -125,16 +165,20 @@ void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
 /*****************************************************************************
  * dvbpsi_EmptyPAT/dvbpsi_DeletePAT
  *****************************************************************************/
-/*!Clean a dvbpsi_pat_t structure.
- * \param p_pat PAT structure
+/*!
+ * \fn void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat)
+ * \brief Clean a dvbpsi_pat_t structure.
+ * \param p_pat pointer to the PAT structure
  * \return nothing.
- *****************************************************************************/
+ */
 void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat);
 
-/*!Clean and free a dvbpsi_pat_t structure.
- * \param p_pat PAT structure
+/*!
+ * \def dvbpsi_DeletePAT(p_pat)
+ * \brief Clean and free a dvbpsi_pat_t structure.
+ * \param p_pat pointer to the PAT structure
  * \return nothing.
- *****************************************************************************/
+ */
 #define dvbpsi_DeletePAT(p_pat)                                         \
   dvbpsi_EmptyPAT(p_pat);                                               \
   free(p_pat);
@@ -143,24 +187,33 @@ void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat);
 /*****************************************************************************
  * dvbpsi_PATAddProgram
  *****************************************************************************/
-/*!Add a program at the end of the PAT.
- * \param p_pat PAT structure
+/*!
+ * \fn dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
+                                                  uint16_t i_number,
+                                                  uint16_t i_pid)
+ * \brief Add a program at the end of the PAT.
+ * \param p_pat pointer to the PAT structure
  * \param i_number program number
  * \param i_pid PID of the NIT/PMT
  * \return a pointer to the added program.
- *****************************************************************************/
+ */
 dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
                                            uint16_t i_number, uint16_t i_pid);
 
 /*****************************************************************************
  * dvbpsi_GenPATSections
  *****************************************************************************/
-/*!Generate PAT sections based on the dvbpsi_pat_t structure.
- * \param p_pat PAT structure
+/*!
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
+                                                   int i_max_pps);
+ * \brief PAT generator.
+ * \param p_pat pointer to the PAT structure
  * \param i_max_pps limitation of the number of program in each section
  * (max: 253).
  * \return a pointer to the list of generated PSI sections.
- *****************************************************************************/
+ *
+ * Generate PAT sections based on the dvbpsi_pat_t structure.
+ */
 dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
                                             int i_max_pps);
 

@@ -1,0 +1,30 @@
+/*! \page Index libdvbpsi's documentation
+
+\author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+
+<h2>Preface</h2>
+
+<p>The <em>libdvbpsi</em> is a library developed by the <a
+href="http://www.videolan.org/">VideoLAN</a> team. This document
+describes how to use it and the "C" API.</p>
+
+<h2>What is libdvbpsi ?</h2>
+
+<p><em>libdvbpsi</em> is a set of tools which allows to decode and generate all the Program specific Information (<em>PSI</em>) present in a MPEG2 TS or a DVB stream. The two keywords are <em>portability</em> and <em>simplicity</em></p>
+
+<h2>Currently supported tables</h2>
+
+<ul>
+  <li>Program Association Table (<em>PAT</em>, MPEG2)</li>
+  <li>Program Map Table (<em>PMT</em>, MPEG2)</li>
+</ul>
+
+<h2>Usage</h2>
+
+<ul>
+  <li>\ref structure</li>
+  <li>\ref usage</li>
+  <li>\ref newdec</li>
+</ul>
+
+*/

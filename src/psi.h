@@ -1,8 +1,7 @@
 /*****************************************************************************
- * psi.h: common PSI structures
- *----------------------------------------------------------------------------
+ * psi.h
  * (c)2001-2002 VideoLAN
- * $Id: psi.h,v 1.4 2002/03/25 21:00:50 bozo Exp $
+ * $Id: psi.h,v 1.5 2002/03/27 20:02:43 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -20,9 +19,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- *----------------------------------------------------------------------------
- *
  *****************************************************************************/
+
+/*!
+ * \file <psi.h>
+ * \author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ * \brief Common PSI tools.
+ *
+ * PSI section structure and its Manipulation tools.
+ */
 
 #ifndef _DVBPSI_PSI_H_
 #define _DVBPSI_PSI_H_
@@ -35,9 +40,32 @@ extern "C" {
 /*****************************************************************************
  * dvbpsi_psi_section_t
  *****************************************************************************/
-/*!This structure is used to store a PSI section. The common information are
+/*!
+ * \struct dvbpsi_psi_section_s
+ * \brief PSI section structure.
+ *
+ * This structure is used to store a PSI section. The common information are
  * decoded (ISO/IEC 13818-1 section 2.4.4.10).
- *****************************************************************************/
+ *
+ * dvbpsi_psi_section_s::p_data stores the complete section including the
+ * header.
+ *
+ * When dvbpsi_psi_section_s::b_syntax_indicator == 0,
+ * dvbpsi_psi_section_s::p_payload_start points immediately after the
+ * section_length field and dvbpsi_psi_section_s::p_payload_end points
+ * immediately after the end of the section (don't try to access this byte).
+ *
+ * When dvbpsi_psi_section_s::b_syntax_indicator != 0,
+ * dvbpsi_psi_section_s::p_payload_start points immediately after the
+ * last_section_number field and dvbpsi_psi_section_s::p_payload_end points to
+ * the first byte of the CRC_32 field.
+ *
+ * When dvbpsi_psi_section_s::b_syntax_indicator == 0
+ * dvbpsi_psi_section_s::i_extension, dvbpsi_psi_section_s::i_version,
+ * dvbpsi_psi_section_s::b_current_next, dvbpsi_psi_section_s::i_number,
+ * dvbpsi_psi_section_s::i_last_number, and dvbpsi_psi_section_s::i_crc are
+ * undifined.
+ */
 struct dvbpsi_psi_section_s
 {
   /* non-specific section data */
@@ -74,40 +102,50 @@ struct dvbpsi_psi_section_s
 /*****************************************************************************
  * dvbpsi_NewPSISection
  *****************************************************************************/
-/*!Creation of a new dvbpsi_psi_section_t structure.
+/*!
+ * \fn dvbpsi_psi_section_t * dvbpsi_NewPSISection(int i_max_size)
+ * \brief Creation of a new dvbpsi_psi_section_t structure.
  * \param i_max_size max size in bytes of the section
  * \return a pointer to the new PSI section structure.
- *****************************************************************************/
+ */
 dvbpsi_psi_section_t * dvbpsi_NewPSISection(int i_max_size);
 
 
 /*****************************************************************************
  * dvbpsi_DeletePSISections
  *****************************************************************************/
-/*!Destruction of a dvbpsi_psi_section_t structure.
+/*!
+ * \fn void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section)
+ * \brief Destruction of a dvbpsi_psi_section_t structure.
  * \param p_section pointer to the first PSI section structure
  * \return nothing.
- *****************************************************************************/
+ */
 void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section);
 
 
 /*****************************************************************************
  * dvbpsi_ValidPSISection
  *****************************************************************************/
-/*!Check the CRC_32 if the section has b_syntax_indicator set.
+/*!
+ * \fn int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
+ * \brief Validity check of a PSI section.
  * \param p_section pointer to the PSI section structure
  * \return boolean value (0 if the section is not valid).
- *****************************************************************************/
+ *
+ * Check the CRC_32 if the section has b_syntax_indicator set.
+ */
 int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
 
 
 /*****************************************************************************
  * dvbpsi_BuildPSISection
  *****************************************************************************/
-/*!Build the section based on the information in the structure.
+/*!
+ * \fn void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section)
+ * \brief Build a valid section based on the information in the structure.
  * \param p_section pointer to the PSI section structure
  * \return nothing.
- *****************************************************************************/
+ */
 void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section);
 
 

@@ -1,8 +1,7 @@
 /*****************************************************************************
- * descriptor.h: common descriptor structures
- *----------------------------------------------------------------------------
+ * descriptor.h
  * (c)2001-2002 VideoLAN
- * $Id: descriptor.h,v 1.3 2002/03/25 21:00:50 bozo Exp $
+ * $Id: descriptor.h,v 1.4 2002/03/27 20:02:43 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -20,9 +19,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- *----------------------------------------------------------------------------
- *
  *****************************************************************************/
+
+/*!
+ * \file <descriptor.h>
+ * \author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ * \brief Common descriptor tools.
+ *
+ * Descriptor structure and its Manipulation tools.
+ */
 
 #ifndef _DVBPSI_DESCRIPTOR_H_
 #define _DVBPSI_DESCRIPTOR_H_
@@ -35,9 +40,17 @@ extern "C" {
 /*****************************************************************************
  * dvbpsi_descriptor_t
  *****************************************************************************/
-/*!This structure is used to store a descriptor.
+/*!
+ * \struct dvbpsi_descriptor_s
+ * \brief Descriptor structure.
+ *
+ * This structure is used to store a descriptor.
  * (ISO/IEC 13818-1 section 2.6).
- *****************************************************************************/
+ */
+/*!
+ * \typedef struct dvbpsi_descriptor_s dvbpsi_descriptor_t
+ * \brief dvbpsi_descriptor_t type definition.
+ */
 typedef struct dvbpsi_descriptor_s
 {
   uint8_t                       i_tag;          /*!< descriptor_tag */
@@ -54,12 +67,16 @@ typedef struct dvbpsi_descriptor_s
 /*****************************************************************************
  * dvbpsi_NewDescriptor
  *****************************************************************************/
-/*!Creation of a new dvbpsi_descriptor_t structure.
+/*!
+ * \fn dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag,
+                                                 uint8_t i_length,
+                                                 uint8_t* p_data)
+ * \brief Creation of a new dvbpsi_descriptor_t structure.
  * \param i_tag descriptor's tag
  * \param i_length descriptor's length
  * \param p_data descriptor's data
  * \return a pointer to the descriptor.
- *****************************************************************************/
+ */
 dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
                                           uint8_t* p_data);
 
@@ -67,10 +84,12 @@ dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
 /*****************************************************************************
  * dvbpsi_DeleteDescriptor
  *****************************************************************************/
-/*!Destruction of a dvbpsi_descriptor_t structure.
+/*!
+ * \fn void dvbpsi_DeleteDescriptor(dvbpsi_descriptor_t* p_descriptor)
+ * \brief Destruction of a dvbpsi_descriptor_t structure.
  * \param p_descriptor pointer to the descriptor
  * \return nothing.
- *****************************************************************************/
+ */
 void dvbpsi_DeleteDescriptor(dvbpsi_descriptor_t* p_descriptor);
 
 
