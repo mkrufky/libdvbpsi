@@ -2,7 +2,7 @@
  * dvbpsi.h: main header
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: dvbpsi.h,v 1.3 2002/03/15 12:16:01 bozo Exp $
+ * $Id: dvbpsi.h,v 1.4 2002/03/25 21:00:50 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -37,16 +37,19 @@ extern "C" {
 
 /*****************************************************************************
  * dvbpsi_handle
- *****************************************************************************
- * Decoder abstration.
+ *****************************************************************************/
+/*!Decoder abstration.
  *****************************************************************************/
 typedef struct dvbpsi_decoder_s * dvbpsi_handle;
 
 
 /*****************************************************************************
  * dvbpsi_PushPacket
- *****************************************************************************
- * Injection of a TS packet into a PSI decoder.
+ *****************************************************************************/
+/*!Injection of a TS packet into a PSI decoder.
+ * \param h_dvbpsi handle to the decoder
+ * \param p_data pointer to a 188 bytes playload of a TS packet
+ * \return nothing.
  *****************************************************************************/
 void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data);
 
@@ -60,8 +63,8 @@ typedef struct dvbpsi_psi_section_s dvbpsi_psi_section_t;
 
 /*****************************************************************************
  * dvbpsi_callback
- *****************************************************************************
- * Callback type definition.
+ *****************************************************************************/
+/*!Callback type definition.
  *****************************************************************************/
 typedef void (* dvbpsi_callback)(dvbpsi_handle p_decoder,
                                  dvbpsi_psi_section_t* p_section);
@@ -69,8 +72,8 @@ typedef void (* dvbpsi_callback)(dvbpsi_handle p_decoder,
 
 /*****************************************************************************
  * dvbpsi_decoder_t
- *****************************************************************************
- * PSI decoder.
+ *****************************************************************************/
+/*!PSI decoder.
  *****************************************************************************/
 typedef struct dvbpsi_decoder_s
 {

@@ -2,7 +2,7 @@
  * psi.h: common PSI structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: psi.h,v 1.3 2002/03/15 12:16:01 bozo Exp $
+ * $Id: psi.h,v 1.4 2002/03/25 21:00:50 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -34,70 +34,79 @@ extern "C" {
 
 /*****************************************************************************
  * dvbpsi_psi_section_t
- *****************************************************************************
- * This structure is used to store a PSI section. The common information are
+ *****************************************************************************/
+/*!This structure is used to store a PSI section. The common information are
  * decoded (ISO/IEC 13818-1 section 2.4.4.10).
  *****************************************************************************/
 struct dvbpsi_psi_section_s
 {
   /* non-specific section data */
-  uint8_t       i_table_id;             /* table_id */
-  int           b_syntax_indicator;     /* section_syntax_indicator */
-  int           b_private_indicator;    /* private_indicator */
-  uint16_t      i_length;               /* section_length */
+  uint8_t       i_table_id;             /*!< table_id */
+  int           b_syntax_indicator;     /*!< section_syntax_indicator */
+  int           b_private_indicator;    /*!< private_indicator */
+  uint16_t      i_length;               /*!< section_length */
 
   /* used if b_syntax_indicator is true */
-  uint16_t      i_extension;            /* table_id_extension */
-                                        /* transport_stream_id for a
-                                           PAT section */
-  uint8_t       i_version;              /* version_number */
-  int           b_current_next;         /* current_next_indicator */
-  uint8_t       i_number;               /* section_number */
-  uint8_t       i_last_number;          /* last_section_number */
+  uint16_t      i_extension;            /*!< table_id_extension */
+                                        /*!< transport_stream_id for a
+                                             PAT section */
+  uint8_t       i_version;              /*!< version_number */
+  int           b_current_next;         /*!< current_next_indicator */
+  uint8_t       i_number;               /*!< section_number */
+  uint8_t       i_last_number;          /*!< last_section_number */
 
   /* non-specific section data */
   /* the content is table-specific */
-  uint8_t *     p_data;                 /* complete section */
-  uint8_t *     p_payload_start;        /* payload start */
-  uint8_t *     p_payload_end;          /* payload end */
+  uint8_t *     p_data;                 /*!< complete section */
+  uint8_t *     p_payload_start;        /*!< payload start */
+  uint8_t *     p_payload_end;          /*!< payload end */
 
   /* used if b_syntax_indicator is true */
-  uint32_t      i_crc;                  /* CRC_32 */
+  uint32_t      i_crc;                  /*!< CRC_32 */
 
   /* list handling */
-  struct dvbpsi_psi_section_s *         p_next;
+  struct dvbpsi_psi_section_s *         p_next;         /*!< next element of
+                                                             the list */
 
 };
 
 
 /*****************************************************************************
  * dvbpsi_NewPSISection
- *****************************************************************************
- * Creation of a new dvbpsi_psi_section_t structure.
+ *****************************************************************************/
+/*!Creation of a new dvbpsi_psi_section_t structure.
+ * \param i_max_size max size in bytes of the section
+ * \return a pointer to the new PSI section structure.
  *****************************************************************************/
 dvbpsi_psi_section_t * dvbpsi_NewPSISection(int i_max_size);
 
 
 /*****************************************************************************
  * dvbpsi_DeletePSISections
- *****************************************************************************
- * Destruction of a dvbpsi_psi_section_t structure.
+ *****************************************************************************/
+/*!Destruction of a dvbpsi_psi_section_t structure.
+ * \param p_section pointer to the first PSI section structure
+ * \return nothing.
  *****************************************************************************/
 void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section);
 
 
 /*****************************************************************************
  * dvbpsi_ValidPSISection
- *****************************************************************************
- * Check the CRC_32 if the section has b_syntax_indicator set.
+ *****************************************************************************/
+/*!Check the CRC_32 if the section has b_syntax_indicator set.
+ * \param p_section pointer to the PSI section structure
+ * \return boolean value (0 if the section is not valid).
  *****************************************************************************/
 int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
 
 
 /*****************************************************************************
  * dvbpsi_BuildPSISection
- *****************************************************************************
- * Build the section based on the information in the structure.
+ *****************************************************************************/
+/*!Build the section based on the information in the structure.
+ * \param p_section pointer to the PSI section structure
+ * \return nothing.
  *****************************************************************************/
 void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section);
 
