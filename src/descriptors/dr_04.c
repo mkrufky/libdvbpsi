@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_04.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_04.c,v 1.2 2002/10/07 14:15:14 sam Exp $
+ * $Id: dr_04.c,v 1.3 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -74,6 +74,7 @@ dvbpsi_hierarchy_dr_t * dvbpsi_DecodeHierarchyDr(
     DVBPSI_ERROR_ARG("dr_04 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
+    return NULL;
   }
 
   p_decoded->i_h_type = p_descriptor->p_data[0] & 0x0f;

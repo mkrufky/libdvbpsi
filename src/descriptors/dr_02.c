@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_02.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_02.c,v 1.6 2002/10/07 14:15:14 sam Exp $
+ * $Id: dr_02.c,v 1.7 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -76,6 +76,8 @@ dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor)
     DVBPSI_ERROR_ARG("dr_02 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
+
+    return NULL;
   }
 
   p_decoded->b_multiple_frame_rate = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;

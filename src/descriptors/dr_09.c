@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_09.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_09.c,v 1.4 2002/10/07 14:15:14 sam Exp $
+ * $Id: dr_09.c,v 1.5 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -73,6 +73,7 @@ dvbpsi_ca_dr_t * dvbpsi_DecodeCADr(dvbpsi_descriptor_t * p_descriptor)
     DVBPSI_ERROR_ARG("dr_09 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
+    return NULL;
   }
 
   p_decoded->i_ca_system_id =   ((uint16_t)(p_descriptor->p_data[0]) << 8)

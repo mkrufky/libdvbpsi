@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_08.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_08.c,v 1.3 2002/10/07 14:15:14 sam Exp $
+ * $Id: dr_08.c,v 1.4 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -73,6 +73,7 @@ dvbpsi_vwindow_dr_t * dvbpsi_DecodeVWindowDr(dvbpsi_descriptor_t * p_descriptor)
     DVBPSI_ERROR_ARG("dr_08 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
+    return NULL;
   }
 
   p_decoded->i_horizontal_offset =   ((uint16_t)(p_descriptor->p_data[0]) << 6)

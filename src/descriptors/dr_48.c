@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_48.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_48.c,v 1.1 2002/12/11 13:14:42 jobi Exp $
+ * $Id: dr_48.c,v 1.2 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -76,6 +76,7 @@ dvbpsi_service_dr_t * dvbpsi_DecodeServiceDr(
     DVBPSI_ERROR_ARG("dr_07 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
+    return NULL;
   }
 
   p_decoded->i_service_type = p_descriptor->p_data[0];
