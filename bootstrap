@@ -1,0 +1,11 @@
+#! /bin/sh
+set -x
+
+aclocal
+libtoolize --force --copy
+autoheader
+#add --include-deps if you want to bootstrap with any other compiler than gcc
+#automake --foreign --add-missing --copy --include-deps
+automake --foreign --add-missing --copy
+autoconf
+rm -f config.cache

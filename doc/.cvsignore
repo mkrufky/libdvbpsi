@@ -1,3 +1,4 @@
 Makefile
+Makefile.in
 doxygen
 decoder.png

@@ -2,7 +2,7 @@
  * pmt.c: PMT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.c,v 1.6 2002/10/07 14:15:14 sam Exp $
+ * $Id: pmt.c,v 1.7 2002/10/10 09:27:02 sam Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -37,10 +37,10 @@
 #include <stdint.h>
 #endif
 
-#include "dvbpsi.h"
-#include "dvbpsi_private.h"
-#include "psi.h"
-#include "descriptor.h"
+#include "../dvbpsi.h"
+#include "../dvbpsi_private.h"
+#include "../psi.h"
+#include "../descriptor.h"
 #include "pmt.h"
 #include "pmt_private.h"
 

@@ -1,6 +1,7 @@
 .deps
 .libs
 Makefile
+Makefile.in
 gen_crc
 gen_pat
 gen_pmt

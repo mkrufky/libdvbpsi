@@ -2,7 +2,7 @@
  * pat.c: PAT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pat.c,v 1.3 2002/10/07 14:15:14 sam Exp $
+ * $Id: pat.c,v 1.4 2002/10/10 09:27:02 sam Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -36,9 +36,9 @@
 #include <stdint.h>
 #endif
 
-#include "dvbpsi.h"
-#include "dvbpsi_private.h"
-#include "psi.h"
+#include "../dvbpsi.h"
+#include "../dvbpsi_private.h"
+#include "../psi.h"
 #include "pat.h"
 #include "pat_private.h"
 

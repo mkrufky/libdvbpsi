@@ -1,12 +1,19 @@
 #=========================#
-# ChangeLog for libsvbpsi #
+# ChangeLog for libdvbpsi #
 #=========================#
 
 HEAD
 
+  * configure.ac, bootstrap: removed redundant stuff from CVS such as the
+    Makefile.in files, configure and config.*, and added a bootstrap script
+    to generate them; renamed configure.in to configure.ac and moved config.h
+    to . because it's now the recommended practice.
   * src/dvbpsi.h: removed automatic inclusion of inttypes.h because it was
     too platform-dependent and led to lots of cross-compilation problems. Now
     the program using libdvbpsi has to make sure it is C99 compliant.
+  * configure.in, ltmain.sh: fixes for Solaris, mingw and Mac OS X.
+  * src/tables/pmt.c: fixed the PMT generator which used to add one PSI
+    section for one ES.
 
 0.1.1
 Sat, 18 May 2002 13:30:44 +0200

@@ -1,7 +1,9 @@
 .deps
 .libs
 Makefile
+Makefile.in
 config.h
+config.h.in
 *.lo
 *.la
 stamp-h
