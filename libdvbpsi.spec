@@ -2,7 +2,7 @@
 %define version		0.1.4
 %define release		1
 
-%define major		2
+%define major		3
 %define lib_name	%{name}%{major}
 
 %define redhat80 0
@@ -91,6 +91,9 @@ rm -rf %buildroot
 %{_includedir}/*
 
 %changelog
+* Fri Jan 2 2004 Sam Hocevar <sam@zoy.org>
+- 0.1.4 release.
+
 * Tue Jul 29 2003 Yves Duret <yves@zarb.org>
 - 0.1.3 release.
 

@@ -15,3 +15,8 @@ doc: doc-dummy
 test_dr.c:
 	$(MAKE) -C misc test_dr.c
 
+changelog:
+	cvs2cl --utc --hide-filenames --no-wrap -w --stdout -g -z9 | \
+	  sed -e 's/^[^0-9]/ /' -e 's/^  *$$//' -e 's/^ \* 	/ /g' | \
+	  grep -v '^ \*$$' | uniq >| ChangeLog
+
