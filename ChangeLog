@@ -1,436 +1,1138 @@
-2003-11-06 Thursday 17:41  sam
-
-   * configure.ac, src/Makefile.am:
-     + Set interface to 3:0:0.
-     + Set version number to 0.1.4.
-     + Use the autotools/ directory.
-   * debian/control:
-     + Set policy to 3.6.1.0.
-     + Renamed source package to libdvbpsi3.
-     + Removed the autotools-dev build dependency.
-
-2003-11-06 Thursday 16:20  nitrox
-
- . 0x59 (dvb subtitles) descriptor decoder
-   Work of Tristan Leteurtre <tristan.leteurtre@anevia.com>
-
-2003-11-06 Thursday 10:13  sam
-
-   * bootstrap: imported libdvdcss's bootstrap file.
-
-2003-09-23 Tuesday 13:04  tooney
-
-   . Memory leak fix
-     Courtesy of Johann Hanne <jhml@gmx.net>
-
-2003-09-16 Tuesday 18:43  asmax
-
- * fixed an unitialiazed pointer (thanks jonny ;)
-
-2003-07-30 Wednesday 10:14  sam
-
-   * debian/Makefile.am:
-     + Added debian/compat.
-     + Removed debian/*.dirs.
-
-2003-07-30 Wednesday 10:11  sam
-
-   * debian/rules: Don't rely on debian/*.dirs to create directories.
-
-2003-07-30 Wednesday 10:06  sam
-
-   * debian/control:
-     + Set policy to 3.6.0. No changes required.
-     + Set debhelper build-dependency to (>= 4.0) due to debian/compat.
-     + Renamed source package to libdvbpsi2.
-   * libdvbpsi.spec:
-     + Renamed source package to libdvbpsi2.
-
-2003-07-30 Wednesday 10:00  sam
-
-   * src/Makefile.am: Changed major number.
-   * configure.ac: Changed package name to libdvbpsi2.
-
-2003-07-28 Monday 23:24  gbazin
-
- * src/Makefile.am: include demux.h in the dist.
-
-2003-07-28 Monday 23:12  gbazin
-
- * ALL: bumped version number to 0.1.3
-
-2003-07-25 Friday 21:08  fenrir
-
-  * pmt.c : fixed my last commit.
-
-2003-07-25 Friday 20:20  fenrir
-
-  * all: fixed segfault with invalid/corrupted psi data.
-
-2003-02-02 Sunday 11:47  yves
-
- - updated URL again.
- - macros for redhat.
- - fixes here and here.
-
-2003-01-14 Tuesday 19:51  sam
-
-   * ./debian/control: fixed a typo (thanks jorge!).
-
-2002-12-13 Friday 13:06  yves
-
- corrected few things for sir rpmlint (uploaded in Mandrake).
-
-2002-12-13 Friday 09:54  yves
-
- update spec file:
-  - s#Copyright#License#
-  - include the libtool .la files.
-  - use macros.
-  - update URL: tag.
-
-2002-12-13 Friday 09:34  massiot
-
- Fixed a typo.
-
-2002-12-12 Thursday 10:19  jobi
-
-   * src/descriptors/*: fixed some typos
-   * misc/*: added tests on the new descriptors
-
-2002-12-11 Wednesday 13:14  jobi
-
-   * src/descriptors/*: added a few DVB descriptors decoder and generator
-     (Stuffing, Bouquet Name, Service Name)
-
-2002-12-11 Wednesday 13:04  jobi
-
-   * src/demux.*: DVB PSI tables demux, required since one PID channel
-     may contain different tables.
-   * src/tables/sdt*: SDT decoder (no generator yet)
-   * examples/decode_sdt.c: added SDT decoder example
-
-2002-12-02 Monday 12:59  sam
-
-   * ./bootstrap: automake 1.7 is accepted as well.
-   * ./bootstrap: we look for glibtoolize if libtoolize isn't present.
-
-2002-10-14 Monday 09:23  alexis
-
- Package Debian for Woody / Sarge / Sid and not just Sid.
-
-2002-10-11 Friday 09:40  sam
-
-   * Updated changelogs and package files for the release.
-
-2002-10-11 Friday 09:28  sam
-
-   * Makefile.am: added bootstrap to the distribution.
-
-2002-10-11 Friday 09:19  sam
-
-   * bootstrap: we remove generated files before running the autotools, to
-     make sure we get the latest version.
-   * bootstrap, Makefile.am: moved the --foreign flag to Makefile.am.
-   * src/Makefile.am: renamed an unused _SOURCES variable to something
-     automake will not choke on.
-   * src/Makefile.am: updated the library version.
-
-2002-10-10 Thursday 22:24  massiot
-
- Better automake detection.
-
-2002-10-10 Thursday 22:08  massiot
-
- Really bumped up revision number to 0.1.2 :p.
-
-2002-10-10 Thursday 22:07  massiot
-
-   * */Makefile.am: reworked automake directories to avoid linking problems
-     on Mac OS X.
-   * Bumped up revision number to 0.1.2.
-
-2002-10-10 Thursday 09:27  sam
-
-   * configure.ac, bootstrap: removed redundant stuff from CVS such as the
-     Makefile.in files, configure and config.*, and added a bootstrap script
-     to generate them; renamed configure.in to configure.ac and moved config.h
-     to . because it's now the recommended practice.
-
-2002-10-07 Monday 14:15  sam
-
-   * src/dvbpsi.h: removed automatic inclusion of inttypes.h because it was
-     too platform-dependent and led to lots of cross-compilation problems. Now
-     the program using libdvbpsi has to make sure it is C99 compliant.
-
-2002-06-06 Thursday 21:33  bozo
-
-   * ltmain.sh: updated from debian 'sid' version of libtool, should fix the
-     Mac OS X compilation.
-
-2002-06-02 Sunday 23:04  bozo
-
-   * configure.in, configure, src/config.h.in, src/dvbpsi.h, misc/gen_crc.c: int types detection. It fixes (or should fix) solaris and mingw port.
-
-2002-05-24 Friday 21:58  bozo
-
-   * src/tables/pmt.c: fixed the PMT generator which used to add one PSI
-     section for one ES.
-
-2002-05-18 Saturday 12:20  sam
-
-   * ALL: ran the auto* tools across the whole mess.
-
-2002-05-18 Saturday 12:12  sam
-
-   * ./debian/Makefile.am: forgot to update this file. hmpf.
-
-2002-05-18 Saturday 11:53  sam
-
-   * ./debian/*: updated Debian control files for the 0.1.1 release.
-
-2002-05-18 Saturday 11:41  bozo
-
-   * .cvsignore: fixed ignore list.
-
-2002-05-18 Saturday 11:39  bozo
-
-  * ALL: automake rebuild.
-  * ChangeLog: up to date changelog.
-  * configure, configure.in: updated version.
-  * libdvbpsi.spec: updated RPM configuration.
-  * src/Makefile.am, src/Makefile.in: updated libtool interface.
-  * misc/Makefile.am, misc/Makefile.in: added test_dr.h into distribution.
-
-2002-05-14 Tuesday 21:47  massiot
-
- Fix for MacOS X.
-
-2002-05-11 Saturday 11:42  bozo
-
-   * src/descriptors/dr.h: stupid mistake.
-
-2002-05-10 Friday 23:50  bozo
-
-   * ALL: doc fixes.
-
-2002-05-10 Friday 22:58  bozo
-
-   * src/descriptors/dr_09.c: reserved bits set to 1 as specified in ISO.
-   * src/descriptors/dr.h: new headers.
-   * src/descriptors/Makefile.am: new descriptors.
-   * misc/dr.xml, misc/test_dr.c: up to date descriptor definition and
-     associated generated file.
-   * src/descriptors/dr_0b.h, src/descriptors/dr_0b.c: MPEG2 "system
-     clock" descriptor decoder and generator.
-   * src/descriptors/dr_0c.h, src/descriptors/dr_0c.c: MPEG2 "multiplex
-     buffer utilization" descriptor decoder and generator.
-   * src/descriptors/dr_0d.h, src/descriptors/dr_0d.c: MPEG2 "copyright"
-     descriptor decoder and generator.
-   * src/descriptors/dr_0e.h, src/descriptors/dr_0e.c: MPEG2 "maximum
-     bitrate" descriptor decoder and generator.
-   * src/descriptors/dr_0f.h, src/descriptors/dr_0f.c: MPEG2 "private
-     data indicator" descriptor decoder and generator.
-
- Note: all the MPEG2 descriptors decoders and generators (except for wide
- range data) have been tested with the "test_dr" program located in the
- "misc" directory.
-
-2002-05-09 Thursday 20:39  bozo
-
-   * misc/dr.dtd, misc/dr.xml, misc/dr.xsl, misc/test_dr.h, misc/test_dr.c: more improvement.
-
-2002-05-09 Thursday 19:59  bozo
-
-   * misc/dr.dtd, misc/dr.xml, misc/dr.xsl, misc/test_dr.h, misc/test_dr.c: modified the way tests are performed (avoid stupid iterations).
-
-2002-05-09 Thursday 17:00  bozo
-
-   * src/descriptors/dr_02.c:
-   * src/descriptors/dr_07.c:
-   * src/descriptors/dr_08.c:
-   * src/descriptors/dr_09.c:
-   * src/descriptors/dr_0a.c:
-   * misc/dr.xml: xml brief description of each descriptor to generate
-     "misc/test_dr.c".
-   * misc/dr.xsl: stylesheet used to generate "misc/test_dr.c".
-   * misc/dr.dtd: DTD against which misc/dr.xml validates.
-   * misc/test_dr.c: generated file.
-   * misc/test_dr.h: macros used by misc/test_dr.c.
-   * src/descriptors/dr.h: gathers all dr_*.h headers.
-
-2002-05-08 Wednesday 16:45  bozo
-
-   * src/descriptors/dr_08.h: fixed a typo.
-   * src/descriptors/dr_09.h, src/descriptors/dr_09.c: MPEG2 "conditional
-     access" descriptor decoder and generator (not tested).
-   * src/descriptors/dr_0a.h, src/descriptors/dr_0a.c: MPEG2 "ISO 639
-     language" descriptor decoder and generator (not tested).
-
-2002-05-08 Wednesday 15:55  bozo
-
-   * src/descriptors/dr_06.h, src/descriptors/dr_06.c: MPEG2 "data
-     stream alignment" descriptor decoder and generator (not tested).
-   * src/descriptors/dr_07.h, src/descriptors/dr_07.c: MPEG2 "target
-     background grid" descriptor decoder and generator (not tested).
-   * src/descriptors/dr_08.h, src/descriptors/dr_08.c: MPEG2 "video
-     window" descriptor decoder and generator (not tested).
-
-2002-05-08 Wednesday 14:56  bozo
-
-   * doc/doxygen.cfg: up to date documentation configuration.
-   * src/descriptor.c: doesn't copy data if none when creating a
-     descriptor.
-   * src/descriptors/dr_02.c, src/descriptors/dr_03.c: generators
-     optimization.
-   * src/descriptors/dr_04.h, src/descriptors/dr_04.c: MPEG2 "hierarchy"
-     descriptor decoder and generator (not tested).
-   * src/descriptors/dr_05.h, src/descriptors/dr_05.c: MPEG2
-     "registration" descriptor decoder and generator (not tested).
-
-2002-05-08 Wednesday 13:33  bozo
-
-   * src/descriptors/dr_02.h, src/descriptors/dr_02.c: fixed a typo and
-     a little optimization.
-   * src/descriptors/dr_03.h, src/descriptors/dr_03.c: MPEG2 "audio
-     stream" descriptor decoder and generator (not tested).
-
-2002-05-08 Wednesday 13:11  bozo
-
-   * src/descriptors/dr_02.c: removed a warning under solaris.
-
-2002-05-08 Wednesday 13:00  bozo
-
-   * ALL: added the src/descriptors directory.
-   * src/descriptor.h, src/descriptor.c: added a p_decoded field to the
-     dvbpsi_descriptor_s structure and added an 's' to the
-     dvbpsi_DeleteDescriptors function.
-   * src/tables/pmt.c: added 's' where needed.
-   * src/tables/pat.h: typo in the documentation.
-   * src/descriptors/dr_02.h, src/descriptors/dr_02.c: MPEG2 "video
-     stream" descriptor decoder and generator (not tested).
-
-2002-04-09 Tuesday 00:42  bozo
-
-   * libdvbpsi.spec: corrected sources URL.
-   * Makefile.*: added spec file to the distribution.
-
-2002-04-08 Monday 23:01  bozo
-
-   * libdvbpsi.spec: corrected URL.
-
-2002-04-08 Monday 22:45  bozo
-
-   * libdvbpsi.spec: added rpm .spec file.
-
-2002-04-03 Wednesday 00:09  bozo
-
-   * ChangeLog: updated cgangelog.
-   * NEWS: updated NEWS.
-   * debian/Makefile.*: debian Makefiles.
-
-2002-04-02 Tuesday 23:41  sam
-
-   * ./debian/libdvbpsi0.copyright: fixed download URL.
-   * ./debian/rules: we now build packages with --enable-release.
-
-2002-04-02 Tuesday 23:30  bozo
-
- Removed the font from the distribution.
-
-2002-04-02 Tuesday 23:28  bozo
-
-   - Added debian stuff in the distribution;
-   - workaround for the generation of decoder.png in the documentation.
-
-2002-04-02 Tuesday 22:57  sam
-
-   * ./debian/*: Debian package generation files.
-   * ./examples/Makefile.am: example programs aren't installed by default.
-   * ./src/Makefile.am: libtool now uses -version-info instead of -release.
-
-2002-04-02 Tuesday 17:55  bozo
-
- typo.
-
-2002-04-02 Tuesday 17:47  bozo
-
- Updated INSTALL and README.
-
-2002-03-28 Thursday 14:59  bozo
-
- Little modification in the API usage page.
-
-2002-03-28 Thursday 14:48  bozo
-
- Added the font file and some little fixes.
-
-2002-03-28 Thursday 12:08  bozo
-
- Cool graphs in documentation.
-
-2002-03-27 Wednesday 20:13  bozo
-
- Documentation files included in "dist" target.
-
-2002-03-27 Wednesday 20:02  bozo
-
- More powerfull API documentation.
- Added Some human readable documentation
- Added a .cvsignore
-
-2002-03-25 Monday 23:34  bozo
-
- .cvsignore stuff
-
-2002-03-25 Monday 21:00  bozo
-
- Doxygen documentation.
-
-2002-03-18 Monday 23:53  bozo
-
- typo.
-
-2002-03-18 Monday 12:38  bozo
-
- Bug fix in the PMT decoder.
-
-2002-03-15 Friday 12:16  bozo
-
- C++ compliant headers.
-
-2002-01-22 Tuesday 23:28  bozo
-
- I forgot to free the arrays.
-
-2002-01-22 Tuesday 20:30  bozo
-
-   - new generation of PAT and PMT decoders that can receive non-consecutive
-     section numbers;
-   - moved tables codecs into "src/tables";
-   - moved PSI decoder in public files to allow external decoders.
-
-2002-01-09 Wednesday 11:22  bozo
-
-   - PMT generator;
-   - example (gen_pmt);
-   - fixed a non-null pointer in 'descriptor.c';
-   - cosmetic changes;
-   - generators review and comments.
-
-2002-01-07 Monday 19:35  bozo
-
- Cosmetic change in debug messages.
-
-2002-01-07 Monday 18:53  bozo
-
- Added .cvsignore files.
-
-2002-01-07 Monday 18:44  bozo
-
- Fix solaris compilation.
-
-2002-01-07 Monday 18:30  bozo
-
- Initial commit.
-
+------------------------------------------------------------------------
+r81 | sam | 2004-01-02 15:23:41 +0100 (Fri, 02 Jan 2004) | 5 lines
+Changed paths:
+   M /trunk/debian/rules
+   M /trunk/examples/.cvsignore
+
+  * debian/rules:
+    + Distribute the NEWS file.
+  * examples/.cvsignore:
+    + Ignore decode_sdt.
+
+------------------------------------------------------------------------
+r80 | sam | 2004-01-02 15:15:46 +0100 (Fri, 02 Jan 2004) | 8 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/Makefile.am
+   A /trunk/NEWS
+   M /trunk/debian/changelog
+   M /trunk/libdvbpsi.spec
+
+  * libdvbpsi.spec debian/changelog:
+    + Prepared the 0.1.4 release.
+  * NEWS ChangeLog:
+    + Renamed the old changelog to a NEWS file.
+    + Regenerated a ChangeLog from the CVS logs.
+  * Makefile.am:
+    + Added a "make changelog" rule.
+
+------------------------------------------------------------------------
+r79 | sam | 2003-11-06 18:41:42 +0100 (Thu, 06 Nov 2003) | 9 lines
+Changed paths:
+   A /trunk/autotools
+   A /trunk/autotools/.cvsignore
+   M /trunk/configure.ac
+   M /trunk/debian/changelog
+   M /trunk/debian/control
+   M /trunk/debian/rules
+   M /trunk/libdvbpsi.spec
+   M /trunk/src/Makefile.am
+
+  * configure.ac, src/Makefile.am:
+    + Set interface to 3:0:0.
+    + Set version number to 0.1.4.
+    + Use the autotools/ directory.
+  * debian/control:
+    + Set policy to 3.6.1.0.
+    + Renamed source package to libdvbpsi3.
+    + Removed the autotools-dev build dependency.
+
+------------------------------------------------------------------------
+r78 | nitrox | 2003-11-06 17:20:30 +0100 (Thu, 06 Nov 2003) | 3 lines
+Changed paths:
+   M /trunk/src/Makefile.am
+   M /trunk/src/descriptors/dr.h
+   A /trunk/src/descriptors/dr_59.c
+   A /trunk/src/descriptors/dr_59.h
+   M /trunk/src/tables/pmt.c
+
+. 0x59 (dvb subtitles) descriptor decoder
+  Work of Tristan Leteurtre <tristan.leteurtre@anevia.com>
+
+------------------------------------------------------------------------
+r77 | sam | 2003-11-06 11:13:40 +0100 (Thu, 06 Nov 2003) | 2 lines
+Changed paths:
+   M /trunk/bootstrap
+
+  * bootstrap: imported libdvdcss's bootstrap file.
+
+------------------------------------------------------------------------
+r76 | tooney | 2003-09-23 15:04:54 +0200 (Tue, 23 Sep 2003) | 4 lines
+Changed paths:
+   M /trunk/src/demux.c
+
+
+  . Memory leak fix
+    Courtesy of Johann Hanne <jhml@gmx.net>
+
+------------------------------------------------------------------------
+r75 | asmax | 2003-09-16 20:43:09 +0200 (Tue, 16 Sep 2003) | 2 lines
+Changed paths:
+   M /trunk/src/tables/sdt.c
+
+* fixed an unitialiazed pointer (thanks jonny ;)
+
+------------------------------------------------------------------------
+r74 | sam | 2003-07-30 12:14:08 +0200 (Wed, 30 Jul 2003) | 4 lines
+Changed paths:
+   M /trunk/debian/Makefile.am
+
+  * debian/Makefile.am:
+    + Added debian/compat.
+    + Removed debian/*.dirs.
+
+------------------------------------------------------------------------
+r73 | sam | 2003-07-30 12:11:55 +0200 (Wed, 30 Jul 2003) | 2 lines
+Changed paths:
+   M /trunk/debian/rules
+
+  * debian/rules: Don't rely on debian/*.dirs to create directories.
+
+------------------------------------------------------------------------
+r72 | sam | 2003-07-30 12:06:56 +0200 (Wed, 30 Jul 2003) | 7 lines
+Changed paths:
+   M /trunk/debian/Makefile.am
+   M /trunk/debian/changelog
+   A /trunk/debian/compat
+   M /trunk/debian/control
+   D /trunk/debian/libdvbpsi1-dev.dirs
+   D /trunk/debian/libdvbpsi1.dirs
+   M /trunk/debian/rules
+   M /trunk/libdvbpsi.spec
+
+  * debian/control:
+    + Set policy to 3.6.0. No changes required.
+    + Set debhelper build-dependency to (>= 4.0) due to debian/compat.
+    + Renamed source package to libdvbpsi2.
+  * libdvbpsi.spec:
+    + Renamed source package to libdvbpsi2.
+
+------------------------------------------------------------------------
+r71 | sam | 2003-07-30 12:00:12 +0200 (Wed, 30 Jul 2003) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/src/Makefile.am
+
+  * src/Makefile.am: Changed major number.
+  * configure.ac: Changed package name to libdvbpsi2.
+
+------------------------------------------------------------------------
+r70 | gbazin | 2003-07-29 01:24:12 +0200 (Tue, 29 Jul 2003) | 3 lines
+Changed paths:
+   M /trunk/src/Makefile.am
+
+
+* src/Makefile.am: include demux.h in the dist.
+
+------------------------------------------------------------------------
+r69 | gbazin | 2003-07-29 01:12:22 +0200 (Tue, 29 Jul 2003) | 3 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/configure.ac
+   M /trunk/debian/changelog
+   M /trunk/libdvbpsi.spec
+
+
+* ALL: bumped version number to 0.1.3
+
+------------------------------------------------------------------------
+r68 | fenrir | 2003-07-25 23:08:45 +0200 (Fri, 25 Jul 2003) | 2 lines
+Changed paths:
+   M /trunk/src/tables/pmt.c
+
+ * pmt.c : fixed my last commit.
+
+------------------------------------------------------------------------
+r67 | fenrir | 2003-07-25 22:20:40 +0200 (Fri, 25 Jul 2003) | 2 lines
+Changed paths:
+   M /trunk/src/descriptors/dr_02.c
+   M /trunk/src/descriptors/dr_03.c
+   M /trunk/src/descriptors/dr_04.c
+   M /trunk/src/descriptors/dr_05.c
+   M /trunk/src/descriptors/dr_06.c
+   M /trunk/src/descriptors/dr_07.c
+   M /trunk/src/descriptors/dr_08.c
+   M /trunk/src/descriptors/dr_09.c
+   M /trunk/src/descriptors/dr_0a.c
+   M /trunk/src/descriptors/dr_0b.c
+   M /trunk/src/descriptors/dr_0c.c
+   M /trunk/src/descriptors/dr_0d.c
+   M /trunk/src/descriptors/dr_0e.c
+   M /trunk/src/descriptors/dr_0f.c
+   M /trunk/src/descriptors/dr_48.c
+   M /trunk/src/tables/pmt.c
+
+ * all: fixed segfault with invalid/corrupted psi data.
+
+------------------------------------------------------------------------
+r66 | yves | 2003-02-02 12:47:13 +0100 (Sun, 02 Feb 2003) | 4 lines
+Changed paths:
+   M /trunk/libdvbpsi.spec
+
+- updated URL again.
+- macros for redhat.
+- fixes here and here.
+
+------------------------------------------------------------------------
+r65 | sam | 2003-01-14 20:51:14 +0100 (Tue, 14 Jan 2003) | 2 lines
+Changed paths:
+   M /trunk/debian/control
+
+  * ./debian/control: fixed a typo (thanks jorge!).
+
+------------------------------------------------------------------------
+r64 | yves | 2002-12-13 14:06:38 +0100 (Fri, 13 Dec 2002) | 2 lines
+Changed paths:
+   M /trunk/libdvbpsi.spec
+
+corrected few things for sir rpmlint (uploaded in Mandrake).
+
+------------------------------------------------------------------------
+r63 | yves | 2002-12-13 10:54:02 +0100 (Fri, 13 Dec 2002) | 6 lines
+Changed paths:
+   M /trunk/libdvbpsi.spec
+
+update spec file:
+ - s#Copyright#License#
+ - include the libtool .la files.
+ - use macros.
+ - update URL: tag.
+
+------------------------------------------------------------------------
+r62 | massiot | 2002-12-13 10:34:32 +0100 (Fri, 13 Dec 2002) | 2 lines
+Changed paths:
+   M /trunk/libdvbpsi.spec
+
+Fixed a typo.
+
+------------------------------------------------------------------------
+r61 | jobi | 2002-12-12 11:19:32 +0100 (Thu, 12 Dec 2002) | 3 lines
+Changed paths:
+   M /trunk/misc/Makefile.am
+   M /trunk/misc/dr.xml
+   M /trunk/misc/dr.xsl
+   M /trunk/misc/test_dr.c
+   M /trunk/src/descriptors/dr.h
+   M /trunk/src/descriptors/dr_42.h
+   M /trunk/src/descriptors/dr_47.h
+   M /trunk/src/descriptors/dr_48.h
+
+  * src/descriptors/*: fixed some typos
+  * misc/*: added tests on the new descriptors
+
+------------------------------------------------------------------------
+r60 | jobi | 2002-12-11 14:14:42 +0100 (Wed, 11 Dec 2002) | 3 lines
+Changed paths:
+   M /trunk/src/Makefile.am
+   A /trunk/src/descriptors/dr_42.c
+   A /trunk/src/descriptors/dr_42.h
+   A /trunk/src/descriptors/dr_47.c
+   A /trunk/src/descriptors/dr_47.h
+   A /trunk/src/descriptors/dr_48.c
+   A /trunk/src/descriptors/dr_48.h
+
+  * src/descriptors/*: added a few DVB descriptors decoder and generator
+    (Stuffing, Bouquet Name, Service Name)
+
+------------------------------------------------------------------------
+r59 | jobi | 2002-12-11 14:04:57 +0100 (Wed, 11 Dec 2002) | 5 lines
+Changed paths:
+   M /trunk/examples/Makefile.am
+   A /trunk/examples/decode_sdt.c
+   M /trunk/src/Makefile.am
+   A /trunk/src/demux.c
+   A /trunk/src/demux.h
+   A /trunk/src/tables/sdt.c
+   A /trunk/src/tables/sdt.h
+   A /trunk/src/tables/sdt_private.h
+
+  * src/demux.*: DVB PSI tables demux, required since one PID channel
+    may contain different tables.
+  * src/tables/sdt*: SDT decoder (no generator yet)
+  * examples/decode_sdt.c: added SDT decoder example
+
+------------------------------------------------------------------------
+r58 | sam | 2002-12-02 13:59:57 +0100 (Mon, 02 Dec 2002) | 3 lines
+Changed paths:
+   M /trunk/bootstrap
+
+  * ./bootstrap: automake 1.7 is accepted as well.
+  * ./bootstrap: we look for glibtoolize if libtoolize isn't present.
+
+------------------------------------------------------------------------
+r57 | alexis | 2002-10-14 11:23:32 +0200 (Mon, 14 Oct 2002) | 3 lines
+Changed paths:
+   M /trunk/debian/changelog
+
+
+Package Debian for Woody / Sarge / Sid and not just Sid.
+
+------------------------------------------------------------------------
+r56 | sam | 2002-10-11 11:40:43 +0200 (Fri, 11 Oct 2002) | 2 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/Makefile.am
+   M /trunk/debian/changelog
+   M /trunk/libdvbpsi.spec
+
+  * Updated changelogs and package files for the release.
+
+------------------------------------------------------------------------
+r55 | sam | 2002-10-11 11:28:38 +0200 (Fri, 11 Oct 2002) | 2 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/Makefile.am
+
+  * Makefile.am: added bootstrap to the distribution.
+
+------------------------------------------------------------------------
+r54 | sam | 2002-10-11 11:19:18 +0200 (Fri, 11 Oct 2002) | 7 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/bootstrap
+   M /trunk/src/Makefile.am
+
+  * bootstrap: we remove generated files before running the autotools, to
+    make sure we get the latest version.
+  * bootstrap, Makefile.am: moved the --foreign flag to Makefile.am.
+  * src/Makefile.am: renamed an unused _SOURCES variable to something
+    automake will not choke on.
+  * src/Makefile.am: updated the library version.
+
+------------------------------------------------------------------------
+r53 | massiot | 2002-10-11 00:24:26 +0200 (Fri, 11 Oct 2002) | 2 lines
+Changed paths:
+   M /trunk/bootstrap
+
+Better automake detection.
+
+------------------------------------------------------------------------
+r52 | massiot | 2002-10-11 00:08:28 +0200 (Fri, 11 Oct 2002) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+Really bumped up revision number to 0.1.2 :p.
+
+------------------------------------------------------------------------
+r51 | massiot | 2002-10-11 00:07:26 +0200 (Fri, 11 Oct 2002) | 4 lines
+Changed paths:
+   M /trunk/.cvsignore
+   M /trunk/ChangeLog
+   M /trunk/configure.ac
+   M /trunk/src/Makefile.am
+   D /trunk/src/descriptors/Makefile.am
+   D /trunk/src/tables/Makefile.am
+
+  * */Makefile.am: reworked automake directories to avoid linking problems
+    on Mac OS X.
+  * Bumped up revision number to 0.1.2.
+
+------------------------------------------------------------------------
+r50 | sam | 2002-10-10 11:27:02 +0200 (Thu, 10 Oct 2002) | 5 lines
+Changed paths:
+   M /trunk/.cvsignore
+   M /trunk/ChangeLog
+   D /trunk/Makefile.in
+   D /trunk/NEWS
+   D /trunk/aclocal.m4
+   A /trunk/bootstrap
+   D /trunk/config.guess
+   D /trunk/config.sub
+   D /trunk/configure
+   A /trunk/configure.ac
+   D /trunk/configure.in
+   M /trunk/debian/.cvsignore
+   D /trunk/debian/Makefile.in
+   M /trunk/doc/.cvsignore
+   D /trunk/doc/Makefile.in
+   M /trunk/examples/.cvsignore
+   D /trunk/examples/Makefile.in
+   D /trunk/install-sh
+   D /trunk/ltmain.sh
+   M /trunk/misc/.cvsignore
+   D /trunk/misc/Makefile.in
+   D /trunk/missing
+   D /trunk/mkinstalldirs
+   M /trunk/src/.cvsignore
+   D /trunk/src/Makefile.in
+   D /trunk/src/config.h.in
+   M /trunk/src/descriptors/.cvsignore
+   D /trunk/src/descriptors/Makefile.in
+   M /trunk/src/tables/.cvsignore
+   D /trunk/src/tables/Makefile.in
+   M /trunk/src/tables/pat.c
+   M /trunk/src/tables/pmt.c
+
+  * configure.ac, bootstrap: removed redundant stuff from CVS such as the
+    Makefile.in files, configure and config.*, and added a bootstrap script
+    to generate them; renamed configure.in to configure.ac and moved config.h
+    to . because it's now the recommended practice.
+
+------------------------------------------------------------------------
+r49 | sam | 2002-10-07 16:15:14 +0200 (Mon, 07 Oct 2002) | 4 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/Makefile.in
+   M /trunk/aclocal.m4
+   M /trunk/config.guess
+   M /trunk/config.sub
+   M /trunk/configure
+   M /trunk/debian/Makefile.in
+   M /trunk/debian/changelog
+   M /trunk/debian/control
+   M /trunk/doc/Makefile.in
+   M /trunk/examples/Makefile.in
+   M /trunk/examples/decode_pat.c
+   M /trunk/examples/decode_pmt.c
+   M /trunk/ltmain.sh
+   M /trunk/misc/Makefile.in
+   M /trunk/misc/gen_pat.c
+   M /trunk/misc/gen_pmt.c
+   M /trunk/misc/test_dr.c
+   M /trunk/src/Makefile.in
+   M /trunk/src/descriptor.c
+   M /trunk/src/descriptors/Makefile.in
+   M /trunk/src/descriptors/dr_02.c
+   M /trunk/src/descriptors/dr_03.c
+   M /trunk/src/descriptors/dr_04.c
+   M /trunk/src/descriptors/dr_05.c
+   M /trunk/src/descriptors/dr_06.c
+   M /trunk/src/descriptors/dr_07.c
+   M /trunk/src/descriptors/dr_08.c
+   M /trunk/src/descriptors/dr_09.c
+   M /trunk/src/descriptors/dr_0a.c
+   M /trunk/src/descriptors/dr_0b.c
+   M /trunk/src/descriptors/dr_0c.c
+   M /trunk/src/descriptors/dr_0d.c
+   M /trunk/src/descriptors/dr_0e.c
+   M /trunk/src/descriptors/dr_0f.c
+   M /trunk/src/dvbpsi.c
+   M /trunk/src/dvbpsi.h
+   M /trunk/src/psi.c
+   M /trunk/src/tables/Makefile.in
+   M /trunk/src/tables/pat.c
+   M /trunk/src/tables/pmt.c
+
+  * src/dvbpsi.h: removed automatic inclusion of inttypes.h because it was
+    too platform-dependent and led to lots of cross-compilation problems. Now
+    the program using libdvbpsi has to make sure it is C99 compliant.
+
+------------------------------------------------------------------------
+r48 | bozo | 2002-06-06 23:33:31 +0200 (Thu, 06 Jun 2002) | 3 lines
+Changed paths:
+   M /trunk/ltmain.sh
+
+  * ltmain.sh: updated from debian 'sid' version of libtool, should fix the
+    Mac OS X compilation.
+
+------------------------------------------------------------------------
+r47 | bozo | 2002-06-03 01:04:08 +0200 (Mon, 03 Jun 2002) | 2 lines
+Changed paths:
+   M /trunk/aclocal.m4
+   M /trunk/configure
+   M /trunk/configure.in
+   M /trunk/misc/gen_crc.c
+   M /trunk/src/config.h.in
+   M /trunk/src/dvbpsi.h
+
+  * configure.in, configure, src/config.h.in, src/dvbpsi.h, misc/gen_crc.c: int types detection. It fixes (or should fix) solaris and mingw port.
+
+------------------------------------------------------------------------
+r46 | bozo | 2002-05-24 23:58:16 +0200 (Fri, 24 May 2002) | 3 lines
+Changed paths:
+   M /trunk/src/tables/pmt.c
+
+  * src/tables/pmt.c: fixed the PMT generator which used to add one PSI
+    section for one ES.
+
+------------------------------------------------------------------------
+r45 | sam | 2002-05-18 14:20:46 +0200 (Sat, 18 May 2002) | 2 lines
+Changed paths:
+   M /trunk/config.guess
+   M /trunk/config.sub
+   M /trunk/debian/Makefile.in
+
+  * ALL: ran the auto* tools across the whole mess.
+
+------------------------------------------------------------------------
+r44 | sam | 2002-05-18 14:12:48 +0200 (Sat, 18 May 2002) | 2 lines
+Changed paths:
+   M /trunk/debian/Makefile.am
+
+  * ./debian/Makefile.am: forgot to update this file. hmpf.
+
+------------------------------------------------------------------------
+r43 | sam | 2002-05-18 13:53:44 +0200 (Sat, 18 May 2002) | 2 lines
+Changed paths:
+   M /trunk/debian/changelog
+   M /trunk/debian/control
+   A /trunk/debian/copyright
+   D /trunk/debian/libdvbpsi0-dev.dirs
+   D /trunk/debian/libdvbpsi0.copyright
+   D /trunk/debian/libdvbpsi0.dirs
+   A /trunk/debian/libdvbpsi1-dev.dirs
+   A /trunk/debian/libdvbpsi1.dirs
+   M /trunk/debian/rules
+
+  * ./debian/*: updated Debian control files for the 0.1.1 release.
+
+------------------------------------------------------------------------
+r42 | bozo | 2002-05-18 13:41:46 +0200 (Sat, 18 May 2002) | 2 lines
+Changed paths:
+   M /trunk/doc/.cvsignore
+
+  * .cvsignore: fixed ignore list.
+
+------------------------------------------------------------------------
+r41 | bozo | 2002-05-18 13:39:07 +0200 (Sat, 18 May 2002) | 7 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/Makefile.in
+   M /trunk/configure
+   M /trunk/configure.in
+   M /trunk/debian/Makefile.in
+   M /trunk/doc/Makefile.in
+   M /trunk/examples/Makefile.in
+   M /trunk/libdvbpsi.spec
+   M /trunk/misc/Makefile.am
+   M /trunk/misc/Makefile.in
+   M /trunk/src/Makefile.am
+   M /trunk/src/Makefile.in
+   M /trunk/src/descriptors/Makefile.in
+   M /trunk/src/tables/Makefile.in
+
+ * ALL: automake rebuild.
+ * ChangeLog: up to date changelog.
+ * configure, configure.in: updated version.
+ * libdvbpsi.spec: updated RPM configuration.
+ * src/Makefile.am, src/Makefile.in: updated libtool interface.
+ * misc/Makefile.am, misc/Makefile.in: added test_dr.h into distribution.
+
+------------------------------------------------------------------------
+r40 | massiot | 2002-05-14 23:47:35 +0200 (Tue, 14 May 2002) | 2 lines
+Changed paths:
+   M /trunk/configure
+   M /trunk/configure.in
+
+Fix for MacOS X.
+
+------------------------------------------------------------------------
+r39 | bozo | 2002-05-11 13:42:27 +0200 (Sat, 11 May 2002) | 2 lines
+Changed paths:
+   M /trunk/src/descriptors/dr.h
+
+  * src/descriptors/dr.h: stupid mistake.
+
+------------------------------------------------------------------------
+r38 | bozo | 2002-05-11 01:50:36 +0200 (Sat, 11 May 2002) | 2 lines
+Changed paths:
+   M /trunk/src/descriptors/dr_02.h
+   M /trunk/src/descriptors/dr_03.h
+   M /trunk/src/descriptors/dr_04.h
+   M /trunk/src/descriptors/dr_05.h
+   M /trunk/src/descriptors/dr_06.h
+   M /trunk/src/descriptors/dr_07.h
+   M /trunk/src/descriptors/dr_08.h
+   M /trunk/src/descriptors/dr_09.h
+   M /trunk/src/descriptors/dr_0a.h
+   M /trunk/src/descriptors/dr_0b.h
+   M /trunk/src/descriptors/dr_0c.h
+   M /trunk/src/descriptors/dr_0d.h
+   M /trunk/src/descriptors/dr_0e.h
+   M /trunk/src/descriptors/dr_0f.h
+
+  * ALL: doc fixes.
+
+------------------------------------------------------------------------
+r37 | bozo | 2002-05-11 00:58:53 +0200 (Sat, 11 May 2002) | 20 lines
+Changed paths:
+   M /trunk/misc/dr.xml
+   M /trunk/misc/test_dr.c
+   M /trunk/src/descriptors/Makefile.am
+   M /trunk/src/descriptors/Makefile.in
+   M /trunk/src/descriptors/dr.h
+   M /trunk/src/descriptors/dr_09.c
+   A /trunk/src/descriptors/dr_0b.c
+   A /trunk/src/descriptors/dr_0b.h
+   A /trunk/src/descriptors/dr_0c.c
+   A /trunk/src/descriptors/dr_0c.h
+   A /trunk/src/descriptors/dr_0d.c
+   A /trunk/src/descriptors/dr_0d.h
+   A /trunk/src/descriptors/dr_0e.c
+   A /trunk/src/descriptors/dr_0e.h
+   A /trunk/src/descriptors/dr_0f.c
+   A /trunk/src/descriptors/dr_0f.h
+
+  * src/descriptors/dr_09.c: reserved bits set to 1 as specified in ISO.
+  * src/descriptors/dr.h: new headers.
+  * src/descriptors/Makefile.am: new descriptors.
+  * misc/dr.xml, misc/test_dr.c: up to date descriptor definition and
+    associated generated file.
+  * src/descriptors/dr_0b.h, src/descriptors/dr_0b.c: MPEG2 "system
+    clock" descriptor decoder and generator.
+  * src/descriptors/dr_0c.h, src/descriptors/dr_0c.c: MPEG2 "multiplex
+    buffer utilization" descriptor decoder and generator.
+  * src/descriptors/dr_0d.h, src/descriptors/dr_0d.c: MPEG2 "copyright"
+    descriptor decoder and generator.
+  * src/descriptors/dr_0e.h, src/descriptors/dr_0e.c: MPEG2 "maximum
+    bitrate" descriptor decoder and generator.
+  * src/descriptors/dr_0f.h, src/descriptors/dr_0f.c: MPEG2 "private
+    data indicator" descriptor decoder and generator.
+
+Note: all the MPEG2 descriptors decoders and generators (except for wide
+range data) have been tested with the "test_dr" program located in the
+"misc" directory.
+
+------------------------------------------------------------------------
+r36 | bozo | 2002-05-09 22:39:02 +0200 (Thu, 09 May 2002) | 2 lines
+Changed paths:
+   M /trunk/misc/dr.dtd
+   M /trunk/misc/dr.xml
+   M /trunk/misc/dr.xsl
+   M /trunk/misc/test_dr.c
+   M /trunk/misc/test_dr.h
+
+  * misc/dr.dtd, misc/dr.xml, misc/dr.xsl, misc/test_dr.h, misc/test_dr.c: more improvement.
+
+------------------------------------------------------------------------
+r35 | bozo | 2002-05-09 21:59:20 +0200 (Thu, 09 May 2002) | 2 lines
+Changed paths:
+   M /trunk/misc/dr.dtd
+   M /trunk/misc/dr.xml
+   M /trunk/misc/dr.xsl
+   M /trunk/misc/test_dr.c
+   M /trunk/misc/test_dr.h
+
+  * misc/dr.dtd, misc/dr.xml, misc/dr.xsl, misc/test_dr.h, misc/test_dr.c: modified the way tests are performed (avoid stupid iterations).
+
+------------------------------------------------------------------------
+r34 | bozo | 2002-05-09 19:00:03 +0200 (Thu, 09 May 2002) | 13 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/Makefile.in
+   M /trunk/misc/.cvsignore
+   M /trunk/misc/Makefile.am
+   M /trunk/misc/Makefile.in
+   A /trunk/misc/dr.dtd
+   A /trunk/misc/dr.xml
+   A /trunk/misc/dr.xsl
+   A /trunk/misc/test_dr.c
+   A /trunk/misc/test_dr.h
+   M /trunk/src/descriptors/Makefile.am
+   M /trunk/src/descriptors/Makefile.in
+   A /trunk/src/descriptors/dr.h
+   M /trunk/src/descriptors/dr_02.c
+   M /trunk/src/descriptors/dr_07.c
+   M /trunk/src/descriptors/dr_08.c
+   M /trunk/src/descriptors/dr_09.c
+   M /trunk/src/descriptors/dr_0a.c
+
+  * src/descriptors/dr_02.c:
+  * src/descriptors/dr_07.c:
+  * src/descriptors/dr_08.c:
+  * src/descriptors/dr_09.c:
+  * src/descriptors/dr_0a.c:
+  * misc/dr.xml: xml brief description of each descriptor to generate
+    "misc/test_dr.c".
+  * misc/dr.xsl: stylesheet used to generate "misc/test_dr.c".
+  * misc/dr.dtd: DTD against which misc/dr.xml validates.
+  * misc/test_dr.c: generated file.
+  * misc/test_dr.h: macros used by misc/test_dr.c.
+  * src/descriptors/dr.h: gathers all dr_*.h headers.
+
+------------------------------------------------------------------------
+r33 | bozo | 2002-05-08 18:45:33 +0200 (Wed, 08 May 2002) | 6 lines
+Changed paths:
+   M /trunk/src/descriptors/Makefile.am
+   M /trunk/src/descriptors/Makefile.in
+   M /trunk/src/descriptors/dr_08.h
+   A /trunk/src/descriptors/dr_09.c
+   A /trunk/src/descriptors/dr_09.h
+   A /trunk/src/descriptors/dr_0a.c
+   A /trunk/src/descriptors/dr_0a.h
+
+  * src/descriptors/dr_08.h: fixed a typo.
+  * src/descriptors/dr_09.h, src/descriptors/dr_09.c: MPEG2 "conditional
+    access" descriptor decoder and generator (not tested).
+  * src/descriptors/dr_0a.h, src/descriptors/dr_0a.c: MPEG2 "ISO 639
+    language" descriptor decoder and generator (not tested).
+
+------------------------------------------------------------------------
+r32 | bozo | 2002-05-08 17:55:32 +0200 (Wed, 08 May 2002) | 7 lines
+Changed paths:
+   M /trunk/src/descriptors/Makefile.am
+   M /trunk/src/descriptors/Makefile.in
+   A /trunk/src/descriptors/dr_06.c
+   A /trunk/src/descriptors/dr_06.h
+   A /trunk/src/descriptors/dr_07.c
+   A /trunk/src/descriptors/dr_07.h
+   A /trunk/src/descriptors/dr_08.c
+   A /trunk/src/descriptors/dr_08.h
+
+  * src/descriptors/dr_06.h, src/descriptors/dr_06.c: MPEG2 "data
+    stream alignment" descriptor decoder and generator (not tested).
+  * src/descriptors/dr_07.h, src/descriptors/dr_07.c: MPEG2 "target
+    background grid" descriptor decoder and generator (not tested).
+  * src/descriptors/dr_08.h, src/descriptors/dr_08.c: MPEG2 "video
+    window" descriptor decoder and generator (not tested).
+
+------------------------------------------------------------------------
+r31 | bozo | 2002-05-08 16:56:28 +0200 (Wed, 08 May 2002) | 10 lines
+Changed paths:
+   M /trunk/doc/doxygen.cfg
+   M /trunk/src/descriptor.c
+   M /trunk/src/descriptors/Makefile.am
+   M /trunk/src/descriptors/Makefile.in
+   M /trunk/src/descriptors/dr_02.c
+   M /trunk/src/descriptors/dr_03.c
+   A /trunk/src/descriptors/dr_04.c
+   A /trunk/src/descriptors/dr_04.h
+   A /trunk/src/descriptors/dr_05.c
+   A /trunk/src/descriptors/dr_05.h
+
+  * doc/doxygen.cfg: up to date documentation configuration.
+  * src/descriptor.c: doesn't copy data if none when creating a
+    descriptor.
+  * src/descriptors/dr_02.c, src/descriptors/dr_03.c: generators
+    optimization.
+  * src/descriptors/dr_04.h, src/descriptors/dr_04.c: MPEG2 "hierarchy"
+    descriptor decoder and generator (not tested).
+  * src/descriptors/dr_05.h, src/descriptors/dr_05.c: MPEG2
+    "registration" descriptor decoder and generator (not tested).
+
+------------------------------------------------------------------------
+r30 | bozo | 2002-05-08 15:33:52 +0200 (Wed, 08 May 2002) | 5 lines
+Changed paths:
+   M /trunk/src/descriptors/Makefile.am
+   M /trunk/src/descriptors/Makefile.in
+   M /trunk/src/descriptors/dr_02.c
+   M /trunk/src/descriptors/dr_02.h
+   A /trunk/src/descriptors/dr_03.c
+   A /trunk/src/descriptors/dr_03.h
+
+  * src/descriptors/dr_02.h, src/descriptors/dr_02.c: fixed a typo and
+    a little optimization.
+  * src/descriptors/dr_03.h, src/descriptors/dr_03.c: MPEG2 "audio
+    stream" descriptor decoder and generator (not tested).
+
+------------------------------------------------------------------------
+r29 | bozo | 2002-05-08 15:11:41 +0200 (Wed, 08 May 2002) | 2 lines
+Changed paths:
+   M /trunk/src/descriptors/dr_02.c
+
+  * src/descriptors/dr_02.c: removed a warning under solaris.
+
+------------------------------------------------------------------------
+r28 | bozo | 2002-05-08 15:00:40 +0200 (Wed, 08 May 2002) | 9 lines
+Changed paths:
+   M /trunk/configure
+   M /trunk/configure.in
+   M /trunk/src/Makefile.am
+   M /trunk/src/Makefile.in
+   M /trunk/src/descriptor.c
+   M /trunk/src/descriptor.h
+   A /trunk/src/descriptors
+   A /trunk/src/descriptors/.cvsignore
+   A /trunk/src/descriptors/Makefile.am
+   A /trunk/src/descriptors/Makefile.in
+   A /trunk/src/descriptors/dr_02.c
+   A /trunk/src/descriptors/dr_02.h
+   M /trunk/src/tables/pat.h
+   M /trunk/src/tables/pmt.c
+
+  * ALL: added the src/descriptors directory.
+  * src/descriptor.h, src/descriptor.c: added a p_decoded field to the
+    dvbpsi_descriptor_s structure and added an 's' to the
+    dvbpsi_DeleteDescriptors function.
+  * src/tables/pmt.c: added 's' where needed.
+  * src/tables/pat.h: typo in the documentation.
+  * src/descriptors/dr_02.h, src/descriptors/dr_02.c: MPEG2 "video
+    stream" descriptor decoder and generator (not tested).
+
+------------------------------------------------------------------------
+r27 | bozo | 2002-04-09 02:42:46 +0200 (Tue, 09 Apr 2002) | 3 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/Makefile.in
+   M /trunk/libdvbpsi.spec
+
+  * libdvbpsi.spec: corrected sources URL.
+  * Makefile.*: added spec file to the distribution.
+
+------------------------------------------------------------------------
+r26 | bozo | 2002-04-09 01:01:35 +0200 (Tue, 09 Apr 2002) | 2 lines
+Changed paths:
+   M /trunk/Makefile.in
+   M /trunk/aclocal.m4
+   M /trunk/configure
+   M /trunk/examples/Makefile.in
+   M /trunk/libdvbpsi.spec
+   M /trunk/misc/Makefile.in
+   M /trunk/src/Makefile.in
+   M /trunk/src/config.h.in
+   M /trunk/src/tables/Makefile.in
+
+  * libdvbpsi.spec: corrected URL.
+
+------------------------------------------------------------------------
+r25 | bozo | 2002-04-09 00:45:29 +0200 (Tue, 09 Apr 2002) | 2 lines
+Changed paths:
+   M /trunk/Makefile.in
+   M /trunk/aclocal.m4
+   M /trunk/configure
+   M /trunk/examples/Makefile.in
+   A /trunk/libdvbpsi.spec
+   M /trunk/misc/Makefile.in
+   M /trunk/src/Makefile.in
+   M /trunk/src/config.h.in
+   M /trunk/src/tables/Makefile.in
+
+  * libdvbpsi.spec: added rpm .spec file.
+
+------------------------------------------------------------------------
+r24 | bozo | 2002-04-03 02:09:43 +0200 (Wed, 03 Apr 2002) | 4 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/NEWS
+   M /trunk/debian/.cvsignore
+   A /trunk/debian/Makefile.am
+   A /trunk/debian/Makefile.in
+
+  * ChangeLog: updated cgangelog.
+  * NEWS: updated NEWS.
+  * debian/Makefile.*: debian Makefiles.
+
+------------------------------------------------------------------------
+r23 | sam | 2002-04-03 01:41:56 +0200 (Wed, 03 Apr 2002) | 4 lines
+Changed paths:
+   M /trunk/debian/libdvbpsi0.copyright
+   M /trunk/debian/rules
+
+
+  * ./debian/libdvbpsi0.copyright: fixed download URL.
+  * ./debian/rules: we now build packages with --enable-release.
+
+------------------------------------------------------------------------
+r22 | bozo | 2002-04-03 01:30:58 +0200 (Wed, 03 Apr 2002) | 2 lines
+Changed paths:
+   M /trunk/doc/Makefile.am
+   M /trunk/doc/Makefile.in
+
+Removed the font from the distribution.
+
+------------------------------------------------------------------------
+r21 | bozo | 2002-04-03 01:28:52 +0200 (Wed, 03 Apr 2002) | 3 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/Makefile.am
+   M /trunk/Makefile.in
+   M /trunk/NEWS
+   M /trunk/configure
+   M /trunk/configure.in
+   M /trunk/doc/Makefile.am
+   M /trunk/doc/Makefile.in
+   M /trunk/doc/decoder.dot
+   M /trunk/doc/structure.doxygen
+
+  - Added debian stuff in the distribution;
+  - workaround for the generation of decoder.png in the documentation.
+
+------------------------------------------------------------------------
+r20 | sam | 2002-04-03 00:57:35 +0200 (Wed, 03 Apr 2002) | 5 lines
+Changed paths:
+   M /trunk/Makefile.in
+   A /trunk/debian
+   A /trunk/debian/.cvsignore
+   A /trunk/debian/changelog
+   A /trunk/debian/control
+   A /trunk/debian/libdvbpsi0-dev.dirs
+   A /trunk/debian/libdvbpsi0.copyright
+   A /trunk/debian/libdvbpsi0.dirs
+   A /trunk/debian/rules
+   M /trunk/examples/Makefile.am
+   M /trunk/examples/Makefile.in
+   M /trunk/src/Makefile.am
+   M /trunk/src/Makefile.in
+
+
+  * ./debian/*: Debian package generation files.
+  * ./examples/Makefile.am: example programs aren't installed by default.
+  * ./src/Makefile.am: libtool now uses -version-info instead of -release.
+
+------------------------------------------------------------------------
+r19 | bozo | 2002-04-02 19:55:30 +0200 (Tue, 02 Apr 2002) | 2 lines
+Changed paths:
+   M /trunk/src/psi.h
+
+typo.
+
+------------------------------------------------------------------------
+r18 | bozo | 2002-04-02 19:47:42 +0200 (Tue, 02 Apr 2002) | 2 lines
+Changed paths:
+   M /trunk/INSTALL
+   M /trunk/README
+
+Updated INSTALL and README.
+
+------------------------------------------------------------------------
+r17 | bozo | 2002-03-28 15:59:42 +0100 (Thu, 28 Mar 2002) | 2 lines
+Changed paths:
+   M /trunk/doc/Makefile.am
+   M /trunk/doc/Makefile.in
+   M /trunk/doc/usage.doxygen
+
+Little modification in the API usage page.
+
+------------------------------------------------------------------------
+r16 | bozo | 2002-03-28 15:48:43 +0100 (Thu, 28 Mar 2002) | 2 lines
+Changed paths:
+   M /trunk/doc/decoder.dot
+   M /trunk/doc/index.doxygen
+
+Added the font file and some little fixes.
+
+------------------------------------------------------------------------
+r15 | bozo | 2002-03-28 13:08:53 +0100 (Thu, 28 Mar 2002) | 2 lines
+Changed paths:
+   M /trunk/doc/doxygen.cfg
+
+Cool graphs in documentation.
+
+------------------------------------------------------------------------
+r14 | bozo | 2002-03-27 21:13:25 +0100 (Wed, 27 Mar 2002) | 2 lines
+Changed paths:
+   M /trunk/doc/Makefile.am
+   M /trunk/doc/Makefile.in
+
+Documentation files included in "dist" target.
+
+------------------------------------------------------------------------
+r13 | bozo | 2002-03-27 21:02:43 +0100 (Wed, 27 Mar 2002) | 4 lines
+Changed paths:
+   A /trunk/doc/decoder.dot
+   M /trunk/doc/doxygen.cfg
+   A /trunk/doc/index.doxygen
+   A /trunk/doc/newdec.doxygen
+   A /trunk/doc/structure.doxygen
+   A /trunk/doc/usage.doxygen
+   M /trunk/src/descriptor.h
+   M /trunk/src/dvbpsi.h
+   M /trunk/src/psi.h
+   A /trunk/src/tables/.cvsignore
+   M /trunk/src/tables/pat.h
+   M /trunk/src/tables/pmt.h
+
+More powerfull API documentation.
+Added Some human readable documentation
+Added a .cvsignore
+
+------------------------------------------------------------------------
+r12 | bozo | 2002-03-26 00:34:02 +0100 (Tue, 26 Mar 2002) | 2 lines
+Changed paths:
+   M /trunk/doc/.cvsignore
+   M /trunk/misc/.cvsignore
+
+.cvsignore stuff
+
+------------------------------------------------------------------------
+r11 | bozo | 2002-03-25 22:00:50 +0100 (Mon, 25 Mar 2002) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/Makefile.in
+   M /trunk/configure
+   M /trunk/configure.in
+   A /trunk/doc
+   A /trunk/doc/.cvsignore
+   A /trunk/doc/Makefile.am
+   A /trunk/doc/Makefile.in
+   A /trunk/doc/doxygen.cfg
+   M /trunk/src/descriptor.h
+   M /trunk/src/dvbpsi.h
+   M /trunk/src/psi.h
+   M /trunk/src/tables/pat.h
+   M /trunk/src/tables/pmt.h
+
+Doxygen documentation.
+
+------------------------------------------------------------------------
+r10 | bozo | 2002-03-19 00:53:39 +0100 (Tue, 19 Mar 2002) | 2 lines
+Changed paths:
+   M /trunk/src/tables/pmt.h
+
+typo.
+
+------------------------------------------------------------------------
+r9 | bozo | 2002-03-18 13:38:53 +0100 (Mon, 18 Mar 2002) | 2 lines
+Changed paths:
+   M /trunk/src/tables/pmt.c
+
+Bug fix in the PMT decoder.
+
+------------------------------------------------------------------------
+r8 | bozo | 2002-03-15 13:16:01 +0100 (Fri, 15 Mar 2002) | 2 lines
+Changed paths:
+   M /trunk/src/descriptor.h
+   M /trunk/src/dvbpsi.h
+   M /trunk/src/psi.h
+   M /trunk/src/tables/pat.h
+   M /trunk/src/tables/pmt.h
+
+C++ compliant headers.
+
+------------------------------------------------------------------------
+r7 | bozo | 2002-01-23 00:28:17 +0100 (Wed, 23 Jan 2002) | 2 lines
+Changed paths:
+   M /trunk/src/tables/pat.c
+   M /trunk/src/tables/pmt.c
+
+I forgot to free the arrays.
+
+------------------------------------------------------------------------
+r6 | bozo | 2002-01-22 21:30:16 +0100 (Tue, 22 Jan 2002) | 5 lines
+Changed paths:
+   M /trunk/aclocal.m4
+   M /trunk/configure
+   M /trunk/configure.in
+   M /trunk/examples/decode_pat.c
+   M /trunk/examples/decode_pmt.c
+   M /trunk/misc/gen_pat.c
+   M /trunk/misc/gen_pmt.c
+   M /trunk/src/Makefile.am
+   M /trunk/src/Makefile.in
+   M /trunk/src/dvbpsi.c
+   M /trunk/src/dvbpsi.h
+   M /trunk/src/dvbpsi_private.h
+   D /trunk/src/pat.c
+   D /trunk/src/pat.h
+   D /trunk/src/pat_private.h
+   D /trunk/src/pmt.c
+   D /trunk/src/pmt.h
+   D /trunk/src/pmt_private.h
+   M /trunk/src/psi.c
+   M /trunk/src/psi.h
+   D /trunk/src/psi_private.h
+   M /trunk/src/stamp-h.in
+   A /trunk/src/tables
+   A /trunk/src/tables/Makefile.am
+   A /trunk/src/tables/Makefile.in
+   A /trunk/src/tables/pat.c
+   A /trunk/src/tables/pat.h
+   A /trunk/src/tables/pat_private.h
+   A /trunk/src/tables/pmt.c
+   A /trunk/src/tables/pmt.h
+   A /trunk/src/tables/pmt_private.h
+
+  - new generation of PAT and PMT decoders that can receive non-consecutive
+    section numbers;
+  - moved tables codecs into "src/tables";
+  - moved PSI decoder in public files to allow external decoders.
+
+------------------------------------------------------------------------
+r5 | bozo | 2002-01-09 12:22:26 +0100 (Wed, 09 Jan 2002) | 6 lines
+Changed paths:
+   M /trunk/AUTHORS
+   M /trunk/misc/Makefile.am
+   M /trunk/misc/Makefile.in
+   A /trunk/misc/gen_pmt.c
+   M /trunk/src/descriptor.c
+   M /trunk/src/pat.c
+   M /trunk/src/pmt.c
+   M /trunk/src/pmt.h
+   M /trunk/src/psi.c
+
+  - PMT generator;
+  - example (gen_pmt);
+  - fixed a non-null pointer in 'descriptor.c';
+  - cosmetic changes;
+  - generators review and comments.
+
+------------------------------------------------------------------------
+r4 | bozo | 2002-01-07 20:35:45 +0100 (Mon, 07 Jan 2002) | 2 lines
+Changed paths:
+   M /trunk/src/pat.c
+   M /trunk/src/pmt.c
+
+Cosmetic change in debug messages.
+
+------------------------------------------------------------------------
+r3 | bozo | 2002-01-07 19:53:03 +0100 (Mon, 07 Jan 2002) | 2 lines
+Changed paths:
+   A /trunk/.cvsignore
+   A /trunk/examples/.cvsignore
+   A /trunk/misc/.cvsignore
+   A /trunk/src/.cvsignore
+
+Added .cvsignore files.
+
+------------------------------------------------------------------------
+r2 | bozo | 2002-01-07 19:44:03 +0100 (Mon, 07 Jan 2002) | 2 lines
+Changed paths:
+   M /trunk/src/descriptor.c
+   M /trunk/src/dvbpsi.c
+
+Fix solaris compilation.
+
+------------------------------------------------------------------------
+r1 | bozo | 2002-01-07 19:30:35 +0100 (Mon, 07 Jan 2002) | 2 lines
+Changed paths:
+   A /trunk
+   A /trunk/AUTHORS
+   A /trunk/COPYING
+   A /trunk/ChangeLog
+   A /trunk/INSTALL
+   A /trunk/Makefile.am
+   A /trunk/Makefile.in
+   A /trunk/NEWS
+   A /trunk/README
+   A /trunk/aclocal.m4
+   A /trunk/config.guess
+   A /trunk/config.sub
+   A /trunk/configure
+   A /trunk/configure.in
+   A /trunk/examples
+   A /trunk/examples/Makefile.am
+   A /trunk/examples/Makefile.in
+   A /trunk/examples/decode_pat.c
+   A /trunk/examples/decode_pmt.c
+   A /trunk/install-sh
+   A /trunk/ltmain.sh
+   A /trunk/misc
+   A /trunk/misc/Makefile.am
+   A /trunk/misc/Makefile.in
+   A /trunk/misc/gen_crc.c
+   A /trunk/misc/gen_pat.c
+   A /trunk/missing
+   A /trunk/mkinstalldirs
+   A /trunk/src
+   A /trunk/src/Makefile.am
+   A /trunk/src/Makefile.in
+   A /trunk/src/config.h.in
+   A /trunk/src/descriptor.c
+   A /trunk/src/descriptor.h
+   A /trunk/src/dvbpsi.c
+   A /trunk/src/dvbpsi.h
+   A /trunk/src/dvbpsi_private.h
+   A /trunk/src/pat.c
+   A /trunk/src/pat.h
+   A /trunk/src/pat_private.h
+   A /trunk/src/pmt.c
+   A /trunk/src/pmt.h
+   A /trunk/src/pmt_private.h
+   A /trunk/src/psi.c
+   A /trunk/src/psi.h
+   A /trunk/src/psi_private.h
+   A /trunk/src/stamp-h.in
+
+Initial commit.
+
+------------------------------------------------------------------------
