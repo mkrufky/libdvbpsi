@@ -1,52 +1,68 @@
 #! /bin/sh
-set -x
 
-rm -f aclocal.m4 configure config.guess config.log config.sub ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh
+##  bootstrap file for libdvbpsi -- Sam Hocevar <sam@zoy.org>
+##  $Id: bootstrap,v 1.5 2003/11/06 10:13:40 sam Exp $
+
+set -x
+set -e
+
+# Get a sane environment, just in case
+LANG=C
+export LANG
+CYGWIN=binmode
+export CYGWIN
 
 # Check for automake
-amvers="none"
-if automake-1.7 --version >/dev/null 2>&1
-then
+amvers="no"
+if automake-1.7 --version >/dev/null 2>&1; then
   amvers="-1.7"
-else
-  if automake-1.6 --version >/dev/null 2>&1
-  then
-    amvers="-1.6"
+elif automake-1.6 --version >/dev/null 2>&1; then
+  amvers="-1.6"
+elif automake-1.5 --version >/dev/null 2>&1; then
+  amvers="-1.5"
+elif automake --version > /dev/null 2>&1; then
+  amvers="`automake --version | sed -e '1s/[^0-9]*//' -e q`"
+  if expr "$amvers" "<" "1.5" > /dev/null 2>&1; then
+    amvers="no"
   else
-    if automake-1.5 --version >/dev/null 2>&1
-    then
-      amvers="-1.5"
-    else
-      if automake --version > /dev/null 2>&1
-      then
-        amvers=`automake --version | sed -e '1s/[^0-9]*//' -e q`
-  
-        if expr "$amvers" "<" "1.5" > /dev/null 2>&1
-        then amvers="none"
-        else amvers=""
-        fi        
-      fi
-    fi 
+    amvers=""
   fi
 fi
 
-if test x$amvers = xnone
-then
+if test "$amvers" = "no"; then
   set +x
-  echo "you need automake version 1.5 or later"
+  echo "$0: you need automake version 1.5 or later"
   exit 1
 fi
 
-aclocal${amvers} || exit 1
-if libtoolize --version >/dev/null 2>&1
-then
-  libtoolize --force --copy || exit 1
-else
-  glibtoolize --force --copy || exit 1
+# Check for libtool
+libtoolize="no"
+if libtoolize --version >/dev/null 2>&1; then
+  libtoolize="libtoolize"
+elif glibtoolize --version >/dev/null 2>&1; then
+  libtoolize="glibtoolize"
 fi
-autoheader || exit 1
-#add --include-deps if you want to bootstrap with any other compiler than gcc
-#automake${amvers} --add-missing --copy --include-deps || exit 1
-automake${amvers} --add-missing --copy || exit 1
-autoconf || exit 1
-rm -f config.cache
+
+if test "$libtoolize" = "no"; then
+  set +x
+  echo "$0: you need libtool"
+  exit 1
+fi
+
+# Remove old cruft
+rm -f aclocal.m4 configure config.guess config.log config.sub config.cache config.h.in config.h compile ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh
+rm -Rf autom4te.cache
+(cd autotools && rm -f config.guess config.sub missing mkinstalldirs compile ltmain.sh depcomp install-sh)
+
+aclocal${amvers}
+${libtoolize} --copy --force
+
+if test -f "ltmain.sh"; then
+  echo "$0: working around a minor libtool issue"
+  mv ltmain.sh autotools/
+fi
+
+autoconf
+autoheader
+automake${amvers} --add-missing --copy
+
