@@ -2,7 +2,7 @@
  * pat.c: PAT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pat.c,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: pat.c,v 1.2 2002/01/07 19:35:45 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -183,8 +183,8 @@ void dvbpsi_DecodePATSection(dvbpsi_decoder_t* p_decoder,
   uint8_t* p_byte;
 
   DVBPSI_DEBUG_ARG("PAT decoder",
-                   "Table version %2d," "i_extension %5d,"
-                   "section %3d up to %3d," "current %1d",
+                   "Table version %2d, " "i_extension %5d, "
+                   "section %3d up to %3d, " "current %1d",
                    p_section->i_version, p_section->i_extension,
                    p_section->i_number, p_section->i_last_number,
                    p_section->b_current_next);
