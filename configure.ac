@@ -2,7 +2,7 @@ AC_INIT(src/dvbpsi.c)
 
 AC_CANONICAL_SYSTEM
 
-AM_INIT_AUTOMAKE(libdvbpsi, 0.1.3)
+AM_INIT_AUTOMAKE(libdvbpsi2, 0.1.3)
 AM_CONFIG_HEADER(config.h)
 
 #AC_CANONICAL_HOST
