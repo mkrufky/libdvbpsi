@@ -43,6 +43,13 @@ your '.c' file:
 The program must be linked against the lib with the '-ldvbpsi' option
 for gcc.
 
+Building documentation
+======================
+
+Once configured, run 'make doc' to build the documentation in html
+(doc/doxygen/html) and latex (doc/doxygen/latex). You'll need the
+doxygen tool (http://www.doxygen.org/) and the graphviz tool
+(http://www.research.att.com/sw/tools/graphviz).
 
 Building packages
 =================
