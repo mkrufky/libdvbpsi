@@ -2,7 +2,7 @@
  * dvbpsi.h: main header
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: dvbpsi.h,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: dvbpsi.h,v 1.2 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -45,6 +45,45 @@ typedef struct dvbpsi_decoder_s * dvbpsi_handle;
  * Injection of a TS packet into a PSI decoder.
  *****************************************************************************/
 void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data);
+
+
+/*****************************************************************************
+ * The following definitions are just here to allow external decoders but
+ * shouldn't be used for any other purpose.
+ *****************************************************************************/
+
+typedef struct dvbpsi_psi_section_s dvbpsi_psi_section_t;
+
+/*****************************************************************************
+ * dvbpsi_callback
+ *****************************************************************************
+ * Callback type definition.
+ *****************************************************************************/
+typedef void (* dvbpsi_callback)(dvbpsi_handle p_decoder,
+                                 dvbpsi_psi_section_t* p_section);
+
+
+/*****************************************************************************
+ * dvbpsi_decoder_t
+ *****************************************************************************
+ * PSI decoder.
+ *****************************************************************************/
+typedef struct dvbpsi_decoder_s
+{
+  dvbpsi_callback               pf_callback;
+
+  void *                        p_private_decoder;
+
+  int                           i_section_max_size;
+
+  uint8_t                       i_continuity_counter;
+  int                           b_discontinuity;
+
+  dvbpsi_psi_section_t *        p_current_section;
+  int                           i_need;
+  int                           b_complete_header;
+
+} dvbpsi_decoder_t;
 
 
 #else

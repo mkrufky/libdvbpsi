@@ -2,7 +2,7 @@
  * dvbpsi_private.h: main private header
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: dvbpsi_private.h,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: dvbpsi_private.h,v 1.2 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -26,38 +26,6 @@
 
 #ifndef _DVBPSI_DVBPSI_PRIVATE_H_
 #define _DVBPSI_DVBPSI_PRIVATE_H_
-
-
-/*****************************************************************************
- * dvbpsi_callback
- *****************************************************************************
- * Callback type definition.
- *****************************************************************************/
-typedef void (* dvbpsi_callback)(struct dvbpsi_decoder_s* p_decoder,
-                                 dvbpsi_psi_section_t* p_section);
-
-
-/*****************************************************************************
- * dvbpsi_decoder_t
- *****************************************************************************
- * PSI decoder.
- *****************************************************************************/
-typedef struct dvbpsi_decoder_s
-{
-  dvbpsi_callback           pf_callback;
-
-  void *                        p_private_decoder;
-
-  int                           i_section_max_size;
-
-  uint8_t                       i_continuity_counter;
-  int                           b_discontinuity;
-
-  dvbpsi_psi_section_t *        p_current_section;
-  int                           i_need;
-  int                           b_complete_header;
-
-} dvbpsi_decoder_t;
 
 
 /*****************************************************************************

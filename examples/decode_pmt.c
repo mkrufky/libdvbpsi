@@ -2,7 +2,7 @@
  * decode_pmt.c: PAT decoder example
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: decode_pmt.c,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: decode_pmt.c,v 1.2 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -37,7 +37,7 @@
 #include "../src/dvbpsi.h"
 #include "../src/psi.h"
 #include "../src/descriptor.h"
-#include "../src/pmt.h"
+#include "../src/tables/pmt.h"
 #else
 #include <dvbpsi/dvbpsi.h>
 #include <dvbpsi/psi.h>
@@ -112,8 +112,6 @@ void DumpPMT(void* p_zero, dvbpsi_pmt_t* p_pmt)
     DumpDescriptors("    |  ]", p_es->p_first_descriptor);
     p_es = p_es->p_next;
   }
-  printf(  "  complete       : %d\n\n",
-         p_pmt->b_complete);
   dvbpsi_DeletePMT(p_pmt);
 }
 

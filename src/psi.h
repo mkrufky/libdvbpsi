@@ -2,7 +2,7 @@
  * psi.h: common PSI structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: psi.h,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: psi.h,v 1.2 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -34,7 +34,7 @@
  * This structure is used to store a PSI section. The common information are
  * decoded (ISO/IEC 13818-1 section 2.4.4.10).
  *****************************************************************************/
-typedef struct dvbpsi_psi_section_s
+struct dvbpsi_psi_section_s
 {
   /* non-specific section data */
   uint8_t       i_table_id;             /* table_id */
@@ -63,7 +63,7 @@ typedef struct dvbpsi_psi_section_s
   /* list handling */
   struct dvbpsi_psi_section_s *         p_next;
 
-} dvbpsi_psi_section_t;
+};
 
 
 /*****************************************************************************
@@ -75,11 +75,27 @@ dvbpsi_psi_section_t * dvbpsi_NewPSISection(int i_max_size);
 
 
 /*****************************************************************************
- * dvbpsi_DeletePSISection
+ * dvbpsi_DeletePSISections
  *****************************************************************************
  * Destruction of a dvbpsi_psi_section_t structure.
  *****************************************************************************/
-void dvbpsi_DeletePSISection(dvbpsi_psi_section_t * p_section);
+void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section);
+
+
+/*****************************************************************************
+ * dvbpsi_ValidPSISection
+ *****************************************************************************
+ * Check the CRC_32 if the section has b_syntax_indicator set.
+ *****************************************************************************/
+int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
+
+
+/*****************************************************************************
+ * dvbpsi_BuildPSISection
+ *****************************************************************************
+ * Build the section based on the information in the structure.
+ *****************************************************************************/
+void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section);
 
 
 #else

@@ -2,7 +2,7 @@
  * psi.c: common PSI functions
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: psi.c,v 1.2 2002/01/09 11:22:26 bozo Exp $
+ * $Id: psi.c,v 1.3 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -31,9 +31,8 @@
 #include <stdlib.h>
 
 #include "dvbpsi.h"
-#include "psi.h"
 #include "dvbpsi_private.h"
-#include "psi_private.h"
+#include "psi.h"
 
 
 /*****************************************************************************
@@ -166,11 +165,11 @@ dvbpsi_psi_section_t * dvbpsi_NewPSISection(int i_max_size)
 
 
 /*****************************************************************************
- * dvbpsi_DeletePSISection
+ * dvbpsi_DeletePSISections
  *****************************************************************************
  * Destruction of a dvbpsi_psi_section_t structure.
  *****************************************************************************/
-void dvbpsi_DeletePSISection(dvbpsi_psi_section_t * p_section)
+void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section)
 {
   while(p_section != NULL)
   {

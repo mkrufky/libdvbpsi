@@ -1,8 +1,8 @@
 /*****************************************************************************
- * psi_private.h: common private PSI structures
+ * pat_private.h: private PAT structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: psi_private.h,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: pat_private.h,v 1.1 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -24,27 +24,50 @@
  *
  *****************************************************************************/
 
-#ifndef _DVBPSI_PSI_PRIVATE_H_
-#define _DVBPSI_PSI_PRIVATE_H_
+#ifndef _DVBPSI_PAT_PRIVATE_H_
+#define _DVBPSI_PAT_PRIVATE_H_
 
 
 /*****************************************************************************
- * dvbpsi_ValidPSISection
+ * dvbpsi_pat_decoder_t
  *****************************************************************************
- * Check the CRC_32 if the section has b_syntax_indicator set.
+ * PAT decoder.
  *****************************************************************************/
-int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
+typedef struct dvbpsi_pat_decoder_s
+{
+  dvbpsi_pat_callback           pf_callback;
+  void *                        p_cb_data;
+
+  dvbpsi_pat_t                  current_pat;
+  dvbpsi_pat_t *                p_building_pat;
+
+  int                           b_current_valid;
+
+  uint8_t                       i_last_section_number;
+  dvbpsi_psi_section_t *        ap_sections [256];
+
+} dvbpsi_pat_decoder_t;
 
 
 /*****************************************************************************
- * dvbpsi_BuildPSISection
+ * dvbpsi_GatherPATSections
  *****************************************************************************
- * Build the section based on the information in the structure.
+ * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section);
+void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
+                              dvbpsi_psi_section_t* p_section);
+
+
+/*****************************************************************************
+ * dvbpsi_DecodePATSection
+ *****************************************************************************
+ * PAT decoder.
+ *****************************************************************************/
+void dvbpsi_DecodePATSections(dvbpsi_pat_t* p_pat,
+                              dvbpsi_psi_section_t* p_section);
 
 
 #else
-#error "Multiple inclusions of psi_private.h"
+#error "Multiple inclusions of pat_private.h"
 #endif
 

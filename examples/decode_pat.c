@@ -2,7 +2,7 @@
  * decode_pat.c: PAT decoder example
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: decode_pat.c,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: decode_pat.c,v 1.2 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -36,7 +36,7 @@
 #ifdef DVBPSI_DIST
 #include "../src/dvbpsi.h"
 #include "../src/psi.h"
-#include "../src/pat.h"
+#include "../src/tables/pat.h"
 #else
 #include <dvbpsi/dvbpsi.h>
 #include <dvbpsi/psi.h>
@@ -88,7 +88,6 @@ void DumpPAT(void* p_zero, dvbpsi_pat_t* p_pat)
     p_program = p_program->p_next;
   }
   printf(  "  active              : %d\n", p_pat->b_current_next);
-  printf(  "  complete            : %d\n\n", p_pat->b_complete);
   dvbpsi_DeletePAT(p_pat);
 }
 

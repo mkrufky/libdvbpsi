@@ -2,7 +2,7 @@
  * gen_pmt.c: PMT generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: gen_pmt.c,v 1.1 2002/01/09 11:22:26 bozo Exp $
+ * $Id: gen_pmt.c,v 1.2 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -34,7 +34,7 @@
 #include "../src/dvbpsi.h"
 #include "../src/psi.h"
 #include "../src/descriptor.h"
-#include "../src/pmt.h"
+#include "../src/tables/pmt.h"
 #else
 #include <dvbpsi/dvbpsi.h>
 #include <dvbpsi/psi.h>
@@ -149,12 +149,12 @@ int main(int i_argc, char* pa_argv[])
   writePSI(packet, p_section6);
 
 
-  dvbpsi_DeletePSISection(p_section1);
-  dvbpsi_DeletePSISection(p_section2);
-  dvbpsi_DeletePSISection(p_section3);
-  dvbpsi_DeletePSISection(p_section4);
-  dvbpsi_DeletePSISection(p_section5);
-  dvbpsi_DeletePSISection(p_section6);
+  dvbpsi_DeletePSISections(p_section1);
+  dvbpsi_DeletePSISections(p_section2);
+  dvbpsi_DeletePSISections(p_section3);
+  dvbpsi_DeletePSISections(p_section4);
+  dvbpsi_DeletePSISections(p_section5);
+  dvbpsi_DeletePSISections(p_section6);
 
   dvbpsi_EmptyPMT(&pmt);
 

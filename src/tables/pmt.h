@@ -2,7 +2,7 @@
  * pmt.h: PMT structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.h,v 1.2 2002/01/09 11:22:26 bozo Exp $
+ * $Id: pmt.h,v 1.1 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -63,9 +63,6 @@ typedef struct dvbpsi_pmt_s
   dvbpsi_descriptor_t *     p_first_descriptor; /* descriptor list */
 
   dvbpsi_pmt_es_t *         p_first_es;         /* ES list */
-
-  int                       b_complete;         /* may not be complete if
-                                                   data has been lost */
 
 } dvbpsi_pmt_t;
 

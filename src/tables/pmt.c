@@ -2,7 +2,7 @@
  * pmt.c: PMT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.c,v 1.3 2002/01/09 11:22:26 bozo Exp $
+ * $Id: pmt.c,v 1.1 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -29,11 +29,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "dvbpsi.h"
-#include "psi.h"
 #include "dvbpsi_private.h"
-#include "psi_private.h"
+#include "psi.h"
 #include "descriptor.h"
 #include "pmt.h"
 #include "pmt_private.h"
@@ -50,6 +50,7 @@ dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
 {
   dvbpsi_handle h_dvbpsi = (dvbpsi_decoder_t*)malloc(sizeof(dvbpsi_decoder_t));
   dvbpsi_pmt_decoder_t* p_pmt_decoder;
+  unsigned int i;
 
   if(h_dvbpsi == NULL)
     return NULL;
@@ -63,7 +64,7 @@ dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
   }
 
   /* PSI decoder configuration */
-  h_dvbpsi->pf_callback = &dvbpsi_DecodePMTSection;
+  h_dvbpsi->pf_callback = &dvbpsi_GatherPMTSections;
   h_dvbpsi->p_private_decoder = p_pmt_decoder;
   h_dvbpsi->i_section_max_size = 1024;
   /* PSI decoder initial state */
@@ -76,9 +77,10 @@ dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
   p_pmt_decoder->pf_callback = pf_callback;
   p_pmt_decoder->p_cb_data = p_cb_data;
   /* PMT decoder initial state */
-  dvbpsi_InitPMT(&p_pmt_decoder->current_pmt, 1, 0, 0, 0);
-  p_pmt_decoder->b_building_next = 0;
-  p_pmt_decoder->b_builded_next = 0;
+  p_pmt_decoder->b_current_valid = 0;
+  p_pmt_decoder->p_building_pmt = NULL;
+  for(i = 0; i <= 255; i++)
+    p_pmt_decoder->ap_sections[i] = NULL;
 
   return h_dvbpsi;
 }
@@ -94,8 +96,7 @@ void dvbpsi_DetachPMT(dvbpsi_handle h_dvbpsi)
   dvbpsi_pmt_decoder_t* p_pmt_decoder
                         = (dvbpsi_pmt_decoder_t*)h_dvbpsi->p_private_decoder;
 
-  dvbpsi_EmptyPMT(&p_pmt_decoder->current_pmt);
-  dvbpsi_EmptyPMT(&p_pmt_decoder->next_pmt);
+  free(p_pmt_decoder->p_building_pmt);
 
   free(h_dvbpsi->p_private_decoder);
   free(h_dvbpsi);
@@ -116,7 +117,6 @@ void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
   p_pmt->i_pcr_pid = i_pcr_pid;
   p_pmt->p_first_descriptor = NULL;
   p_pmt->p_first_es = NULL;
-  p_pmt->b_complete = 0;
 }
 
 
@@ -241,18 +241,18 @@ dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
 
 
 /*****************************************************************************
- * dvbpsi_DecodePMTSection
+ * dvbpsi_GatherPMTSections
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_DecodePMTSection(dvbpsi_decoder_t* p_decoder,
-                             dvbpsi_psi_section_t* p_section)
+void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
+                              dvbpsi_psi_section_t* p_section)
 {
   dvbpsi_pmt_decoder_t* p_pmt_decoder
                         = (dvbpsi_pmt_decoder_t*)p_decoder->p_private_decoder;
-  int b_decode = 1;
+  int b_append = 1;
   int b_reinit = 0;
-  uint8_t* p_byte, * p_end;
+  unsigned int i;
 
   DVBPSI_DEBUG_ARG("PMT decoder",
                    "Table version %2d, " "i_extension %5d, "
@@ -267,83 +267,76 @@ void dvbpsi_DecodePMTSection(dvbpsi_decoder_t* p_decoder,
     DVBPSI_ERROR_ARG("PMT decoder",
                      "invalid section (table_id == 0x%02x)",
                      p_section->i_table_id);
-    b_decode = 0;
-    b_reinit = 1;
+    b_append = 0;
   }
-  else if(!p_section->b_syntax_indicator)
+
+  if(b_append && !p_section->b_syntax_indicator)
   {
     /* Invalid section_syntax_indicator */
     DVBPSI_ERROR("PMT decoder",
                  "invalid section (section_syntax_indicator == 0)");
-    b_decode = 0;
-    b_reinit = 1;
+    b_append = 0;
   }
-  else if(p_pmt_decoder->i_program_number != p_section->i_extension)
+
+  /* Now if b_append is true then we have a valid PMT section */
+  if(b_append && (p_pmt_decoder->i_program_number != p_section->i_extension))
   {
     /* Invalid program_number */
     DVBPSI_ERROR("PMT decoder",
                  "'program_number' don't match");
-    b_decode = 0;
+    b_append = 0;
   }
-  else if(p_decoder->b_discontinuity)
-  {
-    /* A TS discontinuity has occured */
-    b_reinit = 1;
-    p_decoder->b_discontinuity = 0;
-  }
-  else
-  {
-    /* No TS discontinuity has occured */
 
-    /* Perform some few sanity checks */
-    if(p_pmt_decoder->b_building_next)
+  if(b_append)
+  {
+    /* TS discontinuity check */
+    if(p_decoder->b_discontinuity)
     {
-      if(p_pmt_decoder->next_pmt.i_version != p_section->i_version)
-      {
-        /* version_number */
-        DVBPSI_ERROR("PMT decoder",
-                     "'version_number' differs"
-                     " whereas no discontinuity has occured");
-        b_reinit = 1;
-      }
-      else if(p_pmt_decoder->i_last_section_number != p_section->i_last_number)
-      {
-        /* last_section_number */
-        DVBPSI_ERROR("PMT decoder",
-                     "'last_section_number' differs"
-                     " whereas no discontinuity has occured");
-        b_reinit = 1;
-      }
-      else if(p_pmt_decoder->i_previous_section_number >= p_section->i_number)
-      {
-        /* section_number */
-        DVBPSI_ERROR("PMT decoder",
-                     "backward 'section_number'"
-                     " whereas no discontinuity has occured");
-        b_reinit = 1;
-      }
+      b_reinit = 1;
+      p_decoder->b_discontinuity = 0;
     }
     else
     {
-      if(p_pmt_decoder->current_pmt.i_version == p_section->i_version)
+      /* Perform some few sanity checks */
+      if(p_pmt_decoder->p_building_pmt)
       {
-        /* signal a new PMT if the previous one wasn't active */
-        if(    (p_pmt_decoder->current_pmt.b_complete)
-            && (!p_pmt_decoder->current_pmt.b_current_next)
-            && (p_section->b_current_next))
+        if(p_pmt_decoder->p_building_pmt->i_version != p_section->i_version)
         {
-          dvbpsi_pmt_t* p_pmt = (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));
-
-          p_pmt_decoder->current_pmt.b_current_next = 1;
-          *p_pmt = p_pmt_decoder->current_pmt;
-          p_pmt_decoder->current_pmt.p_first_descriptor = NULL;
-          p_pmt_decoder->current_pmt.p_first_es = NULL;
-          p_pmt_decoder->pf_callback(p_pmt_decoder->p_cb_data, p_pmt);
+          /* version_number */
+          DVBPSI_ERROR("PMT decoder",
+                       "'version_number' differs"
+                       " whereas no discontinuity has occured");
+          b_reinit = 1;
         }
+        else if(p_pmt_decoder->i_last_section_number
+                                                != p_section->i_last_number)
+        {
+          /* last_section_number */
+          DVBPSI_ERROR("PMT decoder",
+                       "'last_section_number' differs"
+                       " whereas no discontinuity has occured");
+          b_reinit = 1;
+        }
+      }
+      else
+      {
+        if(    (p_pmt_decoder->b_current_valid)
+            && (p_pmt_decoder->current_pmt.i_version == p_section->i_version))
+        {
+          /* Signal a new PMT if the previous one wasn't active */
+          if(    (!p_pmt_decoder->current_pmt.b_current_next)
+              && (p_section->b_current_next))
+          {
+            dvbpsi_pmt_t* p_pmt = (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));
 
-        /* Don't decode if the version is already decoded */
-        if(p_pmt_decoder->current_pmt.b_complete)
-          b_decode = 0;
+            p_pmt_decoder->current_pmt.b_current_next = 1;
+            *p_pmt = p_pmt_decoder->current_pmt;
+            p_pmt_decoder->pf_callback(p_pmt_decoder->p_cb_data, p_pmt);
+          }
+
+          /* Don't decode since this version is already decoded */
+          b_append = 0;
+        }
       }
     }
   }
@@ -351,36 +344,108 @@ void dvbpsi_DecodePMTSection(dvbpsi_decoder_t* p_decoder,
   /* Reinit the decoder if wanted */
   if(b_reinit)
   {
-    dvbpsi_EmptyPMT(&p_pmt_decoder->current_pmt);
-    p_pmt_decoder->current_pmt.b_complete = 0; /* force redecoding */
-    dvbpsi_EmptyPMT(&p_pmt_decoder->next_pmt);
-    p_pmt_decoder->b_building_next = 0;
+    /* Force redecoding */
+    p_pmt_decoder->b_current_valid = 0;
+    /* Free structures */
+    if(p_pmt_decoder->p_building_pmt)
+    {
+      free(p_pmt_decoder->p_building_pmt);
+      p_pmt_decoder->p_building_pmt = NULL;
+    }
+    /* Clear the section array */
+    for(i = 0; i <= 255; i++)
+    {
+      if(p_pmt_decoder->ap_sections[i] != NULL)
+      {
+        dvbpsi_DeletePSISections(p_pmt_decoder->ap_sections[i]);
+        p_pmt_decoder->ap_sections[i] = NULL;
+      }
+    }
   }
 
-  /* Decode the section if wanted */
-  if(b_decode)
+  /* Append the section to the list if wanted */
+  if(b_append)
   {
-    /* Initialization */
-    if(!p_pmt_decoder->b_building_next)
+    int b_complete;
+
+    /* Initialize the structures if it's the first section received */
+    if(!p_pmt_decoder->p_building_pmt)
     {
-      p_pmt_decoder->next_pmt.i_program_number = p_section->i_extension;
-      p_pmt_decoder->next_pmt.i_version = p_section->i_version;
-      p_pmt_decoder->next_pmt.b_current_next = p_section->b_current_next;
-      p_pmt_decoder->next_pmt.i_pcr_pid =
-                  ((uint16_t)(p_section->p_payload_start[0] & 0x1f) << 8)
-                | p_section->p_payload_start[1];
-      p_pmt_decoder->i_last_section_number = p_section->i_last_number;
-      p_pmt_decoder->b_section_lost = (p_section->i_number != 0);
-      p_pmt_decoder->b_building_next = 1;
-    }
-    else
-    {
-      p_pmt_decoder->b_section_lost =
-                        (    p_section->i_number
-                          != p_pmt_decoder->i_previous_section_number + 1);
+      p_pmt_decoder->p_building_pmt =
+                                (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));
+      dvbpsi_InitPMT(p_pmt_decoder->p_building_pmt,
+                     p_pmt_decoder->i_program_number,
+                     p_section->i_version,
+                     p_section->b_current_next,
+                       ((uint16_t)(p_section->p_payload_start[0] & 0x1f) << 8)
+                     | p_section->p_payload_start[1]);
     }
 
-    /* Decode section */
+    /* Fill the section array */
+    if(p_pmt_decoder->ap_sections[p_section->i_number] != NULL)
+    {
+      DVBPSI_DEBUG_ARG("PMT decoder", "overwrite section number %d",
+                       p_section->i_number);
+      dvbpsi_DeletePSISections(p_pmt_decoder->ap_sections[p_section->i_number]);
+    }
+    p_pmt_decoder->ap_sections[p_section->i_number] = p_section;
+
+    /* Check if we have all the sections */
+    b_complete = 0;
+    for(i = 0; i <= p_pmt_decoder->i_last_section_number; i++)
+    {
+      if(!p_pmt_decoder->ap_sections[i])
+        break;
+
+      if(i == p_pmt_decoder->i_last_section_number)
+        b_complete = 1;
+    }
+
+    if(b_complete)
+    {
+      /* Save the current information */
+      p_pmt_decoder->current_pmt = *p_pmt_decoder->p_building_pmt;
+      p_pmt_decoder->b_current_valid = 1;
+      /* Chain the sections */
+      if(p_pmt_decoder->i_last_section_number)
+      {
+        for(i = 0; i <= p_pmt_decoder->i_last_section_number - 1; i++)
+          p_pmt_decoder->ap_sections[i]->p_next =
+                                        p_pmt_decoder->ap_sections[i + 1];
+      }
+      /* Decode the sections */
+      dvbpsi_DecodePMTSections(p_pmt_decoder->p_building_pmt,
+                               p_pmt_decoder->ap_sections[0]);
+      /* Delete the sections */
+      dvbpsi_DeletePSISections(p_pmt_decoder->ap_sections[0]);
+      /* signal the new PMT */
+      p_pmt_decoder->pf_callback(p_pmt_decoder->p_cb_data,
+                                 p_pmt_decoder->p_building_pmt);
+      /* Reinitialize the structures */
+      p_pmt_decoder->p_building_pmt = NULL;
+      for(i = 0; i <= p_pmt_decoder->i_last_section_number; i++)
+        p_pmt_decoder->ap_sections[i] = NULL;
+    }
+  }
+  else
+  {
+    dvbpsi_DeletePSISections(p_section);
+  }
+}
+
+
+/*****************************************************************************
+ * dvbpsi_DecodePMTSections
+ *****************************************************************************
+ * PMT decoder.
+ *****************************************************************************/
+void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
+                              dvbpsi_psi_section_t* p_section)
+{
+  uint8_t* p_byte, * p_end;
+
+  while(p_section)
+  {
     /* - PMT descriptors */
     p_byte = p_section->p_payload_start + 4;
     p_end = p_byte + (   ((uint16_t)(p_section->p_payload_start[2] & 0x0f) << 8)
@@ -390,22 +455,17 @@ void dvbpsi_DecodePMTSection(dvbpsi_decoder_t* p_decoder,
       uint8_t i_tag = p_byte[0];
       uint8_t i_length = p_byte[1];
       if(i_length + 2 <= p_end - p_byte)
-      {
-        dvbpsi_PMTAddDescriptor(&p_pmt_decoder->next_pmt,
-                                i_tag, i_length, p_byte + 2);
-      }
+        dvbpsi_PMTAddDescriptor(p_pmt, i_tag, i_length, p_byte + 2);
       p_byte += 2 + i_length;
     }
 
     /* - ESs */
-    p_pmt_decoder->i_previous_section_number = p_section->i_number;
     for(p_byte = p_end; p_byte < p_section->p_payload_end;)
     {
       uint8_t i_type = p_byte[0];
       uint16_t i_pid = ((uint16_t)(p_byte[1] & 0x1f) << 8) | p_byte[2];
       uint16_t i_length = ((uint16_t)(p_byte[3] & 0x0f) << 8) | p_byte[4];
-      dvbpsi_pmt_es_t* p_es = dvbpsi_PMTAddES(&p_pmt_decoder->next_pmt,
-                                              i_type, i_pid);
+      dvbpsi_pmt_es_t* p_es = dvbpsi_PMTAddES(p_pmt, i_type, i_pid);
       /* - ES descriptors */
       p_byte += 5;
       p_end = p_byte + i_length;
@@ -414,37 +474,13 @@ void dvbpsi_DecodePMTSection(dvbpsi_decoder_t* p_decoder,
         uint8_t i_tag = p_byte[0];
         uint8_t i_length = p_byte[1];
         if(i_length + 2 <= p_end - p_byte)
-        {
           dvbpsi_PMTESAddDescriptor(p_es, i_tag, i_length, p_byte + 2);
-        }
         p_byte += 2 + i_length;
       }
     }
 
-    if(p_section->i_number == p_pmt_decoder->i_last_section_number)
-    {
-      /* PMT is finished */
-      dvbpsi_pmt_t* p_pmt = (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));
-
-      p_pmt_decoder->next_pmt.b_complete = !p_pmt_decoder->b_section_lost;
-
-      *p_pmt = p_pmt_decoder->next_pmt;
-
-      dvbpsi_EmptyPMT(&p_pmt_decoder->current_pmt);
-      p_pmt_decoder->current_pmt.i_program_number = p_pmt->i_program_number;
-      p_pmt_decoder->current_pmt.i_version = p_pmt->i_version;
-      p_pmt_decoder->current_pmt.b_current_next = p_pmt->b_current_next;
-      p_pmt_decoder->current_pmt.i_pcr_pid = p_pmt->i_pcr_pid;
-      p_pmt_decoder->current_pmt.b_complete = p_pmt->b_complete;
-      /* signal the new PMT */
-      p_pmt_decoder->pf_callback(p_pmt_decoder->p_cb_data, p_pmt);
-      p_pmt_decoder->next_pmt.p_first_descriptor = NULL;
-      p_pmt_decoder->next_pmt.p_first_es = NULL;
-      p_pmt_decoder->b_building_next = 0;
-    }
+    p_section = p_section->p_next;
   }
-
-  dvbpsi_DeletePSISection(p_section);
 }
 
 

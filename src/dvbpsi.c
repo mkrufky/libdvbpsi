@@ -2,7 +2,7 @@
  * dvbpsi.c: conversion from TS packets to PSI sections
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: dvbpsi.c,v 1.2 2002/01/07 18:44:03 bozo Exp $
+ * $Id: dvbpsi.c,v 1.3 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -31,9 +31,8 @@
 #include <stdio.h>
 
 #include "dvbpsi.h"
-#include "psi.h"
 #include "dvbpsi_private.h"
-#include "psi_private.h"
+#include "psi.h"
 
 
 /*****************************************************************************
@@ -71,7 +70,7 @@ void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
     h_dvbpsi->b_discontinuity = 1;
     if(h_dvbpsi->p_current_section)
     {
-      dvbpsi_DeletePSISection(h_dvbpsi->p_current_section);
+      dvbpsi_DeletePSISections(h_dvbpsi->p_current_section);
       h_dvbpsi->p_current_section = NULL;
     }
   }
@@ -148,7 +147,7 @@ void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
         if(h_dvbpsi->i_need > h_dvbpsi->i_section_max_size - 3)
         {
           DVBPSI_ERROR("PSI decoder", "PSI section too long");
-          dvbpsi_DeletePSISection(p_section);
+          dvbpsi_DeletePSISections(p_section);
           h_dvbpsi->p_current_section = NULL;
           /* If there is a new section not being handled then go forward
              in the packet */
@@ -203,7 +202,7 @@ void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
         else
         {
           /* PSI section isn't valid => trash it */
-          dvbpsi_DeletePSISection(p_section);
+          dvbpsi_DeletePSISections(p_section);
           h_dvbpsi->p_current_section = NULL;
         }
 

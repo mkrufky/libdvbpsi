@@ -2,7 +2,7 @@
  * pat.h: PAT structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pat.h,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: pat.h,v 1.1 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -57,9 +57,6 @@ typedef struct dvbpsi_pat_s
   int                       b_current_next;     /* current_next_indicator */
 
   dvbpsi_pat_program_t *    p_first_program;    /* program list */
-
-  int                       b_complete;         /* may not be complete if
-                                                   data has been lost */
 
 } dvbpsi_pat_t;
 
