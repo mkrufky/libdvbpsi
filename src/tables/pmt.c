@@ -2,7 +2,7 @@
  * pmt.c: PMT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.c,v 1.4 2002/05/08 13:00:40 bozo Exp $
+ * $Id: pmt.c,v 1.5 2002/05/24 21:58:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -585,6 +585,7 @@ dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt)
            && ((p_es_start - p_current->p_data) + i_es_length <= 1020))
     {
       i_es_length += p_descriptor->i_length + 2;
+      p_descriptor = p_descriptor->p_next;
     }
 
     /* If _no_ and the current section isn't empty and an empty section
