@@ -15,7 +15,7 @@ build-stamp:
 	dh_testdir
 
 	./configure --prefix=/usr --mandir=$${prefix}/share/man \
-		--infodir=$${prefix}/share/info
+		--infodir=$${prefix}/share/info --enable-release 
 
 	$(MAKE)
 
