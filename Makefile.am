@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = src examples misc
-DIST_SUBDIRS = $(SUBDIRS) doc debian
+DIST_SUBDIRS = $(SUBDIRS) doc debian wince
 
 EXTRA_DIST = libdvbpsi.spec bootstrap
 

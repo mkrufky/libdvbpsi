@@ -2,7 +2,7 @@
  * dvbpsi_private.h: main private header
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: dvbpsi_private.h,v 1.2 2002/01/22 20:30:16 bozo Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -33,17 +33,33 @@
  *****************************************************************************/
 #define DVBPSI_ERROR(src, str)                                          \
         fprintf(stderr, "libdvbpsi error (" src "): " str "\n");
-#define DVBPSI_ERROR_ARG(src, str, x...)                                \
+#ifdef HAVE_VARIADIC_MACROS
+#  define DVBPSI_ERROR_ARG(src, str, x...)                              \
         fprintf(stderr, "libdvbpsi error (" src "): " str "\n", x);
+#else
+   inline void DVBPSI_ERROR_ARG( char *src, const char *str, ... )
+   { va_list ap; va_start( ap, str );
+     vfprintf(stderr, str, ap); fprintf(stderr,"\n"); va_end( ap ); }
+#endif
 
 #ifdef DEBUG
 #  define DVBPSI_DEBUG(src, str)                                        \
           fprintf(stderr, "libdvbpsi debug (" src "): " str "\n");
-#  define DVBPSI_DEBUG_ARG(src, str, x...)                              \
+#  ifdef HAVE_VARIADIC_MACROS
+#     define DVBPSI_DEBUG_ARG(src, str, x...)                           \
           fprintf(stderr, "libdvbpsi debug (" src "): " str "\n", x);
+#  else
+      inline void DVBPSI_DEBUG_ARG( char *src, const char *str, ... )
+      { va_list ap; va_start( ap, str );
+        vfprintf(stderr, str, ap); fprintf(stderr,"\n"); va_end( ap ); }
+#  endif
 #else
 #  define DVBPSI_DEBUG(src, str)
-#  define DVBPSI_DEBUG_ARG(src, str, x...)
+#  ifdef HAVE_VARIADIC_MACROS
+#     define DVBPSI_DEBUG_ARG(src, str, x...)
+#  else
+      inline void DVBPSI_DEBUG_ARG( char *src, const char *str, ... ) {}
+#  endif
 #endif
 
 

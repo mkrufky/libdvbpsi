@@ -10,6 +10,7 @@ AM_CONFIG_HEADER(config.h)
 #AC_CANONICAL_HOST
 AC_PROG_CC
 AC_STDC_HEADERS
+AC_C_INLINE
 
 AM_PROG_LIBTOOL
 
@@ -56,7 +57,20 @@ fi
 dnl Check for headers
 AC_CHECK_HEADERS(stdint.h inttypes.h)
 
-AC_OUTPUT([Makefile src/Makefile examples/Makefile misc/Makefile doc/Makefile debian/Makefile])
+dnl Check for variadic macros
+AC_CACHE_CHECK([for variadic cpp macros],
+    [ac_cv_cpp_variadic_macros],
+    [AC_TRY_COMPILE(
+         [#include <stdio.h>
+          #define a(b,c...) printf(b,##c)],
+         [a("foo");a("%s","bar");a("%s%s","baz","quux");],
+         ac_cv_cpp_variadic_macros=yes,
+         ac_cv_cpp_variadic_macros=no)])
+if test "${ac_cv_cpp_variadic_macros}" != "no"; then
+    AC_DEFINE(HAVE_VARIADIC_MACROS, 1, Support for variadic macros)
+fi
+
+AC_OUTPUT([Makefile src/Makefile examples/Makefile misc/Makefile doc/Makefile debian/Makefile wince/Makefile])
 
 echo "
 libdvbpsi configuration
