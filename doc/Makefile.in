@@ -76,6 +76,8 @@ VERSION = @VERSION@
 
 EXTRA_DIST = index.doxygen structure.doxygen usage.doxygen newdec.doxygen            decoder.dot Helvetica.ttf doxygen.cfg
 
+
+MOSTLYCLEANFILES = decoder.png
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../src/config.h
 CONFIG_CLEAN_FILES = 
@@ -146,6 +148,7 @@ installdirs:
 
 
 mostlyclean-generic:
+	-test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
 
 clean-generic:
 
@@ -181,8 +184,12 @@ distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
 
-doc:
+doc: decoder.png
 	doxygen doxygen.cfg
+	cp decoder.png doxygen/html
+
+decoder.png: decoder.dot
+	dot -Tpng -o $@ $<
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

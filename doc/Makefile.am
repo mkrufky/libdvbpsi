@@ -3,6 +3,12 @@
 EXTRA_DIST=index.doxygen structure.doxygen usage.doxygen newdec.doxygen \
            decoder.dot Helvetica.ttf doxygen.cfg
 
-doc:
+MOSTLYCLEANFILES=decoder.png
+
+doc: decoder.png
 	doxygen doxygen.cfg
+	cp decoder.png doxygen/html
+
+decoder.png: decoder.dot
+	dot -Tpng -o $@ $<
 

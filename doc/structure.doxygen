@@ -2,7 +2,7 @@
 
 <p>The PSI decoder and the specific decoder:</p>
 
-\dotfile decoder.dot "Decoder entities"
+<img src="decoder.png" />
 
 <p>Each decoder is split into two entities:</p>
 
