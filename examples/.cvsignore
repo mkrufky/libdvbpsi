@@ -1,7 +1,0 @@
-.deps
-.libs
-Makefile
-Makefile.in
-decode_pat
-decode_pmt
-decode_sdt
