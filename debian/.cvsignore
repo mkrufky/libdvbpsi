@@ -1,0 +1,6 @@
+tmp
+libdvbpsi*
+delete
+files
+*debhelper
+*substvars
