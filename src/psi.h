@@ -1,7 +1,7 @@
 /*****************************************************************************
  * psi.h
  * (c)2001-2002 VideoLAN
- * $Id: psi.h,v 1.5 2002/03/27 20:02:43 bozo Exp $
+ * $Id: psi.h,v 1.6 2002/04/02 17:55:30 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -64,7 +64,7 @@ extern "C" {
  * dvbpsi_psi_section_s::i_extension, dvbpsi_psi_section_s::i_version,
  * dvbpsi_psi_section_s::b_current_next, dvbpsi_psi_section_s::i_number,
  * dvbpsi_psi_section_s::i_last_number, and dvbpsi_psi_section_s::i_crc are
- * undifined.
+ * undefined.
  */
 struct dvbpsi_psi_section_s
 {
