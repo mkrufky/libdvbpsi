@@ -2,7 +2,7 @@
  * pmt.c: PMT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.c,v 1.2 2002/01/07 19:35:45 bozo Exp $
+ * $Id: pmt.c,v 1.3 2002/01/09 11:22:26 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -445,5 +445,190 @@ void dvbpsi_DecodePMTSection(dvbpsi_decoder_t* p_decoder,
   }
 
   dvbpsi_DeletePSISection(p_section);
+}
+
+
+/*****************************************************************************
+ * dvbpsi_GenPMTSections
+ *****************************************************************************
+ * Generate PMT sections based on the dvbpsi_pmt_t structure.
+ *****************************************************************************/
+dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt)
+{
+  dvbpsi_psi_section_t* p_result = dvbpsi_NewPSISection(1024);
+  dvbpsi_psi_section_t* p_current = p_result;
+  dvbpsi_psi_section_t* p_prev;
+  dvbpsi_descriptor_t* p_descriptor = p_pmt->p_first_descriptor;
+  dvbpsi_pmt_es_t* p_es = p_pmt->p_first_es;
+  uint16_t i_info_length;
+
+  p_current->i_table_id = 0x02;
+  p_current->b_syntax_indicator = 1;
+  p_current->b_private_indicator = 0;
+  p_current->i_length = 13;                     /* header + CRC_32 */
+  p_current->i_extension = p_pmt->i_program_number;
+  p_current->i_version = p_pmt->i_version;
+  p_current->b_current_next = p_pmt->b_current_next;
+  p_current->i_number = 0;
+  p_current->p_payload_end += 12;               /* just after the header */
+  p_current->p_payload_start = p_current->p_data + 8;
+
+  /* PCR_PID */
+  p_current->p_data[8] = (p_pmt->i_pcr_pid >> 8) | 0xe0;
+  p_current->p_data[9] = p_pmt->i_pcr_pid;
+
+  /* PMT descriptors */
+  while(p_descriptor != NULL)
+  {
+    /* New section if needed */
+    /* written_data_length + descriptor_length + 2 > 1024 - CRC_32_length */
+    if(   (p_current->p_payload_end - p_current->p_data)
+                                + p_descriptor->i_length > 1018)
+    {
+      /* program_info_length */
+      i_info_length = (p_current->p_payload_end - p_current->p_data) - 12;
+      p_current->p_data[10] = (i_info_length >> 8) | 0xf0;
+      p_current->p_data[11] = i_info_length;
+
+      p_prev = p_current;
+      p_current = dvbpsi_NewPSISection(1024);
+      p_prev->p_next = p_current;
+
+      p_current->i_table_id = 0x02;
+      p_current->b_syntax_indicator = 1;
+      p_current->b_private_indicator = 0;
+      p_current->i_length = 13;                 /* header + CRC_32 */
+      p_current->i_extension = p_pmt->i_program_number;
+      p_current->i_version = p_pmt->i_version;
+      p_current->b_current_next = p_pmt->b_current_next;
+      p_current->i_number = p_prev->i_number + 1;
+      p_current->p_payload_end += 12;           /* just after the header */
+      p_current->p_payload_start = p_current->p_data + 8;
+
+      /* PCR_PID */
+      p_current->p_data[8] = (p_pmt->i_pcr_pid >> 8) | 0xe0;
+      p_current->p_data[9] = p_pmt->i_pcr_pid;
+    }
+
+    /* p_payload_end is where the descriptor begins */
+    p_current->p_payload_end[0] = p_descriptor->i_tag;
+    p_current->p_payload_end[1] = p_descriptor->i_length;
+    memcpy(p_current->p_payload_end + 2,
+           p_descriptor->p_data,
+           p_descriptor->i_length);
+
+    /* Increase length by descriptor_length + 2 */
+    p_current->p_payload_end += p_descriptor->i_length + 2;
+    p_current->i_length += p_descriptor->i_length + 2;
+
+    p_descriptor = p_descriptor->p_next;
+  }
+
+  /* program_info_length */
+  i_info_length = (p_current->p_payload_end - p_current->p_data) - 12;
+  p_current->p_data[10] = (i_info_length >> 8) | 0xf0;
+  p_current->p_data[11] = i_info_length;
+
+  /* PMT ESs */
+  while(p_es != NULL)
+  {
+    uint8_t* p_es_start = p_current->p_payload_end;
+    uint16_t i_es_length = 5;
+
+    /* Can the current section carry all the descriptors ? */
+    p_descriptor = p_es->p_first_descriptor;
+    while(    (p_descriptor != NULL)
+           && ((p_es_start - p_current->p_data) + i_es_length <= 1020))
+    {
+      i_es_length += p_descriptor->i_length + 2;
+    }
+
+    /* If _no_ and the current section isn't empty and an empty section
+       may carry one more descriptor
+       then create a new section */
+    if(    (p_descriptor != NULL)
+        && (p_es_start - p_current->p_data != 12)
+        && (i_es_length <= 1008))
+    {
+      /* will put more descriptors in an empty section */
+      DVBPSI_DEBUG("PMT generator",
+                   "create a new section to carry more ES descriptors");
+      p_prev = p_current;
+      p_current = dvbpsi_NewPSISection(1024);
+      p_prev->p_next = p_current;
+
+      p_current->i_table_id = 0x02;
+      p_current->b_syntax_indicator = 1;
+      p_current->b_private_indicator = 0;
+      p_current->i_length = 13;                 /* header + CRC_32 */
+      p_current->i_extension = p_pmt->i_program_number;
+      p_current->i_version = p_pmt->i_version;
+      p_current->b_current_next = p_pmt->b_current_next;
+      p_current->i_number = p_prev->i_number + 1;
+      p_current->p_payload_end += 12;           /* just after the header */
+      p_current->p_payload_start = p_current->p_data + 8;
+
+      /* PCR_PID */
+      p_current->p_data[8] = (p_pmt->i_pcr_pid >> 8) | 0xe0;
+      p_current->p_data[9] = p_pmt->i_pcr_pid;
+
+      /* program_info_length */
+      i_info_length = 0;
+      p_current->p_data[10] = 0xf0;
+      p_current->p_data[11] = 0x00;
+
+      p_es_start = p_current->p_payload_end;
+    }
+
+    /* p_es_start is where the ES begins */
+    p_es_start[0] = p_es->i_type;
+    p_es_start[1] = (p_es->i_pid >> 8) | 0xe0;
+    p_es_start[2] = p_es->i_pid;
+
+    /* Increase the length by 5 */
+    p_current->p_payload_end += 5;
+    p_current->i_length += 5;
+
+    /* ES descriptors */
+    p_descriptor = p_es->p_first_descriptor;
+    while(    (p_descriptor != NULL)
+           && (   (p_current->p_payload_end - p_current->p_data)
+                + p_descriptor->i_length <= 1018))
+    {
+      /* p_payload_end is where the descriptor begins */
+      p_current->p_payload_end[0] = p_descriptor->i_tag;
+      p_current->p_payload_end[1] = p_descriptor->i_length;
+      memcpy(p_current->p_payload_end + 2,
+             p_descriptor->p_data,
+             p_descriptor->i_length);
+
+      /* Increase length by descriptor_length + 2 */
+      p_current->p_payload_end += p_descriptor->i_length + 2;
+      p_current->i_length += p_descriptor->i_length + 2;
+
+      p_descriptor = p_descriptor->p_next;
+    }
+
+    if(p_descriptor != NULL)
+      DVBPSI_ERROR("PMT generator", "unable to carry all the ES descriptors");
+
+    /* ES_info_length */
+    i_es_length = p_current->p_payload_end - p_es_start - 5;
+    p_es_start[3] = (i_es_length >> 8) | 0xf0;
+    p_es_start[4] = i_es_length;
+
+    p_es = p_es->p_next;
+  }
+
+  /* Finalization */
+  p_prev = p_result;
+  while(p_prev != NULL)
+  {
+    p_prev->i_last_number = p_current->i_number;
+    dvbpsi_BuildPSISection(p_prev);
+    p_prev = p_prev->p_next;
+  }
+
+  return p_result;
 }
 

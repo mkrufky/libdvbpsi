@@ -74,16 +74,19 @@ RANLIB = @RANLIB@
 STRIP = @STRIP@
 VERSION = @VERSION@
 
-noinst_PROGRAMS = gen_crc gen_pat
+noinst_PROGRAMS = gen_crc gen_pat gen_pmt
 
 gen_crc_SOURCES = gen_crc.c
 
 gen_pat_SOURCES = gen_pat.c
 gen_pat_LDFLAGS = -L../src -ldvbpsi
+
+gen_pmt_SOURCES = gen_pmt.c
+gen_pmt_LDFLAGS = -L../src -ldvbpsi
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../src/config.h
 CONFIG_CLEAN_FILES = 
-noinst_PROGRAMS =  gen_crc$(EXEEXT) gen_pat$(EXEEXT)
+noinst_PROGRAMS =  gen_crc$(EXEEXT) gen_pat$(EXEEXT) gen_pmt$(EXEEXT)
 PROGRAMS =  $(noinst_PROGRAMS)
 
 
@@ -98,6 +101,9 @@ gen_crc_LDFLAGS =
 gen_pat_OBJECTS =  gen_pat.$(OBJEXT)
 gen_pat_LDADD = $(LDADD)
 gen_pat_DEPENDENCIES = 
+gen_pmt_OBJECTS =  gen_pmt.$(OBJEXT)
+gen_pmt_LDADD = $(LDADD)
+gen_pmt_DEPENDENCIES = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -110,9 +116,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/gen_crc.P .deps/gen_pat.P
-SOURCES = $(gen_crc_SOURCES) $(gen_pat_SOURCES)
-OBJECTS = $(gen_crc_OBJECTS) $(gen_pat_OBJECTS)
+DEP_FILES =  .deps/gen_crc.P .deps/gen_pat.P .deps/gen_pmt.P
+SOURCES = $(gen_crc_SOURCES) $(gen_pat_SOURCES) $(gen_pmt_SOURCES)
+OBJECTS = $(gen_crc_OBJECTS) $(gen_pat_OBJECTS) $(gen_pmt_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
@@ -179,6 +185,10 @@ gen_crc$(EXEEXT): $(gen_crc_OBJECTS) $(gen_crc_DEPENDENCIES)
 gen_pat$(EXEEXT): $(gen_pat_OBJECTS) $(gen_pat_DEPENDENCIES)
 	@rm -f gen_pat$(EXEEXT)
 	$(LINK) $(gen_pat_LDFLAGS) $(gen_pat_OBJECTS) $(gen_pat_LDADD) $(LIBS)
+
+gen_pmt$(EXEEXT): $(gen_pmt_OBJECTS) $(gen_pmt_DEPENDENCIES)
+	@rm -f gen_pmt$(EXEEXT)
+	$(LINK) $(gen_pmt_LDFLAGS) $(gen_pmt_OBJECTS) $(gen_pmt_LDADD) $(LIBS)
 
 tags: TAGS
 

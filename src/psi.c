@@ -2,7 +2,7 @@
  * psi.c: common PSI functions
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: psi.c,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: psi.c,v 1.2 2002/01/09 11:22:26 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -211,7 +211,7 @@ int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
     else
     {
       DVBPSI_ERROR_ARG("misc PSI",
-                       "Bad CRC_32 (0x%08x) !!!!!!!!!!!!!!!!!!!!", i_crc);
+                       "Bad CRC_32 (0x%08x) !!!", i_crc);
       return 0;
     }
   }

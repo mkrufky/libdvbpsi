@@ -2,7 +2,7 @@
  * descriptor.c: descriptors functions
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: descriptor.c,v 1.2 2002/01/07 18:44:03 bozo Exp $
+ * $Id: descriptor.c,v 1.3 2002/01/09 11:22:26 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -54,6 +54,7 @@ dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
       p_descriptor->i_tag = i_tag;
       p_descriptor->i_length = i_length;
       memcpy(p_descriptor->p_data, p_data, i_length);
+      p_descriptor->p_next = NULL;
     }
     else
     {

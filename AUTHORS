@@ -11,5 +11,5 @@ C: bozo
 D: main structure
 D: PSI section gathering
 D: PAT decoder/generator
-D: PMT decoder
+D: PMT decoder/generator
 

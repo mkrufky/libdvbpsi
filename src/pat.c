@@ -2,7 +2,7 @@
  * pat.c: PAT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pat.c,v 1.2 2002/01/07 19:35:45 bozo Exp $
+ * $Id: pat.c,v 1.3 2002/01/09 11:22:26 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -352,26 +352,29 @@ dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
 {
   dvbpsi_psi_section_t* p_result = dvbpsi_NewPSISection(1024);
   dvbpsi_psi_section_t* p_current = p_result;
-  dvbpsi_psi_section_t* p_prev = p_result;
+  dvbpsi_psi_section_t* p_prev;
   dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
   int i_count = 0;
 
+  /* A PAT section can carry up to 253 programs */
   if((i_max_pps <= 0) || (i_max_pps > 253))
     i_max_pps = 253;
 
   p_current->i_table_id = 0;
   p_current->b_syntax_indicator = 1;
   p_current->b_private_indicator = 0;
-  p_current->i_length = 9;
+  p_current->i_length = 9;                      /* header + CRC_32 */
   p_current->i_extension = p_pat->i_ts_id;
   p_current->i_version = p_pat->i_version;
   p_current->b_current_next = p_pat->b_current_next;
   p_current->i_number = 0;
-  p_current->p_payload_end += 8;
+  p_current->p_payload_end += 8;                /* just after the header */
   p_current->p_payload_start = p_current->p_payload_end;
 
+  /* PAT programs */
   while(p_program != NULL)
   {
+    /* New section if needed */
     if(++i_count > i_max_pps)
     {
       p_prev = p_current;
@@ -382,25 +385,29 @@ dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
       p_current->i_table_id = 0;
       p_current->b_syntax_indicator = 1;
       p_current->b_private_indicator = 0;
-      p_current->i_length = 9;
+      p_current->i_length = 9;                  /* header + CRC_32 */
       p_current->i_extension = p_pat->i_ts_id;
       p_current->i_version = p_pat->i_version;
       p_current->b_current_next = p_pat->b_current_next;
       p_current->i_number = p_prev->i_number + 1;
-      p_current->p_payload_end += 8;
+      p_current->p_payload_end += 8;            /* just after the header */
       p_current->p_payload_start = p_current->p_payload_end;
     }
 
-    p_current->p_payload_end[0] = (p_program->i_number >> 8) & 0xff;
-    p_current->p_payload_end[1] = p_program->i_number & 0xff;
-    p_current->p_payload_end[2] = (p_program->i_pid >> 8) & 0xff;
-    p_current->p_payload_end[3] = p_program->i_pid & 0xff;
+    /* p_payload_end is where the program begins */
+    p_current->p_payload_end[0] = p_program->i_number >> 8;
+    p_current->p_payload_end[1] = p_program->i_number;
+    p_current->p_payload_end[2] = (p_program->i_pid >> 8) | 0xe0;
+    p_current->p_payload_end[3] = p_program->i_pid;
+
+    /* Increase length by 4 */
     p_current->p_payload_end += 4;
     p_current->i_length += 4;
 
     p_program = p_program->p_next;
   }
 
+  /* Finalization */
   p_prev = p_result;
   while(p_prev != NULL)
   {

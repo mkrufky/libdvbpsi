@@ -2,7 +2,7 @@
  * pmt.h: PMT structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.h,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: pmt.h,v 1.2 2002/01/09 11:22:26 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -151,6 +151,14 @@ dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
 dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data);
+
+
+/*****************************************************************************
+ * dvbpsi_GenPMTSections
+ *****************************************************************************
+ * Generate PMT sections based on the dvbpsi_pmt_t structure.
+ *****************************************************************************/
+dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt);
 
 
 #else
