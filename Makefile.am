@@ -2,6 +2,8 @@
 
 SUBDIRS = src examples misc doc debian
 
+EXTRA_DIST=libdvbpsi.spec
+
 doc-dummy:
 
 doc: doc-dummy

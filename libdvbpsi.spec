@@ -11,7 +11,7 @@ Release:	%{release}
 Copyright:	GPL
 URL:		http://www.videolan.org/
 Group:		Application/Multimedia
-Source:		http://www.videolan.org/libdvbpsi/%{version}/%{name}-%{version}.tar.gz
+Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}-%{version}.tar.gz
 BuildRoot:	%_tmppath/%name-%version-%release-root
 
 %description
