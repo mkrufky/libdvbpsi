@@ -36,6 +36,11 @@ int main()
   int i_err = 0;
   <xsl:apply-templates mode="main" />
 
+  if(i_err)
+    fprintf(stderr, "At least one test has FAILED !!!\n");
+  else
+    fprintf(stdout, "All tests succeeded.\n");
+
   return i_err;
 }
 
@@ -86,11 +91,11 @@ int main_<xsl:value-of select="@sname" />_<xsl:value-of select="@msuffix" />()
 
 <xsl:template match="integer" mode="check">
   /* check <xsl:value-of select="@name" /> */<xsl:apply-templates select=".." mode="init" />
-  BOZO_begin_integer(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />, <xsl:choose><xsl:when test="@min != ''"><xsl:value-of select="@min" /></xsl:when><xsl:otherwise>0</xsl:otherwise></xsl:choose>)
+  BOZO_begin_integer(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />)
     BOZO_DOJOB(<xsl:value-of select="../@fname" />);
-    BOZO_check_integer<xsl:if test="@bitcount='32' or @bitcount='64'" ><xsl:value-of select="@bitcount" /></xsl:if>(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />)
+    BOZO_check_integer(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />)
     BOZO_CLEAN();
-  BOZO_end_integer(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />, <xsl:choose><xsl:when test="@max != ''"><xsl:value-of select="@max" /></xsl:when><xsl:otherwise>(1 &lt;&lt; <xsl:value-of select="@bitcount" />) - 1</xsl:otherwise></xsl:choose>, <xsl:choose><xsl:when test="@step != ''"><xsl:value-of select="@step" /></xsl:when><xsl:otherwise>1</xsl:otherwise></xsl:choose>)
+  BOZO_end_integer(<xsl:value-of select="@name" />, <xsl:value-of select="@bitcount" />)
 </xsl:template>
 
 <xsl:template match="boolean" mode="check">

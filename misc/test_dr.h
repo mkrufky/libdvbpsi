@@ -1,7 +1,7 @@
 /*****************************************************************************
  * test_dr.h
  * (c)2001-2002 VideoLAN
- * $Id: test_dr.h,v 1.2 2002/05/09 19:59:20 bozo Exp $
+ * $Id: test_dr.h,v 1.3 2002/05/09 20:39:02 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -52,20 +52,21 @@
 #define BOZO_init_integer(name, default)                                \
   s_decoded.name = default;
 
-#define BOZO_begin_integer(name, bitcount, min)                         \
+#define BOZO_begin_integer(name, bitcount)                              \
   if(!i_err)                                                            \
   {                                                                     \
+    unsigned int i = 0;                                                 \
     fprintf(stdout, "  \"%s\" %u bit(s) integer check\n",               \
             #name, bitcount);                                           \
     i_loop_count = 0;                                                   \
-    s_decoded.name = min;                                               \
+    s_decoded.name = 1;                                                 \
     do                                                                  \
     {
 
-#define BOZO_end_integer(name, bitcount, max, step)                     \
-      s_decoded.name += step;                                           \
+#define BOZO_end_integer(name, bitcount)                                \
+      s_decoded.name <<= 1;                                             \
     } while(!i_err                                                      \
-         && (s_decoded.name != max + step));                            \
+         && (++i < bitcount));                                          \
     fprintf(stdout, "\r  iteration count: %22llu", i_loop_count);       \
     if(i_err)                                                           \
       fprintf(stdout, "    FAILED !!!\n");                              \
@@ -78,43 +79,6 @@
   {                                                                     \
     fprintf(stderr, "\nError: integer %s %llu -> %llu\n", #name,        \
             (uint64_t)s_decoded.name, (uint64_t)p_new_decoded->name);   \
-    i_err = 1;                                                          \
-  }                                                                     \
-  if(!i_err && (p_new_decoded->name & ~(((uint64_t)1 << bitcount) - 1))) \
-  {                                                                     \
-    fprintf(stderr,                                                     \
-            "\nError: integer %s has more than %d bits (%llx)\n",       \
-            #name, bitcount, (uint64_t)p_new_decoded->name);            \
-    i_err = 1;                                                          \
-  }
-
-#define BOZO_check_integer32(name, bitcount)                            \
-  if(!i_err && (s_decoded.name != p_new_decoded->name))                 \
-  {                                                                     \
-    fprintf(stderr, "\nError: integer %s %llu -> %llu\n", #name,        \
-            (uint64_t)s_decoded.name, (uint64_t)p_new_decoded->name);   \
-    i_err = 1;                                                          \
-  }                                                                     \
-  if(!i_err && (p_new_decoded->name & ~0xffffffff))                     \
-  {                                                                     \
-    fprintf(stderr,                                                     \
-            "\nError: integer %s has more than %d bits (%llx)\n",       \
-            #name, bitcount, (uint64_t)p_new_decoded->name);            \
-    i_err = 1;                                                          \
-  }
-
-#define BOZO_check_integer64(name, bitcount)                            \
-  if(!i_err && (s_decoded.name != p_new_decoded->name))                 \
-  {                                                                     \
-    fprintf(stderr, "\nError: integer %s %llu -> %llu\n", #name,        \
-            (uint64_t)s_decoded.name, (uint64_t)p_new_decoded->name);   \
-    i_err = 1;                                                          \
-  }                                                                     \
-  if(!i_err && (p_new_decoded->name & ~0xffffffffffffffff))             \
-  {                                                                     \
-    fprintf(stderr,                                                     \
-            "\nError: integer %s has more than %d bits (%llx)\n",       \
-            #name, bitcount, (uint64_t)p_new_decoded->name);            \
     i_err = 1;                                                          \
   }
 

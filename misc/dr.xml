@@ -22,7 +22,7 @@
     </insert>
     <boolean name="b_constrained_parameter" default="0" />
     <boolean name="b_still_picture" default="0" />
-    <integer name="i_profile_level_indication" bitcount="8" default="0" max="0xff - 1" />
+    <integer name="i_profile_level_indication" bitcount="8" default="0" />
     <integer name="i_chroma_format" bitcount="2" default="0" />
     <boolean name="b_frame_rate_extension" default="0" />
   </descriptor>
@@ -45,12 +45,11 @@
       <begin>
   s_decoded.i_additional_length = 0;</begin>
     </insert>
-    <integer name="i_format_identifier" bitcount="32" default="0" max="0xffff" />
-    <integer name="i_format_identifier" bitcount="32" default="0" max="0xffff0000" step="0x10000" />
+    <integer name="i_format_identifier" bitcount="32" default="0" />
   </descriptor>
 
   <descriptor name="data stream alignment" sname="ds_alignment" fname="DSAlignment">
-    <integer name="i_alignment_type" bitcount="8" default="0" max="0xff - 1" />
+    <integer name="i_alignment_type" bitcount="8" default="0" />
   </descriptor>
 
   <descriptor name="target background grid" sname="target_bg_grid" fname="TargetBgGrid">
@@ -70,7 +69,7 @@
       <begin>
   s_decoded.i_private_length = 0;</begin>
     </insert>
-    <integer name="i_ca_system_id" bitcount="16" default="0" max="0xffff - 1" />
+    <integer name="i_ca_system_id" bitcount="16" default="0" />
     <integer name="i_ca_pid" bitcount="13" default="0" />
   </descriptor>
 
@@ -79,7 +78,7 @@
       <begin>
   s_decoded.i_code_count = 0;</begin>
     </insert>
-    <integer name="i_audio_type" bitcount="8" default="0" max="0xff - 1" />
+    <integer name="i_audio_type" bitcount="8" default="0" />
   </descriptor>
 
 </dr>
