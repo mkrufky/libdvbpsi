@@ -12,4 +12,24 @@ D: main structure
 D: PSI section gathering
 D: PAT decoder/generator
 D: PMT decoder/generator
+D: MPEG descriptors
+
+N: Johan Bilien
+E: jobi@via.ecp.fr
+C: jobi
+D: subtables decoder
+D: SDT decoder
+D: most DVB descriptors
+
+N: Tristan Leteurtre
+E: tristan.leteurtre@anevia.com
+C: tooney
+D: subtitles descriptor (0x59)
+
+N: Christophe Massiot
+E: massiot@via.ecp.fr
+C: massiot
+D: initial specs
+D: EIT decoder
+D: parental rating descriptor (0x55)
 

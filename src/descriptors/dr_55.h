@@ -1,10 +1,9 @@
 /*****************************************************************************
- * dr_59.h
- * (c)2001-2002 VideoLAN
- * $Id$
+ * dr_55.h
+ * (c)2004 VideoLAN
+ * $Id: dr_55.h 88 2004-02-24 14:31:18Z sam $
  *
- * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
- *          Tristan Leteurtre <tristan.leteurtre@anevia.com>
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,97 +22,95 @@
  *****************************************************************************/
 
 /*!
- * \file <dr_59.h>
- * \author Tristan Leteurtre <tristan.leteurtre@anevia.com>
- * \brief DVB subtitling descriptor parsing.
+ * \file <dr_55.h>
+ * \author Christophe Massiot <massiot@via.ecp.fr>
+ * \brief Parental rating descriptor parsing.
  *
- * DVB subtitling descriptor parsing, according to ETSI EN 300 468 
- * section 6.2.36.
+ * Parental rating descriptor parsing, according to ETSI EN 300 468 
+ * section 6.2.26.
  */
 
-#ifndef _DVBPSI_DR_59_H_
-#define _DVBPSI_DR_59_H_
+#ifndef _DVBPSI_DR_55_H_
+#define _DVBPSI_DR_55_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*****************************************************************************
- * dvbpsi_subtitle_t
+ * dvbpsi_parental_rating_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_subtitle_s
+ * \struct dvbpsi_parental_rating_s
  * \brief  one subtitle structure.
  *
- * This structure is used since subtitling_descriptor will contain several
- * subtitles
+ * This structure is used since parental_rating_descriptor will contain several
+ * coutry/rating pairs.
  */
 /*!
- * \typedef struct dvbpsi_subtitle_s dvbpsi_subtitle_t
- * \brief dvbpsi_subtitle_t type definition.
+ * \typedef struct dvbpsi_parental_rating_s dvbpsi_parental_rating_t
+ * \brief dvbpsi_parental_rating_t type definition.
  */
-typedef struct dvbpsi_subtitle_s
+typedef struct dvbpsi_parental_rating_s
 {
-  uint8_t      i_iso6392_language_code[3];   
-  uint8_t      i_subtitling_type;
-  uint16_t      i_composition_page_id;
-  uint16_t      i_ancillary_page_id;
+  uint32_t      i_country_code;
+  uint8_t       i_rating;
 
-} dvbpsi_subtitle_t;
+} dvbpsi_parental_rating_t;
 
 
 /*****************************************************************************
- * dvbpsi_subtitling_dr_t
+ * dvbpsi_parental_rating_dr_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_subtitling_dr_s
- * \brief "subtitling" descriptor structure.
+ * \struct dvbpsi_parental_rating_dr_s
+ * \brief "parental_rating" descriptor structure.
  *
- * This structure is used to store a decoded "subtitling"
- * descriptor. (ETSI EN 300 468 section 6.2.30).
+ * This structure is used to store a decoded "parental_rating"
+ * descriptor. (ETSI EN 300 468 section 6.2.26).
  */
 /*!
- * \typedef struct dvbpsi_subtitling_dr_s dvbpsi_subtitling_dr_t
- * \brief dvbpsi_subtitling_dr_t type definition.
+ * \typedef struct dvbpsi_parental_rating_dr_s dvbpsi_parental_rating_dr_t
+ * \brief dvbpsi_parental_rating_dr_t type definition.
  */
-typedef struct dvbpsi_subtitling_dr_s
+typedef struct dvbpsi_parental_rating_dr_s
 {
-  uint8_t      i_subtitles_number;
-  dvbpsi_subtitle_t p_subtitle[20];
+  uint8_t       i_ratings_number;
+  dvbpsi_parental_rating_t p_parental_rating[64];
 
-} dvbpsi_subtitling_dr_t;
+} dvbpsi_parental_rating_dr_t;
 
 
 /*****************************************************************************
- * dvbpsi_DecodeSubtitlingDataDr
+ * dvbpsi_DecodeParentalRatingDataDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
+ * \fn dvbpsi_parental_rating_dr_t * dvbpsi_DecodeParentalRatingDr(
                                         dvbpsi_descriptor_t * p_descriptor)
- * \brief "subtitling" descriptor decoder.
+ * \brief "parental_rating" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
- * \return a pointer to a new "subtitling" descriptor structure
+ * \return a pointer to a new "parental_rating" descriptor structure
  * which contains the decoded data.
  */
-dvbpsi_subtitling_dr_t* dvbpsi_DecodeSubtitlingDr(
+dvbpsi_parental_rating_dr_t* dvbpsi_DecodeParentalRatingDr(
                                         dvbpsi_descriptor_t * p_descriptor);
 
 
 /*****************************************************************************
- * dvbpsi_GenSubtitlingDataDr
+ * dvbpsi_GenParentalRatingDataDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
-                        dvbpsi_subtitling_dr_t * p_decoded, int b_duplicate)
- * \brief "subtitling" descriptor generator.
- * \param p_decoded pointer to a decoded "subtitling" descriptor
+ * \fn dvbpsi_descriptor_t * dvbpsi_GenParentalRatingDr(
+                        dvbpsi_parental_rating_dr_t * p_decoded, int b_duplicate)
+ * \brief "parental_rating" descriptor generator.
+ * \param p_decoded pointer to a decoded "parental_rating" descriptor
  * structure
  * \param b_duplicate if non zero then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
-dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
-                                        dvbpsi_subtitling_dr_t * p_decoded,
+dvbpsi_descriptor_t * dvbpsi_GenParentalRatingDr(
+                                        dvbpsi_parental_rating_dr_t * p_decoded,
                                         int b_duplicate);
 
 
@@ -122,6 +119,6 @@ dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
 #endif
 
 #else
-#error "Multiple inclusions of dr_59.h"
+#error "Multiple inclusions of dr_55.h"
 #endif
 

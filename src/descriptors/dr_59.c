@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dr_48.c
+ * dr_59.c
  * (c)2001-2002 VideoLAN
  * $Id$
  *
@@ -77,6 +77,7 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
     DVBPSI_ERROR_ARG("dr_59 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
+    return NULL;
   }
 
   if(p_descriptor->i_length % 8)
@@ -84,6 +85,7 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
     DVBPSI_ERROR_ARG("dr_59 decoder", "length not multiple of 8 (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
+    return NULL;
   }
   
   i_subtitles_number = p_descriptor->i_length / 8;
