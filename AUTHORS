@@ -1,0 +1,15 @@
+# The format of this file was inspired by the Linux kernel CREDITS file.
+# 
+# Authors and contributors are listed alphabetically.
+# 
+# The fields are: name (N), email (E), web-address (W), CVS account login (C),
+# PGP key ID and fingerprint (P), description (D), and snail-mail address (S).
+
+N: Arnaud de Bossoreille de Ribou
+E: bozo@via.ecp.fr
+C: bozo
+D: main structure
+D: PSI section gathering
+D: PAT decoder/generator
+D: PMT decoder
+

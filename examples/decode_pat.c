@@ -1,0 +1,127 @@
+/*****************************************************************************
+ * decode_pat.c: PAT decoder example
+ *----------------------------------------------------------------------------
+ * (c)2001-2002 VideoLAN
+ * $Id: decode_pat.c,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ *
+ * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ *----------------------------------------------------------------------------
+ *
+ *****************************************************************************/
+
+
+#include "config.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+/* The libdvbpsi distribution defines DVBPSI_DIST */
+#ifdef DVBPSI_DIST
+#include "../src/dvbpsi.h"
+#include "../src/psi.h"
+#include "../src/pat.h"
+#else
+#include <dvbpsi/dvbpsi.h>
+#include <dvbpsi/psi.h>
+#include <dvbpsi/pat.h>
+#endif
+
+
+/*****************************************************************************
+ * ReadPacket
+ *****************************************************************************/
+int ReadPacket(int i_fd, uint8_t* p_dst)
+{
+  int i = 187;
+  int i_rc = 1;
+
+  p_dst[0] = 0;
+
+  while((p_dst[0] != 0x47) && (i_rc > 0))
+  {
+    i_rc = read(i_fd, p_dst, 1);
+  }
+
+  while((i != 0) && (i_rc > 0))
+  {
+    i_rc = read(i_fd, p_dst + 188 - i, i);
+    if(i_rc >= 0)
+      i -= i_rc;
+  }
+
+  return (i == 0) ? 1 : 0;
+}
+
+
+/*****************************************************************************
+ * DumpPAT
+ *****************************************************************************/
+void DumpPAT(void* p_zero, dvbpsi_pat_t* p_pat)
+{
+  dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
+  printf(  "\n");
+  printf(  "New PAT\n");
+  printf(  "  transport_stream_id : %d\n", p_pat->i_ts_id);
+  printf(  "  version_number      : %d\n", p_pat->i_version);
+  printf(  "    | program_number @ [NIT|PMT]_PID\n");
+  while(p_program)
+  {
+    printf("    | %14d @ 0x%x (%d)\n",
+           p_program->i_number, p_program->i_pid, p_program->i_pid);
+    p_program = p_program->p_next;
+  }
+  printf(  "  active              : %d\n", p_pat->b_current_next);
+  printf(  "  complete            : %d\n\n", p_pat->b_complete);
+  dvbpsi_DeletePAT(p_pat);
+}
+
+
+/*****************************************************************************
+ * main
+ *****************************************************************************/
+int main(int i_argc, char* pa_argv[])
+{
+  int i_fd;
+  uint8_t data[188];
+  dvbpsi_handle h_dvbpsi;
+  int b_ok;
+
+  if(i_argc != 2)
+    return 1;
+
+  i_fd = open(pa_argv[1], 0);
+
+  h_dvbpsi = dvbpsi_AttachPAT(DumpPAT, NULL);
+
+  b_ok = ReadPacket(i_fd, data);
+
+  while(b_ok)
+  {
+    uint16_t i_pid = ((uint16_t)(data[1] & 0x1f) << 8) + data[2];
+    if(i_pid == 0x0)
+      dvbpsi_PushPacket(h_dvbpsi, data);
+    b_ok = ReadPacket(i_fd, data);
+  }
+
+  dvbpsi_DetachPAT(h_dvbpsi);
+
+  return 0;
+}
+
