@@ -2,7 +2,7 @@
  * decode_pat.c: PAT decoder example
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: decode_pat.c,v 1.3 2002/10/07 14:15:14 sam Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *

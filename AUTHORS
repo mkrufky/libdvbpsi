@@ -21,6 +21,11 @@ D: subtables decoder
 D: SDT decoder
 D: most DVB descriptors
 
+N: Andrew John Hughes
+E: gnu_andrew@member.fsf.org
+D: descriptor 0x52
+D: decode_pmt verbose output
+
 N: Tristan Leteurtre
 E: tristan.leteurtre@anevia.com
 C: tooney

@@ -2,7 +2,7 @@
  * decode_pmt.c: PAT decoder example
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: decode_pmt.c,v 1.3 2002/10/07 14:15:14 sam Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <math.h>
 
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
@@ -44,13 +45,19 @@
 #include "../src/psi.h"
 #include "../src/descriptor.h"
 #include "../src/tables/pmt.h"
+#include "../src/descriptors/dr.h"
 #else
 #include <dvbpsi/dvbpsi.h>
 #include <dvbpsi/psi.h>
 #include <dvbpsi/descriptor.h>
 #include <dvbpsi/pmt.h>
+#include <dvbpsi/dr.h>
 #endif
 
+#define SYSTEM_CLOCK_DR 0x0B
+#define MAX_BITRATE_DR 0x0E
+#define STREAM_IDENTIFIER_DR 0x52
+#define SUBTITLING_DR 0x59
 
 /*****************************************************************************
  * ReadPacket
@@ -77,19 +84,129 @@ int ReadPacket(int i_fd, uint8_t* p_dst)
   return (i == 0) ? 1 : 0;
 }
 
+/*****************************************************************************
+ * GetTypeName
+ *****************************************************************************/
+char* GetTypeName(uint8_t type)
+{
+  switch (type)
+    {
+    case 0x00:
+      return "Reserved";
+    case 0x01:
+      return "ISO/IEC 11172 Video";
+    case 0x02:
+      return "ISO/IEC 13818-2 Video";
+    case 0x03:
+      return "ISO/IEC 11172 Audio";
+    case 0x04:
+      return "ISO/IEC 13818-3 Audio";
+    case 0x05:
+      return "ISO/IEC 13818-1 Private Section";
+    case 0x06:
+      return "ISO/IEC 13818-1 Private PES data packets";
+    case 0x07:
+      return "ISO/IEC 13522 MHEG";
+    case 0x08:
+      return "ISO/IEC 13818-1 Annex A DSM CC";
+    case 0x09:
+      return "H222.1";
+    case 0x0A:
+      return "ISO/IEC 13818-6 type A";
+    case 0x0B:
+      return "ISO/IEC 13818-6 type B";
+    case 0x0C:
+      return "ISO/IEC 13818-6 type C";
+    case 0x0D:
+      return "ISO/IEC 13818-6 type D";
+    case 0x0E:
+      return "ISO/IEC 13818-1 auxillary";
+    default:
+      if (type < 0x80)
+	return "ISO/IEC 13818-1 reserved";
+      else
+	return "User Private";
+    }
+}
+
+/*****************************************************************************
+ * DumpMaxBitrateDescriptor
+ *****************************************************************************/
+void DumpMaxBitrateDescriptor(dvbpsi_max_bitrate_dr_t* bitrate_descriptor)
+{
+  printf("Bitrate: %d\n", bitrate_descriptor->i_max_bitrate);
+}
+
+/*****************************************************************************
+ * DumpSystemClockDescriptor
+ *****************************************************************************/
+void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
+{
+  printf("External clock: %s, Accuracy: %E\n",
+	 p_clock_descriptor->b_external_clock_ref ? "Yes" : "No",
+	 p_clock_descriptor->i_clock_accuracy_integer *
+	 pow(10, p_clock_descriptor->i_clock_accuracy_exponent));
+}
+
+/*****************************************************************************
+ * DumpStreamIdentifierDescriptor
+ *****************************************************************************/
+void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_descriptor)
+{
+  printf("Component tag: %d\n",
+	 p_si_descriptor->i_component_tag);
+}
+
+/*****************************************************************************
+ * DumpSubtitleDescriptor
+ *****************************************************************************/
+void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor)
+{
+  int a;
+
+  printf("%d subtitles,\n", p_subtitle_descriptor->i_subtitles_number);
+  for (a = 0; a < p_subtitle_descriptor->i_subtitles_number; ++a)
+    {
+      printf("       | %d - lang: %c%c%c, type: %d, cpid: %d, apid: %d\n", a,
+	     p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[0],
+	     p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[1],
+	     p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[2],
+	     p_subtitle_descriptor->p_subtitle[a].i_subtitling_type,
+	     p_subtitle_descriptor->p_subtitle[a].i_composition_page_id,
+	     p_subtitle_descriptor->p_subtitle[a].i_ancillary_page_id);
+    }
+}
 
 /*****************************************************************************
  * DumpDescriptors
  *****************************************************************************/
 void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
 {
+  int i;
+
   while(p_descriptor)
   {
-    int i;
-    printf("%s 0x%02x : \"", str, p_descriptor->i_tag);
-    for(i = 0; i < p_descriptor->i_length; i++)
-      printf("%c", p_descriptor->p_data[i]);
-    printf("\"\n");
+    printf("%s 0x%02x : ", str, p_descriptor->i_tag);
+    switch (p_descriptor->i_tag)
+      {
+      case SYSTEM_CLOCK_DR:
+	DumpSystemClockDescriptor(dvbpsi_DecodeSystemClockDr(p_descriptor));
+	break;
+      case MAX_BITRATE_DR:
+	DumpMaxBitrateDescriptor(dvbpsi_DecodeMaxBitrateDr(p_descriptor));
+	break;
+      case STREAM_IDENTIFIER_DR:
+	DumpStreamIdentifierDescriptor(dvbpsi_DecodeStreamIdentifierDr(p_descriptor));
+	break;
+      case SUBTITLING_DR:
+	DumpSubtitleDescriptor(dvbpsi_DecodeSubtitlingDr(p_descriptor));
+	break;
+      default:
+	printf("\"");
+	for(i = 0; i < p_descriptor->i_length; i++)
+	  printf("%c", p_descriptor->p_data[i]);
+	printf("\"\n");
+      }
     p_descriptor = p_descriptor->p_next;
   }
 };
@@ -113,8 +230,9 @@ void DumpPMT(void* p_zero, dvbpsi_pmt_t* p_pmt)
   printf(  "    | type @ elementary_PID\n");
   while(p_es)
   {
-    printf("    | 0x%02x @ 0x%x (%d)\n",
-           p_es->i_type, p_es->i_pid, p_es->i_pid);
+    printf("    | 0x%02x (%s) @ 0x%x (%d)\n",
+           p_es->i_type, GetTypeName(p_es->i_type),
+	   p_es->i_pid, p_es->i_pid);
     DumpDescriptors("    |  ]", p_es->p_first_descriptor);
     p_es = p_es->p_next;
   }
