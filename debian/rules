@@ -50,7 +50,8 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_installdirs
+	dh_installdirs -plibdvbpsi2-dev usr/lib usr/share/doc
+	dh_installdirs -plibdvbpsi2 usr/lib usr/share/doc/libdvbpsi2
 
 	$(MAKE) install DESTDIR=`pwd`/debian/libdvbpsi2/
 
