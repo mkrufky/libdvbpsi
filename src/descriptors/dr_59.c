@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_48.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_59.c,v 1.1 2003/11/06 16:20:30 nitrox Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *          Tristan Leteurtre <tristan.leteurtre@anevia.com>
@@ -124,7 +124,7 @@ dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
   
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =
-      dvbpsi_NewDescriptor(0x59, 2 + p_decoded->i_subtitles_number * 8 , NULL);
+      dvbpsi_NewDescriptor(0x59, p_decoded->i_subtitles_number * 8 , NULL);
   
   if(p_descriptor)
   {
