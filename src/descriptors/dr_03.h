@@ -1,7 +1,7 @@
 /*****************************************************************************
- * dr_02.h
+ * dr_03.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_02.h,v 1.2 2002/05/08 13:33:52 bozo Exp $
+ * $Id: dr_03.h,v 1.1 2002/05/08 13:33:52 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -22,18 +22,18 @@
  *****************************************************************************/
 
 /*!
- * \file <dr_02.h>
+ * \file <dr_03.h>
  * \author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
- * \brief Application interface for the MPEG 2 "video stream" descriptor
+ * \brief Application interface for the MPEG 2 "audio stream" descriptor
  * decoder and generator.
  *
- * Application interface for the MPEG 2 "video stream" descriptor
+ * Application interface for the MPEG 2 "audio stream" descriptor
  * decoder and generator. This descriptor's definition can be found in
- * ISO/IEC 13818-1 section 2.6.2.
+ * ISO/IEC 13818-1 section 2.6.4.
  */
 
-#ifndef _DVBPSI_DR_02_H_
-#define _DVBPSI_DR_02_H_
+#ifndef _DVBPSI_DR_03_H_
+#define _DVBPSI_DR_03_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,62 +41,55 @@ extern "C" {
 
 
 /*****************************************************************************
- * dvbpsi_vstream_dr_t
+ * dvbpsi_astream_dr_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_vstream_dr_s
- * \brief "video stream" descriptor structure.
+ * \struct dvbpsi_astream_dr_s
+ * \brief "audio stream" descriptor structure.
  *
- * This structure is used to store a decoded "video stream" descriptor.
- * (ISO/IEC 13818-1 section 2.6.2).
+ * This structure is used to store a decoded "audio stream" descriptor.
+ * (ISO/IEC 13818-1 section 2.6.4).
  */
 /*!
- * \typedef struct dvbpsi_vstream_dr_s dvbpsi_vstream_dr_t
- * \brief dvbpsi_vstream_dr_t type definition.
+ * \typedef struct dvbpsi_astream_dr_s dvbpsi_astream_dr_t
+ * \brief dvbpsi_astream_dr_t type definition.
  */
-typedef struct dvbpsi_vstream_dr_s
+typedef struct dvbpsi_astream_dr_s
 {
-  int       b_multiple_frame_rate;      /*!< multiple_frame_rate_flag */
-  uint8_t   i_frame_rate_code;          /*!< frame_rate_code */
-  int       b_mpeg2;                    /*!< MPEG_2_flag */
-  int       b_constrained_parameter;    /*!< constrained_parameter_flag */
-  int       b_still_picture;            /*!< still_picture_flag */
+  int           b_free_format;              /*!< free_format_flag */
+  uint8_t       i_id;                       /*!< ID */
+  uint8_t       i_layer;                    /*!< layer */
 
-  /* used if b_mpeg2 is true */
-  uint8_t   i_profile_level_indication; /*!< profile_and_level_indication */
-  uint8_t   i_chroma_format;            /*!< chroma_format */
-  int       b_frame_rate_extension;     /*!< frame_rate_extension_flag */
-
-} dvbpsi_vstream_dr_t;
+} dvbpsi_astream_dr_t;
 
 
 /*****************************************************************************
- * dvbpsi_DecodeVStreamDr
+ * dvbpsi_DecodeAStreamDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(
+ * \fn dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(
  * dvbpsi_descriptor_t * p_descriptor)
- * \brief "video stream" descriptor decoder.
+ * \brief "audio stream" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
- * \return a pointer to a new "video stream" descriptor structure which
+ * \return a pointer to a new "audio stream" descriptor structure which
  * contains the decoded data.
  */
-dvbpsi_vstream_dr_t* dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor);
+dvbpsi_astream_dr_t* dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor);
 
 
 /*****************************************************************************
- * dvbpsi_GenVStreamDr
+ * dvbpsi_GenAStreamDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(
- * dvbpsi_vstream_dr_t * p_decoded, int b_duplicate)
- * \brief "video stream" descriptor generator.
+ * \fn dvbpsi_descriptor_t * dvbpsi_GenAStreamDr(
+ * dvbpsi_astream_dr_t * p_decoded, int b_duplicate)
+ * \brief "audio stream" descriptor generator.
  * \param p_decoded pointer to a decoded "video stream" descriptor structure
  * \param b_duplicate if non zero then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
-dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(dvbpsi_vstream_dr_t * p_decoded,
+dvbpsi_descriptor_t * dvbpsi_GenAStreamDr(dvbpsi_astream_dr_t * p_decoded,
                                           int b_duplicate);
 
 
@@ -105,6 +98,6 @@ dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(dvbpsi_vstream_dr_t * p_decoded,
 #endif
 
 #else
-#error "Multiple inclusions of dr_02.h"
+#error "Multiple inclusions of dr_03.h"
 #endif
 

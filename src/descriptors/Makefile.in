@@ -77,9 +77,9 @@ pkgincludedir = $(includedir)/dvbpsi
 
 noinst_LTLIBRARIES = lib_descriptors.la
 
-lib_descriptors_la_SOURCES = dr_02.c
+lib_descriptors_la_SOURCES = dr_02.c dr_03.c
 
-pkginclude_HEADERS = dr_02.h
+pkginclude_HEADERS = dr_02.h dr_03.h
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../src/config.h
 CONFIG_CLEAN_FILES = 
@@ -92,7 +92,7 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 lib_descriptors_la_LDFLAGS = 
 lib_descriptors_la_LIBADD = 
-lib_descriptors_la_OBJECTS =  dr_02.lo
+lib_descriptors_la_OBJECTS =  dr_02.lo dr_03.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -107,7 +107,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/dr_02.P
+DEP_FILES =  .deps/dr_02.P .deps/dr_03.P
 SOURCES = $(lib_descriptors_la_SOURCES)
 OBJECTS = $(lib_descriptors_la_OBJECTS)
 

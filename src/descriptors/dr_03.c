@@ -1,7 +1,7 @@
 /*****************************************************************************
- * dr_02.c
+ * dr_03.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_02.c,v 1.3 2002/05/08 13:33:52 bozo Exp $
+ * $Id: dr_03.c,v 1.1 2002/05/08 13:33:52 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -32,20 +32,20 @@
 #include "../dvbpsi_private.h"
 #include "../descriptor.h"
 
-#include "dr_02.h"
+#include "dr_03.h"
 
 
 /*****************************************************************************
- * dvbpsi_DecodeVStreamDr
+ * dvbpsi_DecodeAStreamDr
  *****************************************************************************/
-dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor)
+dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_vstream_dr_t * p_decoded;
+  dvbpsi_astream_dr_t * p_decoded;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x02)
+  if(p_descriptor->i_tag != 0x03)
   {
-    DVBPSI_ERROR_ARG("dr_02 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    DVBPSI_ERROR_ARG("dr_03 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -54,36 +54,24 @@ dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor)
     return p_descriptor->p_decoded;
 
   /* Allocate memory */
-  p_decoded = (dvbpsi_vstream_dr_t*)malloc(sizeof(dvbpsi_vstream_dr_t));
+  p_decoded = (dvbpsi_astream_dr_t*)malloc(sizeof(dvbpsi_astream_dr_t));
   if(!p_decoded)
   {
-    DVBPSI_ERROR("dr_02 decoder", "out of memory");
+    DVBPSI_ERROR("dr_03 decoder", "out of memory");
     return NULL;
   }
 
   /* Decode data and check the length */
-  p_decoded->b_mpeg2 = (p_descriptor->p_data[0] & 0x04) ? 1 : 0;
-
-  if(    (!p_decoded->b_mpeg2 && (p_descriptor->i_length != 1))
-      || (p_decoded->b_mpeg2 && (p_descriptor->i_length != 3)))
+  if(p_descriptor->i_length != 1)
   {
-    DVBPSI_ERROR_ARG("dr_02 decoder", "bad length (%d)",
+    DVBPSI_ERROR_ARG("dr_03 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
   }
 
-  p_decoded->b_multiple_frame_rate = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;
-  p_decoded->i_frame_rate_code = (p_descriptor->p_data[0] & 0x78) >> 3;
-  p_decoded->b_constrained_parameter = (p_descriptor->p_data[0] & 0x02) ? 1 : 0;
-  p_decoded->b_still_picture = (p_descriptor->p_data[0] & 0x01) ? 1 : 0;
-
-  if(p_decoded->b_mpeg2)
-  {
-    p_decoded->i_profile_level_indication = p_descriptor->p_data[1];
-    p_decoded->i_chroma_format = (p_descriptor->p_data[2] & 0xc0) >> 6;
-    p_decoded->b_frame_rate_extension =
-                                (p_descriptor->p_data[2] & 0x20) ? 1 : 0;
-  }
+  p_decoded->b_free_format = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;
+  p_decoded->i_id = (p_descriptor->p_data[0] & 0x40) >> 6;
+  p_decoded->i_layer = (p_descriptor->p_data[0] & 0x30) >> 4;
 
   p_descriptor->p_decoded = (void*)p_decoded;
 
@@ -92,46 +80,34 @@ dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor)
 
 
 /*****************************************************************************
- * dvbpsi_GenVStreamDr
+ * dvbpsi_GenAStreamDr
  *****************************************************************************/
-dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(dvbpsi_vstream_dr_t * p_decoded,
+dvbpsi_descriptor_t * dvbpsi_GenAStreamDr(dvbpsi_astream_dr_t * p_decoded,
                                           int b_duplicate)
 {
-  uint8_t data[3];
+  uint8_t data;
 
   dvbpsi_descriptor_t * p_descriptor;
 
   /* Encode data */
-  data[0] = 0;
-  if(p_decoded->b_multiple_frame_rate)
-    data[0] |= 0x80;
-  data[0] |= (p_decoded->i_frame_rate_code & 0x0f) << 3;
-  if(p_decoded->b_constrained_parameter)
-    data[0] |= 0x02;
-  if(p_decoded->b_still_picture)
-    data[0] |= 0x01;
-
-  if(p_decoded->b_mpeg2)
-  {
-    data[1] = p_decoded->i_profile_level_indication;
-    data[2] = 0x1f;
-    data[2] |= (p_decoded->i_chroma_format & 0x03) << 6;
-    if(p_decoded->b_frame_rate_extension)
-      data[2] |= 0x20;
-  }
+  data = 0x0f;
+  if(p_decoded->b_free_format)
+    data |= 0x80;
+  data |= (p_decoded->i_id & 0x01) << 6;
+  data |= (p_decoded->i_layer & 0x03) << 4;
 
   /* Create the descriptor */
-  p_descriptor = dvbpsi_NewDescriptor(0x02, p_decoded->b_mpeg2 ? 3 : 1, data);
+  p_descriptor = dvbpsi_NewDescriptor(0x03, 1, &data);
 
   if(p_descriptor)
   {
     if(b_duplicate)
     {
       /* Duplicate decoded data */
-      dvbpsi_vstream_dr_t * p_dup_decoded =
-                (dvbpsi_vstream_dr_t*)malloc(sizeof(dvbpsi_vstream_dr_t));
+      dvbpsi_astream_dr_t * p_dup_decoded =
+                (dvbpsi_astream_dr_t*)malloc(sizeof(dvbpsi_astream_dr_t));
       if(p_dup_decoded)
-        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_vstream_dr_t));
+        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_astream_dr_t));
 
       p_descriptor->p_decoded = (void*)p_dup_decoded;
     }
