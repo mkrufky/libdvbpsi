@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr.h
  * (c)2001-2002 VideoLAN
- * $Id: dr.h,v 1.4 2002/12/12 10:19:32 jobi Exp $
+ * $Id: dr.h,v 1.5 2003/11/06 16:20:30 nitrox Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -49,6 +49,7 @@
 #include "dr_42.h"
 #include "dr_47.h"
 #include "dr_48.h"
+#include "dr_59.h"
 
 #else
 #error "Multiple inclusions of dr.h"

@@ -32,6 +32,7 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      descriptors/dr_42.h \
                      descriptors/dr_47.h \
                      descriptors/dr_48.h \
+                     descriptors/dr_59.h \
                      descriptors/dr.h
 
 descriptors_src = descriptors/dr_02.c \
@@ -50,7 +51,8 @@ descriptors_src = descriptors/dr_02.c \
                   descriptors/dr_0f.c \
                   descriptors/dr_42.c \
                   descriptors/dr_47.c \
-                  descriptors/dr_48.c
+                  descriptors/dr_48.c \
+                  descriptors/dr_59.c
 
 tables_src = tables/pat.c tables/pat_private.h \
              tables/pmt.c tables/pmt_private.h \
