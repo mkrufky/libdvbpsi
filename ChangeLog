@@ -2,7 +2,19 @@
 # ChangeLog for libsvbpsi #
 #=========================#
 
-HEAD
+0.1.0
+Wed,  3 Apr 2002 01:42:12 +0200
 
-  * First public release.
+  * doc/*: documentation.
+  * misc/gen_pmt.c: PMT generator example.
+  * example/decode_pmt.c: PMT decoder example.
+  * misc/gen_pat.c: PAT generator example.
+  * example/decode_pat.c: PAT decoder example.
+  * src/tables/pmt.h, src/tables/pmt_private.h, src/tables/pmt.c: PMT decoder
+    and PMT generator.
+  * src/tables/pat.h, src/tables/pat_private.h, src/tables/pat.c: PAT decoder
+    and PAT generator.
+  * src/dvbpsi.h, src/dvbpsi_private.h, src/dvbpsi.c: PSI decoder.
+  * src/descriptor.h, src/descriptor.c: descriptors.
+  * src/psi.h, src/psi.c: PSI sections.
 
