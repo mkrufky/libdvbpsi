@@ -1,0 +1,5 @@
+.deps
+.libs
+Makefile
+gen_crc
+gen_pat

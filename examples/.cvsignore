@@ -1,0 +1,5 @@
+.deps
+.libs
+Makefile
+decode_pat
+decode_pmt
