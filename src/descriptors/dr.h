@@ -50,6 +50,7 @@
 #include "dr_47.h"
 #include "dr_48.h"
 #include "dr_55.h"
+#include "dr_56.h"
 #include "dr_59.h"
 
 #else
