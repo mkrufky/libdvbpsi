@@ -9,7 +9,7 @@ Name:		%{name}
 Version:	%{version}
 Release:	%{release}
 Copyright:	GPL
-URL:		http://www.videolan.org
+URL:		http://www.videolan.org/
 Group:		Application/Multimedia
 Source:		http://www.videolan.org/libdvbpsi/%{version}/%{name}-%{version}.tar.gz
 BuildRoot:	%_tmppath/%name-%version-%release-root
