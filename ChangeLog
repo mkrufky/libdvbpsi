@@ -3,7 +3,7 @@
 #=========================#
 
 0.1.2
-**
+Fri, 11 Oct 2002 11:34:23 +0200
 
   * Makefile.am: added bootstrap to the distribution.
   * bootstrap: we remove generated files before running the autotools, to

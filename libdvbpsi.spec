@@ -1,5 +1,5 @@
 %define name		libdvbpsi
-%define version		0.1.1
+%define version		0.1.2
 %define release		1
 %define major		1
 %define lib_name	%{name}%{major}
@@ -78,6 +78,9 @@ rm -rf %buildroot
 %{_includedir}/*
 
 %changelog
+* Fri Oct 11 2002 Samuel Hocevar <sam@zoy.org>
+- 0.1.2 release.
+
 * Sat May 18 2002 Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
 - 0.1.1 release.
 
