@@ -2,7 +2,7 @@
  * pmt.h: PMT structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.h,v 1.2 2002/03/15 12:16:01 bozo Exp $
+ * $Id: pmt.h,v 1.3 2002/03/18 23:53:39 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -118,7 +118,7 @@ void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
  *****************************************************************************
  * Clean/free a dvbpsi_pmt_t structure.
  *****************************************************************************/
-void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pat);
+void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt);
 
 #define dvbpsi_DeletePMT(p_pmt)                                         \
   dvbpsi_EmptyPMT(p_pmt);                                               \
