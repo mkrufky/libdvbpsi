@@ -2,7 +2,7 @@
  * pmt.c: PMT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.c,v 1.10 2003/11/06 16:20:30 nitrox Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -464,7 +464,7 @@ void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
     p_byte = p_section->p_payload_start + 4;
     p_end = p_byte + (   ((uint16_t)(p_section->p_payload_start[2] & 0x0f) << 8)
                        | p_section->p_payload_start[3]);
-    while(p_byte + 2 < p_end)
+    while(p_byte + 2 <= p_end)
     {
       uint8_t i_tag = p_byte[0];
       uint8_t i_length = p_byte[1];
@@ -487,7 +487,7 @@ void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
       {
             p_end = p_section->p_payload_end;
       }
-      while(p_byte + 2 < p_end)
+      while(p_byte + 2 <= p_end)
       {
         uint8_t i_tag = p_byte[0];
         uint8_t i_length = p_byte[1];
