@@ -8,7 +8,7 @@ Summary:	A library for decoding and generating MPEG 2 and DVB PSI sections.
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-Copyright:	GPL
+License:	GPL
 URL:		http://www.videolan.org/
 Group:		Application/Multimedia
 Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}-%{version}.tar.gz
