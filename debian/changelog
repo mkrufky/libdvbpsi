@@ -1,3 +1,12 @@
+libdvbpsi3 (0.1.4-2) unstable; urgency=high
+
+  * src/descriptors/dr_59.c:
+    + Fixed dvb subtitles descriptor generation.
+  * src/tables/pmt.c:
+    + Fixed a bug in the PMT parser.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 27 Aug 2004 11:16:12 +0200
+
 libdvbpsi3 (0.1.4-1) unstable; urgency=low
 
   * New upstream release.
