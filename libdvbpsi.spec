@@ -1,5 +1,5 @@
-%define name		libdvbpsi2
-%define version		0.1.3
+%define name		libdvbpsi3
+%define version		0.1.4
 %define release		1
 
 %define major		2

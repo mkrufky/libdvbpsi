@@ -1,8 +1,10 @@
 AC_INIT(src/dvbpsi.c)
 
+AC_PREREQ(2.50)
+AC_CONFIG_AUX_DIR(autotools)
 AC_CANONICAL_SYSTEM
 
-AM_INIT_AUTOMAKE(libdvbpsi2, 0.1.3)
+AM_INIT_AUTOMAKE(libdvbpsi3, 0.1.4)
 AM_CONFIG_HEADER(config.h)
 
 #AC_CANONICAL_HOST
