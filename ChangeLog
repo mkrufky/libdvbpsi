@@ -2,6 +2,19 @@
 # ChangeLog for libdvbpsi #
 #=========================#
 
+0.1.3
+Tue, 29 Jul 2003 01:01:02 +0200
+  * fixed segfault with invalid/corrupted psi data
+  * update spec file
+  * src/descriptors/*: fixed some typos
+  * misc/*: added tests on the new descriptors
+  * src/descriptors/*: added a few DVB descriptors decoder and generator
+    (Stuffing, Bouquet Name, Service Name)
+  * src/demux.*: DVB PSI tables demux, required since one PID channel
+    may contain different tables.
+  * src/tables/sdt*: SDT decoder (no generator yet)
+  * examples/decode_sdt.c: added SDT decoder example
+
 0.1.2
 Fri, 11 Oct 2002 11:34:23 +0200
 

@@ -1,6 +1,6 @@
 %define name		libdvbpsi
 %define version		0.1.2
-%define release		2mdk
+%define release		1
 
 %define major		1
 %define lib_name	%{name}%{major}
@@ -91,6 +91,9 @@ rm -rf %buildroot
 %{_includedir}/*
 
 %changelog
+* Tue Jul 29 2003 Yves Duret <yves@zarb.org>
+- 0.1.3 release.
+
 * Fri Dec 13 2002 Yves Duret <yves@zarb.org> 0.1.2-2mdk
 - s#Copyright#License#
 - include the libtool .la files.
