@@ -5,24 +5,29 @@ rm -f aclocal.m4 configure config.guess config.log config.sub ltmain.sh libtool 
 
 # Check for automake
 amvers="none"
-if automake-1.6 --version >/dev/null 2>&1
+if automake-1.7 --version >/dev/null 2>&1
 then
-  amvers="-1.6"
+  amvers="-1.7"
 else
-  if automake-1.5 --version >/dev/null 2>&1
+  if automake-1.6 --version >/dev/null 2>&1
   then
-    amvers="-1.5"
+    amvers="-1.6"
   else
-    if automake --version > /dev/null 2>&1
+    if automake-1.5 --version >/dev/null 2>&1
     then
-      amvers=`automake --version | sed -e '1s/[^0-9]*//' -e q`
-
-      if expr "$amvers" "<" "1.5" > /dev/null 2>&1
-      then amvers="none"
-      else amvers=""
-      fi        
-    fi
-  fi 
+      amvers="-1.5"
+    else
+      if automake --version > /dev/null 2>&1
+      then
+        amvers=`automake --version | sed -e '1s/[^0-9]*//' -e q`
+  
+        if expr "$amvers" "<" "1.5" > /dev/null 2>&1
+        then amvers="none"
+        else amvers=""
+        fi        
+      fi
+    fi 
+  fi
 fi
 
 if test x$amvers = xnone
@@ -33,7 +38,12 @@ then
 fi
 
 aclocal${amvers} || exit 1
-libtoolize --force --copy || exit 1
+if libtoolize --version >/dev/null 2>&1
+then
+  libtoolize --force --copy || exit 1
+else
+  glibtoolize --force --copy || exit 1
+fi
 autoheader || exit 1
 #add --include-deps if you want to bootstrap with any other compiler than gcc
 #automake${amvers} --add-missing --copy --include-deps || exit 1
