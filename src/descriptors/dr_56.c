@@ -95,9 +95,9 @@ dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
                      p_descriptor->p_data + 5 * i, 3);
 
     p_decoded->p_pages[i].i_teletext_type = 
-                ((uint8_t)(p_descriptor->p_data[5 * i + 3]) >> 3)
+                ((uint8_t)(p_descriptor->p_data[5 * i + 3]) >> 3);
     
-    p_decoded->p_pages[i].i_teletext_magazin_number = 
+    p_decoded->p_pages[i].i_teletext_magazine_number = 
               ((uint16_t)(p_descriptor->p_data[5 * i + 3]) & 0x07)
             | p_descriptor->p_data[5 * i + 5];
     
@@ -113,7 +113,7 @@ dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
 /*****************************************************************************
  * dvbpsi_GenTeletextDr
  *****************************************************************************/
-dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
+dvbpsi_descriptor_t * dvbpsi_GenTeletextDr(
                                         dvbpsi_teletext_dr_t * p_decoded,
                                         int b_duplicate)
 {
@@ -133,8 +133,8 @@ dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
               3);
          
       p_descriptor->p_data[8 * i + 3] =
-                            (uint8_t) ( (uint8_t)( p_decoded->p_pages[i].i_teletext_type << 3 ) | 
-                            ( (uint8_t) p_decoded->p_pages[i].i_teletext_magazine_number & 0x07 );
+                            (uint8_t) ( ( (uint8_t) p_decoded->p_pages[i].i_teletext_type << 3 ) | 
+                            ( (uint8_t) p_decoded->p_pages[i].i_teletext_magazine_number & 0x07 ) );
 
       p_descriptor->p_data[8 * i + 4] = 
                             p_decoded->p_pages[i].i_teletext_page_number;
