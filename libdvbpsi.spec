@@ -1,6 +1,7 @@
 %define name		libdvbpsi
 %define version		0.1.2
-%define release		1
+%define release		2mdk
+
 %define major		1
 %define lib_name	%{name}%{major}
 
@@ -9,8 +10,8 @@ Name:		%{name}
 Version:	%{version}
 Release:	%{release}
 License:	GPL
-URL:		http://www.videolan.org/
-Group:		Application/Multimedia
+URL:		http://www.videolan.org/libdvbpsi/
+Group:		System/Libraries
 Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}-%{version}.tar.gz
 BuildRoot:	%_tmppath/%name-%version-%release-root
 
@@ -22,7 +23,7 @@ decoding and generating. The important features are:
 
 %package -n %{lib_name}
 Summary:	A library for decoding and generating MPEG 2 and DVB PSI sections.
-Group:		Application/Multimedia
+Group:		System/Libraries
 Provides:	%name
 
 %description -n %{lib_name}
@@ -51,8 +52,8 @@ the %name package installed.
 %setup -q
 
 %build
-./configure --prefix=%_prefix --enable-release
-make 
+%configure --enable-release
+%make 
 
 %install
 %makeinstall
@@ -67,17 +68,22 @@ rm -rf %buildroot
 %files -n %{lib_name}
 %defattr(-,root,root,-)
 %doc AUTHORS README COPYING ChangeLog
-
 %{_libdir}/*.so.*
 
 %files -n %{lib_name}-devel
 %defattr(-,root,root)
 %doc COPYING
-%{_libdir}/*.a
+%{_libdir}/*a
 %{_libdir}/*.so
 %{_includedir}/*
 
 %changelog
+* Fri Dec 13 2002 Yves Duret <yves@zarb.org> 0.1.2-2mdk
+- s#Copyright#License#
+- include the libtool .la files.
+- use macros.
+- update URL: tag.
+
 * Fri Oct 11 2002 Samuel Hocevar <sam@zoy.org>
 - 0.1.2 release.
 
