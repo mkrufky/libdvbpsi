@@ -2,7 +2,8 @@
 # ChangeLog for libdvbpsi #
 #=========================#
 
-HEAD
+0.1.2
+**
 
   * configure.ac, bootstrap: removed redundant stuff from CVS such as the
     Makefile.in files, configure and config.*, and added a bootstrap script
@@ -14,9 +15,12 @@ HEAD
   * configure.in, ltmain.sh: fixes for Solaris, mingw and Mac OS X.
   * src/tables/pmt.c: fixed the PMT generator which used to add one PSI
     section for one ES.
+  * */Makefile.am: reworked automake directories to avoid linking problems
+    on Mac OS X.
 
 0.1.1
 Sat, 18 May 2002 13:30:44 +0200
+
   * src/descriptor.h, src/descriptor.c: added a p_decoded field to the
     dvbpsi_descriptor_s structure.
   * src/descriptor.h, src/descriptor.c, src/tables/pmt.c: added an 's' to the

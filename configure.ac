@@ -54,7 +54,7 @@ fi
 dnl Check for headers
 AC_CHECK_HEADERS(stdint.h inttypes.h)
 
-AC_OUTPUT([Makefile src/Makefile src/tables/Makefile src/descriptors/Makefile examples/Makefile misc/Makefile doc/Makefile debian/Makefile])
+AC_OUTPUT([Makefile src/Makefile examples/Makefile misc/Makefile doc/Makefile debian/Makefile])
 
 echo "
 libdvbpsi configuration

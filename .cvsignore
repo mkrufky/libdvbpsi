@@ -4,6 +4,7 @@ config.cache
 config.status
 config.guess
 config.status
+config.sub
 config.h
 config.h.in
 Makefile
@@ -17,3 +18,4 @@ libtool
 ltmain.sh
 missing
 mkinstalldirs
+depcomp
