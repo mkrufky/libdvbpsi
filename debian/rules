@@ -4,17 +4,28 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-# This is the debhelper compatability version to use.
-export DH_COMPAT=3
+# See /usr/share/doc/autotools-dev/README.Debian.gz
+export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
-# Compilation options
-export CONFIG_FLAGS="--prefix=/usr"
+# FOR AUTOCONF 2.52 AND NEWER ONLY
+ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+  confflags += --build $(DEB_HOST_GNU_TYPE)
+else
+  confflags += --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+endif
 
 build: build-stamp
 build-stamp:
 	dh_testdir
 
-	./configure --prefix=/usr --mandir=$${prefix}/share/man \
+	touch configure.ac \
+	&& touch aclocal.m4 \
+	&& touch configure \
+	&& touch config.h.in \
+	&& touch `find -name Makefile.in`
+
+	./configure $(confflags) --prefix=/usr --mandir=$${prefix}/share/man \
 		--infodir=$${prefix}/share/info --enable-release 
 
 	$(MAKE)
@@ -30,18 +41,23 @@ clean:
 
 	dh_clean
 
+	-test -r /usr/share/misc/config.sub && \
+           cp -f /usr/share/misc/config.sub config.sub
+	-test -r /usr/share/misc/config.guess && \
+           cp -f /usr/share/misc/config.guess config.guess
+
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
 
-	$(MAKE) install DESTDIR=`pwd`/debian/libdvbpsi1/
+	$(MAKE) install DESTDIR=`pwd`/debian/libdvbpsi2/
 
-	ln -s libdvbpsi1 debian/libdvbpsi1-dev/usr/share/doc/libdvbpsi1-dev
-	mv debian/libdvbpsi1/usr/lib/*.so debian/libdvbpsi1/usr/lib/*a \
-		debian/libdvbpsi1-dev/usr/lib/
-	mv debian/libdvbpsi1/usr/include debian/libdvbpsi1-dev/usr/
+	ln -s libdvbpsi2 debian/libdvbpsi2-dev/usr/share/doc/libdvbpsi2-dev
+	mv debian/libdvbpsi2/usr/lib/*.so debian/libdvbpsi2/usr/lib/*a \
+		debian/libdvbpsi2-dev/usr/lib/
+	mv debian/libdvbpsi2/usr/include debian/libdvbpsi2-dev/usr/
 
 # Build architecture-independent files here.
 binary-indep: build install

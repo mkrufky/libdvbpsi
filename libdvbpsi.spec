@@ -1,8 +1,8 @@
-%define name		libdvbpsi
-%define version		0.1.2
+%define name		libdvbpsi2
+%define version		0.1.3
 %define release		1
 
-%define major		1
+%define major		2
 %define lib_name	%{name}%{major}
 
 %define redhat80 0
@@ -24,8 +24,8 @@ Packager:	Yves Duret <yves@zarb.org>
 License:	GPL
 URL:		http://developers.videolan.org/libdvbpsi/
 Group:		System/Libraries
-Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}-%{version}.tar.bz2
-BuildRoot:	%_tmppath/%name-%version-%release-root
+Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}${major}-%{version}.tar.bz2
+BuildRoot:	%_tmppath/%name%major-%version-%release-root
 
 %description
 libdvbpsi is a simple library designed for MPEG 2 TS and DVB PSI tables
