@@ -4,6 +4,8 @@ SUBDIRS = src examples misc doc debian
 
 EXTRA_DIST=libdvbpsi.spec
 
+AUTOMAKE_OPTIONS = foreign dist-bzip2 subdir-objects
+
 doc-dummy:
 
 doc: doc-dummy

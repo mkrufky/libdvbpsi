@@ -1,6 +1,8 @@
 #! /bin/sh
 set -x
 
+rm -f aclocal.m4 configure config.guess config.log config.sub ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh
+
 # Check for automake
 amvers="none"
 if automake-1.6 --version >/dev/null 2>&1
@@ -34,7 +36,7 @@ aclocal${amvers} || exit 1
 libtoolize --force --copy || exit 1
 autoheader || exit 1
 #add --include-deps if you want to bootstrap with any other compiler than gcc
-#automake${amvers} --foreign --add-missing --copy --include-deps || exit 1
-automake${amvers} --foreign --add-missing --copy || exit 1
+#automake${amvers} --add-missing --copy --include-deps || exit 1
+automake${amvers} --add-missing --copy || exit 1
 autoconf || exit 1
 rm -f config.cache
