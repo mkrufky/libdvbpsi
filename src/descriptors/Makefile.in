@@ -77,10 +77,10 @@ pkgincludedir = $(includedir)/dvbpsi
 
 noinst_LTLIBRARIES = lib_descriptors.la
 
-lib_descriptors_la_SOURCES = dr_02.c                              dr_03.c                              dr_04.c                              dr_05.c                              dr_06.c                              dr_07.c                              dr_08.c
+lib_descriptors_la_SOURCES = dr_02.c                              dr_03.c                              dr_04.c                              dr_05.c                              dr_06.c                              dr_07.c                              dr_08.c                              dr_09.c                              dr_0a.c
 
 
-pkginclude_HEADERS = dr_02.h                      dr_03.h                      dr_04.h                      dr_05.h                      dr_06.h                      dr_07.h                      dr_08.h
+pkginclude_HEADERS = dr_02.h                      dr_03.h                      dr_04.h                      dr_05.h                      dr_06.h                      dr_07.h                      dr_08.h                      dr_09.h                      dr_0a.h
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../src/config.h
@@ -95,7 +95,7 @@ LIBS = @LIBS@
 lib_descriptors_la_LDFLAGS = 
 lib_descriptors_la_LIBADD = 
 lib_descriptors_la_OBJECTS =  dr_02.lo dr_03.lo dr_04.lo dr_05.lo \
-dr_06.lo dr_07.lo dr_08.lo
+dr_06.lo dr_07.lo dr_08.lo dr_09.lo dr_0a.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -111,7 +111,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = tar
 GZIP_ENV = --best
 DEP_FILES =  .deps/dr_02.P .deps/dr_03.P .deps/dr_04.P .deps/dr_05.P \
-.deps/dr_06.P .deps/dr_07.P .deps/dr_08.P
+.deps/dr_06.P .deps/dr_07.P .deps/dr_08.P .deps/dr_09.P .deps/dr_0a.P
 SOURCES = $(lib_descriptors_la_SOURCES)
 OBJECTS = $(lib_descriptors_la_OBJECTS)
 

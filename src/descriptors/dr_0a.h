@@ -1,7 +1,7 @@
 /*****************************************************************************
- * dr_08.h
+ * dr_0a.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_08.h,v 1.2 2002/05/08 16:45:33 bozo Exp $
+ * $Id: dr_0a.h,v 1.1 2002/05/08 16:45:33 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -22,18 +22,18 @@
  *****************************************************************************/
 
 /*!
- * \file <dr_08.h>
+ * \file <dr_0a.h>
  * \author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
- * \brief Application interface for the MPEG 2 "video window"
+ * \brief Application interface for the MPEG 2 "ISO 639 language"
  * descriptor decoder and generator.
  *
- * Application interface for the MPEG 2 "video window" descriptor
+ * Application interface for the MPEG 2 "ISO 639 language" descriptor
  * decoder and generator. This descriptor's definition can be found in
- * ISO/IEC 13818-1 section 2.6.14.
+ * ISO/IEC 13818-1 section 2.6.18.
  */
 
-#ifndef _DVBPSI_DR_08_H_
-#define _DVBPSI_DR_08_H_
+#ifndef _DVBPSI_DR_0A_H_
+#define _DVBPSI_DR_0A_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,56 +41,58 @@ extern "C" {
 
 
 /*****************************************************************************
- * dvbpsi_vwindow_dr_t
+ * dvbpsi_iso639_dr_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_vwindow_dr_s
- * \brief "video window" descriptor structure.
+ * \struct dvbpsi_iso639_dr_s
+ * \brief "ISO 639 language" descriptor structure.
  *
- * This structure is used to store a decoded "video window"
- * descriptor. (ISO/IEC 13818-1 section 2.6.14).
+ * This structure is used to store a decoded "ISO 639 language"
+ * descriptor. (ISO/IEC 13818-1 section 2.6.18).
  */
 /*!
- * \typedef struct dvbpsi_vwindow_dr_s dvbpsi_vwindow_dr_t
- * \brief dvbpsi_vwindow_dr_t type definition.
+ * \typedef struct dvbpsi_iso639_dr_s dvbpsi_iso639_dr_t
+ * \brief dvbpsi_iso639_dr_t type definition.
  */
-typedef struct dvbpsi_vwindow_dr_s
+typedef struct dvbpsi_iso639_dr_s
 {
-  uint16_t      i_horizontal_offset;    /*!< horizontal_offset */
-  uint16_t      i_vertical_offset;      /*!< vertical_offset */
-  uint8_t       i_window_priority;      /*!< window_priority */
+  uint8_t       i_code_count;           /*!< length of the i_iso_639_code
+                                             array */
+  uint8_t       i_iso_639_code[252];    /*!< ISO_639_language_code */
+  uint8_t       i_audio_type;           /*!< audio_type */
 
-} dvbpsi_vwindow_dr_t;
+} dvbpsi_iso639_dr_t;
 
 
 /*****************************************************************************
- * dvbpsi_DecodeVWindowDr
+ * dvbpsi_DecodeISO639Dr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_vwindow_dr_t * dvbpsi_DecodeVWindowDr(
+ * \fn dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(
  * dvbpsi_descriptor_t * p_descriptor)
- * \brief "video window" descriptor decoder.
+ * \brief "ISO 639 language" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
- * \return a pointer to a new "video window" descriptor structure which
+ * \return a pointer to a new "ISO 639 language" descriptor structure which
  * contains the decoded data.
  */
-dvbpsi_vwindow_dr_t* dvbpsi_DecodeVWindowDr(dvbpsi_descriptor_t * p_descriptor);
+dvbpsi_iso639_dr_t* dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor);
 
 
 /*****************************************************************************
- * dvbpsi_GenVWindowDr
+ * dvbpsi_GenISO639Dr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t * dvbpsi_GenVWindowDr(
- * dvbpsi_vwindow_dr_t * p_decoded, int b_duplicate)
- * \brief "video window" descriptor generator.
- * \param p_decoded pointer to a decoded "video window" descriptor structure
+ * \fn dvbpsi_descriptor_t * dvbpsi_GenISO639Dr(
+ * dvbpsi_iso639_dr_t * p_decoded, int b_duplicate)
+ * \brief "ISO 639 language" descriptor generator.
+ * \param p_decoded pointer to a decoded "ISO 639 language" descriptor
+ * structure
  * \param b_duplicate if non zero then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
-dvbpsi_descriptor_t * dvbpsi_GenVWindowDr(dvbpsi_vwindow_dr_t * p_decoded,
-                                          int b_duplicate);
+dvbpsi_descriptor_t * dvbpsi_GenISO639Dr(dvbpsi_iso639_dr_t * p_decoded,
+                                         int b_duplicate);
 
 
 #ifdef __cplusplus
@@ -98,6 +100,6 @@ dvbpsi_descriptor_t * dvbpsi_GenVWindowDr(dvbpsi_vwindow_dr_t * p_decoded,
 #endif
 
 #else
-#error "Multiple inclusions of dr_08.h"
+#error "Multiple inclusions of dr_0a.h"
 #endif
 
