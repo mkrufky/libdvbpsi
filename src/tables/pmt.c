@@ -2,7 +2,7 @@
  * pmt.c: PMT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.c,v 1.2 2002/01/22 23:28:17 bozo Exp $
+ * $Id: pmt.c,v 1.3 2002/03/18 12:38:53 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -386,6 +386,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
                      p_section->b_current_next,
                        ((uint16_t)(p_section->p_payload_start[0] & 0x1f) << 8)
                      | p_section->p_payload_start[1]);
+      p_pmt_decoder->i_last_section_number = p_section->i_last_number;
     }
 
     /* Fill the section array */
