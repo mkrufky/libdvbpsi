@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_0c.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_0c.h,v 1.1 2002/05/10 22:58:53 bozo Exp $
+ * $Id: dr_0c.h,v 1.2 2002/05/10 23:50:36 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -51,8 +51,7 @@ extern "C" {
  * descriptor. (ISO/IEC 13818-1 section 2.6.22).
  */
 /*!
- * \typedef struct dvbpsi_mx_buff_utilization_dr_s
- * dvbpsi_mx_buff_utilization_dr_t
+ * \typedef struct dvbpsi_mx_buff_utilization_dr_s dvbpsi_mx_buff_utilization_dr_t
  * \brief dvbpsi_systemclock_dr_t type definition.
  */
 typedef struct dvbpsi_mx_buff_utilization_dr_s
@@ -69,7 +68,7 @@ typedef struct dvbpsi_mx_buff_utilization_dr_s
  *****************************************************************************/
 /*!
  * \fn dvbpsi_mx_buff_utilization_dr_t * dvbpsi_DecodeMxBuffUtilizationDr(
- * dvbpsi_descriptor_t * p_descriptor)
+                                        dvbpsi_descriptor_t * p_descriptor)
  * \brief "multiplex buffer utilization" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
  * \return a pointer to a new "multiplex buffer utilization" descriptor
@@ -84,7 +83,7 @@ dvbpsi_mx_buff_utilization_dr_t* dvbpsi_DecodeMxBuffUtilizationDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenMxBuffUtilizationDr(
- * dvbpsi_mx_buff_utilization_dr_t * p_decoded, int b_duplicate)
+                dvbpsi_mx_buff_utilization_dr_t * p_decoded, int b_duplicate)
  * \brief "multiplex buffer utilization" descriptor generator.
  * \param p_decoded pointer to a decoded "system clock" descriptor
  * structure

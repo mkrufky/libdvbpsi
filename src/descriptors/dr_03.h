@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_03.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_03.h,v 1.1 2002/05/08 13:33:52 bozo Exp $
+ * $Id: dr_03.h,v 1.2 2002/05/10 23:50:36 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -68,7 +68,7 @@ typedef struct dvbpsi_astream_dr_s
  *****************************************************************************/
 /*!
  * \fn dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(
- * dvbpsi_descriptor_t * p_descriptor)
+                                        dvbpsi_descriptor_t * p_descriptor)
  * \brief "audio stream" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
  * \return a pointer to a new "audio stream" descriptor structure which
@@ -82,7 +82,7 @@ dvbpsi_astream_dr_t* dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor);
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenAStreamDr(
- * dvbpsi_astream_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_astream_dr_t * p_decoded, int b_duplicate)
  * \brief "audio stream" descriptor generator.
  * \param p_decoded pointer to a decoded "video stream" descriptor structure
  * \param b_duplicate if non zero then duplicate the p_decoded structure into

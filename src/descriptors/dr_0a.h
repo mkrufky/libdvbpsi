@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_0a.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_0a.h,v 1.1 2002/05/08 16:45:33 bozo Exp $
+ * $Id: dr_0a.h,v 1.2 2002/05/10 23:50:36 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -69,7 +69,7 @@ typedef struct dvbpsi_iso639_dr_s
  *****************************************************************************/
 /*!
  * \fn dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(
- * dvbpsi_descriptor_t * p_descriptor)
+                                        dvbpsi_descriptor_t * p_descriptor)
  * \brief "ISO 639 language" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
  * \return a pointer to a new "ISO 639 language" descriptor structure which
@@ -83,7 +83,7 @@ dvbpsi_iso639_dr_t* dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor);
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenISO639Dr(
- * dvbpsi_iso639_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_iso639_dr_t * p_decoded, int b_duplicate)
  * \brief "ISO 639 language" descriptor generator.
  * \param p_decoded pointer to a decoded "ISO 639 language" descriptor
  * structure

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_09.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_09.h,v 1.1 2002/05/08 16:45:33 bozo Exp $
+ * $Id: dr_09.h,v 1.2 2002/05/10 23:50:36 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -70,7 +70,7 @@ typedef struct dvbpsi_ca_dr_s
  *****************************************************************************/
 /*!
  * \fn dvbpsi_ca_dr_t * dvbpsi_DecodeCADr(
- * dvbpsi_descriptor_t * p_descriptor)
+                                        dvbpsi_descriptor_t * p_descriptor)
  * \brief "conditional access" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
  * \return a pointer to a new "conditional access" descriptor structure which
@@ -84,7 +84,7 @@ dvbpsi_ca_dr_t* dvbpsi_DecodeCADr(dvbpsi_descriptor_t * p_descriptor);
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenCADr(
- * dvbpsi_ca_dr_t * p_decoded, int b_duplicate)
+                                dvbpsi_ca_dr_t * p_decoded, int b_duplicate)
  * \brief "conditional access" descriptor generator.
  * \param p_decoded pointer to a decoded "conditional access" descriptor
  * structure

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_06.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_06.h,v 1.1 2002/05/08 15:55:32 bozo Exp $
+ * $Id: dr_06.h,v 1.2 2002/05/10 23:50:36 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -66,7 +66,7 @@ typedef struct dvbpsi_ds_alignment_dr_s
  *****************************************************************************/
 /*!
  * \fn dvbpsi_ds_alignment_dr_t * dvbpsi_DecodeDSAlignmentDr(
- * dvbpsi_descriptor_t * p_descriptor)
+                                        dvbpsi_descriptor_t * p_descriptor)
  * \brief "data stream alignment" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
  * \return a pointer to a new "data stream alignment" descriptor structure
@@ -81,7 +81,7 @@ dvbpsi_ds_alignment_dr_t* dvbpsi_DecodeDSAlignmentDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenDSAlignmentDr(
- * dvbpsi_ds_alignment_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_ds_alignment_dr_t * p_decoded, int b_duplicate)
  * \brief "data stream alignment" descriptor generator.
  * \param p_decoded pointer to a decoded "data stream alignment" descriptor
  * structure

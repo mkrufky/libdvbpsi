@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_05.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_05.h,v 1.1 2002/05/08 14:56:28 bozo Exp $
+ * $Id: dr_05.h,v 1.2 2002/05/10 23:50:36 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -69,7 +69,7 @@ typedef struct dvbpsi_registration_dr_s
  *****************************************************************************/
 /*!
  * \fn dvbpsi_registration_dr_t * dvbpsi_DecodeRegistrationDr(
- * dvbpsi_descriptor_t * p_descriptor)
+                                        dvbpsi_descriptor_t * p_descriptor)
  * \brief "registration" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
  * \return a pointer to a new "registration" descriptor structure which
@@ -84,7 +84,7 @@ dvbpsi_registration_dr_t* dvbpsi_DecodeRegistrationDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenRegistrationDr(
- * dvbpsi_registration_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_registration_dr_t * p_decoded, int b_duplicate)
  * \brief "registration" descriptor generator.
  * \param p_decoded pointer to a decoded "registration" descriptor structure
  * \param b_duplicate if non zero then duplicate the p_decoded structure into

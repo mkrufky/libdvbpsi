@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_0e.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_0e.h,v 1.1 2002/05/10 22:58:53 bozo Exp $
+ * $Id: dr_0e.h,v 1.2 2002/05/10 23:50:36 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -66,7 +66,7 @@ typedef struct dvbpsi_max_bitrate_dr_s
  *****************************************************************************/
 /*!
  * \fn dvbpsi_max_bitrate_dr_t * dvbpsi_DecodeMaxBitrateDr(
- * dvbpsi_descriptor_t * p_descriptor)
+                                        dvbpsi_descriptor_t * p_descriptor)
  * \brief "maximum bitrate" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
  * \return a pointer to a new "maximum bitrate" descriptor structure which
@@ -81,7 +81,7 @@ dvbpsi_max_bitrate_dr_t* dvbpsi_DecodeMaxBitrateDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenMaxBitrateDr(
- * dvbpsi_max_bitrate_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_max_bitrate_dr_t * p_decoded, int b_duplicate)
  * \brief "maximum bitrate" descriptor generator.
  * \param p_decoded pointer to a decoded "maximum bitrate" descriptor structure
  * \param b_duplicate if non zero then duplicate the p_decoded structure into

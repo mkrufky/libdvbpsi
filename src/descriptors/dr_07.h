@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_07.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_07.h,v 1.1 2002/05/08 15:55:32 bozo Exp $
+ * $Id: dr_07.h,v 1.2 2002/05/10 23:50:36 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -68,7 +68,7 @@ typedef struct dvbpsi_target_bg_grid_dr_s
  *****************************************************************************/
 /*!
  * \fn dvbpsi_target_bg_grid_dr_t * dvbpsi_DecodeTargetBgGridDr(
- * dvbpsi_descriptor_t * p_descriptor)
+                                        dvbpsi_descriptor_t * p_descriptor)
  * \brief "target background grid" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
  * \return a pointer to a new "target background grid" descriptor structure
@@ -83,7 +83,7 @@ dvbpsi_target_bg_grid_dr_t* dvbpsi_DecodeTargetBgGridDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenTargetBgGridDr(
- * dvbpsi_target_bg_grid_dr_t * p_decoded, int b_duplicate)
+                dvbpsi_target_bg_grid_dr_t * p_decoded, int b_duplicate)
  * \brief "target background grid" descriptor generator.
  * \param p_decoded pointer to a decoded "target background grid" descriptor
  * structure
