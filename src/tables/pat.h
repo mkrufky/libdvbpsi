@@ -2,7 +2,7 @@
  * pat.h: PAT structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pat.h,v 1.1 2002/01/22 20:30:16 bozo Exp $
+ * $Id: pat.h,v 1.2 2002/03/15 12:16:01 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -26,6 +26,10 @@
 
 #ifndef _DVBPSI_PAT_H_
 #define _DVBPSI_PAT_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*****************************************************************************
@@ -130,6 +134,10 @@ dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
 dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
                                             int i_max_pps);
 
+
+#ifdef __cplusplus
+};
+#endif
 
 #else
 #error "Multiple inclusions of pat.h"

@@ -2,7 +2,7 @@
  * psi.h: common PSI structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: psi.h,v 1.2 2002/01/22 20:30:16 bozo Exp $
+ * $Id: psi.h,v 1.3 2002/03/15 12:16:01 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -26,6 +26,10 @@
 
 #ifndef _DVBPSI_PSI_H_
 #define _DVBPSI_PSI_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*****************************************************************************
@@ -97,6 +101,10 @@ int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
  *****************************************************************************/
 void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section);
 
+
+#ifdef __cplusplus
+};
+#endif
 
 #else
 #error "Multiple inclusions of psi.h"

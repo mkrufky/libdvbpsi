@@ -2,7 +2,7 @@
  * descriptor.h: common descriptor structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: descriptor.h,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: descriptor.h,v 1.2 2002/03/15 12:16:01 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -26,6 +26,10 @@
 
 #ifndef _DVBPSI_DESCRIPTOR_H_
 #define _DVBPSI_DESCRIPTOR_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*****************************************************************************
@@ -62,6 +66,10 @@ dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
  *****************************************************************************/
 void dvbpsi_DeleteDescriptor(dvbpsi_descriptor_t* p_descriptor);
 
+
+#ifdef __cplusplus
+};
+#endif
 
 #else
 #error "Multiple inclusions of descriptor.h"

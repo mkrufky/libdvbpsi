@@ -2,7 +2,7 @@
  * dvbpsi.h: main header
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: dvbpsi.h,v 1.2 2002/01/22 20:30:16 bozo Exp $
+ * $Id: dvbpsi.h,v 1.3 2002/03/15 12:16:01 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -29,6 +29,10 @@
 
 
 #include <inttypes.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*****************************************************************************
@@ -85,6 +89,10 @@ typedef struct dvbpsi_decoder_s
 
 } dvbpsi_decoder_t;
 
+
+#ifdef __cplusplus
+};
+#endif
 
 #else
 #error "Multiple inclusions of dvbpsi.h"

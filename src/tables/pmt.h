@@ -2,7 +2,7 @@
  * pmt.h: PMT structures
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.h,v 1.1 2002/01/22 20:30:16 bozo Exp $
+ * $Id: pmt.h,v 1.2 2002/03/15 12:16:01 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -26,6 +26,10 @@
 
 #ifndef _DVBPSI_PMT_H_
 #define _DVBPSI_PMT_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*****************************************************************************
@@ -157,6 +161,10 @@ dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
  *****************************************************************************/
 dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt);
 
+
+#ifdef __cplusplus
+};
+#endif
 
 #else
 #error "Multiple inclusions of pmt.h"
