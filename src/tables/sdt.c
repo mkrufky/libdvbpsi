@@ -2,7 +2,7 @@
  * sdt.c: SDT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: sdt.c,v 1.1 2002/12/11 13:04:57 jobi Exp $
+ * $Id: sdt.c,v 1.2 2003/09/16 18:43:09 asmax Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -209,6 +209,7 @@ dvbpsi_sdt_service_t* dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
     p_service->i_running_status = i_running_status;
     p_service->b_free_ca = b_free_ca;
     p_service->p_next = NULL;
+    p_service->p_first_descriptor = NULL;
 
     if(p_sdt->p_first_service == NULL)
     {
