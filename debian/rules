@@ -36,12 +36,12 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	$(MAKE) install DESTDIR=`pwd`/debian/libdvbpsi0/
+	$(MAKE) install DESTDIR=`pwd`/debian/libdvbpsi1/
 
-	ln -s libdvbpsi0 debian/libdvbpsi0-dev/usr/share/doc/libdvbpsi0-dev
-	mv debian/libdvbpsi0/usr/lib/*.so debian/libdvbpsi0/usr/lib/*a \
-		debian/libdvbpsi0-dev/usr/lib/
-	mv debian/libdvbpsi0/usr/include debian/libdvbpsi0-dev/usr/
+	ln -s libdvbpsi1 debian/libdvbpsi1-dev/usr/share/doc/libdvbpsi1-dev
+	mv debian/libdvbpsi1/usr/lib/*.so debian/libdvbpsi1/usr/lib/*a \
+		debian/libdvbpsi1-dev/usr/lib/
+	mv debian/libdvbpsi1/usr/include debian/libdvbpsi1-dev/usr/
 
 # Build architecture-independent files here.
 binary-indep: build install

@@ -1,3 +1,10 @@
+libdvbpsi (0.1.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Changed bunary package name from libdvbpsi0 to libdvbpsi1.
+
+ -- Samuel Hocevar <sam@zoy.org>  Sat, 18 May 2002 13:49:48 +0200
+
 libdvbpsi (0.1.0-1) unstable; urgency=low
 
   * First public release.
