@@ -483,6 +483,156 @@ int main_iso639_()
   return i_err;
 }
 
+/* system clock */
+int main_system_clock_()
+{
+  BOZO_VARS(system_clock);
+  BOZO_START(system clock);
+
+  
+  /* check b_external_clock_ref */
+  BOZO_init_boolean(b_external_clock_ref, 0);
+  BOZO_init_integer(i_clock_accuracy_integer, 0);
+  BOZO_init_integer(i_clock_accuracy_exponent, 0);
+  BOZO_begin_boolean(b_external_clock_ref)
+    BOZO_DOJOB(SystemClock);
+    BOZO_check_boolean(b_external_clock_ref)
+    BOZO_CLEAN();
+  BOZO_end_boolean(b_external_clock_ref)
+
+  /* check i_clock_accuracy_integer */
+  BOZO_init_boolean(b_external_clock_ref, 0);
+  BOZO_init_integer(i_clock_accuracy_integer, 0);
+  BOZO_init_integer(i_clock_accuracy_exponent, 0);
+  BOZO_begin_integer(i_clock_accuracy_integer, 6)
+    BOZO_DOJOB(SystemClock);
+    BOZO_check_integer(i_clock_accuracy_integer, 6)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_clock_accuracy_integer, 6)
+
+  /* check i_clock_accuracy_exponent */
+  BOZO_init_boolean(b_external_clock_ref, 0);
+  BOZO_init_integer(i_clock_accuracy_integer, 0);
+  BOZO_init_integer(i_clock_accuracy_exponent, 0);
+  BOZO_begin_integer(i_clock_accuracy_exponent, 3)
+    BOZO_DOJOB(SystemClock);
+    BOZO_check_integer(i_clock_accuracy_exponent, 3)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_clock_accuracy_exponent, 3)
+
+
+  BOZO_END(system clock);
+
+  return i_err;
+}
+
+/* multiplex buffer utilization */
+int main_mx_buff_utilization_()
+{
+  BOZO_VARS(mx_buff_utilization);
+  BOZO_START(multiplex buffer utilization);
+
+  
+  /* check b_mdv_valid */
+  BOZO_init_boolean(b_mdv_valid, 0);
+  BOZO_init_integer(i_mx_delay_variation, 0);
+  BOZO_init_integer(i_mx_strategy, 0);
+  BOZO_begin_boolean(b_mdv_valid)
+    BOZO_DOJOB(MxBuffUtilization);
+    BOZO_check_boolean(b_mdv_valid)
+    BOZO_CLEAN();
+  BOZO_end_boolean(b_mdv_valid)
+
+  /* check i_mx_delay_variation */
+  BOZO_init_boolean(b_mdv_valid, 0);
+  BOZO_init_integer(i_mx_delay_variation, 0);
+  BOZO_init_integer(i_mx_strategy, 0);
+  BOZO_begin_integer(i_mx_delay_variation, 15)
+    BOZO_DOJOB(MxBuffUtilization);
+    BOZO_check_integer(i_mx_delay_variation, 15)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_mx_delay_variation, 15)
+
+  /* check i_mx_strategy */
+  BOZO_init_boolean(b_mdv_valid, 0);
+  BOZO_init_integer(i_mx_delay_variation, 0);
+  BOZO_init_integer(i_mx_strategy, 0);
+  BOZO_begin_integer(i_mx_strategy, 3)
+    BOZO_DOJOB(MxBuffUtilization);
+    BOZO_check_integer(i_mx_strategy, 3)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_mx_strategy, 3)
+
+
+  BOZO_END(multiplex buffer utilization);
+
+  return i_err;
+}
+
+/* copyright */
+int main_copyright_()
+{
+  BOZO_VARS(copyright);
+  BOZO_START(copyright);
+
+  
+  /* check i_copyright_identifier */
+  s_decoded.i_additional_length = 0;
+  BOZO_init_integer(i_copyright_identifier, 0);
+  BOZO_begin_integer(i_copyright_identifier, 32)
+    BOZO_DOJOB(Copyright);
+    BOZO_check_integer(i_copyright_identifier, 32)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_copyright_identifier, 32)
+
+
+  BOZO_END(copyright);
+
+  return i_err;
+}
+
+/* maximum bitrate */
+int main_max_bitrate_()
+{
+  BOZO_VARS(max_bitrate);
+  BOZO_START(maximum bitrate);
+
+  
+  /* check i_max_bitrate */
+  BOZO_init_integer(i_max_bitrate, 0);
+  BOZO_begin_integer(i_max_bitrate, 22)
+    BOZO_DOJOB(MaxBitrate);
+    BOZO_check_integer(i_max_bitrate, 22)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_max_bitrate, 22)
+
+
+  BOZO_END(maximum bitrate);
+
+  return i_err;
+}
+
+/* private data indicator */
+int main_private_data_()
+{
+  BOZO_VARS(private_data);
+  BOZO_START(private data indicator);
+
+  
+  /* check i_private_data */
+  BOZO_init_integer(i_private_data, 0);
+  BOZO_begin_integer(i_private_data, 32)
+    BOZO_DOJOB(PrivateData);
+    BOZO_check_integer(i_private_data, 32)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_private_data, 32)
+
+
+  BOZO_END(private data indicator);
+
+  return i_err;
+}
+
 
 /* main function */
 int main()
@@ -499,6 +649,11 @@ int main()
   i_err |= main_vwindow_();
   i_err |= main_ca_();
   i_err |= main_iso639_();
+  i_err |= main_system_clock_();
+  i_err |= main_mx_buff_utilization_();
+  i_err |= main_copyright_();
+  i_err |= main_max_bitrate_();
+  i_err |= main_private_data_();
 
   if(i_err)
     fprintf(stderr, "At least one test has FAILED !!!\n");

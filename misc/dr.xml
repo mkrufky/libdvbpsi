@@ -81,4 +81,32 @@
     <integer name="i_audio_type" bitcount="8" default="0" />
   </descriptor>
 
+  <descriptor name="system clock" sname="system_clock" fname="SystemClock">
+    <boolean name="b_external_clock_ref" default="0" />
+    <integer name="i_clock_accuracy_integer" bitcount="6" default="0" />
+    <integer name="i_clock_accuracy_exponent" bitcount="3" default="0" />
+  </descriptor>
+
+  <descriptor name="multiplex buffer utilization" sname="mx_buff_utilization" fname="MxBuffUtilization">
+    <boolean name="b_mdv_valid" default="0" />
+    <integer name="i_mx_delay_variation" bitcount="15" default="0" />
+    <integer name="i_mx_strategy" bitcount="3" default="0" />
+  </descriptor>
+
+  <descriptor name="copyright" sname="copyright" fname="Copyright">
+    <insert>
+      <begin>
+  s_decoded.i_additional_length = 0;</begin>
+    </insert>
+    <integer name="i_copyright_identifier" bitcount="32" default="0" />
+  </descriptor>
+
+  <descriptor name="maximum bitrate" sname="max_bitrate" fname="MaxBitrate">
+    <integer name="i_max_bitrate" bitcount="22" default="0" />
+  </descriptor>
+
+  <descriptor name="private data indicator" sname="private_data" fname="PrivateData">
+    <integer name="i_private_data" bitcount="32" default="0" />
+  </descriptor>
+
 </dr>

@@ -1,7 +1,7 @@
 /*****************************************************************************
- * dr_09.c
+ * dr_0b.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_09.c,v 1.3 2002/05/10 22:58:53 bozo Exp $
+ * $Id: dr_0b.c,v 1.1 2002/05/10 22:58:53 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -32,20 +32,21 @@
 #include "../dvbpsi_private.h"
 #include "../descriptor.h"
 
-#include "dr_09.h"
+#include "dr_0b.h"
 
 
 /*****************************************************************************
- * dvbpsi_DecodeCADr
+ * dvbpsi_DecodeSystemClockDr
  *****************************************************************************/
-dvbpsi_ca_dr_t * dvbpsi_DecodeCADr(dvbpsi_descriptor_t * p_descriptor)
+dvbpsi_system_clock_dr_t * dvbpsi_DecodeSystemClockDr(
+                                        dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_ca_dr_t * p_decoded;
+  dvbpsi_system_clock_dr_t * p_decoded;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x09)
+  if(p_descriptor->i_tag != 0x0b)
   {
-    DVBPSI_ERROR_ARG("dr_09 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    DVBPSI_ERROR_ARG("dr_0b decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -54,30 +55,25 @@ dvbpsi_ca_dr_t * dvbpsi_DecodeCADr(dvbpsi_descriptor_t * p_descriptor)
     return p_descriptor->p_decoded;
 
   /* Allocate memory */
-  p_decoded = (dvbpsi_ca_dr_t*)malloc(sizeof(dvbpsi_ca_dr_t));
+  p_decoded =
+        (dvbpsi_system_clock_dr_t*)malloc(sizeof(dvbpsi_system_clock_dr_t));
   if(!p_decoded)
   {
-    DVBPSI_ERROR("dr_09 decoder", "out of memory");
+    DVBPSI_ERROR("dr_0b decoder", "out of memory");
     return NULL;
   }
 
   /* Decode data and check the length */
-  if(p_descriptor->i_length < 4)
+  if(p_descriptor->i_length != 2)
   {
-    DVBPSI_ERROR_ARG("dr_09 decoder", "bad length (%d)",
+    DVBPSI_ERROR_ARG("dr_0b decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
   }
 
-  p_decoded->i_ca_system_id =   ((uint16_t)(p_descriptor->p_data[0]) << 8)
-                              | p_descriptor->p_data[1];
-  p_decoded->i_ca_pid =   ((uint16_t)(p_descriptor->p_data[2] & 0x1f) << 8)
-                        | p_descriptor->p_data[3];
-  p_decoded->i_private_length = p_descriptor->i_length - 4;
-  if(p_decoded->i_private_length)
-    memcpy(p_decoded->i_private_data,
-           p_descriptor->p_data + 4,
-           p_decoded->i_private_length);
+  p_decoded->b_external_clock_ref = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;
+  p_decoded->i_clock_accuracy_integer = p_descriptor->p_data[0] & 0x3f;
+  p_decoded->i_clock_accuracy_exponent = (p_descriptor->p_data[1] & 0xe0) >> 5;
 
   p_descriptor->p_decoded = (void*)p_decoded;
 
@@ -86,34 +82,32 @@ dvbpsi_ca_dr_t * dvbpsi_DecodeCADr(dvbpsi_descriptor_t * p_descriptor)
 
 
 /*****************************************************************************
- * dvbpsi_GenCADr
+ * dvbpsi_GenSystemClockDr
  *****************************************************************************/
-dvbpsi_descriptor_t * dvbpsi_GenCADr(dvbpsi_ca_dr_t * p_decoded,
-                                     int b_duplicate)
+dvbpsi_descriptor_t * dvbpsi_GenSystemClockDr(
+                                        dvbpsi_system_clock_dr_t * p_decoded,
+                                        int b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x09, p_decoded->i_private_length + 4, NULL);
+        dvbpsi_NewDescriptor(0x0b, 2, NULL);
 
   if(p_descriptor)
   {
     /* Encode data */
-    p_descriptor->p_data[0] = p_decoded->i_ca_system_id >> 8;
-    p_descriptor->p_data[1] = p_decoded->i_ca_system_id;
-    p_descriptor->p_data[2] = 0xe0 | ((p_decoded->i_ca_pid >> 8) & 0x1f);
-    p_descriptor->p_data[3] = p_decoded->i_ca_pid;
-    if(p_decoded->i_private_length)
-      memcpy(p_descriptor->p_data + 4,
-             p_decoded->i_private_data,
-             p_decoded->i_private_length);
+    p_descriptor->p_data[0] =
+                        0x40 | (p_decoded->i_clock_accuracy_integer & 0x3f);
+    if(p_decoded->b_external_clock_ref)
+      p_descriptor->p_data[0] |= 0x80;
+    p_descriptor->p_data[1] = 0x1f | p_decoded->i_clock_accuracy_exponent << 5;
 
     if(b_duplicate)
     {
       /* Duplicate decoded data */
-      dvbpsi_ca_dr_t * p_dup_decoded =
-                        (dvbpsi_ca_dr_t*)malloc(sizeof(dvbpsi_ca_dr_t));
+      dvbpsi_system_clock_dr_t * p_dup_decoded =
+        (dvbpsi_system_clock_dr_t*)malloc(sizeof(dvbpsi_system_clock_dr_t));
       if(p_dup_decoded)
-        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_ca_dr_t));
+        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_system_clock_dr_t));
 
       p_descriptor->p_decoded = (void*)p_dup_decoded;
     }
