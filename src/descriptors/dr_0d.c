@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_0d.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_0d.c,v 1.1 2002/05/10 22:58:53 bozo Exp $
+ * $Id: dr_0d.c,v 1.2 2002/10/07 14:15:14 sam Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -27,6 +27,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if defined(HAVE_INTTYPES_H)
+#include <inttypes.h>
+#elif defined(HAVE_STDINT_H)
+#include <stdint.h>
+#endif
 
 #include "../dvbpsi.h"
 #include "../dvbpsi_private.h"

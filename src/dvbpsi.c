@@ -2,7 +2,7 @@
  * dvbpsi.c: conversion from TS packets to PSI sections
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: dvbpsi.c,v 1.3 2002/01/22 20:30:16 bozo Exp $
+ * $Id: dvbpsi.c,v 1.4 2002/10/07 14:15:14 sam Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -29,6 +29,12 @@
 
 #include <string.h>
 #include <stdio.h>
+
+#if defined(HAVE_INTTYPES_H)
+#include <inttypes.h>
+#elif defined(HAVE_STDINT_H)
+#include <stdint.h>
+#endif
 
 #include "dvbpsi.h"
 #include "dvbpsi_private.h"

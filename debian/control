@@ -1,11 +1,12 @@
 Source: libdvbpsi
-Section: graphics
+Section: libs
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
 Build-Depends: debhelper (>=2.2.0)
 Standards-Version: 3.0.1
 
 Package: libdvbpsi1
+Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}
 Description: a library for for MPEG TS and DVB PSI tables decoding and generating
@@ -15,6 +16,7 @@ Description: a library for for MPEG TS and DVB PSI tables decoding and generatin
  This package contains the libdvbpsi1 runtime library.
 
 Package: libdvbpsi1-dev
+Section: devel
 Architecture: any
 Depends: libdvbpsi1 (= ${Source-Version})
 Conflicts: libdvbpsi0-dev

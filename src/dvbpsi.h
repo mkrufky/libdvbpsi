@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dvbpsi.h
  * (c)2001-2002 VideoLAN
- * $Id: dvbpsi.h,v 1.6 2002/06/02 23:04:08 bozo Exp $
+ * $Id: dvbpsi.h,v 1.7 2002/10/07 14:15:14 sam Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -32,13 +32,6 @@
 
 #ifndef _DVBPSI_DVBPSI_H_
 #define _DVBPSI_DVBPSI_H_
-
-
-#if defined(HAVE_INTTYPES_H)
-#include <inttypes.h>
-#elif defined(HAVE_STDINT_H)
-#include <stdint.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
