@@ -2,7 +2,7 @@
  * descriptor.c: descriptors functions
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: descriptor.c,v 1.1 2002/01/07 18:30:35 bozo Exp $
+ * $Id: descriptor.c,v 1.2 2002/01/07 18:44:03 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -28,6 +28,7 @@
 #include "config.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "dvbpsi.h"
 #include "descriptor.h"
