@@ -479,7 +479,7 @@ void dvbpsi_DecodeEITSections(dvbpsi_eit_t* p_eit,
       uint32_t i_duration = ((uint32_t)(p_byte[7]) << 16)
                                | ((uint32_t)(p_byte[8]) << 8) | p_byte[9];
       uint8_t i_running_status = (uint8_t)(p_byte[10]) >> 5;
-      int b_free_ca = (int)(p_byte[10]) & 0x10 >> 4;
+      int b_free_ca = (int)(p_byte[10] & 0x10) >> 4;
       uint16_t i_length = ((uint16_t)(p_byte[10] & 0xf) << 8) | p_byte[11];
       dvbpsi_eit_event_t* p_event = dvbpsi_EITAddEvent(p_eit,
           i_event_id, i_start_time, i_duration,
