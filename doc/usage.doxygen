@@ -14,11 +14,6 @@ called <em>dvbpsi_AttachXXX()</em>.</p>
 call the <em>dvbpsi_DetachXXX()</em> function (ex:
 dvbpsi_DetachPAT()).</p>
 
-<p>Be careful! If a table wasn't active (b_current_next == 0) and the
-next is the same but active (b_current_next == 1) then the lists
-contained by the table structure are empty and should be caught from the
-previous structure.</p>
-
 <p>In this version of <em>libdvbpsi</em> the descriptors aren't decoded.
 These decoders will come in the next release.</p>
 
