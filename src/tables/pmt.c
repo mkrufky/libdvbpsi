@@ -2,7 +2,7 @@
  * pmt.c: PMT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.c,v 1.1 2002/01/22 20:30:16 bozo Exp $
+ * $Id: pmt.c,v 1.2 2002/01/22 23:28:17 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -95,8 +95,15 @@ void dvbpsi_DetachPMT(dvbpsi_handle h_dvbpsi)
 {
   dvbpsi_pmt_decoder_t* p_pmt_decoder
                         = (dvbpsi_pmt_decoder_t*)h_dvbpsi->p_private_decoder;
+  unsigned int i;
 
   free(p_pmt_decoder->p_building_pmt);
+
+  for(i = 0; i <= 255; i++)              
+  {
+    if(p_pmt_decoder->ap_sections[i])
+      free(p_pmt_decoder->ap_sections[i]);
+  }
 
   free(h_dvbpsi->p_private_decoder);
   free(h_dvbpsi);
