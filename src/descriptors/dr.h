@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr.h
  * (c)2001-2002 VideoLAN
- * $Id: dr.h,v 1.2 2002/05/10 22:58:53 bozo Exp $
+ * $Id: dr.h,v 1.3 2002/05/11 11:42:27 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -32,20 +32,20 @@
 #ifndef _DVBPSI_DR_H_
 #define _DVBPSI_DR_H_
 
-#include "../src/descriptors/dr_02.h"
-#include "../src/descriptors/dr_03.h"
-#include "../src/descriptors/dr_04.h"
-#include "../src/descriptors/dr_05.h"
-#include "../src/descriptors/dr_06.h"
-#include "../src/descriptors/dr_07.h"
-#include "../src/descriptors/dr_08.h"
-#include "../src/descriptors/dr_09.h"
-#include "../src/descriptors/dr_0a.h"
-#include "../src/descriptors/dr_0b.h"
-#include "../src/descriptors/dr_0c.h"
-#include "../src/descriptors/dr_0d.h"
-#include "../src/descriptors/dr_0e.h"
-#include "../src/descriptors/dr_0f.h"
+#include "dr_02.h"
+#include "dr_03.h"
+#include "dr_04.h"
+#include "dr_05.h"
+#include "dr_06.h"
+#include "dr_07.h"
+#include "dr_08.h"
+#include "dr_09.h"
+#include "dr_0a.h"
+#include "dr_0b.h"
+#include "dr_0c.h"
+#include "dr_0d.h"
+#include "dr_0e.h"
+#include "dr_0f.h"
 
 #else
 #error "Multiple inclusions of dr.h"
