@@ -191,14 +191,14 @@ void dvbpsi_EmptySDT(dvbpsi_sdt_t* p_sdt)
  *****************************************************************************
  * Add a service description at the end of the SDT.
  *****************************************************************************/
-dvbpsi_sdt_service_t* dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
+dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
                                            uint16_t i_service_id,
                                            int b_eit_schedule,
                                            int b_eit_present,
                                            uint8_t i_running_status,
                                            int b_free_ca)
 {
-  dvbpsi_sdt_service_t* p_service
+  dvbpsi_sdt_service_t * p_service
                 = (dvbpsi_sdt_service_t*)malloc(sizeof(dvbpsi_sdt_service_t));
 
   if(p_service)
@@ -217,7 +217,7 @@ dvbpsi_sdt_service_t* dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
     }
     else
     {
-      dvbpsi_sdt_service_t* p_last_service = p_sdt->p_first_service;
+      dvbpsi_sdt_service_t * p_last_service = p_sdt->p_first_service;
       while(p_last_service->p_next != NULL)
         p_last_service = p_last_service->p_next;
       p_last_service->p_next = p_service;
@@ -233,12 +233,12 @@ dvbpsi_sdt_service_t* dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
  *****************************************************************************
  * Add a descriptor in the SDT service description.
  *****************************************************************************/
-dvbpsi_descriptor_t* dvbpsi_SDTServiceAddDescriptor(
-                                               dvbpsi_sdt_service_t* p_service,
+dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
+                                               dvbpsi_sdt_service_t *p_service,
                                                uint8_t i_tag, uint8_t i_length,
-                                               uint8_t* p_data)
+                                               uint8_t *p_data)
 {
-  dvbpsi_descriptor_t* p_descriptor
+  dvbpsi_descriptor_t * p_descriptor
                         = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
 
   if(p_descriptor)
@@ -249,7 +249,7 @@ dvbpsi_descriptor_t* dvbpsi_SDTServiceAddDescriptor(
     }
     else
     {
-      dvbpsi_descriptor_t* p_last_descriptor = p_service->p_first_descriptor;
+      dvbpsi_descriptor_t * p_last_descriptor = p_service->p_first_descriptor;
       while(p_last_descriptor->p_next != NULL)
         p_last_descriptor = p_last_descriptor->p_next;
       p_last_descriptor->p_next = p_descriptor;
@@ -269,7 +269,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
                               void * p_private_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
-  dvbpsi_sdt_decoder_t* p_sdt_decoder
+  dvbpsi_sdt_decoder_t * p_sdt_decoder
                         = (dvbpsi_sdt_decoder_t*)p_private_decoder;
   int b_append = 1;
   int b_reinit = 0;
@@ -341,7 +341,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
           if(    (!p_sdt_decoder->current_sdt.b_current_next)
               && (p_section->b_current_next))
           {
-            dvbpsi_sdt_t* p_sdt = (dvbpsi_sdt_t*)malloc(sizeof(dvbpsi_sdt_t));
+            dvbpsi_sdt_t * p_sdt = (dvbpsi_sdt_t*)malloc(sizeof(dvbpsi_sdt_t));
 
             p_sdt_decoder->current_sdt.b_current_next = 1;
             *p_sdt = p_sdt_decoder->current_sdt;
@@ -455,9 +455,9 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
  * SDT decoder.
  *****************************************************************************/
 void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
-                               dvbpsi_psi_section_t* p_section)
+                              dvbpsi_psi_section_t* p_section)
 {
-  uint8_t* p_byte, * p_end;
+  uint8_t *p_byte, *p_end;
 
   while(p_section)
   {
@@ -465,10 +465,10 @@ void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
         p_byte < p_section->p_payload_end;)
     {
       uint16_t i_service_id = ((uint16_t)(p_byte[0]) << 8) | p_byte[1];
-      int b_eit_schedule = (int)((p_byte[2]) & 0x2 >> 1);
+      int b_eit_schedule = (int)((p_byte[2] & 0x2) >> 1);
       int b_eit_present = (int)((p_byte[2]) & 0x1);
       uint8_t i_running_status = (uint8_t)(p_byte[3]) >> 5;
-      int b_free_ca = (int)(p_byte[3]) & 0x10 >> 4;
+      int b_free_ca = (int)((p_byte[3] & 0x10) >> 4);
       uint16_t i_length = ((uint16_t)(p_byte[3] & 0xf) <<8) | p_byte[4];
       dvbpsi_sdt_service_t* p_service = dvbpsi_SDTAddService(p_sdt,
           i_service_id, b_eit_schedule, b_eit_present,
@@ -489,3 +489,122 @@ void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
     p_section = p_section->p_next;
   }
 }
+
+
+/*****************************************************************************
+ * dvbpsi_GenSDTSections
+ *****************************************************************************
+ * Generate SDT sections based on the dvbpsi_sdt_t structure.
+ *****************************************************************************/
+dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t* p_sdt)
+{
+  dvbpsi_psi_section_t * p_result = dvbpsi_NewPSISection(1024);
+  dvbpsi_psi_section_t * p_current = p_result;
+  dvbpsi_psi_section_t * p_prev;
+ 
+  dvbpsi_sdt_service_t *    p_service = p_sdt->p_first_service;
+
+  p_current->i_table_id = 0x42;
+  p_current->b_syntax_indicator = 1;
+  p_current->b_private_indicator = 1;
+  p_current->i_length = 12;                     /* header + CRC_32 */
+  p_current->i_extension = p_sdt->i_ts_id;
+  p_current->i_version = p_sdt->i_version;
+  p_current->b_current_next = p_sdt->b_current_next;
+  p_current->i_number = 0;
+  p_current->p_payload_end += 11;               /* just after the header */
+  p_current->p_payload_start = p_current->p_data + 8;
+
+  /* Original Network ID */
+  p_current->p_data[8] = (p_sdt->i_network_id >> 8) ;
+  p_current->p_data[9] = p_sdt->i_network_id;
+  p_current->p_data[10] = 0xff;
+  
+  /* SDT service */
+  while(p_service != NULL)
+  {
+    uint8_t * p_service_start = p_current->p_payload_end;
+    
+    uint16_t i_service_length = 5;
+
+    dvbpsi_descriptor_t * p_descriptor = p_service->p_first_descriptor;
+    
+    while ( (p_descriptor != NULL)&& ((p_service_start - p_current->p_data) + i_service_length <= 1020) )
+    {
+      i_service_length += p_descriptor->i_length + 2;
+      p_descriptor = p_descriptor->p_next;
+    }
+
+    if ( (p_descriptor != NULL) && (p_service_start - p_current->p_data != 11) && (i_service_length <= 1009) )
+    {
+      /* will put more descriptors in an empty section */
+      DVBPSI_DEBUG("SDT generator","create a new section to carry more Service descriptors");
+      p_prev = p_current;
+      p_current = dvbpsi_NewPSISection(1024);
+      p_prev->p_next = p_current;
+
+      p_current->i_table_id = 0x42;
+      p_current->b_syntax_indicator = 1;
+      p_current->b_private_indicator = 1;
+      p_current->i_length = 12;                 /* header + CRC_32 */
+      p_current->i_extension = p_sdt->i_ts_id;;
+      p_current->i_version = p_sdt->i_version;
+      p_current->b_current_next = p_sdt->b_current_next;
+      p_current->i_number = p_prev->i_number + 1;
+      p_current->p_payload_end += 11;           /* just after the header */
+      p_current->p_payload_start = p_current->p_data + 8;
+
+
+      /* Original Network ID */
+      p_current->p_data[8] = (p_sdt->i_network_id >> 8) ;
+      p_current->p_data[9] = p_sdt->i_network_id;
+      p_current->p_data[10] = 0xff;
+      
+      p_service_start = p_current->p_payload_end;
+    }
+
+    p_service_start[0] = (p_service->i_service_id >>8);
+    p_service_start[1] = (p_service->i_service_id );
+    p_service_start[2] = 0xfc | (p_service-> b_eit_schedule  ? 0x2 : 0x0) | (p_service->b_eit_present ? 0x01 : 0x00);
+    p_service_start[3] = ((p_service->i_running_status & 0x07) << 5 ) | ((p_service->b_free_ca & 0x1) << 4);
+
+    /* Increase the length by 5 */
+    p_current->p_payload_end += 5;
+    p_current->i_length += 5;
+
+    /* ES descriptors */
+    p_descriptor = p_service->p_first_descriptor;
+    while ( (p_descriptor != NULL) && ( (p_current->p_payload_end - p_current->p_data) + p_descriptor->i_length <= 1018) )
+    {
+      /* p_payload_end is where the descriptor begins */
+      p_current->p_payload_end[0] = p_descriptor->i_tag;
+      p_current->p_payload_end[1] = p_descriptor->i_length;
+      memcpy(p_current->p_payload_end + 2, p_descriptor->p_data, p_descriptor->i_length);
+      /* Increase length by descriptor_length + 2 */
+      p_current->p_payload_end += p_descriptor->i_length + 2;
+      p_current->i_length += p_descriptor->i_length + 2;
+      p_descriptor = p_descriptor->p_next;
+    }
+
+    if(p_descriptor != NULL)
+      DVBPSI_ERROR("SDT generator", "unable to carry all the descriptors");
+
+    /* ES_info_length */
+    i_service_length = p_current->p_payload_end - p_service_start - 5;
+    p_service_start[3] |= ((i_service_length  >> 8) & 0x0f);
+    p_service_start[4] = i_service_length;
+
+    p_service = p_service->p_next;
+  }    
+
+  /* Finalization */
+  p_prev = p_result;
+  while(p_prev != NULL)
+  {
+    p_prev->i_last_number = p_current->i_number;
+    dvbpsi_BuildPSISection(p_prev);
+    p_prev = p_prev->p_next;
+  }
+  return p_result;
+}
+

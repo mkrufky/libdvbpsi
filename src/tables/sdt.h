@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sdt.h
  * (c)2001-2002 VideoLAN
- * $Id: sdt.h,v 1.1 2002/12/11 13:04:57 jobi Exp $
+ * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -163,7 +163,7 @@ void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
  * \param i_network_id original network id
  * \return nothing.
  */
-void dvbpsi_InitSDT(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id, uint8_t i_version,
+void dvbpsi_InitSDT(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
                     int b_current_next, uint16_t i_network_id);
 
 /*!
@@ -191,7 +191,7 @@ void dvbpsi_InitSDT(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id, uint8_t i_version,
  * \param p_sdt pointer to the SDT structure
  * \return nothing.
  */
-void dvbpsi_EmptySDT(dvbpsi_sdt_t* p_sdt);
+void dvbpsi_EmptySDT(dvbpsi_sdt_t *p_sdt);
 
 /*!
  * \def dvbpsi_DeleteSDT(p_sdt)
@@ -223,9 +223,16 @@ void dvbpsi_EmptySDT(dvbpsi_sdt_t* p_sdt);
  * \param b_free_ca Free CA flag
  * \return a pointer to the added service description.
  */
-dvbpsi_sdt_service_t* dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
+dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
     uint16_t i_service_id, int b_eit_schedule, int b_eit_present,
     uint8_t i_running_status,int b_free_ca);
+
+/*****************************************************************************
+ * dvbpsi_GenSDTSections
+ *****************************************************************************
+ * Generate SDT sections based on the dvbpsi_sdt_t structure.
+ *****************************************************************************/
+dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t * p_sdt);
 
 #ifdef __cplusplus
 };
