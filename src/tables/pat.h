@@ -1,7 +1,7 @@
 /*****************************************************************************
  * pat.h
  * (c)2001-2002 VideoLAN
- * $Id: pat.h,v 1.4 2002/03/27 20:02:43 bozo Exp $
+ * $Id: pat.h,v 1.5 2002/05/08 13:00:40 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -26,8 +26,8 @@
  * \author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  * \brief Application interface for the PAT decoder and the PAT generator.
  *
- * Application interface for the PAT decoder decoder and the PAT generator.
- * New decoded PAT tables are sent by callback to the application. If a table
+ * Application interface for the PAT decoder and the PAT generator. New
+ * decoded PAT tables are sent by callback to the application. If a table
  * wasn't active (b_current_next == 0) and the next is the same but active
  * (b_current_next == 1) then the program list is empty and should be
  * caught from the previous structure.

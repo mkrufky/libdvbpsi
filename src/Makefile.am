@@ -2,12 +2,12 @@
 
 pkgincludedir = $(includedir)/dvbpsi
 
-SUBDIRS = tables
+SUBDIRS = tables descriptors
 
 lib_LTLIBRARIES = libdvbpsi.la
 
 libdvbpsi_la_SOURCES = dvbpsi.c psi.c descriptor.c
-libdvbpsi_la_LIBADD = tables/lib_tables.la
+libdvbpsi_la_LIBADD = tables/lib_tables.la descriptors/lib_descriptors.la
 libdvbpsi_la_LDFLAGS = -version-info 0:1:0
 
 noinst_HEADERS = dvbpsi_private.h

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * descriptor.h
  * (c)2001-2002 VideoLAN
- * $Id: descriptor.h,v 1.4 2002/03/27 20:02:43 bozo Exp $
+ * $Id: descriptor.h,v 1.5 2002/05/08 13:00:40 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -61,6 +61,8 @@ typedef struct dvbpsi_descriptor_s
   struct dvbpsi_descriptor_s *  p_next;         /*!< next element of
                                                      the list */
 
+  void *                        p_decoded;      /*!< decoded descriptor */
+
 } dvbpsi_descriptor_t;
 
 
@@ -82,15 +84,15 @@ dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
 
 
 /*****************************************************************************
- * dvbpsi_DeleteDescriptor
+ * dvbpsi_DeleteDescriptors
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DeleteDescriptor(dvbpsi_descriptor_t* p_descriptor)
+ * \fn void dvbpsi_DeleteDescriptors(dvbpsi_descriptor_t* p_descriptor)
  * \brief Destruction of a dvbpsi_descriptor_t structure.
- * \param p_descriptor pointer to the descriptor
+ * \param p_descriptor pointer to the first descriptor structure
  * \return nothing.
  */
-void dvbpsi_DeleteDescriptor(dvbpsi_descriptor_t* p_descriptor);
+void dvbpsi_DeleteDescriptors(dvbpsi_descriptor_t* p_descriptor);
 
 
 #ifdef __cplusplus

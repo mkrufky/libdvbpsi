@@ -2,7 +2,7 @@
  * pmt.c: PMT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pmt.c,v 1.3 2002/03/18 12:38:53 bozo Exp $
+ * $Id: pmt.c,v 1.4 2002/05/08 13:00:40 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -136,12 +136,12 @@ void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt)
 {
   dvbpsi_pmt_es_t* p_es = p_pmt->p_first_es;
 
-  dvbpsi_DeleteDescriptor(p_pmt->p_first_descriptor);
+  dvbpsi_DeleteDescriptors(p_pmt->p_first_descriptor);
 
   while(p_es != NULL)
   {
     dvbpsi_pmt_es_t* p_tmp = p_es->p_next;
-    dvbpsi_DeleteDescriptor(p_es->p_first_descriptor);
+    dvbpsi_DeleteDescriptors(p_es->p_first_descriptor);
     free(p_es);
     p_es = p_tmp;
   }

@@ -42,7 +42,7 @@ else
 fi
 
 
-AC_OUTPUT([Makefile src/Makefile src/tables/Makefile examples/Makefile misc/Makefile doc/Makefile debian/Makefile])
+AC_OUTPUT([Makefile src/Makefile src/tables/Makefile src/descriptors/Makefile examples/Makefile misc/Makefile doc/Makefile debian/Makefile])
 
 echo "
 libdvbpsi configuration

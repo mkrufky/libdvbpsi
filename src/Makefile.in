@@ -75,12 +75,12 @@ VERSION = @VERSION@
 
 pkgincludedir = $(includedir)/dvbpsi
 
-SUBDIRS = tables
+SUBDIRS = tables descriptors
 
 lib_LTLIBRARIES = libdvbpsi.la
 
 libdvbpsi_la_SOURCES = dvbpsi.c psi.c descriptor.c
-libdvbpsi_la_LIBADD = tables/lib_tables.la
+libdvbpsi_la_LIBADD = tables/lib_tables.la descriptors/lib_descriptors.la
 libdvbpsi_la_LDFLAGS = -version-info 0:1:0
 
 noinst_HEADERS = dvbpsi_private.h
@@ -95,7 +95,8 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I.
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libdvbpsi_la_DEPENDENCIES =  tables/lib_tables.la
+libdvbpsi_la_DEPENDENCIES =  tables/lib_tables.la \
+descriptors/lib_descriptors.la
 libdvbpsi_la_OBJECTS =  dvbpsi.lo psi.lo descriptor.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
