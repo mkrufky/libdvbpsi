@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_02.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_02.c,v 1.1 2002/05/08 13:00:40 bozo Exp $
+ * $Id: dr_02.c,v 1.2 2002/05/08 13:11:41 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../dvbpsi.h"
 #include "../dvbpsi_private.h"
