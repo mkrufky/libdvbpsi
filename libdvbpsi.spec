@@ -5,13 +5,24 @@
 %define major		1
 %define lib_name	%{name}%{major}
 
+%define redhat80 0
+%if %redhat80
+%define release %rel
+# some mdk macros that do not exist in rh
+%define configure2_5x CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr
+%define make %__make
+%define makeinstall_std %__make DESTDIR="$RPM_BUILD_ROOT" install
+# adjust define for Redhat.
+%endif
+
+
 Summary:	A library for decoding and generating MPEG 2 and DVB PSI sections.
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
 Packager:	Yves Duret <yves@zarb.org>
 License:	GPL
-URL:		http://www.videolan.org/libdvbpsi/
+URL:		http://developers.videolan.org/libdvbpsi/
 Group:		System/Libraries
 Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}-%{version}.tar.bz2
 BuildRoot:	%_tmppath/%name-%version-%release-root
@@ -36,8 +47,8 @@ decoding and generating. The important features are:
 %package -n %{lib_name}-devel
 Summary:	Development tools for programs which will use the libdvbpsi library.
 Group:		Development/C
-Provides:	%name-devel
-Requires:	%{lib_name} = %{version}
+Provides:	%name-devel =%version-%release
+Requires:	%{lib_name} = %version-%release
 
 %description -n %{lib_name}-devel
 The %{name}-devel package includes the header files and static libraries
@@ -53,11 +64,12 @@ the %name package installed.
 %setup -q
 
 %build
-%configure --enable-release
+%configure2_5x --enable-release
 %make 
 
 %install
-%makeinstall
+rm -rf %buildroot
+%makeinstall_std
 
 %clean
 rm -rf %buildroot
