@@ -2,7 +2,7 @@
  * sdt.c: SDT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: sdt.c,v 1.2 2003/09/16 18:43:09 asmax Exp $
+ * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -476,7 +476,7 @@ void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
       /* Service descriptors */
       p_byte += 5;
       p_end = p_byte + i_length;
-      while(p_byte + 2 < p_end)
+      while(p_byte + 2 <= p_end)
       {
         uint8_t i_tag = p_byte[0];
         uint8_t i_length = p_byte[1];
