@@ -1,11 +1,40 @@
 #! /bin/sh
 set -x
 
-aclocal
-libtoolize --force --copy
-autoheader
+# Check for automake
+amvers="none"
+if automake-1.6 --version >/dev/null 2>&1
+then
+  amvers="-1.6"
+else
+  if automake-1.5 --version >/dev/null 2>&1
+  then
+    amvers="-1.5"
+  else
+    if automake --version > /dev/null 2>&1
+    then
+      amvers=`automake --version | sed -e '1s/[^0-9]*//' -e q`
+
+      if expr "$amvers" "<" "1.5" > /dev/null 2>&1
+      then amvers="none"
+      else amvers=""
+      fi        
+    fi
+  fi 
+fi
+
+if test x$amvers = xnone
+then
+  set +x
+  echo "you need automake version 1.5 or later"
+  exit 1
+fi
+
+aclocal${amvers} || exit 1
+libtoolize --force --copy || exit 1
+autoheader || exit 1
 #add --include-deps if you want to bootstrap with any other compiler than gcc
-#automake --foreign --add-missing --copy --include-deps
-automake --foreign --add-missing --copy
-autoconf
+#automake${amvers} --foreign --add-missing --copy --include-deps || exit 1
+automake${amvers} --foreign --add-missing --copy || exit 1
+autoconf || exit 1
 rm -f config.cache
