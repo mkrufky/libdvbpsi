@@ -74,7 +74,8 @@ RANLIB = @RANLIB@
 STRIP = @STRIP@
 VERSION = @VERSION@
 
-EXTRA_DIST = doxygen.cfg
+EXTRA_DIST = index.doxygen structure.doxygen usage.doxygen newdec.doxygen            decoder.dot doxygen.cfg
+
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../src/config.h
 CONFIG_CLEAN_FILES = 
