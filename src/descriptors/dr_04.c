@@ -1,7 +1,7 @@
 /*****************************************************************************
- * dr_03.c
+ * dr_04.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_03.c,v 1.2 2002/05/08 14:56:28 bozo Exp $
+ * $Id: dr_04.c,v 1.1 2002/05/08 14:56:28 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -32,20 +32,21 @@
 #include "../dvbpsi_private.h"
 #include "../descriptor.h"
 
-#include "dr_03.h"
+#include "dr_04.h"
 
 
 /*****************************************************************************
- * dvbpsi_DecodeAStreamDr
+ * dvbpsi_DecodeHierarchyDr
  *****************************************************************************/
-dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
+dvbpsi_hierarchy_dr_t * dvbpsi_DecodeHierarchyDr(
+                                        dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_astream_dr_t * p_decoded;
+  dvbpsi_hierarchy_dr_t * p_decoded;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x03)
+  if(p_descriptor->i_tag != 0x04)
   {
-    DVBPSI_ERROR_ARG("dr_03 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    DVBPSI_ERROR_ARG("dr_04 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -54,24 +55,25 @@ dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
     return p_descriptor->p_decoded;
 
   /* Allocate memory */
-  p_decoded = (dvbpsi_astream_dr_t*)malloc(sizeof(dvbpsi_astream_dr_t));
+  p_decoded = (dvbpsi_hierarchy_dr_t*)malloc(sizeof(dvbpsi_hierarchy_dr_t));
   if(!p_decoded)
   {
-    DVBPSI_ERROR("dr_03 decoder", "out of memory");
+    DVBPSI_ERROR("dr_04 decoder", "out of memory");
     return NULL;
   }
 
   /* Decode data and check the length */
-  if(p_descriptor->i_length != 1)
+  if(p_descriptor->i_length != 4)
   {
-    DVBPSI_ERROR_ARG("dr_03 decoder", "bad length (%d)",
+    DVBPSI_ERROR_ARG("dr_04 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
   }
 
-  p_decoded->b_free_format = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;
-  p_decoded->i_id = (p_descriptor->p_data[0] & 0x40) >> 6;
-  p_decoded->i_layer = (p_descriptor->p_data[0] & 0x30) >> 4;
+  p_decoded->i_h_type = p_descriptor->p_data[0] & 0x0f;
+  p_decoded->i_h_layer_index = p_descriptor->p_data[1] & 0x3f;
+  p_decoded->i_h_embedded_layer = p_descriptor->p_data[2] & 0x3f;
+  p_decoded->i_h_priority = p_descriptor->p_data[3] & 0x3f;
 
   p_descriptor->p_decoded = (void*)p_decoded;
 
@@ -80,30 +82,29 @@ dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
 
 
 /*****************************************************************************
- * dvbpsi_GenAStreamDr
+ * dvbpsi_GenHierarchyDr
  *****************************************************************************/
-dvbpsi_descriptor_t * dvbpsi_GenAStreamDr(dvbpsi_astream_dr_t * p_decoded,
-                                          int b_duplicate)
+dvbpsi_descriptor_t * dvbpsi_GenHierarchyDr(dvbpsi_hierarchy_dr_t * p_decoded,
+                                            int b_duplicate)
 {
   /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x03, 1, NULL);
+  dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x04, 4, NULL);
 
   if(p_descriptor)
   {
     /* Encode data */
-    *p_descriptor->p_data = 0x0f;
-    if(p_decoded->b_free_format)
-      *p_descriptor->p_data |= 0x80;
-    *p_descriptor->p_data |= (p_decoded->i_id & 0x01) << 6;
-    *p_descriptor->p_data |= (p_decoded->i_layer & 0x03) << 4;
+    p_descriptor->p_data[0] = 0xf0 | p_decoded->i_h_type;
+    p_descriptor->p_data[1] = 0xc0 | p_decoded->i_h_layer_index;
+    p_descriptor->p_data[2] = 0xc0 | p_decoded->i_h_embedded_layer;
+    p_descriptor->p_data[3] = 0xc0 | p_decoded->i_h_priority;
 
     if(b_duplicate)
     {
       /* Duplicate decoded data */
-      dvbpsi_astream_dr_t * p_dup_decoded =
-                (dvbpsi_astream_dr_t*)malloc(sizeof(dvbpsi_astream_dr_t));
+      dvbpsi_hierarchy_dr_t * p_dup_decoded =
+                (dvbpsi_hierarchy_dr_t*)malloc(sizeof(dvbpsi_hierarchy_dr_t));
       if(p_dup_decoded)
-        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_astream_dr_t));
+        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_hierarchy_dr_t));
 
       p_descriptor->p_decoded = (void*)p_dup_decoded;
     }

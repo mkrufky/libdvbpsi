@@ -4,7 +4,7 @@ pkgincludedir = $(includedir)/dvbpsi
 
 noinst_LTLIBRARIES = lib_descriptors.la
 
-lib_descriptors_la_SOURCES = dr_02.c dr_03.c
+lib_descriptors_la_SOURCES = dr_02.c dr_03.c dr_04.c dr_05.c
 
-pkginclude_HEADERS = dr_02.h dr_03.h
+pkginclude_HEADERS = dr_02.h dr_03.h dr_04.h dr_05.h
 

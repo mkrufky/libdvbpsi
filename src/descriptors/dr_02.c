@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_02.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_02.c,v 1.3 2002/05/08 13:33:52 bozo Exp $
+ * $Id: dr_02.c,v 1.4 2002/05/08 14:56:28 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -97,34 +97,31 @@ dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor)
 dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(dvbpsi_vstream_dr_t * p_decoded,
                                           int b_duplicate)
 {
-  uint8_t data[3];
-
-  dvbpsi_descriptor_t * p_descriptor;
-
-  /* Encode data */
-  data[0] = 0;
-  if(p_decoded->b_multiple_frame_rate)
-    data[0] |= 0x80;
-  data[0] |= (p_decoded->i_frame_rate_code & 0x0f) << 3;
-  if(p_decoded->b_constrained_parameter)
-    data[0] |= 0x02;
-  if(p_decoded->b_still_picture)
-    data[0] |= 0x01;
-
-  if(p_decoded->b_mpeg2)
-  {
-    data[1] = p_decoded->i_profile_level_indication;
-    data[2] = 0x1f;
-    data[2] |= (p_decoded->i_chroma_format & 0x03) << 6;
-    if(p_decoded->b_frame_rate_extension)
-      data[2] |= 0x20;
-  }
-
   /* Create the descriptor */
-  p_descriptor = dvbpsi_NewDescriptor(0x02, p_decoded->b_mpeg2 ? 3 : 1, data);
+  dvbpsi_descriptor_t * p_descriptor =
+                dvbpsi_NewDescriptor(0x02, p_decoded->b_mpeg2 ? 3 : 1, NULL);
 
   if(p_descriptor)
   {
+    /* Encode data */
+    p_descriptor->p_data[0] = 0;
+    if(p_decoded->b_multiple_frame_rate)
+      p_descriptor->p_data[0] |= 0x80;
+    p_descriptor->p_data[0] |= (p_decoded->i_frame_rate_code & 0x0f) << 3;
+    if(p_decoded->b_constrained_parameter)
+      p_descriptor->p_data[0] |= 0x02;
+    if(p_decoded->b_still_picture)
+      p_descriptor->p_data[0] |= 0x01;
+
+    if(p_decoded->b_mpeg2)
+    {
+      p_descriptor->p_data[1] = p_decoded->i_profile_level_indication;
+      p_descriptor->p_data[2] = 0x1f;
+      p_descriptor->p_data[2] |= (p_decoded->i_chroma_format & 0x03) << 6;
+      if(p_decoded->b_frame_rate_extension)
+        p_descriptor->p_data[2] |= 0x20;
+    }
+
     if(b_duplicate)
     {
       /* Duplicate decoded data */
