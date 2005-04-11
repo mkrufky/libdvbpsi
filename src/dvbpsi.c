@@ -68,7 +68,8 @@ void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
   i_expected_counter = (h_dvbpsi->i_continuity_counter + 1) & 0xf;
   h_dvbpsi->i_continuity_counter = p_data[3] & 0xf;
 
-  if(i_expected_counter == ((h_dvbpsi->i_continuity_counter + 1) & 0xf))
+  if(i_expected_counter == ((h_dvbpsi->i_continuity_counter + 1) & 0xf)
+      && !h_dvbpsi->b_discontinuity)
   {
     DVBPSI_ERROR_ARG("PSI decoder",
                      "TS duplicate (received %d, expected %d) for PID %d",
