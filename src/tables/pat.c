@@ -2,7 +2,7 @@
  * pat.c: PAT decoder/generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: pat.c,v 1.4 2002/10/10 09:27:02 sam Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -108,6 +108,8 @@ void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi)
   }
 
   free(h_dvbpsi->p_private_decoder);
+  if(h_dvbpsi->p_current_section)
+    dvbpsi_DeletePSISections(h_dvbpsi->p_current_section);
   free(h_dvbpsi);
 }
 

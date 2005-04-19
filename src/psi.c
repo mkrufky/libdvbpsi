@@ -2,7 +2,7 @@
  * psi.c: common PSI functions
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: psi.c,v 1.4 2002/10/07 14:15:14 sam Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -160,7 +160,7 @@ dvbpsi_psi_section_t * dvbpsi_NewPSISection(int i_max_size)
     else
     {
       free(p_section);
-      p_section = NULL;
+      return NULL;
     }
 
     p_section->p_next = NULL;

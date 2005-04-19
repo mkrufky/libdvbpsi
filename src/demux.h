@@ -1,7 +1,7 @@
 /*****************************************************************************
  * demux.h
  * (c)2001-2002 VideoLAN
- * $Id: demux.h,v 1.1 2002/12/11 13:04:56 jobi Exp $
+ * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -81,12 +81,15 @@ typedef void (*dvbpsi_demux_subdec_cb_t)
  * \typedef struct dvbpsi_demux_subdec_s dvbpsi_demux_subdec_t
  * \brief dvbpsi_demux_subdec_t type definition.
  */
+struct dvbpsi_demux_s;
 typedef struct dvbpsi_demux_subdec_s
 {
   uint32_t                        i_id;
   dvbpsi_demux_subdec_cb_t        pf_callback;
   void *                          p_cb_data;
-  struct dvbpsi_demux_subdec_s *    p_next;
+  struct dvbpsi_demux_subdec_s *  p_next;
+
+  void (*pf_detach)(struct dvbpsi_demux_s *, uint8_t, uint16_t);
 
 } dvbpsi_demux_subdec_t;
 

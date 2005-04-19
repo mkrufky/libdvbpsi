@@ -112,6 +112,8 @@ void dvbpsi_DetachPMT(dvbpsi_handle h_dvbpsi)
   }
 
   free(h_dvbpsi->p_private_decoder);
+  if(h_dvbpsi->p_current_section)
+    dvbpsi_DeletePSISections(h_dvbpsi->p_current_section);
   free(h_dvbpsi);
 }
 

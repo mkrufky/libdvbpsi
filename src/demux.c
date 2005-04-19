@@ -2,7 +2,7 @@
  * demux.c: DVB subtables demux functions.
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: demux.c,v 1.2 2003/09/23 13:04:54 tooney Exp $
+ * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -159,9 +159,14 @@ void dvbpsi_DetachDemux(dvbpsi_handle h_dvbpsi)
   {
     p_subdec_temp = p_subdec;
     p_subdec = p_subdec->p_next;
-    free(p_subdec_temp);
+    if(p_subdec_temp->pf_detach)
+        p_subdec_temp->pf_detach(p_demux, (p_subdec_temp->i_id >> 16) & 0xFFFF,
+                                 p_subdec_temp->i_id & 0xFFFF);
+    else free(p_subdec_temp);
   }
 
   free(p_demux);
+  if(h_dvbpsi->p_current_section)
+    dvbpsi_DeletePSISections(h_dvbpsi->p_current_section);
   free(h_dvbpsi);
 }

@@ -88,6 +88,7 @@ int dvbpsi_AttachSDT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
   p_subdec->pf_callback = &dvbpsi_GatherSDTSections;
   p_subdec->p_cb_data = p_sdt_decoder;
   p_subdec->i_id = (uint32_t)i_table_id << 16 | (uint32_t)i_extension;
+  p_subdec->pf_detach = dvbpsi_DetachSDT;
 
   /* Attach the subtable decoder to the demux */
   p_subdec->p_next = p_demux->p_first_subdec;
@@ -115,7 +116,7 @@ void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension)
 {
   dvbpsi_demux_subdec_t* p_subdec;
-  dvbpsi_demux_subdec_t* p_next_subdec;
+  dvbpsi_demux_subdec_t** pp_prev_subdec;
   dvbpsi_sdt_decoder_t* p_sdt_decoder;
 
   unsigned int i;
@@ -131,8 +132,6 @@ void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
     return;
   }
 
-  p_next_subdec = p_subdec->p_next;
-
   p_sdt_decoder = (dvbpsi_sdt_decoder_t*)p_subdec->p_cb_data;
 
   free(p_sdt_decoder->p_building_sdt);
@@ -140,12 +139,17 @@ void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
   for(i = 0; i <= 255; i++)
   {
     if(p_sdt_decoder->ap_sections[i])
-      free(p_sdt_decoder->ap_sections[i]);
+      dvbpsi_DeletePSISections(p_sdt_decoder->ap_sections[i]);
   }
 
   free(p_subdec->p_cb_data);
+
+  pp_prev_subdec = &p_demux->p_first_subdec;
+  while(*pp_prev_subdec != p_subdec)
+    pp_prev_subdec = &(*pp_prev_subdec)->p_next;
+
+  *pp_prev_subdec = p_subdec->p_next;
   free(p_subdec);
-  p_subdec = p_next_subdec;
 }
 
 
