@@ -16,7 +16,7 @@ AM_PROG_LIBTOOL
 
 
 dnl default CFLAGS
-CFLAGS="-Wall -DDVBPSI_DIST"
+CFLAGS="${CFLAGS} -Wall -DDVBPSI_DIST"
 
 dnl check the operating system
 case x"${target_os}" in
