@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_48.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_48.c,v 1.2 2003/07/25 20:20:40 fenrir Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -79,20 +79,36 @@ dvbpsi_service_dr_t * dvbpsi_DecodeServiceDr(
     return NULL;
   }
 
+  p_descriptor->p_decoded = (void*)p_decoded;
+
   p_decoded->i_service_type = p_descriptor->p_data[0];
   p_decoded->i_service_provider_name_length = p_descriptor->p_data[1];
+  p_decoded->i_service_name_length = 0;
+  p_decoded->i_service_provider_name[0] = 0;
+  p_decoded->i_service_name[0] = 0;
+
+  if(p_decoded->i_service_provider_name_length + 2 > p_descriptor->i_length)
+      return p_decoded;
+
   if(p_decoded->i_service_provider_name_length)
     memcpy(p_decoded->i_service_provider_name,
            p_descriptor->p_data + 2,
            p_decoded->i_service_provider_name_length);
+
+  if(p_decoded->i_service_provider_name_length + 3 > p_descriptor->i_length)
+      return p_decoded;
+
   p_decoded->i_service_name_length =
     p_descriptor->p_data[2+p_decoded->i_service_provider_name_length];
+
+  if(p_decoded->i_service_provider_name_length + 3 +
+     p_decoded->i_service_name_length > p_descriptor->i_length)
+      return p_decoded;
+
   if(p_decoded->i_service_name_length)
     memcpy(p_decoded->i_service_name,
            p_descriptor->p_data + 3 + p_decoded->i_service_provider_name_length,
            p_decoded->i_service_name_length);
-
-  p_descriptor->p_decoded = (void*)p_decoded;
 
   return p_decoded;
 }

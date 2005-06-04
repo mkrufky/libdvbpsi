@@ -466,7 +466,7 @@ void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
   while(p_section)
   {
     for(p_byte = p_section->p_payload_start + 3;
-        p_byte < p_section->p_payload_end;)
+        p_byte + 4 < p_section->p_payload_end;)
     {
       uint16_t i_service_id = ((uint16_t)(p_byte[0]) << 8) | p_byte[1];
       int b_eit_schedule = (int)((p_byte[2] & 0x2) >> 1);
@@ -477,9 +477,12 @@ void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
       dvbpsi_sdt_service_t* p_service = dvbpsi_SDTAddService(p_sdt,
           i_service_id, b_eit_schedule, b_eit_present,
           i_running_status, b_free_ca);
+
       /* Service descriptors */
       p_byte += 5;
       p_end = p_byte + i_length;
+      if( p_end > p_section->p_payload_end ) break;
+
       while(p_byte + 2 <= p_end)
       {
         uint8_t i_tag = p_byte[0];
