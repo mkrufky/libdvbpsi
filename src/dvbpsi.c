@@ -223,6 +223,12 @@ void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
           h_dvbpsi->p_current_section = NULL;
         }
 
+        /* A TS packet may contain any number of sections, only the first
+         * new one is flagged by the pointer_field. If the next payload
+         * byte isn't 0xff then a new section starts. */
+        if(p_new_pos == NULL && i_available && *p_payload_pos != 0xff)
+          p_new_pos = p_payload_pos;
+
         /* If there is a new section not being handled then go forward
            in the packet */
         if(p_new_pos)
