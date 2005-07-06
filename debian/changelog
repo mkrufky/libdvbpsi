@@ -1,3 +1,12 @@
+libdvbpsi4 (0.1.5-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    + Set policy to 3.6.2.1.
+    + Renamed source package to libdvbpsi4.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Wed,  6 Jul 2005 14:48:49 +0200
+
 libdvbpsi3 (0.1.4-2) unstable; urgency=high
 
   * src/descriptors/dr_59.c:

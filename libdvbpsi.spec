@@ -1,8 +1,8 @@
 %define name		libdvbpsi3
-%define version		0.1.4
+%define version		0.1.5
 %define release		1
 
-%define major		3
+%define major		4
 %define lib_name	%{name}%{major}
 
 %define redhat80 0
@@ -91,6 +91,9 @@ rm -rf %buildroot
 %{_includedir}/*
 
 %changelog
+* Wed Jul 6 2005 Sam Hocevar <sam+rpm@zoy.org>
+- 0.1.5 release.
+
 * Fri Jan 2 2004 Sam Hocevar <sam@zoy.org>
 - 0.1.4 release.
 
