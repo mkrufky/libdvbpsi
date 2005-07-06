@@ -1,4 +1,354 @@
 ------------------------------------------------------------------------
+r113 | sam | 2005-07-06 15:07:44 +0200 (Wed, 06 Jul 2005) | 3 lines
+Changed paths:
+   M /trunk/debian/changelog
+   M /trunk/debian/control
+   M /trunk/libdvbpsi.spec
+   M /trunk/wince/Makefile.am
+   M /trunk/wince/config.h
+   M /trunk/wince/libdvbpsi.vcp
+   M /trunk/wince/libdvbpsi.vcw
+
+  * updated build files for 0.1.5 release.
+  * removed unneedde executable flags.
+
+------------------------------------------------------------------------
+r112 | massiot | 2005-07-06 14:42:10 +0200 (Wed, 06 Jul 2005) | 2 lines
+Changed paths:
+   M /trunk/NEWS
+   M /trunk/configure.ac
+   M /trunk/debian/control
+   M /trunk/src/Makefile.am
+
+ * ALL: preparing for 0.1.5 release.
+
+------------------------------------------------------------------------
+r111 | massiot | 2005-07-04 17:20:54 +0200 (Mon, 04 Jul 2005) | 6 lines
+Changed paths:
+   M /trunk/src/dvbpsi.c
+
+ * src/dvbpsi.c: Fixed a long-standing issue in the section gathering. The
+   code assumed that no more than 2 sections could be present in a TS
+   packet, this is wrong. Consequently on some rare transponders (Hotbird
+   11785 H), some PMT sections may be lost. This is a MAJOR bug of
+   libdvbpsi and we should release a new version immediately.
+
+------------------------------------------------------------------------
+r110 | gbazin | 2005-06-04 14:52:02 +0200 (Sat, 04 Jun 2005) | 1 line
+Changed paths:
+   M /trunk/src/descriptors/dr_48.c
+   M /trunk/src/tables/sdt.c
+
+* src/tables/sdt.c, src/descriptors/dr_48.c: added sanity checks for bad streams.
+------------------------------------------------------------------------
+r109 | massiot | 2005-05-17 21:59:13 +0200 (Tue, 17 May 2005) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+ * configure.ac : Allow the user to specify extra arguments to CFLAGS.
+
+------------------------------------------------------------------------
+r108 | gbazin | 2005-04-19 14:33:21 +0200 (Tue, 19 Apr 2005) | 2 lines
+Changed paths:
+   M /trunk/src/demux.c
+   M /trunk/src/demux.h
+   M /trunk/src/psi.c
+   M /trunk/src/tables/eit.c
+   M /trunk/src/tables/pat.c
+   M /trunk/src/tables/pmt.c
+   M /trunk/src/tables/sdt.c
+
+* ALL: bunch of bug and mem-leak fixes.
+
+------------------------------------------------------------------------
+r107 | massiot | 2005-04-11 17:59:48 +0200 (Mon, 11 Apr 2005) | 2 lines
+Changed paths:
+   M /trunk/src/dvbpsi.c
+
+* src/dvbpsi.c: Fixed drop of first packet when gathering sections.
+
+------------------------------------------------------------------------
+r106 | fenrir | 2005-03-23 18:03:12 +0100 (Wed, 23 Mar 2005) | 2 lines
+Changed paths:
+   M /trunk/src/Makefile.am
+
+ * Makefile.am: added new files ...
+
+------------------------------------------------------------------------
+r105 | fenrir | 2005-03-23 18:02:48 +0100 (Wed, 23 Mar 2005) | 2 lines
+Changed paths:
+   M /trunk/src/descriptors/dr.h
+   A /trunk/src/descriptors/dr_4d.c
+   A /trunk/src/descriptors/dr_4d.h
+   A /trunk/src/descriptors/dr_4e.c
+   A /trunk/src/descriptors/dr_4e.h
+
+ * all: added descriptor 4d/4e for EIT.
+
+------------------------------------------------------------------------
+r104 | massiot | 2005-03-21 14:38:56 +0100 (Mon, 21 Mar 2005) | 4 lines
+Changed paths:
+   M /trunk/AUTHORS
+   M /trunk/examples/Makefile.am
+   M /trunk/examples/decode_pat.c
+   M /trunk/examples/decode_pmt.c
+   M /trunk/src/Makefile.am
+   M /trunk/src/descriptors/dr.h
+   A /trunk/src/descriptors/dr_52.c
+   A /trunk/src/descriptors/dr_52.h
+
+* src/descriptor: Descriptor 0x52 decoding and generation
+* examples/decode_pmt.c: More verbose output
+Patch courtesy of Andrew John Hughes.
+
+------------------------------------------------------------------------
+r103 | massiot | 2005-01-21 15:34:51 +0100 (Fri, 21 Jan 2005) | 2 lines
+Changed paths:
+   M /trunk/src/tables/eit.h
+   M /trunk/src/tables/pat.h
+   M /trunk/src/tables/pmt.h
+   M /trunk/src/tables/sdt.h
+
+* src/tables/*.h: Protect multiple-lines macros with { }
+
+------------------------------------------------------------------------
+r102 | gbazin | 2004-12-22 13:09:54 +0100 (Wed, 22 Dec 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/configure.ac
+   M /trunk/src/dvbpsi_private.h
+   A /trunk/wince
+   A /trunk/wince/Makefile.am
+   A /trunk/wince/config.h
+   A /trunk/wince/libdvbpsi.vcp
+   A /trunk/wince/libdvbpsi.vcw
+
+* ALL: WinCE port.
+
+------------------------------------------------------------------------
+r101 | massiot | 2004-12-20 14:54:29 +0100 (Mon, 20 Dec 2004) | 2 lines
+Changed paths:
+   M /trunk/AUTHORS
+
+ * Updated AUTHORS file.
+
+------------------------------------------------------------------------
+r100 | massiot | 2004-12-20 14:43:25 +0100 (Mon, 20 Dec 2004) | 2 lines
+Changed paths:
+   M /trunk/src/tables/eit.c
+
+ * src/tables/eit.c: Fixed EIT b_free_ca.
+
+------------------------------------------------------------------------
+r99 | massiot | 2004-12-20 14:42:55 +0100 (Mon, 20 Dec 2004) | 4 lines
+Changed paths:
+   M /trunk/src/tables/pmt.c
+   M /trunk/src/tables/sdt.c
+   M /trunk/src/tables/sdt.h
+
+ * src/tables/sdt.c: Fixed b_free_ca and b_eit_schedule, implemented
+   SDT generation.
+   (patch courtesy of Luzin Viktor <vl at msp dot ru>)
+
+------------------------------------------------------------------------
+r98 | massiot | 2004-11-10 20:34:56 +0100 (Wed, 10 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/src/dvbpsi.c
+
+ * src/dvbpsi.c: When encountering a discontinuity, print the PID.
+
+------------------------------------------------------------------------
+r97 | massiot | 2004-11-10 15:47:53 +0100 (Wed, 10 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/src/tables/eit.c
+   M /trunk/src/tables/sdt.c
+
+ * src/tables/eit.c, src/tables/sdt.c: Fixed numerous parsing bugs due to
+   wrong offsets and bad reading of the spec (sic).
+
+------------------------------------------------------------------------
+r96 | hartman | 2004-10-29 14:26:37 +0200 (Fri, 29 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/src/descriptors/dr_56.c
+
+* compile fixes
+
+------------------------------------------------------------------------
+r95 | hartman | 2004-10-29 14:20:44 +0200 (Fri, 29 Oct 2004) | 3 lines
+Changed paths:
+   M /trunk/NEWS
+   M /trunk/src/Makefile.am
+   M /trunk/src/descriptors/dr.h
+   A /trunk/src/descriptors/dr_56.c
+   A /trunk/src/descriptors/dr_56.h
+
+* New 0x56 EBU System B Teletext descriptor decoder.
+  Currently untested
+
+------------------------------------------------------------------------
+r94 | massiot | 2004-10-22 15:04:36 +0200 (Fri, 22 Oct 2004) | 3 lines
+Changed paths:
+   M /trunk/NEWS
+   M /trunk/src/dvbpsi.c
+
+ * src/dvbpsi.c: duplicate packets are legal, do not treat them as a
+   discontinuity.
+
+------------------------------------------------------------------------
+r93 | massiot | 2004-10-19 21:17:49 +0200 (Tue, 19 Oct 2004) | 6 lines
+Changed paths:
+   M /trunk/AUTHORS
+   M /trunk/NEWS
+   M /trunk/configure.ac
+   M /trunk/src/Makefile.am
+   M /trunk/src/descriptors/dr.h
+   A /trunk/src/descriptors/dr_55.c
+   A /trunk/src/descriptors/dr_55.h
+   M /trunk/src/descriptors/dr_59.c
+   M /trunk/src/descriptors/dr_59.h
+   A /trunk/src/tables/eit.c
+   A /trunk/src/tables/eit.h
+   A /trunk/src/tables/eit_private.h
+
+  * src/tables/eit*: EIT decoder (no generator yet)
+  * 0x55 (dvb parental rating) descriptor decoder
+  * fixed a segfault in the subtitles descriptor decoder
+  * bumped up version number to 0.1.5
+
+
+------------------------------------------------------------------------
+r92 | sam | 2004-08-27 11:30:01 +0200 (Fri, 27 Aug 2004) | 2 lines
+Changed paths:
+   M /trunk/debian/changelog
+   M /trunk/debian/copyright
+   M /trunk/debian/rules
+
+  * New minor Debian upload.
+
+------------------------------------------------------------------------
+r91 | nitrox | 2004-08-27 11:08:17 +0200 (Fri, 27 Aug 2004) | 7 lines
+Changed paths:
+   M /trunk/src/tables/pmt.c
+
+
+Fixed a bug in the PMT parser
+( descriptor could have a size of 0 bytes ...
+  That is the case on the channel "Barnkanalen" on swedish DVB-T transmissions)
+
+
+
+------------------------------------------------------------------------
+r90 | sam | 2004-07-05 11:22:27 +0200 (Mon, 05 Jul 2004) | 4 lines
+Changed paths:
+   M /trunk/bootstrap
+
+  * bootstrap:
+    + Run libtoolize before aclocal.
+    + Support automake 1.8.
+
+------------------------------------------------------------------------
+r89 | gbazin | 2004-06-28 21:17:23 +0200 (Mon, 28 Jun 2004) | 1 line
+Changed paths:
+   M /trunk/src/descriptors/dr_59.c
+
+* src/descriptors/dr_59.c: fixed dvb subtitles descriptor generation.
+------------------------------------------------------------------------
+r88 | sam | 2004-02-24 15:31:18 +0100 (Tue, 24 Feb 2004) | 2 lines
+Changed paths:
+   M /trunk
+   D /trunk/.cvsignore
+   M /trunk/NEWS
+   M /trunk/autotools
+   D /trunk/autotools/.cvsignore
+   M /trunk/bootstrap
+   M /trunk/debian
+   D /trunk/debian/.cvsignore
+   M /trunk/doc
+   D /trunk/doc/.cvsignore
+   M /trunk/examples
+   D /trunk/examples/.cvsignore
+   M /trunk/examples/decode_pat.c
+   M /trunk/examples/decode_pmt.c
+   M /trunk/examples/decode_sdt.c
+   M /trunk/misc
+   D /trunk/misc/.cvsignore
+   M /trunk/misc/gen_crc.c
+   M /trunk/misc/gen_pat.c
+   M /trunk/misc/gen_pmt.c
+   M /trunk/misc/test_dr.h
+   M /trunk/src
+   D /trunk/src/.cvsignore
+   M /trunk/src/demux.c
+   M /trunk/src/demux.h
+   M /trunk/src/descriptor.c
+   M /trunk/src/descriptor.h
+   M /trunk/src/descriptors
+   D /trunk/src/descriptors/.cvsignore
+   M /trunk/src/descriptors/dr.h
+   M /trunk/src/descriptors/dr_02.c
+   M /trunk/src/descriptors/dr_02.h
+   M /trunk/src/descriptors/dr_03.c
+   M /trunk/src/descriptors/dr_03.h
+   M /trunk/src/descriptors/dr_04.c
+   M /trunk/src/descriptors/dr_04.h
+   M /trunk/src/descriptors/dr_05.c
+   M /trunk/src/descriptors/dr_05.h
+   M /trunk/src/descriptors/dr_06.c
+   M /trunk/src/descriptors/dr_06.h
+   M /trunk/src/descriptors/dr_07.c
+   M /trunk/src/descriptors/dr_07.h
+   M /trunk/src/descriptors/dr_08.c
+   M /trunk/src/descriptors/dr_08.h
+   M /trunk/src/descriptors/dr_09.c
+   M /trunk/src/descriptors/dr_09.h
+   M /trunk/src/descriptors/dr_0a.c
+   M /trunk/src/descriptors/dr_0a.h
+   M /trunk/src/descriptors/dr_0b.c
+   M /trunk/src/descriptors/dr_0b.h
+   M /trunk/src/descriptors/dr_0c.c
+   M /trunk/src/descriptors/dr_0c.h
+   M /trunk/src/descriptors/dr_0d.c
+   M /trunk/src/descriptors/dr_0d.h
+   M /trunk/src/descriptors/dr_0e.c
+   M /trunk/src/descriptors/dr_0e.h
+   M /trunk/src/descriptors/dr_0f.c
+   M /trunk/src/descriptors/dr_0f.h
+   M /trunk/src/descriptors/dr_42.c
+   M /trunk/src/descriptors/dr_42.h
+   M /trunk/src/descriptors/dr_47.c
+   M /trunk/src/descriptors/dr_47.h
+   M /trunk/src/descriptors/dr_48.c
+   M /trunk/src/descriptors/dr_48.h
+   M /trunk/src/descriptors/dr_59.c
+   M /trunk/src/descriptors/dr_59.h
+   M /trunk/src/dvbpsi.c
+   M /trunk/src/dvbpsi.h
+   M /trunk/src/dvbpsi_private.h
+   M /trunk/src/psi.c
+   M /trunk/src/psi.h
+   M /trunk/src/tables
+   D /trunk/src/tables/.cvsignore
+   M /trunk/src/tables/pat.c
+   M /trunk/src/tables/pat.h
+   M /trunk/src/tables/pat_private.h
+   M /trunk/src/tables/pmt.c
+   M /trunk/src/tables/pmt.h
+   M /trunk/src/tables/pmt_private.h
+   M /trunk/src/tables/sdt.c
+   M /trunk/src/tables/sdt.h
+   M /trunk/src/tables/sdt_private.h
+
+  * Added proper SVN keywords to files and directories (for $Id and ignores).
+
+------------------------------------------------------------------------
+r86 | sam | 2004-02-23 22:44:01 +0100 (Mon, 23 Feb 2004) | 3 lines
+Changed paths:
+   M /trunk/ChangeLog
+
+  * ChangeLog:
+    + Moved changelog to SVN format.
+
+------------------------------------------------------------------------
 r81 | sam | 2004-01-02 15:23:41 +0100 (Fri, 02 Jan 2004) | 5 lines
 Changed paths:
    M /trunk/debian/rules
