@@ -1,6 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_PROGRAMS = decode_pat decode_pmt decode_sdt decode_mpeg
+noinst_PROGRAMS = decode_pat decode_pmt decode_sdt
+if !HAVE_WIN32
+noinst_PROGRAMS += decode_mpeg
+endif
 
 decode_pat_SOURCES = decode_pat.c
 decode_pat_LDFLAGS = -L../src -ldvbpsi

@@ -23,7 +23,11 @@ case x"${target_os}" in
   xdarwin*)
     CFLAGS="${CFLAGS} -no-cpp-precomp"
     ;;
+  *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
+    HAVE_WIN32=yes
+    ;;
 esac
+AM_CONDITIONAL(HAVE_WIN32, test "${HAVE_WIN32}" = "yes")
 
 dnl --enable-debug
 AC_ARG_ENABLE(debug,
