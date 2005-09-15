@@ -45,15 +45,15 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_installdirs -plibdvbpsi3-dev usr/lib usr/share/doc
-	dh_installdirs -plibdvbpsi3 usr/lib usr/share/doc/libdvbpsi3
+	dh_installdirs -plibdvbpsi4-dev usr/lib usr/share/doc
+	dh_installdirs -plibdvbpsi4 usr/lib usr/share/doc/libdvbpsi4
 
-	$(MAKE) install DESTDIR=`pwd`/debian/libdvbpsi3/
+	$(MAKE) install DESTDIR=`pwd`/debian/libdvbpsi4/
 
-	ln -s libdvbpsi3 debian/libdvbpsi3-dev/usr/share/doc/libdvbpsi3-dev
-	mv debian/libdvbpsi3/usr/lib/*.so debian/libdvbpsi3/usr/lib/*a \
-		debian/libdvbpsi3-dev/usr/lib/
-	mv debian/libdvbpsi3/usr/include debian/libdvbpsi3-dev/usr/
+	ln -s libdvbpsi4 debian/libdvbpsi4-dev/usr/share/doc/libdvbpsi4-dev
+	mv debian/libdvbpsi4/usr/lib/*.so debian/libdvbpsi4/usr/lib/*a \
+		debian/libdvbpsi4-dev/usr/lib/
+	mv debian/libdvbpsi4/usr/include debian/libdvbpsi4-dev/usr/
 
 # Build architecture-independent files here.
 binary-indep: build install
