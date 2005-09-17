@@ -1,9 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_PROGRAMS = decode_pat decode_pmt decode_sdt
-if !HAVE_WIN32
-noinst_PROGRAMS += decode_mpeg
-endif
+noinst_PROGRAMS = decode_pat decode_pmt decode_sdt decode_mpeg
 
 decode_pat_SOURCES = decode_pat.c
 decode_pat_LDFLAGS = -L../src -ldvbpsi
@@ -14,6 +11,9 @@ decode_pmt_LDFLAGS = -L../src -ldvbpsi -lm
 decode_sdt_SOURCES = decode_sdt.c
 decode_sdt_LDFLAGS = -L../src -ldvbpsi
 
-decode_mpeg_SOURCES = connect.c decode_mpeg.c
+decode_mpeg_SOURCES = decode_mpeg.c
+if HAVE_SYS_SOCKET_H
+decode_mpeg_SOURCES += connect.c
+endif
 decode_mpeg_LDFLAGS = -L../src -ldvbpsi -lm
 

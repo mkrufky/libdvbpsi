@@ -23,11 +23,7 @@ case x"${target_os}" in
   xdarwin*)
     CFLAGS="${CFLAGS} -no-cpp-precomp"
     ;;
-  *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
-    HAVE_WIN32=yes
-    ;;
 esac
-AM_CONDITIONAL(HAVE_WIN32, test "${HAVE_WIN32}" = "yes")
 
 dnl --enable-debug
 AC_ARG_ENABLE(debug,
@@ -37,7 +33,7 @@ AC_ARG_ENABLE(debug,
   no)  debug=false ;;
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-debug) ;;
 esac],[debug=false])
-if test x$debug = xtrue
+if test "$debug" = "true"
 then
   CFLAGS="${CFLAGS} -DDEBUG -g"
 fi
@@ -51,7 +47,7 @@ AC_ARG_ENABLE(release,
   no)  release=false ;;
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-release) ;;
 esac],[release=false])
-if test x$release = xtrue
+if test "$release" = "true"
 then
   CFLAGS="${CFLAGS} -O6"
 else
@@ -60,6 +56,9 @@ fi
 
 dnl Check for headers
 AC_CHECK_HEADERS(stdint.h inttypes.h)
+
+AC_CHECK_HEADERS(sys/socket.h, [ac_have_sys_socket_h=yes])
+AM_CONDITIONAL(HAVE_SYS_SOCKET_H, test "${ac_have_sys_socket_h}" = "yes")
 
 dnl Check for variadic macros
 AC_CACHE_CHECK([for variadic cpp macros],
@@ -74,7 +73,13 @@ if test "${ac_cv_cpp_variadic_macros}" != "no"; then
     AC_DEFINE(HAVE_VARIADIC_MACROS, 1, Support for variadic macros)
 fi
 
-AC_OUTPUT([Makefile src/Makefile examples/Makefile misc/Makefile doc/Makefile debian/Makefile wince/Makefile])
+AC_OUTPUT([Makefile
+           src/Makefile
+           examples/Makefile
+           misc/Makefile
+           doc/Makefile
+           debian/Makefile
+           wince/Makefile])
 
 echo "
 libdvbpsi configuration

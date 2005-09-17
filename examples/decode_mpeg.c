@@ -161,6 +161,7 @@ int ReadPacket( int i_fd, uint8_t* p_dst )
     return (i == 0) ? 1 : 0;
 }
 
+#ifdef HAVE_SYS_SOCKET_H
 int ReadPacketFromSocket( int i_socket, uint8_t* p_dst, size_t i_size)
 {
     int i_rc = -1;
@@ -169,6 +170,7 @@ int ReadPacketFromSocket( int i_socket, uint8_t* p_dst, size_t i_size)
     i_rc = read( i_socket, p_dst, i_size );
     return (i_rc <= i_size ) ? 1 : 0;
 }
+#endif
 
 /*****************************************************************************
  * DumpPAT
@@ -363,17 +365,26 @@ void DumpPMT(void* p_data, dvbpsi_pmt_t* p_pmt)
  *****************************************************************************/
 void usage( char *name )
 {
+#ifdef HAVE_SYS_SOCKET_H
     printf( "Usage: %s [--file <filename>|--udp <ipaddress> --port <port> -mtu <mtu>|--help]\n", name );
     printf( "       %s [-f <filename>|-u <ipaddress> -p <port> -m <mtu>|-h]\n", name );
+#else
+    printf( "Usage: %s [--file <filename>|--help]\n", name );
+    printf( "       %s [-f <filename>|-h]\n", name );
+#endif
     printf( "\n" );   
     printf( "       %s --help\n", name );
     printf( "       %s --file <filename>\n", name );
+#ifdef HAVE_SYS_SOCKET_H
     printf( "       %s --udp <ipaddres> --port <port> --mtu <mtu>\n", name );
+#endif
     printf( "Arguments:\n" );
     printf( "file   : read MPEG2-TS stream from file\n" );
+#ifdef HAVE_SYS_SOCKET_H
     printf( "udp    : read MPEG2-TS stream from network using UDP protocol\n" );
     printf( "port   : read MPEG2-TS stream from this port number\n" );
     printf( "mtu    : read MPEG2-TS stream from network using maximum transfer unit (mtu) = 1316\n" );
+#endif
     printf( "help   : print this help message\n" );
 }
 
@@ -382,27 +393,35 @@ void usage( char *name )
  *****************************************************************************/
 int main(int i_argc, char* pa_argv[])
 {
+#ifdef HAVE_SYS_SOCKET_H
     const char* const short_options = "hf:m:p:u:";
+#else
+    const char* const short_options = "hf:";
+#endif
     const struct option long_options[] =
     {
         { "help",       0, NULL, 'h' },
         { "file",       0, NULL, 'f' },
+#ifdef HAVE_SYS_SOCKET_H
         { "mtu",        0, NULL, 'm' },
         { "port",       0, NULL, 'p' },
         { "udp",        0, NULL, 'u' },        
+#endif
         { NULL,         0, NULL, 0 }
     };
     int next_option = 0;
     
     int i_fd = -1;
-    int i_port = 0;
     int i_mtu = 1316; /* (7 * 188) = 1316 < 1500 network MTU */
+#ifdef HAVE_SYS_SOCKET_H
+    int i_port = 0;
     char *ipaddress = NULL;
+#endif
     char *filename = NULL;
     
     uint8_t *p_data = NULL;
     ts_stream_t *p_stream = NULL;
-    int b_ok;
+    int b_ok = 0;
 
     /* parser commandline arguments */
     do {
@@ -416,6 +435,7 @@ int main(int i_argc, char* pa_argv[])
                 usage( pa_argv[0] );
                 goto error;
                 break;
+#ifdef HAVE_SYS_SOCKET_H
             case 'm':
                 i_mtu = atoi( optarg );
                 if( i_mtu < 0 ) i_mtu = 1316;
@@ -426,6 +446,7 @@ int main(int i_argc, char* pa_argv[])
             case 'u':
                 ipaddress = strdup( optarg );
                 break;
+#endif
             case -1:
                 break;
             default:
@@ -442,6 +463,7 @@ int main(int i_argc, char* pa_argv[])
         if( !p_data )
             goto out_of_memory;
     }
+#ifdef HAVE_SYS_SOCKET_H
     if( ipaddress )
     {
         i_fd = create_udp_connection( ipaddress, i_port );
@@ -449,6 +471,7 @@ int main(int i_argc, char* pa_argv[])
         if( !p_data )
             goto out_of_memory;
     }
+#endif
     p_stream = (ts_stream_t *) malloc( sizeof(ts_stream_t) );
     if( !p_stream )
         goto out_of_memory;
@@ -457,8 +480,10 @@ int main(int i_argc, char* pa_argv[])
     /* Read first packet */
     if( filename )
         b_ok = ReadPacket( i_fd, p_data);
+#ifdef HAVE_SYS_SOCKET_H
     else
         b_ok = ReadPacketFromSocket( i_fd, p_data, i_mtu );
+#endif
         
     /* Enter infinite loop */    
     p_stream->pat.handle = dvbpsi_AttachPAT( DumpPAT, p_stream );    
@@ -539,7 +564,7 @@ int main(int i_argc, char* pa_argv[])
                 if( b_discontinuity_indicator )
                 {
                     if( b_pcr )
-                        printf( "New PCR pid %d value %ld \n", i_pid, p_stream->pid[i_pid].i_pcr );
+                        printf( "New PCR pid %d value %lld \n", i_pid, (long long int)p_stream->pid[i_pid].i_pcr );
                     if( b_discontinuity_seen )
                     {
                         /* cc discontinuity is expected */
@@ -560,8 +585,10 @@ int main(int i_argc, char* pa_argv[])
         /* Read next packet */
         if( filename )
             b_ok = ReadPacket( i_fd, p_data);
+#ifdef HAVE_SYS_SOCKET_H
         else
             b_ok = ReadPacketFromSocket( i_fd, p_data, i_mtu );
+#endif
     }
     dvbpsi_DetachPMT( p_stream->pmt.handle );
     dvbpsi_DetachPAT( p_stream->pat.handle );
@@ -569,12 +596,16 @@ int main(int i_argc, char* pa_argv[])
     /* clean up */
     if( filename )
         close( i_fd );
+#ifdef HAVE_SYS_SOCKET_H
     else
         close_connection( i_fd );
+#endif
 
     if( p_data )    free( p_data );
     if( filename )  free( filename );
+#ifdef HAVE_SYS_SOCKET_H
     if( ipaddress ) free( ipaddress );
+#endif
     
     /* free other stuff first ;-)*/
     if( p_stream )  free( p_stream );
@@ -586,7 +617,9 @@ out_of_memory:
 error:
     if( p_data )    free( p_data );
     if( filename )  free( filename );
+#ifdef HAVE_SYS_SOCKET_H
     if( ipaddress ) free( ipaddress );
+#endif
     
     /* free other stuff first ;-)*/
     if( p_stream )  free( p_stream );
