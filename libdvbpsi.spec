@@ -1,13 +1,12 @@
-%define name		libdvbpsi3
+%define name		libdvbpsi
 %define version		0.1.5
 %define release		1
 
 %define major		4
 %define lib_name	%{name}%{major}
 
-%define redhat80 0
-%if %redhat80
-%define release %rel
+%define redhat 0
+%if %redhat
 # some mdk macros that do not exist in rh
 %define configure2_5x CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr
 %define make %__make
@@ -24,7 +23,7 @@ Packager:	Yves Duret <yves@zarb.org>
 License:	GPL
 URL:		http://developers.videolan.org/libdvbpsi/
 Group:		System/Libraries
-Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}${major}-%{version}.tar.bz2
+Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}%{major}-%{version}.tar.bz2
 BuildRoot:	%_tmppath/%name%major-%version-%release-root
 
 %description
@@ -47,7 +46,7 @@ decoding and generating. The important features are:
 %package -n %{lib_name}-devel
 Summary:	Development tools for programs which will use the libdvbpsi library.
 Group:		Development/C
-Provides:	%name-devel =%version-%release
+Provides:	%name-devel = %version-%release
 Requires:	%{lib_name} = %version-%release
 
 %description -n %{lib_name}-devel
@@ -61,7 +60,7 @@ the %name package installed.
 
 
 %prep
-%setup -q
+%setup -q -n %{lib_name}-%{version}
 
 %build
 %configure2_5x --enable-release
@@ -91,6 +90,10 @@ rm -rf %buildroot
 %{_includedir}/*
 
 %changelog
+* Thu Sep 22 2005 Jean-Paul Saman <jpsaman@videolan.org>
+- Remove conflicting redefine of release
+- Fix typo's
+
 * Wed Jul 6 2005 Sam Hocevar <sam+rpm@zoy.org>
 - 0.1.5 release.
 
