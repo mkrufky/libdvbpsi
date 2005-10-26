@@ -496,7 +496,8 @@ int main(int i_argc, char* pa_argv[])
             uint8_t   *p_tmp = &p_data[i];
             uint16_t   i_pid = ((uint16_t)(p_tmp[1] & 0x1f) << 8) + p_tmp[2];
             int        i_cc = (p_tmp[3] & 0x0f);
-            int        i_old_cc; 
+            int        i_old_cc = -1; 
+            mtime_t    i_prev_pcr = 0;  /* 33 bits */
             vlc_bool_t b_adaptation = (p_tmp[3] & 0x20); /* adaptation field */
             vlc_bool_t b_discontinuity_seen = VLC_FALSE;
 
@@ -542,15 +543,20 @@ int main(int i_argc, char* pa_argv[])
                 if( b_pcr && (p_tmp[4] >= 7) )
                 {
                     mtime_t i_pcr;  /* 33 bits */
+		    mtime_t i_delta = 0;
     
                     i_pcr = ( (mtime_t)p_tmp[6] << 25 ) |
                             ( (mtime_t)p_tmp[7] << 17 ) |
                             ( (mtime_t)p_tmp[8] << 9 ) |
                             ( (mtime_t)p_tmp[9] << 1 ) |
                             ( (mtime_t)p_tmp[10] >> 7 );
-                    //printf( "New PCR pid %d delta %ld\n", i_pid, i_pcr - p_stream->pid[i_pid].i_pcr );
-                    p_stream->pid[i_pid].i_pcr = i_pcr;       
-                    //printf( "New PCR pid %d value %ld \n", i_pid, i_pcr );
+                    i_prev_pcr = p_stream->pid[i_pid].i_pcr;
+                    p_stream->pid[i_pid].i_pcr = i_pcr;
+		    i_delta = p_stream->pid[i_pid].i_pcr - i_prev_pcr;
+                    if( i_delta < 0 )
+                        printf( "Backwards PCR %lld previous %lld, delta %lld\n",
+				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
+				(long long int)i_delta );
                 }
             }
             
@@ -564,7 +570,9 @@ int main(int i_argc, char* pa_argv[])
                 if( b_discontinuity_indicator )
                 {
                     if( b_pcr )
-                        printf( "New PCR pid %d value %lld \n", i_pid, (long long int)p_stream->pid[i_pid].i_pcr );
+                        printf( "New PCR pid %d value %lld (previous %lld, delta %lld)\n", i_pid, 
+				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
+				(long long int)p_stream->pid[i_pid].i_pcr - (long long int)i_prev_pcr );
                     if( b_discontinuity_seen )
                     {
                         /* cc discontinuity is expected */
