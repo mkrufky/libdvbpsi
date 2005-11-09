@@ -495,7 +495,7 @@ int main(int i_argc, char* pa_argv[])
         b_ok = ReadPacketFromSocket( i_fd, p_data, i_mtu );
     
     if( b_verbose )
-        printf( "network (ms), PCR value (ms), PCR prev (ms), delta (ms)\n" );
+        printf( "seqno, network (ms), PCR value (ms), PCR prev (ms), delta (ms)\n" );
 #endif
         
     /* Enter infinite loop */    
@@ -566,7 +566,7 @@ int main(int i_argc, char* pa_argv[])
                     p_stream->pid[i_pid].i_pcr = i_pcr;
                     i_delta = p_stream->pid[i_pid].i_pcr - i_prev_pcr;
 
-                    printf( "PCR (%d) ", i_pid );
+                    printf( "%.2d, PCR (%d) ", i_cc, i_pid );
                     if( b_verbose )
                     {
                         time_t time_current;
