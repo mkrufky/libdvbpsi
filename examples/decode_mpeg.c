@@ -493,6 +493,9 @@ int main(int i_argc, char* pa_argv[])
 #ifdef HAVE_SYS_SOCKET_H
     else
         b_ok = ReadPacketFromSocket( i_fd, p_data, i_mtu );
+    
+    if( b_verbose )
+        printf( "network (ms), PCR value (ms), PCR prev (ms), delta (ms)\n" );
 #endif
         
     /* Enter infinite loop */    
@@ -572,15 +575,15 @@ int main(int i_argc, char* pa_argv[])
                         gettimeofday( &tv, NULL );
                         time_current = (tv.tv_sec*1000) + (tv.tv_usec/1000);
 			tv_delta = time_current - time_prev;
-                        printf( "arrival %.3ld ms ", (long)tv_delta );
+                        printf( "arrival %.2ld, ", (long)tv_delta );
 			time_prev = time_current;
                     }
                     if( i_delta < 0 )
-                        printf( "value %lld previous %lld, delta %lld\n",
+                        printf( "value %lld, previous %lld, delta %lld\n",
 				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
 				(long long int)i_delta );
 		    else if( b_verbose )
-                        printf( "value %lld previous %lld, delta %lld\n",
+                        printf( "value %lld, previous %lld, delta %lld\n",
 				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
 				(long long int)i_delta );
                 }
