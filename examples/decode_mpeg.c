@@ -564,10 +564,10 @@ int main(int i_argc, char* pa_argv[])
                               ( (mtime_t)p_tmp[10] >> 7 ) ) / 90;
                     i_prev_pcr = p_stream->pid[i_pid].i_pcr;
                     p_stream->pid[i_pid].i_pcr = i_pcr;
-		    i_delta = p_stream->pid[i_pid].i_pcr - i_prev_pcr;
-                    
+                    i_delta = p_stream->pid[i_pid].i_pcr - i_prev_pcr;
+
                     printf( "PCR (%d) ", i_pid );
-                    if( b_verbose && (gettimeofday( &tv, NULL ) == 0) )
+                    if( b_verbose )
                     {
                         time_t time_current;
 			time_t tv_delta;
