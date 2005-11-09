@@ -566,7 +566,7 @@ int main(int i_argc, char* pa_argv[])
                     p_stream->pid[i_pid].i_pcr = i_pcr;
 		    i_delta = p_stream->pid[i_pid].i_pcr - i_prev_pcr;
                     
-                    printf( "PCR " );
+                    printf( "PCR (%d) ", i_pid );
                     if( b_verbose && (gettimeofday( &tv, NULL ) == 0) )
                     {
                         time_t time_current;
