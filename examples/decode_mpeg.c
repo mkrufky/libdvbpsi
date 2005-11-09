@@ -32,6 +32,8 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <sys/time.h>
+#include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <math.h>
@@ -394,9 +396,9 @@ void usage( char *name )
 int main(int i_argc, char* pa_argv[])
 {
 #ifdef HAVE_SYS_SOCKET_H
-    const char* const short_options = "hf:m:p:u:";
+    const char* const short_options = "hf:m:p:u:v";
 #else
-    const char* const short_options = "hf:";
+    const char* const short_options = "hf:v";
 #endif
     const struct option long_options[] =
     {
@@ -405,8 +407,9 @@ int main(int i_argc, char* pa_argv[])
 #ifdef HAVE_SYS_SOCKET_H
         { "mtu",        0, NULL, 'm' },
         { "port",       0, NULL, 'p' },
-        { "udp",        0, NULL, 'u' },        
+        { "udp",        0, NULL, 'u' },
 #endif
+	{ "verbose",    0, NULL, 'v' },
         { NULL,         0, NULL, 0 }
     };
     int next_option = 0;
@@ -416,12 +419,16 @@ int main(int i_argc, char* pa_argv[])
 #ifdef HAVE_SYS_SOCKET_H
     int i_port = 0;
     char *ipaddress = NULL;
+    time_t  time_prev = 0;
+    int     i_old_cc = -1; 
+    mtime_t i_prev_pcr = 0;  /* 33 bits */
 #endif
     char *filename = NULL;
     
     uint8_t *p_data = NULL;
     ts_stream_t *p_stream = NULL;
     int b_ok = 0;
+    int b_verbose = 0;
 
     /* parser commandline arguments */
     do {
@@ -447,6 +454,9 @@ int main(int i_argc, char* pa_argv[])
                 ipaddress = strdup( optarg );
                 break;
 #endif
+            case 'v':
+                b_verbose = 1;
+                break;
             case -1:
                 break;
             default:
@@ -489,15 +499,13 @@ int main(int i_argc, char* pa_argv[])
     p_stream->pat.handle = dvbpsi_AttachPAT( DumpPAT, p_stream );    
     while(b_ok)
     {
-        int i = 0;
+        int     i = 0;
 
         for( i=0; i < i_mtu; i += 188 )
         {
             uint8_t   *p_tmp = &p_data[i];
             uint16_t   i_pid = ((uint16_t)(p_tmp[1] & 0x1f) << 8) + p_tmp[2];
             int        i_cc = (p_tmp[3] & 0x0f);
-            int        i_old_cc = -1; 
-            mtime_t    i_prev_pcr = 0;  /* 33 bits */
             vlc_bool_t b_adaptation = (p_tmp[3] & 0x20); /* adaptation field */
             vlc_bool_t b_discontinuity_seen = VLC_FALSE;
 
@@ -544,17 +552,35 @@ int main(int i_argc, char* pa_argv[])
                 {
                     mtime_t i_pcr;  /* 33 bits */
 		    mtime_t i_delta = 0;
-    
-                    i_pcr = ( (mtime_t)p_tmp[6] << 25 ) |
-                            ( (mtime_t)p_tmp[7] << 17 ) |
-                            ( (mtime_t)p_tmp[8] << 9 ) |
-                            ( (mtime_t)p_tmp[9] << 1 ) |
-                            ( (mtime_t)p_tmp[10] >> 7 );
+                    struct timeval tv;
+
+                    i_pcr = ( ( (mtime_t)p_tmp[6] << 25 ) |
+                              ( (mtime_t)p_tmp[7] << 17 ) |
+                              ( (mtime_t)p_tmp[8] << 9 ) |
+                              ( (mtime_t)p_tmp[9] << 1 ) |
+                              ( (mtime_t)p_tmp[10] >> 7 ) ) / 90;
                     i_prev_pcr = p_stream->pid[i_pid].i_pcr;
                     p_stream->pid[i_pid].i_pcr = i_pcr;
 		    i_delta = p_stream->pid[i_pid].i_pcr - i_prev_pcr;
+                    
+                    printf( "PCR " );
+                    if( b_verbose && (gettimeofday( &tv, NULL ) == 0) )
+                    {
+                        time_t time_current;
+			time_t tv_delta;
+
+                        gettimeofday( &tv, NULL );
+                        time_current = (tv.tv_sec*1000) + (tv.tv_usec/1000);
+			tv_delta = time_current - time_prev;
+                        printf( "arrival %.3ld ms ", (long)tv_delta );
+			time_prev = time_current;
+                    }
                     if( i_delta < 0 )
-                        printf( "Backwards PCR %lld previous %lld, delta %lld\n",
+                        printf( "value %lld previous %lld, delta %lld\n",
+				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
+				(long long int)i_delta );
+		    else if( b_verbose )
+                        printf( "value %lld previous %lld, delta %lld\n",
 				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
 				(long long int)i_delta );
                 }
