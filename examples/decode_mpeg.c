@@ -170,6 +170,8 @@ int ReadPacketFromSocket( int i_socket, uint8_t* p_dst, size_t i_size)
     
     memset( p_dst, 0, i_size );
     i_rc = read( i_socket, p_dst, i_size );
+    if( i_rc < 0 ) printf( "READ INTERRUPTED BY SIGNAL\n" );
+    if( i_rc == 0 ) printf( "READ RETURNS 0\n" );
     return (i_rc <= i_size ) ? 1 : 0;
 }
 #endif
@@ -417,12 +419,13 @@ int main(int i_argc, char* pa_argv[])
     int i_fd = -1;
     int i_mtu = 1316; /* (7 * 188) = 1316 < 1500 network MTU */
 #ifdef HAVE_SYS_SOCKET_H
-    int i_port = 0;
-    char *ipaddress = NULL;
-    time_t  time_prev = 0;
-    int     i_old_cc = -1; 
-    mtime_t i_prev_pcr = 0;  /* 33 bits */
+    int      i_port = 0;
+    char   * ipaddress = NULL;
+    time_t   time_prev = 0;
+    int      i_old_cc = -1; 
+    mtime_t  i_prev_pcr = 0;  /* 33 bits */
 #endif
+    uint32_t i_bytes = 0; /* bytes transmitted between PCR's */
     char *filename = NULL;
     
     uint8_t *p_data = NULL;
@@ -446,6 +449,7 @@ int main(int i_argc, char* pa_argv[])
             case 'm':
                 i_mtu = atoi( optarg );
                 if( i_mtu < 0 ) i_mtu = 1316;
+		else i_mtu = (i_mtu / 188) * 188;
                 break;
             case 'p':
                 i_port = atoi( optarg );
@@ -465,6 +469,12 @@ int main(int i_argc, char* pa_argv[])
         }
     } while( next_option != -1 );
 
+#ifdef HAVE_SYS_SOCKET_H
+    if( b_verbose ) 
+    {
+    	printf( "set mtu to %d\n", i_mtu );
+    }
+#endif
     /* initialize */
     if( filename )
     {
@@ -489,18 +499,23 @@ int main(int i_argc, char* pa_argv[])
     
     /* Read first packet */
     if( filename )
+    {
         b_ok = ReadPacket( i_fd, p_data);
+        i_bytes += 188;
+    }
 #ifdef HAVE_SYS_SOCKET_H
-    else
+    else 
+    {
         b_ok = ReadPacketFromSocket( i_fd, p_data, i_mtu );
-    
+        i_bytes += i_mtu;
+    }
     if( b_verbose )
-        printf( "seqno, network (ms), PCR value (ms), PCR prev (ms), delta (ms)\n" );
+        printf( "seqno, network (ms), PCR value (ms), PCR prev (ms), delta (ms), bytes, bitrate (bytes/delta)\n" );
 #endif
         
     /* Enter infinite loop */    
     p_stream->pat.handle = dvbpsi_AttachPAT( DumpPAT, p_stream );    
-    while(b_ok)
+    while( b_ok )
     {
         int     i = 0;
 
@@ -537,7 +552,7 @@ int main(int i_argc, char* pa_argv[])
                 i_old_cc = p_stream->pid[i_pid].i_cc;
                 p_stream->pid[i_pid].i_cc = i_cc;
             }
-            
+
             /* Other adaptation field */
             if( b_adaptation )
             {
@@ -554,8 +569,7 @@ int main(int i_argc, char* pa_argv[])
                 if( b_pcr && (p_tmp[4] >= 7) )
                 {
                     mtime_t i_pcr;  /* 33 bits */
-		    mtime_t i_delta = 0;
-                    struct timeval tv;
+                    mtime_t i_delta = 0;
 
                     i_pcr = ( ( (mtime_t)p_tmp[6] << 25 ) |
                               ( (mtime_t)p_tmp[7] << 17 ) |
@@ -571,24 +585,38 @@ int main(int i_argc, char* pa_argv[])
                     {
                         time_t time_current;
 			time_t tv_delta;
+                        struct timeval tv;
 
                         gettimeofday( &tv, NULL );
                         time_current = (tv.tv_sec*1000) + (tv.tv_usec/1000);
-			tv_delta = time_current - time_prev;
-                        printf( "arrival %.2ld, ", (long)tv_delta );
+                        if( time_prev == 0 ) /* probably the first one */
+                            printf( "arrival -, " );
+                        else 
+                        {
+			    tv_delta = time_current - time_prev;
+                            printf( "arrival %.2lld, ", (long long int)tv_delta );
+                        }
 			time_prev = time_current;
                     }
-                    if( i_delta < 0 )
-                        printf( "value %lld, previous %lld, delta %lld\n",
+                    if( i_delta <= 0 )
+                        printf( "value %lld, previous %lld, delta %lld, bytes %u, ",
 				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
-				(long long int)i_delta );
+				(long long int)i_delta, i_bytes );
 		    else if( b_verbose )
-                        printf( "value %lld, previous %lld, delta %lld\n",
+                        printf( "value %lld, previous %lld, delta %lld, bytes %u, ",
 				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
-				(long long int)i_delta );
+				(long long int)i_delta, i_bytes );
+                    if( (i_delta > 0) )
+                        printf( "%lld Kbps", ((i_bytes*8)/i_delta) );
+                    else 
+                        printf( "-" );
+                    if( (i_delta <= 0) || b_verbose )
+                        printf( "\n" );
+
+                    i_bytes = 0;
                 }
             }
-            
+
             /* Handle discontinuities if they occured,
              * according to ISO/IEC 13818-1: DIS pages 20-22 */
             if( b_adaptation )
@@ -599,9 +627,26 @@ int main(int i_argc, char* pa_argv[])
                 if( b_discontinuity_indicator )
                 {
                     if( b_pcr )
-                        printf( "New PCR pid %d value %lld (previous %lld, delta %lld)\n", i_pid, 
-				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
-				(long long int)p_stream->pid[i_pid].i_pcr - (long long int)i_prev_pcr );
+                    {
+                        mtime_t i_delta;
+                        struct timeval tv;
+
+                        i_delta = (long long int)p_stream->pid[i_pid].i_pcr - (long long int)i_prev_pcr;
+                        printf( "New PCR pid %d, value %lld, previous %lld, delta %lld, bytes %u, ",
+                                i_pid, 
+				(long long int)p_stream->pid[i_pid].i_pcr, 
+                                (long long int)i_prev_pcr,
+                                i_delta, 
+                                i_bytes );
+                        if( i_delta > 0 )
+                            printf( "%lld", (i_bytes*8)/(i_delta/1000) );
+                        printf( "\n" );
+
+                        /* Initialize the arrival time */
+                        gettimeofday( &tv, NULL );
+                        time_prev = (tv.tv_sec*1000) + (tv.tv_usec/1000);
+                        i_bytes = 0;
+                    }
                     if( b_discontinuity_seen )
                     {
                         /* cc discontinuity is expected */
@@ -621,10 +666,16 @@ int main(int i_argc, char* pa_argv[])
         }
         /* Read next packet */
         if( filename )
+        {
             b_ok = ReadPacket( i_fd, p_data);
+            i_bytes += 188;
+        }
 #ifdef HAVE_SYS_SOCKET_H
         else
+        {
             b_ok = ReadPacketFromSocket( i_fd, p_data, i_mtu );
+            i_bytes += i_mtu;
+        }
 #endif
     }
     dvbpsi_DetachPMT( p_stream->pmt.handle );
