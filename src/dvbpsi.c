@@ -210,6 +210,11 @@ void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
           }
           else
           {
+            p_section->i_extension = 0;
+            p_section->i_version = 0;
+            p_section->b_current_next = 1;
+            p_section->i_number = 0;
+            p_section->i_last_number = 0;
             p_section->p_payload_start = p_section->p_data + 3;
           }
 
