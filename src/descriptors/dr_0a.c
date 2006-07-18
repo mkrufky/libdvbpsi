@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_0a.c
  * (c)2001-2002 VideoLAN
- * $Id: dr_0a.c,v 1.4 2003/07/25 20:20:40 fenrir Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -47,6 +47,7 @@
 dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor)
 {
   dvbpsi_iso639_dr_t * p_decoded;
+  int i;
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x0a)
@@ -68,7 +69,7 @@ dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor)
   }
 
   /* Decode data and check the length */
-  if((p_descriptor->i_length < 1) || ((p_descriptor->i_length - 1) % 3 != 0))
+  if((p_descriptor->i_length < 1) || (p_descriptor->i_length % 4 != 0))
   {
     DVBPSI_ERROR_ARG("dr_0a decoder", "bad length (%d)",
                      p_descriptor->i_length);
@@ -76,13 +77,15 @@ dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor)
     return NULL;
   }
 
-  p_decoded->i_audio_type = p_descriptor->p_data[p_descriptor->i_length - 1];
-  p_decoded->i_code_count = (p_descriptor->i_length - 1) / 3;
-  if(p_decoded->i_code_count)
-    memcpy(p_decoded->i_iso_639_code,
-           p_descriptor->p_data,
-           p_descriptor->i_length - 1);
-
+  p_decoded->i_code_count = p_descriptor->i_length / 4;
+  i = 0;
+  while( i < p_decoded->i_code_count ) {
+    p_decoded->code[i].iso_639_code[0] = p_descriptor->p_data[i*4];
+    p_decoded->code[i].iso_639_code[1] = p_descriptor->p_data[i*4+1];
+    p_decoded->code[i].iso_639_code[2] = p_descriptor->p_data[i*4+2];
+    p_decoded->code[i].i_audio_type = p_descriptor->p_data[i*4+3];
+    i++;
+  }
   p_descriptor->p_decoded = (void*)p_decoded;
 
   return p_decoded;
@@ -97,17 +100,19 @@ dvbpsi_descriptor_t * dvbpsi_GenISO639Dr(dvbpsi_iso639_dr_t * p_decoded,
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x0a, p_decoded->i_code_count * 3 + 1, NULL);
+        dvbpsi_NewDescriptor(0x0a, p_decoded->i_code_count * 4, NULL);
 
   if(p_descriptor)
   {
     /* Encode data */
-    p_descriptor->p_data[p_descriptor->i_length - 1] = p_decoded->i_audio_type;
-    if(p_decoded->i_code_count)
-      memcpy(p_descriptor->p_data,
-             p_decoded->i_iso_639_code,
-             p_descriptor->i_length - 1);
-
+    int i = 0;
+    while( i < p_decoded->i_code_count ) {
+      p_descriptor->p_data[i*4] = p_decoded->code[i].iso_639_code[0];
+      p_descriptor->p_data[i*4+1] = p_decoded->code[i].iso_639_code[1];
+      p_descriptor->p_data[i*4+2] = p_decoded->code[i].iso_639_code[2];
+      p_descriptor->p_data[i*4+3] = p_decoded->code[i].i_audio_type;
+      i++;
+    }
     if(b_duplicate)
     {
       /* Duplicate decoded data */
