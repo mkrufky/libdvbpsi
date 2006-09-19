@@ -474,6 +474,7 @@ int main_iso639_()
   BOZO_START(ISO 639 language);
 
   
+#if 0
   /* check i_audio_type */
   s_decoded.i_code_count = 0;
   BOZO_init_integer(i_audio_type, 0);
@@ -482,6 +483,7 @@ int main_iso639_()
     BOZO_check_integer(i_audio_type, 8)
     BOZO_CLEAN();
   BOZO_end_integer(i_audio_type, 8)
+#endif
 
 
   BOZO_END(ISO 639 language);
