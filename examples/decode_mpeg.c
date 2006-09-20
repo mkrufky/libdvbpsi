@@ -421,10 +421,12 @@ int main(int i_argc, char* pa_argv[])
 #ifdef HAVE_SYS_SOCKET_H
     int      i_port = 0;
     char   * ipaddress = NULL;
-    time_t   time_prev = 0;
-    int      i_old_cc = -1; 
-    mtime_t  i_prev_pcr = 0;  /* 33 bits */
 #endif
+#ifdef HAVE_GETTIMEOFDAY
+    time_t   time_prev = 0;
+#endif
+    mtime_t  i_prev_pcr = 0;  /* 33 bits */
+    int      i_old_cc = -1; 
     uint32_t i_bytes = 0; /* bytes transmitted between PCR's */
     char *filename = NULL;
     
@@ -581,6 +583,7 @@ int main(int i_argc, char* pa_argv[])
                     i_delta = p_stream->pid[i_pid].i_pcr - i_prev_pcr;
 
                     printf( "%.2d, PCRpid(%d), ", i_cc, i_pid );
+#ifdef HAVE_GETTIMEOFDAY
                     if( b_verbose )
                     {
                         time_t time_current;
@@ -598,6 +601,7 @@ int main(int i_argc, char* pa_argv[])
                         }
 			time_prev = time_current;
                     }
+#endif
                     if( i_delta <= 0 )
                         printf( "value %lld, previous %lld, delta %lld, bytes %u, ",
 				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
@@ -629,7 +633,9 @@ int main(int i_argc, char* pa_argv[])
                     if( b_pcr )
                     {
                         mtime_t i_delta;
+#ifdef HAVE_GETTIMEOFDAY
                         struct timeval tv;
+#endif
 
                         i_delta = (long long int)p_stream->pid[i_pid].i_pcr - (long long int)i_prev_pcr;
                         printf( "New PCR pid %d, value %lld, previous %lld, delta %lld, bytes %u, ",
@@ -642,10 +648,12 @@ int main(int i_argc, char* pa_argv[])
                             printf( "%lld", (i_bytes*8)/(i_delta/1000) );
                         printf( "\n" );
 
+#ifdef HAVE_GETTIMEOFDAY
                         /* Initialize the arrival time */
                         gettimeofday( &tv, NULL );
                         time_prev = (tv.tv_sec*1000) + (tv.tv_usec/1000);
                         i_bytes = 0;
+#endif
                     }
                     if( b_discontinuity_seen )
                     {
