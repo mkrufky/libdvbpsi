@@ -145,7 +145,7 @@ void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
   printf("External clock: %s, Accuracy: %E\n",
 	 p_clock_descriptor->b_external_clock_ref ? "Yes" : "No",
 	 p_clock_descriptor->i_clock_accuracy_integer *
-	 pow(10, p_clock_descriptor->i_clock_accuracy_exponent));
+	 pow(10.0, -(double)p_clock_descriptor->i_clock_accuracy_exponent));
 }
 
 /*****************************************************************************
