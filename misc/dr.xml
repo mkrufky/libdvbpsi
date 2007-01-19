@@ -73,14 +73,6 @@
     <integer name="i_ca_pid" bitcount="13" default="0" />
   </descriptor>
 
-  <descriptor name="ISO 639 language" sname="iso639" fname="ISO639">
-    <insert>
-      <begin>
-  s_decoded.i_code_count = 0;</begin>
-    </insert>
-    <integer name="i_audio_type" bitcount="8" default="0" />
-  </descriptor>
-
   <descriptor name="system clock" sname="system_clock" fname="SystemClock">
     <boolean name="b_external_clock_ref" default="0" />
     <integer name="i_clock_accuracy_integer" bitcount="6" default="0" />

@@ -467,30 +467,6 @@ int main_ca_()
   return i_err;
 }
 
-/* ISO 639 language */
-int main_iso639_()
-{
-  BOZO_VARS(iso639);
-  BOZO_START(ISO 639 language);
-
-  
-#if 0
-  /* check i_audio_type */
-  s_decoded.i_code_count = 0;
-  BOZO_init_integer(i_audio_type, 0);
-  BOZO_begin_integer(i_audio_type, 8)
-    BOZO_DOJOB(ISO639);
-    BOZO_check_integer(i_audio_type, 8)
-    BOZO_CLEAN();
-  BOZO_end_integer(i_audio_type, 8)
-#endif
-
-
-  BOZO_END(ISO 639 language);
-
-  return i_err;
-}
-
 /* system clock */
 int main_system_clock_()
 {
@@ -679,7 +655,6 @@ int main()
   i_err |= main_target_bg_grid_();
   i_err |= main_vwindow_();
   i_err |= main_ca_();
-  i_err |= main_iso639_();
   i_err |= main_system_clock_();
   i_err |= main_mx_buff_utilization_();
   i_err |= main_copyright_();
