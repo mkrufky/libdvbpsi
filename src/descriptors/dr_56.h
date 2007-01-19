@@ -94,7 +94,7 @@ typedef struct dvbpsi_teletext_dr_s
  * \return a pointer to a new "subtitling" descriptor structure
  * which contains the decoded data.
  */
-dvbpsi_teletext_dr_t* dvbpsi_DecodeTeletextDataDr(
+dvbpsi_teletext_dr_t* dvbpsi_DecodeTeletextDr(
                                         dvbpsi_descriptor_t * p_descriptor);
 
 

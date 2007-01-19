@@ -98,10 +98,9 @@ dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
                 ((uint8_t)(p_descriptor->p_data[5 * i + 3]) >> 3);
     
     p_decoded->p_pages[i].i_teletext_magazine_number = 
-              ((uint16_t)(p_descriptor->p_data[5 * i + 3]) & 0x07)
-            | p_descriptor->p_data[5 * i + 5];
+              ((uint16_t)(p_descriptor->p_data[5 * i + 3]) & 0x07);
     
-    p_decoded->p_pages[i].i_teletext_page_number = p_descriptor->p_data[4 * i + 4]; 
+    p_decoded->p_pages[i].i_teletext_page_number = p_descriptor->p_data[5 * i + 4];
   }
   
   p_descriptor->p_decoded = (void*)p_decoded;
