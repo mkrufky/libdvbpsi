@@ -1,5 +1,14 @@
 $Id$
 
+Changes between 0.1.5 and 0.1.6:
+--------------------------------
+
+  * fixed a parsing bug due to outdated spec in ISO 639 language descriptor
+  * fixed the use of uninitialized data when section_syntax_indicator=0
+  * fixed a parsing bug in the EBU teletext descriptor decoder
+  * fixed the declaration of dvbpsi_DecodeTeletextDr
+  * new example tool for checking an MPEG-2 TS file
+
 Changes between 0.1.4 and 0.1.5:
 --------------------------------
 
