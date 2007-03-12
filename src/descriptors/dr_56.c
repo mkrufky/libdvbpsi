@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_56.c
- * (c)2004 VideoLAN
+ * (c)2004-2007 VideoLAN
  * $Id: dr_56.c 93 2004-10-19 19:17:49Z massiot $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>

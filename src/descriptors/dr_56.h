@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_56.h
- * (c)2004 VideoLAN
+ * (c)2004-2007 VideoLAN
  * $Id: dr_56.h 93 2004-10-19 19:17:49Z massiot $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -28,6 +28,8 @@
  *
  * DVB EBU Teletext descriptor parsing, according to ETSI EN 300 468 
  * section 6.2.41.
+ * 
+ * NOTE: this descriptor is known by tag value 0x56 AND 0x46
  */
 
 #ifndef _DVBPSI_DR_56_H_
@@ -66,10 +68,10 @@ typedef struct dvbpsi_teletextpage_s
  *****************************************************************************/
 /*!
  * \struct dvbpsi_teletext_dr_s
- * \brief "subtitling" descriptor structure.
+ * \brief "teletext" descriptor structure.
  *
- * This structure is used to store a decoded "subtitling"
- * descriptor. (ETSI EN 300 468 section 6.2.30).
+ * This structure is used to store a decoded "teletext"
+ * descriptor. (ETSI EN 300 468 section 6.2.41).
  */
 /*!
  * \typedef struct dvbpsi_teletext_dr_s dvbpsi_teletext_dr_t
@@ -89,9 +91,9 @@ typedef struct dvbpsi_teletext_dr_s
 /*!
  * \fn dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDataDr(
                                         dvbpsi_descriptor_t * p_descriptor)
- * \brief "subtitling" descriptor decoder.
+ * \brief "teletext" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
- * \return a pointer to a new "subtitling" descriptor structure
+ * \return a pointer to a new "teletext" descriptor structure
  * which contains the decoded data.
  */
 dvbpsi_teletext_dr_t* dvbpsi_DecodeTeletextDr(
