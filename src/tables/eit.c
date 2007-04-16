@@ -405,6 +405,7 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
                      p_section->p_payload_start[4],
                      p_section->p_payload_start[5]);
       p_eit_decoder->i_last_section_number = p_section->i_last_number;
+      p_eit_decoder->i_first_received_section_number = p_section->i_number;
     }
 
     /* Fill the section array */
@@ -427,6 +428,41 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
         b_complete = 1;
     }
 
+    /* As there may be gaps in the section_number fields (see below), we
+     * have to wait until we have received a section_number twice - this
+     * is the only way to be sure that a complete table has been sent! */
+    if(!b_complete &&
+       p_section->i_number == p_eit_decoder->i_first_received_section_number)
+    {
+      for(i = 0; i <= p_eit_decoder->i_last_section_number; i++)
+      {
+        if(!p_eit_decoder->ap_sections[i])
+          break;
+
+        if(i == p_eit_decoder->i_last_section_number)
+        {
+          b_complete = 1;
+          break;
+        }
+
+        /* ETSI EN 300 468 V1.5.1 section 5.2.4 says that the EIT
+         * sections may be structured into a number of segments and
+         * that there may be a gap in the section_number between
+         * two segments (but not within a single segment); thus at
+         * the end of a segment (indicated by
+         * section_number == segment_last_section_number)
+         * we have to search for the beginning of the next segment) */
+        if(i == p_eit_decoder->ap_sections[i]->p_payload_start[4])
+        {
+          while(!p_eit_decoder->ap_sections[i + 1] &&
+                (i + 1 < p_eit_decoder->i_last_section_number))
+          {
+            i++;
+          }
+        }
+      }
+    }
+
     if(b_complete)
     {
       /* Save the current information */
@@ -435,9 +471,17 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
       /* Chain the sections */
       if(p_eit_decoder->i_last_section_number)
       {
-        for(i = 0; i <= p_eit_decoder->i_last_section_number - 1; i++)
-          p_eit_decoder->ap_sections[i]->p_next =
-                                        p_eit_decoder->ap_sections[i + 1];
+        dvbpsi_psi_section_t * p_prev_section;
+
+        p_prev_section = p_eit_decoder->ap_sections[0];
+        for(i = 1; i <= p_eit_decoder->i_last_section_number; i++)
+        {
+          if(p_eit_decoder->ap_sections[i] != NULL)
+          {
+            p_prev_section->p_next = p_eit_decoder->ap_sections[i];
+            p_prev_section = p_eit_decoder->ap_sections[i];
+          }
+        }
       }
       /* Decode the sections */
       dvbpsi_DecodeEITSections(p_eit_decoder->p_building_eit,

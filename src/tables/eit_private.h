@@ -44,6 +44,7 @@ typedef struct dvbpsi_eit_decoder_s
   int                           b_current_valid;
 
   uint8_t                       i_last_section_number;
+  uint8_t                       i_first_received_section_number;
   dvbpsi_psi_section_t *        ap_sections [256];
 
 } dvbpsi_eit_decoder_t;
