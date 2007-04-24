@@ -419,20 +419,22 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
 
     /* Check if we have all the sections */
     b_complete = 0;
-    for(i = 0; i <= p_eit_decoder->i_last_section_number; i++)
-    {
-      if(!p_eit_decoder->ap_sections[i])
-        break;
-
-      if(i == p_eit_decoder->i_last_section_number)
-        b_complete = 1;
-    }
 
     /* As there may be gaps in the section_number fields (see below), we
-     * have to wait until we have received a section_number twice - this
-     * is the only way to be sure that a complete table has been sent! */
-    if(!b_complete &&
-       p_section->i_number == p_eit_decoder->i_first_received_section_number)
+     * have to wait until we have received a section_number twice or
+     * until we have a received a section_number which is
+     * first_received_section_number - 1;
+     * if the first_received_section_number is 0, it's enough to wait
+     * until the last_section_number has been received;
+     * this is the only way to be sure that a complete table has been
+     * sent! */
+    if((p_eit_decoder->i_first_received_section_number > 0 &&
+        (p_section->i_number ==
+           p_eit_decoder->i_first_received_section_number ||
+         p_section->i_number ==
+           p_eit_decoder->i_first_received_section_number - 1)) ||
+       (p_eit_decoder->i_first_received_section_number == 0 &&
+        p_section->i_number == p_eit_decoder->i_last_section_number))
     {
       for(i = 0; i <= p_eit_decoder->i_last_section_number; i++)
       {
