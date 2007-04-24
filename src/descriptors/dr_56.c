@@ -51,7 +51,7 @@ dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
   dvbpsi_teletext_dr_t * p_decoded;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x56 || p_descriptor->i_tag != 0x46)
+  if(p_descriptor->i_tag != 0x56 && p_descriptor->i_tag != 0x46)
   {
     DVBPSI_ERROR_ARG("dr_46/56 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
