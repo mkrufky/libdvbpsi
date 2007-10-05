@@ -21,6 +21,10 @@ D: subtables decoder
 D: SDT decoder
 D: most DVB descriptors
 
+N: Johann Hanne
+E: jhml@gmx.net
+D: CAT support
+
 N: Andrew John Hughes
 E: gnu_andrew@member.fsf.org
 D: descriptor 0x52
