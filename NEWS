@@ -8,6 +8,8 @@ Changes between 0.1.5 and 0.1.6:
   * fixed a parsing bug in the EBU teletext descriptor decoder
   * fixed the declaration of dvbpsi_DecodeTeletextDr
   * new example tool for checking an MPEG-2 TS file
+  * fixed EIT discontinuities
+  * new cat support
 
 Changes between 0.1.4 and 0.1.5:
 --------------------------------
