@@ -1,8 +1,8 @@
 %define name		libdvbpsi
-%define version		0.1.5
+%define version		0.1.6
 %define release		1
 
-%define major		4
+%define major		5
 %define lib_name	%{name}%{major}
 
 %define redhat 0

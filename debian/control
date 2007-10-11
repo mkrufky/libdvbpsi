@@ -1,10 +1,10 @@
-Source: libdvbpsi4
+Source: libdvbpsi5
 Priority: optional
 Maintainer: Sam Hocevar (Debian packages) <sam+deb@zoy.org>
 Build-Depends: debhelper (>= 4.0)
 Standards-Version: 3.6.2.1
 
-Package: libdvbpsi4
+Package: libdvbpsi5
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}
@@ -12,17 +12,17 @@ Description: library for MPEG TS and DVB PSI tables decoding and generating
  libdvbpsi is a simple library designed for MPEG TS and DVB PSI tables
  decoding and generating.
  .
- This package contains the libdvbpsi4 runtime library.
+ This package contains the libdvbpsi5 runtime library.
 
-Package: libdvbpsi4-dev
+Package: libdvbpsi5-dev
 Section: libdevel
 Architecture: any
-Depends: libdvbpsi4 (= ${Source-Version})
-Conflicts: libdvbpsi0-dev, libdvbpsi1-dev, libdvbpsi2-dev, libdvbpsi3-dev
-Description: development files for libdvbpsi4
+Depends: libdvbpsi5 (= ${Source-Version})
+Conflicts: libdvbpsi0-dev, libdvbpsi1-dev, libdvbpsi2-dev, libdvbpsi3-dev, libdvbpsi4-dev
+Description: development files for libdvbpsi5
  libdvbpsi is a simple library designed for MPEG TS and DVB PSI tables
  decoding and generating.
  .
  This package contains the header files and static library needed to
- compile applications that use libdvbpsi4.
+ compile applications that use libdvbpsi5.
 

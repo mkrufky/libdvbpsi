@@ -11,7 +11,7 @@ libdvbpsi_la_SOURCES = dvbpsi.c dvbpsi_private.h \
                        $(tables_src) \
                        $(descriptors_src)
 
-libdvbpsi_la_LDFLAGS = -version-info 4:0:0
+libdvbpsi_la_LDFLAGS = -version-info 5:0:0
 
 pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      tables/pat.h tables/pmt.h tables/sdt.h tables/eit.h \
