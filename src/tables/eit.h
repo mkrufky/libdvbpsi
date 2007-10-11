@@ -239,6 +239,26 @@ dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
     uint16_t i_event_id, uint64_t i_start_time, uint32_t i_duration,
     uint8_t i_running_status, int b_free_ca);
 
+/*****************************************************************************
+ * dvbpsi_EITEventAddDescriptor
+ *****************************************************************************/
+/*!
+ * \fn dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(
+                                               dvbpsi_eit_event_t* p_event,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t* p_data)
+ * \brief Add a descriptor to the EIT event.
+ * \param p_event pointer to the EIT event structure
+ * \param i_tag descriptor's tag
+ * \param i_length descriptor's length
+ * \param p_data descriptor's data
+ * \return a pointer to the added descriptor.
+ */
+dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(
+                                               dvbpsi_eit_event_t* p_event,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t* p_data);
+
 #ifdef __cplusplus
 };
 #endif
