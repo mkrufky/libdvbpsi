@@ -2,7 +2,7 @@
  * gen_pmt.c: PMT generator
  *----------------------------------------------------------------------------
  * (c)2001-2002 VideoLAN
- * $Id: gen_pmt.c,v 1.3 2002/10/07 14:15:14 sam Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -104,7 +104,7 @@ void writePSI(uint8_t* p_packet, dvbpsi_psi_section_t* p_section)
 int main(int i_argc, char* pa_argv[])
 {
   uint8_t packet[188];
-  char data[] = "abcdefghijklmnopqrstuvwxyz";
+  uint8_t data[] = "abcdefghijklmnopqrstuvwxyz";
   dvbpsi_pmt_t pmt;
   dvbpsi_pmt_es_t* p_es;
   dvbpsi_psi_section_t* p_section1, * p_section2;
