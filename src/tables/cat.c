@@ -367,7 +367,7 @@ void dvbpsi_GatherCATSections(dvbpsi_decoder_t* p_decoder,
 void dvbpsi_DecodeCATSections(dvbpsi_cat_t* p_cat,
                               dvbpsi_psi_section_t* p_section)
 {
-  uint8_t* p_byte, * p_end;
+  uint8_t* p_byte;
 
   while(p_section)
   {
