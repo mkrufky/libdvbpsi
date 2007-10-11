@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dr_42.h
  * (c)2001-2002 VideoLAN
- * $Id: dr_42.h,v 1.2 2002/12/12 10:19:32 jobi Exp $
+ * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -65,7 +65,7 @@ typedef struct dvbpsi_stuffing_dr_s
 
 
 /*****************************************************************************
- * dvbpsi_DecodeStuffingDataDr
+ * dvbpsi_DecodeStuffingDr
  *****************************************************************************/
 /*!
  * \fn dvbpsi_stuffing_dr_t * dvbpsi_DecodeStuffingDr(
@@ -80,7 +80,7 @@ dvbpsi_stuffing_dr_t* dvbpsi_DecodeStuffingDr(
 
 
 /*****************************************************************************
- * dvbpsi_GenStuffingDataDr
+ * dvbpsi_GenStuffingDr
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenStuffingDr(
@@ -92,7 +92,7 @@ dvbpsi_stuffing_dr_t* dvbpsi_DecodeStuffingDr(
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
-dvbpsi_descriptor_t * dvbpsi_GenStuffingDataDr(
+dvbpsi_descriptor_t * dvbpsi_GenStuffingDr(
                                         dvbpsi_stuffing_dr_t * p_decoded,
                                         int b_duplicate);
 
