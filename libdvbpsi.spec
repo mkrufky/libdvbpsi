@@ -90,6 +90,12 @@ rm -rf %buildroot
 %{_includedir}/*
 
 %changelog
+* Thu Oct, 22 2007 Jean-Paul Saman <jpsaman@videolan.org>
+- New cat support
+- Fix EIT discontinuities
+- new example tool for checking an MPEG-2 TS file
+- 0.1.6 release
+
 * Thu Sep 22 2005 Jean-Paul Saman <jpsaman@videolan.org>
 - Remove conflicting redefine of release
 - Fix typo's
