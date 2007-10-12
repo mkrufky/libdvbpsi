@@ -10,6 +10,7 @@ Changes between 0.1.5 and 0.1.6:
   * new example tool for checking an MPEG-2 TS file
   * fixed EIT discontinuities
   * new cat support
+  * new PDC support descriptor 0x69
 
 Changes between 0.1.4 and 0.1.5:
 --------------------------------

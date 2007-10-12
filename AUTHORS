@@ -46,3 +46,7 @@ D: initial specs
 D: EIT decoder
 D: parental rating descriptor (0x55)
 
+N: Jiri Pinkava
+E: jiri.pinkava@vscht.cz
+D: Program Delivery Control (0x69)
+
