@@ -127,10 +127,10 @@ typedef struct ts_pmt_s
 typedef struct
 {
     ts_pat_t    pat;
-    
+
     int         i_pmt;
     ts_pmt_t    pmt;
-    
+
     ts_pid_t    pid[8192];
 } ts_stream_t;
 
@@ -146,14 +146,14 @@ int ReadPacket( int i_fd, uint8_t* p_dst )
 {
     int i = 187;
     int i_rc = 1;
-    
+
     p_dst[0] = 0;
-    
+
     while((p_dst[0] != 0x47) && (i_rc > 0))
     {
         i_rc = read(i_fd, p_dst, 1);
     }
-    
+
     while((i != 0) && (i_rc > 0))
     {
         i_rc = read(i_fd, p_dst + 188 - i, i);
@@ -167,7 +167,7 @@ int ReadPacket( int i_fd, uint8_t* p_dst )
 int ReadPacketFromSocket( int i_socket, uint8_t* p_dst, size_t i_size)
 {
     int i_rc = -1;
-    
+
     memset( p_dst, 0, i_size );
     i_rc = read( i_socket, p_dst, i_size );
     if( i_rc < 0 ) printf( "READ INTERRUPTED BY SIGNAL\n" );
@@ -183,7 +183,7 @@ void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
 {
     dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
     ts_stream_t* p_stream = (ts_stream_t*) p_data;
-    
+
     p_stream->pat.i_pat_version = p_pat->i_version;
     p_stream->pat.i_ts_id = p_pat->i_ts_id;
 
@@ -193,13 +193,13 @@ void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
     printf(  "  version_number      : %d\n", p_pat->i_version);
     printf(  "    | program_number @ [NIT|PMT]_PID\n");
     while(p_program)
-    {            
+    {
             p_stream->i_pmt++;
             p_stream->pmt.i_number = p_program->i_number;
             p_stream->pmt.pid_pmt = &p_stream->pid[p_program->i_pid];
             p_stream->pmt.pid_pmt->i_pid = p_program->i_pid;
             p_stream->pmt.handle = dvbpsi_AttachPMT( p_program->i_number, DumpPMT, p_stream );
-            
+
             printf("    | %14d @ 0x%x (%d)\n",
                 p_program->i_number, p_program->i_pid, p_program->i_pid);
             p_program = p_program->p_next;
@@ -346,7 +346,7 @@ void DumpPMT(void* p_data, dvbpsi_pmt_t* p_pmt)
     p_stream->pmt.i_pmt_version = p_pmt->i_version;
     p_stream->pmt.pid_pcr = &p_stream->pid[p_pmt->i_pcr_pid];
     p_stream->pid[p_pmt->i_pcr_pid].b_pcr = VLC_TRUE;
-    
+
     printf( "\n" );
     printf( "New active PMT\n" );
     printf( "  program_number : %d\n", p_pmt->i_program_number );
@@ -376,7 +376,7 @@ void usage( char *name )
     printf( "Usage: %s [--file <filename>|--help]\n", name );
     printf( "       %s [-f <filename>|-h]\n", name );
 #endif
-    printf( "\n" );   
+    printf( "\n" );
     printf( "       %s --help\n", name );
     printf( "       %s --file <filename>\n", name );
 #ifdef HAVE_SYS_SOCKET_H
@@ -411,11 +411,11 @@ int main(int i_argc, char* pa_argv[])
         { "port",       0, NULL, 'p' },
         { "udp",        0, NULL, 'u' },
 #endif
-	{ "verbose",    0, NULL, 'v' },
+        { "verbose",    0, NULL, 'v' },
         { NULL,         0, NULL, 0 }
     };
     int next_option = 0;
-    
+
     int i_fd = -1;
     int i_mtu = 1316; /* (7 * 188) = 1316 < 1500 network MTU */
 #ifdef HAVE_SYS_SOCKET_H
@@ -429,7 +429,7 @@ int main(int i_argc, char* pa_argv[])
     int      i_old_cc = -1; 
     uint32_t i_bytes = 0; /* bytes transmitted between PCR's */
     char *filename = NULL;
-    
+
     uint8_t *p_data = NULL;
     ts_stream_t *p_stream = NULL;
     int b_ok = 0;
@@ -451,7 +451,7 @@ int main(int i_argc, char* pa_argv[])
             case 'm':
                 i_mtu = atoi( optarg );
                 if( i_mtu < 0 ) i_mtu = 1316;
-		else i_mtu = (i_mtu / 188) * 188;
+            else i_mtu = (i_mtu / 188) * 188;
                 break;
             case 'p':
                 i_port = atoi( optarg );
@@ -474,7 +474,7 @@ int main(int i_argc, char* pa_argv[])
 #ifdef HAVE_SYS_SOCKET_H
     if( b_verbose ) 
     {
-    	printf( "set mtu to %d\n", i_mtu );
+        printf( "set mtu to %d\n", i_mtu );
     }
 #endif
     /* initialize */
@@ -498,7 +498,7 @@ int main(int i_argc, char* pa_argv[])
     if( !p_stream )
         goto out_of_memory;
     memset( p_stream, 0, sizeof(ts_stream_t) );
-    
+
     /* Read first packet */
     if( filename )
     {
@@ -514,9 +514,9 @@ int main(int i_argc, char* pa_argv[])
     if( b_verbose )
         printf( "seqno, network (ms), PCR value (ms), PCR prev (ms), delta (ms), bytes, bitrate (bytes/delta)\n" );
 #endif
-        
-    /* Enter infinite loop */    
-    p_stream->pat.handle = dvbpsi_AttachPAT( DumpPAT, p_stream );    
+
+    /* Enter infinite loop */
+    p_stream->pat.handle = dvbpsi_AttachPAT( DumpPAT, p_stream );
     while( b_ok )
     {
         int     i = 0;
@@ -533,11 +533,10 @@ int main(int i_argc, char* pa_argv[])
                 dvbpsi_PushPacket(p_stream->pat.handle, p_tmp);
             else if( p_stream->pmt.pid_pmt && i_pid == p_stream->pmt.pid_pmt->i_pid )
                 dvbpsi_PushPacket(p_stream->pmt.handle, p_tmp);
-                
+
             /* Remember PID */
             if( !p_stream->pid[i_pid].b_seen )
             {
-       
                 p_stream->pid[i_pid].b_seen = VLC_TRUE;
                 i_old_cc = i_cc;
                 p_stream->pid[i_pid].i_cc = i_cc;
@@ -546,10 +545,10 @@ int main(int i_argc, char* pa_argv[])
             {
                 /* Check continuity counter */
                 int i_diff = 0;
-                
+
                 i_diff = i_cc - (p_stream->pid[i_pid].i_cc+1)%16;
                 b_discontinuity_seen = ( i_diff != 0 );
-                
+
                 /* Update CC */
                 i_old_cc = p_stream->pid[i_pid].i_cc;
                 p_stream->pid[i_pid].i_cc = i_cc;
@@ -587,7 +586,7 @@ int main(int i_argc, char* pa_argv[])
                     if( b_verbose )
                     {
                         time_t time_current;
-			time_t tv_delta;
+                        time_t tv_delta;
                         struct timeval tv;
 
                         gettimeofday( &tv, NULL );
@@ -596,20 +595,20 @@ int main(int i_argc, char* pa_argv[])
                             printf( "arrival -, " );
                         else 
                         {
-			    tv_delta = time_current - time_prev;
+                            tv_delta = (time_t)(time_current - time_prev);
                             printf( "arrival %.2lld, ", (long long int)tv_delta );
                         }
-			time_prev = time_current;
+                        time_prev = time_current;
                     }
 #endif
                     if( i_delta <= 0 )
                         printf( "value %lld, previous %lld, delta %lld, bytes %u, ",
-				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
-				(long long int)i_delta, i_bytes );
-		    else if( b_verbose )
+                                (long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
+                                (long long int)i_delta, i_bytes );
+                    else if( b_verbose )
                         printf( "value %lld, previous %lld, delta %lld, bytes %u, ",
-				(long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
-				(long long int)i_delta, i_bytes );
+                                (long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
+                                (long long int)i_delta, i_bytes );
                     if( (i_delta > 0) )
                         printf( "%lld Kbps", ((i_bytes*8)/i_delta) );
                     else 
@@ -627,7 +626,7 @@ int main(int i_argc, char* pa_argv[])
             {
                 vlc_bool_t b_discontinuity_indicator = (p_tmp[5]&0x80);
                 vlc_bool_t b_pcr = ( p_tmp[5] & 0x10 );  /* pcr flag */
-                
+
                 if( b_discontinuity_indicator )
                 {
                     if( b_pcr )
@@ -640,7 +639,7 @@ int main(int i_argc, char* pa_argv[])
                         i_delta = (long long int)p_stream->pid[i_pid].i_pcr - (long long int)i_prev_pcr;
                         printf( "New PCR pid %d, value %lld, previous %lld, delta %lld, bytes %u, ",
                                 i_pid, 
-				(long long int)p_stream->pid[i_pid].i_pcr, 
+                                (long long int)p_stream->pid[i_pid].i_pcr,
                                 (long long int)i_prev_pcr,
                                 i_delta, 
                                 i_bytes );
@@ -702,11 +701,11 @@ int main(int i_argc, char* pa_argv[])
 #ifdef HAVE_SYS_SOCKET_H
     if( ipaddress ) free( ipaddress );
 #endif
-    
+
     /* free other stuff first ;-)*/
     if( p_stream )  free( p_stream );
     return EXIT_SUCCESS;
-    
+
 out_of_memory:
     fprintf( stderr, "Out of memory\n" );
 
@@ -716,7 +715,7 @@ error:
 #ifdef HAVE_SYS_SOCKET_H
     if( ipaddress ) free( ipaddress );
 #endif
-    
+
     /* free other stuff first ;-)*/
     if( p_stream )  free( p_stream );
     return EXIT_FAILURE;
