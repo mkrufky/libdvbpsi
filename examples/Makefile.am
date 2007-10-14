@@ -13,7 +13,7 @@ decode_sdt_LDFLAGS = -L../src -ldvbpsi
 
 decode_mpeg_SOURCES = decode_mpeg.c
 if HAVE_SYS_SOCKET_H
-decode_mpeg_SOURCES += connect.c
+decode_mpeg_SOURCES += connect.c connect.h
 endif
 decode_mpeg_LDFLAGS = -L../src -ldvbpsi -lm
 
