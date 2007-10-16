@@ -55,6 +55,7 @@
 #include "dr_55.h"
 #include "dr_56.h"
 #include "dr_59.h"
+#include "dr_69.h"
 
 #else
 #error "Multiple inclusions of dr.h"
