@@ -31,6 +31,7 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      descriptors/dr_0e.h \
                      descriptors/dr_0f.h \
                      descriptors/dr_42.h \
+                     descriptors/dr_45.h \
                      descriptors/dr_47.h \
                      descriptors/dr_48.h \
                      descriptors/dr_4d.h \
@@ -57,6 +58,7 @@ descriptors_src = descriptors/dr_02.c \
                   descriptors/dr_0e.c \
                   descriptors/dr_0f.c \
                   descriptors/dr_42.c \
+                  descriptors/dr_45.c \
                   descriptors/dr_47.c \
                   descriptors/dr_48.c \
                   descriptors/dr_4d.c \
@@ -69,7 +71,7 @@ descriptors_src = descriptors/dr_02.c \
 
 tables_src = tables/pat.c tables/pat_private.h \
              tables/pmt.c tables/pmt_private.h \
-	     tables/sdt.c tables/sdt_private.h \
-	     tables/eit.c tables/eit_private.h \
-	     tables/cat.c tables/cat_private.h
+             tables/sdt.c tables/sdt_private.h \
+             tables/eit.c tables/eit_private.h \
+             tables/cat.c tables/cat_private.h
 
