@@ -26,9 +26,9 @@
  * \author Derk-Jan Hartman <hartman at videolan dot org>
  * \brief EBU Teletext descriptor parsing.
  *
- * DVB EBU Teletext descriptor parsing, according to ETSI EN 300 468 
- * section 6.2.41.
- * 
+ * DVB EBU Teletext descriptor parsing, according to ETSI EN 300 468
+ * version 1.7.1 section 6.2.42 and 6.2.47.
+ *
  * NOTE: this descriptor is known by tag value 0x56 AND 0x46
  */
 
@@ -71,7 +71,7 @@ typedef struct dvbpsi_teletextpage_s
  * \brief "teletext" descriptor structure.
  *
  * This structure is used to store a decoded "teletext"
- * descriptor. (ETSI EN 300 468 section 6.2.41).
+ * descriptor. (ETSI EN 300 468 version 1.7.1 section 6.2.42 and 6.2.47).
  */
 /*!
  * \typedef struct dvbpsi_teletext_dr_s dvbpsi_teletext_dr_t
@@ -125,4 +125,3 @@ dvbpsi_descriptor_t * dvbpsi_GenTeletextDr(
 #else
 #error "Multiple inclusions of dr_56.h"
 #endif
-
