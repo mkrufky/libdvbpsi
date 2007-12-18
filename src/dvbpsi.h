@@ -33,8 +33,8 @@
 #ifndef _DVBPSI_DVBPSI_H_
 #define _DVBPSI_DVBPSI_H_
 
-#define DVBPSI_VERSION      0.1.6
-#define DVBPSI_VERSION_INT  ((0<<16)+(1<<8)+6)
+#define DVBPSI_VERSION      0.1.7
+#define DVBPSI_VERSION_INT  ((0<<16)+(1<<8)+7)
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,4 +136,3 @@ typedef struct dvbpsi_decoder_s
 #else
 #error "Multiple inclusions of dvbpsi.h"
 #endif
-

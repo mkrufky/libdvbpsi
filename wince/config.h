@@ -57,7 +57,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.1.6"
+#define VERSION "0.1.7"
 
 /* C99 types */
 typedef unsigned char       uint8_t;

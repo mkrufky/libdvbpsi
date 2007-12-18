@@ -1,5 +1,5 @@
 %define name		libdvbpsi
-%define version		0.1.6
+%define version		0.1.7
 %define release		1
 
 %define major		5
@@ -90,6 +90,10 @@ rm -rf %buildroot
 %{_includedir}/*
 
 %changelog
+* Tue Dec, 18 2007 Jean-Paul Saman <jpsaman@videolan.org>
+- New VBI data descriptor support
+- 0.1.7 release
+
 * Thu Oct, 22 2007 Jean-Paul Saman <jpsaman@videolan.org>
 - New cat support
 - Fix EIT discontinuities
