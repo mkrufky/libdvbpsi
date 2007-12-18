@@ -1,5 +1,11 @@
 $Id$
 
+Changes between 0.1.6 and 0.1.7:
+--------------------------------
+
+  * new VBI data descriptor support descriptor 0x45
+
+
 Changes between 0.1.5 and 0.1.6:
 --------------------------------
 
