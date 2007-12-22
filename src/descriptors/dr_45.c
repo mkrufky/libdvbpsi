@@ -58,7 +58,7 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
     return p_descriptor->p_decoded;
-
+printf( "DECODING VBI_DATA DESCRIPTOR \n" );
   /* Decode data and check the length */
   if(p_descriptor->i_length < 3)
   {
@@ -67,14 +67,14 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
     return NULL;
   }
 
-  if(p_descriptor->i_length % 3)
+  if(p_descriptor->i_length % 2)
   {
     DVBPSI_ERROR_ARG("dr_45 decoder", "length not multiple of 3(%d)",
                      p_descriptor->i_length);
     return NULL;
   }
 
-  i_services_number = p_descriptor->i_length / 3;
+  i_services_number = p_descriptor->i_length / 2;
 
   /* Allocate memory */
   p_decoded =
@@ -101,7 +101,7 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
       if( (i_data_service_id >= 0x01) && (i_data_service_id <= 0x07) )
       {
         p_decoded->p_services[i].p_lines[n].i_parity =
-               ((uint8_t)(p_descriptor->p_data[3 * i + 3 + n])&0x20);
+               ((uint8_t)((p_descriptor->p_data[3 * i + 3 + n])&0x20)>>5);
         p_decoded->p_services[i].p_lines[n].i_line_offset =
                ((uint8_t)(p_descriptor->p_data[3 * i + 3 + n])&0x1f);
       }
@@ -143,7 +143,7 @@ dvbpsi_descriptor_t * dvbpsi_GenVBIDataDr(
              (p_decoded->p_services[i].i_data_service_id <= 0x07) )
          {
             p_descriptor->p_data[5 * i + 4 + n] = (uint8_t)
-                ( ((uint8_t) p_decoded->p_services[i].p_lines[n].i_parity)&0x20) |
+                ( (((uint8_t) p_decoded->p_services[i].p_lines[n].i_parity)&0x20)<<5) |
                 ( ((uint8_t) p_decoded->p_services[i].p_lines[n].i_line_offset)&0x1f);
          }
          else p_descriptor->p_data[5 * i + 3 + n] = 0xFF; /* Stuffing byte */
