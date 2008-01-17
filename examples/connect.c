@@ -38,7 +38,9 @@
 #   include <netinet/if_ether.h>
 #endif
 #include <netdb.h>
-#include <netinet/ip.h>
+#ifndef __FreeBSD__
+#    include <netinet/ip.h>
+#endif
 #include <netinet/udp.h>
 #include <arpa/inet.h>
 
