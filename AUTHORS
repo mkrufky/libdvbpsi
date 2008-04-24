@@ -24,6 +24,8 @@ D: most DVB descriptors
 N: Johann Hanne
 E: jhml@gmx.net
 D: CAT support
+D: NIT decoder
+D: TOT/TDT decoder
 
 N: Andrew John Hughes
 E: gnu_andrew@member.fsf.org
