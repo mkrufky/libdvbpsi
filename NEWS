@@ -6,7 +6,9 @@ Changes between 0.1.6 and 0.1.7:
   * new VBI data descriptor support (0x45)
   * NIT support
   * TOT/TDT support
-
+  * new DVB Satellite Delivery systems descriptor support (0x43)
+  * new DVB Local time offset descriptor support (0x58)
+  * new Terrestrial Delivery systems descriptor support (0x5a)
 
 Changes between 0.1.5 and 0.1.6:
 --------------------------------

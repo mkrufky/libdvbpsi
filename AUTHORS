@@ -26,6 +26,9 @@ E: jhml@gmx.net
 D: CAT support
 D: NIT decoder
 D: TOT/TDT decoder
+D: DVB satellite delivery systems descriptor 0x43
+D: DVB local time offset descriptor 0x58
+D: Terrestrial delivery system descriptor 0x5a
 
 N: Andrew John Hughes
 E: gnu_andrew@member.fsf.org
