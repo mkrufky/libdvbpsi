@@ -58,7 +58,7 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
     return p_descriptor->p_decoded;
-printf( "DECODING VBI_DATA DESCRIPTOR \n" );
+
   /* Decode data and check the length */
   if(p_descriptor->i_length < 3)
   {
