@@ -610,7 +610,7 @@ int main(int i_argc, char* pa_argv[])
                                 (long long int)p_stream->pid[i_pid].i_pcr, (long long int)i_prev_pcr,
                                 (long long int)i_delta, i_bytes );
                     if( (i_delta > 0) )
-                        printf( "%lld Kbps", ((i_bytes*8)/i_delta) );
+                        printf( "%lld Kbps", (long long int)(i_bytes*8)/i_delta );
                     else 
                         printf( "-" );
                     if( (i_delta <= 0) || b_verbose )
@@ -620,7 +620,7 @@ int main(int i_argc, char* pa_argv[])
                 }
             }
 
-            /* Handle discontinuities if they occured,
+            /* Handle discontinuities if they occurred,
              * according to ISO/IEC 13818-1: DIS pages 20-22 */
             if( b_adaptation )
             {
@@ -638,13 +638,13 @@ int main(int i_argc, char* pa_argv[])
 
                         i_delta = (long long int)p_stream->pid[i_pid].i_pcr - (long long int)i_prev_pcr;
                         printf( "New PCR pid %d, value %lld, previous %lld, delta %lld, bytes %u, ",
-                                i_pid, 
+                                i_pid,
                                 (long long int)p_stream->pid[i_pid].i_pcr,
                                 (long long int)i_prev_pcr,
-                                i_delta, 
+                                (long long int)i_delta,
                                 i_bytes );
                         if( i_delta > 0 )
-                            printf( "%lld", (i_bytes*8)/(i_delta/1000) );
+                            printf( "%lld", (long long int)(i_bytes*8)/(i_delta/1000) );
                         printf( "\n" );
 
 #ifdef HAVE_GETTIMEOFDAY

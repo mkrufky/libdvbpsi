@@ -78,7 +78,8 @@
   if(!i_err && (s_decoded.name != p_new_decoded->name))                 \
   {                                                                     \
     fprintf(stderr, "\nError: integer %s %llu -> %llu\n", #name,        \
-            (uint64_t)s_decoded.name, (uint64_t)p_new_decoded->name);   \
+            (long long unsigned int)s_decoded.name,                     \
+            (long long unsigned int)p_new_decoded->name);               \
     i_err = 1;                                                          \
   }
 
