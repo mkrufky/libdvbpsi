@@ -53,6 +53,13 @@ void dvbpsi_GatherTOTSections(dvbpsi_decoder_t* p_decoder,
 
 
 /*****************************************************************************
+ * dvbpsi_ValidTOTSection
+ *****************************************************************************
+ * Check the CRC_32 if the section has b_syntax_indicator set.
+ *****************************************************************************/
+int dvbpsi_ValidTOTSection(dvbpsi_psi_section_t* p_section);
+
+/*****************************************************************************
  * dvbpsi_DecodeTOTSections
  *****************************************************************************
  * TDT/TOT decoder.

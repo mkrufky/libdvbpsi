@@ -334,7 +334,7 @@ void dvbpsi_GatherCATSections(dvbpsi_decoder_t* p_decoder,
       /* Chain the sections */
       if(p_cat_decoder->i_last_section_number)
       {
-        for(i = 0; i <= p_cat_decoder->i_last_section_number - 1; i++)
+        for(i = 0; (int)i <= p_cat_decoder->i_last_section_number - 1; i++)
           p_cat_decoder->ap_sections[i]->p_next =
                                         p_cat_decoder->ap_sections[i + 1];
       }

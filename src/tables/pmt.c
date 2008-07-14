@@ -427,7 +427,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
       /* Chain the sections */
       if(p_pmt_decoder->i_last_section_number)
       {
-        for(i = 0; i <= p_pmt_decoder->i_last_section_number - 1; i++)
+        for(i = 0; (int)i <= p_pmt_decoder->i_last_section_number - 1; i++)
           p_pmt_decoder->ap_sections[i]->p_next =
                                         p_pmt_decoder->ap_sections[i + 1];
       }
@@ -482,11 +482,11 @@ void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
     {
       uint8_t i_type = p_byte[0];
       uint16_t i_pid = ((uint16_t)(p_byte[1] & 0x1f) << 8) | p_byte[2];
-      uint16_t i_length = ((uint16_t)(p_byte[3] & 0x0f) << 8) | p_byte[4];
+      uint16_t i_es_length = ((uint16_t)(p_byte[3] & 0x0f) << 8) | p_byte[4];
       dvbpsi_pmt_es_t* p_es = dvbpsi_PMTAddES(p_pmt, i_type, i_pid);
       /* - ES descriptors */
       p_byte += 5;
-      p_end = p_byte + i_length;
+      p_end = p_byte + i_es_length;
       if( p_end > p_section->p_payload_end )
       {
             p_end = p_section->p_payload_end;

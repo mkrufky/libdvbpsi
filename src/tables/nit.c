@@ -462,7 +462,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
       /* Chain the sections */
       if(p_nit_decoder->i_last_section_number)
       {
-        for(i = 0; i <= p_nit_decoder->i_last_section_number - 1; i++)
+        for(i = 0; (int)i <= p_nit_decoder->i_last_section_number - 1; i++)
           p_nit_decoder->ap_sections[i]->p_next =
                                         p_nit_decoder->ap_sections[i + 1];
       }
@@ -526,11 +526,11 @@ void dvbpsi_DecodeNITSections(dvbpsi_nit_t* p_nit,
     {
       uint16_t i_ts_id = ((uint16_t)p_byte[0] << 8) | p_byte[1];
       uint16_t i_orig_network_id = ((uint16_t)p_byte[2] << 8) | p_byte[3];
-      uint16_t i_length = ((uint16_t)(p_byte[4] & 0x0f) << 8) | p_byte[5];
+      uint16_t i_ts_length = ((uint16_t)(p_byte[4] & 0x0f) << 8) | p_byte[5];
       dvbpsi_nit_ts_t* p_ts = dvbpsi_NITAddTS(p_nit, i_ts_id, i_orig_network_id);
       /* - TS descriptors */
       p_byte += 6;
-      p_end2 = p_byte + i_length;
+      p_end2 = p_byte + i_ts_length;
       if( p_end2 > p_section->p_payload_end )
       {
             p_end2 = p_section->p_payload_end;

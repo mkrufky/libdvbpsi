@@ -352,7 +352,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
       /* Chain the sections */
       if(p_pat_decoder->i_last_section_number)
       {
-        for(i = 0; i <= p_pat_decoder->i_last_section_number - 1; i++)
+        for(i = 0; (int)i <= p_pat_decoder->i_last_section_number - 1; i++)
           p_pat_decoder->ap_sections[i]->p_next =
                                         p_pat_decoder->ap_sections[i + 1];
       }

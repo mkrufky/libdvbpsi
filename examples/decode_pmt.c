@@ -62,7 +62,7 @@
 /*****************************************************************************
  * ReadPacket
  *****************************************************************************/
-int ReadPacket(int i_fd, uint8_t* p_dst)
+static int ReadPacket(int i_fd, uint8_t* p_dst)
 {
   int i = 187;
   int i_rc = 1;
@@ -87,7 +87,7 @@ int ReadPacket(int i_fd, uint8_t* p_dst)
 /*****************************************************************************
  * GetTypeName
  *****************************************************************************/
-char* GetTypeName(uint8_t type)
+static char* GetTypeName(uint8_t type)
 {
   switch (type)
     {
@@ -132,7 +132,7 @@ char* GetTypeName(uint8_t type)
 /*****************************************************************************
  * DumpMaxBitrateDescriptor
  *****************************************************************************/
-void DumpMaxBitrateDescriptor(dvbpsi_max_bitrate_dr_t* bitrate_descriptor)
+static void DumpMaxBitrateDescriptor(dvbpsi_max_bitrate_dr_t* bitrate_descriptor)
 {
   printf("Bitrate: %d\n", bitrate_descriptor->i_max_bitrate);
 }
@@ -140,7 +140,7 @@ void DumpMaxBitrateDescriptor(dvbpsi_max_bitrate_dr_t* bitrate_descriptor)
 /*****************************************************************************
  * DumpSystemClockDescriptor
  *****************************************************************************/
-void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
+static void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
 {
   printf("External clock: %s, Accuracy: %E\n",
 	 p_clock_descriptor->b_external_clock_ref ? "Yes" : "No",
@@ -151,7 +151,7 @@ void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
 /*****************************************************************************
  * DumpStreamIdentifierDescriptor
  *****************************************************************************/
-void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_descriptor)
+static void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_descriptor)
 {
   printf("Component tag: %d\n",
 	 p_si_descriptor->i_component_tag);
@@ -160,7 +160,7 @@ void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_descript
 /*****************************************************************************
  * DumpSubtitleDescriptor
  *****************************************************************************/
-void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor)
+static void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor)
 {
   int a;
 
@@ -180,7 +180,7 @@ void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor)
 /*****************************************************************************
  * DumpDescriptors
  *****************************************************************************/
-void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
+static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
 {
   int i;
 
@@ -215,7 +215,7 @@ void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
 /*****************************************************************************
  * DumpPMT
  *****************************************************************************/
-void DumpPMT(void* p_zero, dvbpsi_pmt_t* p_pmt)
+static void DumpPMT(void* p_zero, dvbpsi_pmt_t* p_pmt)
 {
   dvbpsi_pmt_es_t* p_es = p_pmt->p_first_es;
   printf(  "\n");

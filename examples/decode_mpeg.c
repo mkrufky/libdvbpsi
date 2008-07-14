@@ -137,12 +137,12 @@ typedef struct
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-void DumpPMT(void* p_data, dvbpsi_pmt_t* p_pmt);
+static void DumpPMT(void* p_data, dvbpsi_pmt_t* p_pmt);
 
 /*****************************************************************************
  * ReadPacket
  *****************************************************************************/
-int ReadPacket( int i_fd, uint8_t* p_dst )
+static int ReadPacket( int i_fd, uint8_t* p_dst )
 {
     int i = 187;
     int i_rc = 1;
@@ -164,7 +164,7 @@ int ReadPacket( int i_fd, uint8_t* p_dst )
 }
 
 #ifdef HAVE_SYS_SOCKET_H
-int ReadPacketFromSocket( int i_socket, uint8_t* p_dst, size_t i_size)
+static int ReadPacketFromSocket( int i_socket, uint8_t* p_dst, size_t i_size)
 {
     int i_rc = -1;
 
@@ -172,14 +172,14 @@ int ReadPacketFromSocket( int i_socket, uint8_t* p_dst, size_t i_size)
     i_rc = read( i_socket, p_dst, i_size );
     if( i_rc < 0 ) printf( "READ INTERRUPTED BY SIGNAL\n" );
     if( i_rc == 0 ) printf( "READ RETURNS 0\n" );
-    return (i_rc <= i_size ) ? 1 : 0;
+    return (i_rc <= (int)i_size ) ? 1 : 0;
 }
 #endif
 
 /*****************************************************************************
  * DumpPAT
  *****************************************************************************/
-void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
+static void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
 {
     dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
     ts_stream_t* p_stream = (ts_stream_t*) p_data;
@@ -211,7 +211,7 @@ void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
 /*****************************************************************************
  * GetTypeName
  *****************************************************************************/
-char* GetTypeName(uint8_t type)
+static char const* GetTypeName(uint8_t type)
 {
   switch (type)
     {
@@ -256,7 +256,7 @@ char* GetTypeName(uint8_t type)
 /*****************************************************************************
  * DumpMaxBitrateDescriptor
  *****************************************************************************/
-void DumpMaxBitrateDescriptor(dvbpsi_max_bitrate_dr_t* bitrate_descriptor)
+static void DumpMaxBitrateDescriptor(dvbpsi_max_bitrate_dr_t* bitrate_descriptor)
 {
   printf("Bitrate: %d\n", bitrate_descriptor->i_max_bitrate);
 }
@@ -264,7 +264,7 @@ void DumpMaxBitrateDescriptor(dvbpsi_max_bitrate_dr_t* bitrate_descriptor)
 /*****************************************************************************
  * DumpSystemClockDescriptor
  *****************************************************************************/
-void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
+static void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
 {
   printf("External clock: %s, Accuracy: %E\n",
      p_clock_descriptor->b_external_clock_ref ? "Yes" : "No",
@@ -275,7 +275,7 @@ void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
 /*****************************************************************************
  * DumpStreamIdentifierDescriptor
  *****************************************************************************/
-void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_descriptor)
+static void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_descriptor)
 {
   printf("Component tag: %d\n",
      p_si_descriptor->i_component_tag);
@@ -284,7 +284,7 @@ void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_descript
 /*****************************************************************************
  * DumpSubtitleDescriptor
  *****************************************************************************/
-void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor)
+static void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor)
 {
   int a;
 
@@ -304,7 +304,7 @@ void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor)
 /*****************************************************************************
  * DumpDescriptors
  *****************************************************************************/
-void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
+static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
 {
   int i;
 
@@ -338,7 +338,7 @@ void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
 /*****************************************************************************
  * DumpPMT
  *****************************************************************************/
-void DumpPMT(void* p_data, dvbpsi_pmt_t* p_pmt)
+static void DumpPMT(void* p_data, dvbpsi_pmt_t* p_pmt)
 {
     dvbpsi_pmt_es_t* p_es = p_pmt->p_first_es;
     ts_stream_t* p_stream = (ts_stream_t*) p_data;
@@ -367,7 +367,7 @@ void DumpPMT(void* p_data, dvbpsi_pmt_t* p_pmt)
 /*****************************************************************************
  * usage
  *****************************************************************************/
-void usage( char *name )
+static void usage( char *name )
 {
 #ifdef HAVE_SYS_SOCKET_H
     printf( "Usage: %s [--file <filename>|--udp <ipaddress> --port <port> -mtu <mtu>|--help]\n", name );

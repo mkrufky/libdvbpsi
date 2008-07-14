@@ -130,7 +130,6 @@ dvbpsi_descriptor_t * dvbpsi_GenExtendedEventDr(dvbpsi_extended_event_dr_t * p_d
   if(p_descriptor)
   {
     uint8_t *p = &p_descriptor->p_data[0];
-    int i;
 
     /* Encode data */
     p[0] = (p_decoded->i_descriptor_number << 4 ) |

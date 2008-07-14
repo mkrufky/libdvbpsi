@@ -53,7 +53,7 @@
 /*****************************************************************************
  * ReadPacket
  *****************************************************************************/
-int ReadPacket(int i_fd, uint8_t* p_dst)
+static int ReadPacket(int i_fd, uint8_t* p_dst)
 {
   int i = 187;
   int i_rc = 1;
@@ -79,7 +79,7 @@ int ReadPacket(int i_fd, uint8_t* p_dst)
 /*****************************************************************************
  * DumpPAT
  *****************************************************************************/
-void DumpPAT(void* p_zero, dvbpsi_pat_t* p_pat)
+static void DumpPAT(void* p_zero, dvbpsi_pat_t* p_pat)
 {
   dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
   printf(  "\n");

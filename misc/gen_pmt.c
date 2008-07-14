@@ -52,7 +52,7 @@
 /*****************************************************************************
  * writePSI
  *****************************************************************************/
-void writePSI(uint8_t* p_packet, dvbpsi_psi_section_t* p_section)
+static void writePSI(uint8_t* p_packet, dvbpsi_psi_section_t* p_section)
 {
   p_packet[0] = 0x47;
 

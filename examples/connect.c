@@ -44,6 +44,8 @@
 #include <netinet/udp.h>
 #include <arpa/inet.h>
 
+#include "connect.h"
+
 int create_tcp_connection( const char *ipaddress, int port )
 {
     struct sockaddr_in addr_ctl;

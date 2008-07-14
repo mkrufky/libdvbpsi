@@ -58,7 +58,7 @@
 /*****************************************************************************
  * ReadPacket
  *****************************************************************************/
-int ReadPacket(int i_fd, uint8_t* p_dst)
+static int ReadPacket(int i_fd, uint8_t* p_dst)
 {
   int i = 187;
   int i_rc = 1;
@@ -84,7 +84,7 @@ int ReadPacket(int i_fd, uint8_t* p_dst)
 /*****************************************************************************
  * DumpDescriptors
  *****************************************************************************/
-void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
+static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
 {
   while(p_descriptor)
   {
@@ -101,7 +101,7 @@ void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
 /*****************************************************************************
  * DumpSDT
  *****************************************************************************/
-void DumpSDT(void* p_zero, dvbpsi_sdt_t* p_sdt)
+static void DumpSDT(void* p_zero, dvbpsi_sdt_t* p_sdt)
 {
   dvbpsi_sdt_service_t* p_service = p_sdt->p_first_service;
   printf(  "\n");
@@ -126,7 +126,7 @@ void DumpSDT(void* p_zero, dvbpsi_sdt_t* p_sdt)
 /*****************************************************************************
  * NewSubtable
  *****************************************************************************/
-void NewSubtable(void * p_zero, dvbpsi_handle h_dvbpsi,
+static void NewSubtable(void * p_zero, dvbpsi_handle h_dvbpsi,
                  uint8_t i_table_id, uint16_t i_extension)
 {
   if(i_table_id == 0x42)
