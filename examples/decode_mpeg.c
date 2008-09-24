@@ -189,7 +189,7 @@ static void report_Header( int i_report )
             printf( "# seqno, PID PCR, network arrival (ms), PCR value (ms), PCR prev (ms), delta (ms), bytes since last pcr, bitrate (bits/delta) Kbps since last pcr\n" );
             break;
         case REPORT_UDP:
-            printf( "# seq no, previous (ms), packet arrival (ms), delta (ms), bytes since last\n");
+            printf( "# seq no, packet arrival (ms), delta (ms), bytes since last\n");
             break;
     }
 }
@@ -199,7 +199,7 @@ static void report_Header( int i_report )
  * PrintPacketTiming for REPORT_UDP
  *****************************************************************************/
 #ifdef HAVE_GETTIMEOFDAY
-static mtime_t report_UDPPacketTiming( int32_t i_seqno, mtime_t time_prev, int32_t bytes )
+static mtime_t report_UDPPacketTiming( int32_t i_seqno, int32_t bytes, mtime_t time_prev, mtime_t *time_base )
 #else
 static void report_UDPPacketTiming( int32_t i_seqno, int32_t bytes )
 #endif
@@ -217,8 +217,11 @@ static void report_UDPPacketTiming( int32_t i_seqno, int32_t bytes )
     else
         tv_delta = (mtime_t)(time_current - time_prev);
 
-    printf( "%.2d %"PRId64" %"PRId64" %"PRId64" ",
-            i_seqno, time_prev, time_current,
+    if( *time_base == 0 )
+        *time_base = time_current;
+
+    printf( "%.2d %"PRId64" %"PRId64" ",
+            i_seqno, time_current - *time_base,
             tv_delta );
     time_prev = time_current;
     printf( "%d\n", bytes );
@@ -533,6 +536,7 @@ int main(int i_argc, char* pa_argv[])
 #endif
 #ifdef HAVE_GETTIMEOFDAY
     mtime_t  time_prev = 0;
+    mtime_t  time_base = 0;
 #endif
     mtime_t  i_prev_pcr = 0;  /* 33 bits */
     int      i_old_cc = -1; 
@@ -650,7 +654,7 @@ int main(int i_argc, char* pa_argv[])
             if( i_report == REPORT_UDP && !b_first )
             {
 #ifdef HAVE_GETTIMEOFDAY
-                time_prev = report_UDPPacketTiming( i_cc, time_prev, i_bytes );
+                time_prev = report_UDPPacketTiming( i_cc, i_bytes, time_prev, &time_base );
 #else
                 report_UDPPacketTiming( i_cc, i_bytes );
 #endif
