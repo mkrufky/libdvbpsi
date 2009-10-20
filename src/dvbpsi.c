@@ -290,7 +290,7 @@ void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
         if(p_section->b_syntax_indicator)
           p_section->p_payload_end -= 4;
 
-        if(dvbpsi_ValidPSISection(p_section))
+        if(p_section->p_data[0] != 0x72 && dvbpsi_ValidPSISection(p_section))
         {
           /* PSI section is valid */
           p_section->i_table_id = p_section->p_data[0];
