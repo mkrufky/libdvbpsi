@@ -339,19 +339,10 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
       else
       {
         if(    (p_sdt_decoder->b_current_valid)
-            && (p_sdt_decoder->current_sdt.i_version == p_section->i_version))
+            && (p_sdt_decoder->current_sdt.i_version == p_section->i_version)
+            && (p_sdt_decoder->current_sdt.b_current_next ==
+                                           p_section->b_current_next))
         {
-          /* Signal a new SDT if the previous one wasn't active */
-          if(    (!p_sdt_decoder->current_sdt.b_current_next)
-              && (p_section->b_current_next))
-          {
-            dvbpsi_sdt_t * p_sdt = (dvbpsi_sdt_t*)malloc(sizeof(dvbpsi_sdt_t));
-
-            p_sdt_decoder->current_sdt.b_current_next = 1;
-            *p_sdt = p_sdt_decoder->current_sdt;
-            p_sdt_decoder->pf_callback(p_sdt_decoder->p_cb_data, p_sdt);
-          }
-
           /* Don't decode since this version is already decoded */
           b_append = 0;
         }

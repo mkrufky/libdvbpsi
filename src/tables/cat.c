@@ -248,19 +248,10 @@ void dvbpsi_GatherCATSections(dvbpsi_decoder_t* p_decoder,
       else
       {
         if(    (p_cat_decoder->b_current_valid)
-            && (p_cat_decoder->current_cat.i_version == p_section->i_version))
+            && (p_cat_decoder->current_cat.i_version == p_section->i_version)
+            && (p_cat_decoder->current_cat.b_current_next ==
+                                           p_section->b_current_next))
         {
-          /* Signal a new CAT if the previous one wasn't active */
-          if(    (!p_cat_decoder->current_cat.b_current_next)
-              && (p_section->b_current_next))
-          {
-            dvbpsi_cat_t* p_cat = (dvbpsi_cat_t*)malloc(sizeof(dvbpsi_cat_t));
-
-            p_cat_decoder->current_cat.b_current_next = 1;
-            *p_cat = p_cat_decoder->current_cat;
-            p_cat_decoder->pf_callback(p_cat_decoder->p_cb_data, p_cat);
-          }
-
           /* Don't decode since this version is already decoded */
           b_append = 0;
         }

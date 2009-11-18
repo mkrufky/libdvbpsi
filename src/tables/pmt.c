@@ -338,19 +338,10 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
       else
       {
         if(    (p_pmt_decoder->b_current_valid)
-            && (p_pmt_decoder->current_pmt.i_version == p_section->i_version))
+            && (p_pmt_decoder->current_pmt.i_version == p_section->i_version)
+            && (p_pmt_decoder->current_pmt.b_current_next ==
+                                           p_section->b_current_next))
         {
-          /* Signal a new PMT if the previous one wasn't active */
-          if(    (!p_pmt_decoder->current_pmt.b_current_next)
-              && (p_section->b_current_next))
-          {
-            dvbpsi_pmt_t* p_pmt = (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));
-
-            p_pmt_decoder->current_pmt.b_current_next = 1;
-            *p_pmt = p_pmt_decoder->current_pmt;
-            p_pmt_decoder->pf_callback(p_pmt_decoder->p_cb_data, p_pmt);
-          }
-
           /* Don't decode since this version is already decoded */
           b_append = 0;
         }

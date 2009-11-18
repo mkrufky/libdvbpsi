@@ -265,19 +265,10 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
       else
       {
         if(    (p_pat_decoder->b_current_valid)
-            && (p_pat_decoder->current_pat.i_version == p_section->i_version))
+            && (p_pat_decoder->current_pat.i_version == p_section->i_version)
+            && (p_pat_decoder->current_pat.b_current_next ==
+                                           p_section->b_current_next))
         {
-          /* Signal a new PAT if the previous one wasn't active */
-          if(    (!p_pat_decoder->current_pat.b_current_next)
-              && (p_section->b_current_next))
-          {
-            dvbpsi_pat_t* p_pat = (dvbpsi_pat_t*)malloc(sizeof(dvbpsi_pat_t));
-
-            p_pat_decoder->current_pat.b_current_next = 1;
-            *p_pat = p_pat_decoder->current_pat;
-            p_pat_decoder->pf_callback(p_pat_decoder->p_cb_data, p_pat);
-          }
-
           /* Don't decode since this version is already decoded */
           b_append = 0;
         }

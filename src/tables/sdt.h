@@ -26,11 +26,8 @@
  * \author Johan Bilien <jobi@via.ecp.fr>
  * \brief Application interface for the SDT decoder and the SDT generator.
  *
- * Application interface for the SDT decoder and the SDT generator. New
- * decoded SDT are sent by callback to the application. If a table
- * wasn't active (b_current_next == 0) and the next is the same but active
- * (b_current_next == 1) then the service description list is empty and should
- * be caught from the previous structure.
+ * Application interface for the SDT decoder and the SDT generator.
+ * New decoded SDT tables are sent by callback to the application.
  */
 
 #ifndef _DVBPSI_SDT_H_

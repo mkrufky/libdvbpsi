@@ -375,19 +375,10 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
       else
       {
         if(    (p_nit_decoder->b_current_valid)
-            && (p_nit_decoder->current_nit.i_version == p_section->i_version))
+            && (p_nit_decoder->current_nit.i_version == p_section->i_version)
+            && (p_nit_decoder->current_nit.b_current_next ==
+                                           p_section->b_current_next))
         {
-          /* Signal a new NIT if the previous one wasn't active */
-          if(    (!p_nit_decoder->current_nit.b_current_next)
-              && (p_section->b_current_next))
-          {
-            dvbpsi_nit_t* p_nit = (dvbpsi_nit_t*)malloc(sizeof(dvbpsi_nit_t));
-
-            p_nit_decoder->current_nit.b_current_next = 1;
-            *p_nit = p_nit_decoder->current_nit;
-            p_nit_decoder->pf_callback(p_nit_decoder->p_cb_data, p_nit);
-          }
-
           /* Don't decode since this version is already decoded */
           b_append = 0;
         }

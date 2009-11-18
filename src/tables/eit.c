@@ -342,19 +342,10 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
       else
       {
         if(    (p_eit_decoder->b_current_valid)
-            && (p_eit_decoder->current_eit.i_version == p_section->i_version))
+            && (p_eit_decoder->current_eit.i_version == p_section->i_version)
+            && (p_eit_decoder->current_eit.b_current_next ==
+                                           p_section->b_current_next))
         {
-          /* Signal a new EIT if the previous one wasn't active */
-          if(    (!p_eit_decoder->current_eit.b_current_next)
-              && (p_section->b_current_next))
-          {
-            dvbpsi_eit_t* p_eit = (dvbpsi_eit_t*)malloc(sizeof(dvbpsi_eit_t));
-
-            p_eit_decoder->current_eit.b_current_next = 1;
-            *p_eit = p_eit_decoder->current_eit;
-            p_eit_decoder->pf_callback(p_eit_decoder->p_cb_data, p_eit);
-          }
-
           /* Don't decode since this version is already decoded */
           b_append = 0;
         }

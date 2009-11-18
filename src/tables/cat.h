@@ -28,11 +28,8 @@
  * \author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  * \brief Application interface for the CAT decoder and the CAT generator.
  *
- * Application interface for the CAT decoder and the CAT generator. New
- * decoded CAT tables are sent by callback to the application. If a table
- * wasn't active (b_current_next == 0) and the next is the same but active
- * (b_current_next == 1) then the two lists are empty and should be
- * caught from the previous structure.
+ * Application interface for the CAT decoder and the CAT generator.
+ * New decoded CAT tables are sent by callback to the application.
  */
 
 #ifndef _DVBPSI_CAT_H_
