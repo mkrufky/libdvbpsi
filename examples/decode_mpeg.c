@@ -479,7 +479,7 @@ static void DumpPMT(void* p_data, dvbpsi_pmt_t* p_pmt)
 static void usage( char *name )
 {
 #ifdef HAVE_SYS_SOCKET_H
-    printf( "Usage: %s [--file <filename>|--udp <ipaddress> --port <port> -mtu <mtu>|--help]\n", name );
+    printf( "Usage: %s [--file <filename>|--udp <ipaddress> --port <port> --mtu <mtu>|--help]\n", name );
     printf( "       %s [-f <filename>|-u <ipaddress> -p <port> -m <mtu>|-h]\n", name );
 #else
     printf( "Usage: %s [--file <filename>|--help]\n", name );
