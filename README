@@ -23,38 +23,9 @@ See the INSTALL file for this.
 Troubleshooting
 ===============
 
-A mailing-list has been set up for support and discussion about the
-libdvbpsi. Its address is :
-
-   <libdvbpsi@videolan.org>
-
-To subscribe, send a mail to <listar@videolan.org> with the following
-words in the mail body :
-
-   subscribe libdvbpsi
-
-To unsubscribe, do the same with the words :
-
-   unsubscribe libdvbpsi
-
-
-A mailing-list has been set up for development discussion about the
-libdvbpsi. CVS mails are sent to this list. Its address is :
-
-   <libdvbpsi-devel@videolan.org>
-
-To subscribe, send a mail to <listar@videolan.org> with the following
-words in the mail body :
-
-   subscribe libdvbpsi-devel
-
-To unsubscribe, do the same with the words :
-
-   unsubscribe libdvbpsi-devel
-
-
-When reporting bugs, try to be as precise as possible (which OS, which
-distribution, and so on).
+A mailing-list has been set up for discussion about the libdvbpsi:
+libdvbpsi-devel. SVN mails are sent to this list. More information on
+VideoLAN website: http://www.videolan.org/
 
 
 Resources
