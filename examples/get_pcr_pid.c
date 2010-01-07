@@ -74,6 +74,12 @@ static dvbpsi_handle p_pmt_dvbpsi_fds[MAX_PROGRAMS];
  *****************************************************************************/
 static void PMTCallback( void *_unused, dvbpsi_pmt_t *p_pmt )
 {
+    if ( p_pmt->i_program_number != i_program )
+    {
+        dvbpsi_DeletePMT( p_pmt );
+        return;
+    }
+
     printf( "%u\n", p_pmt->i_pcr_pid );
     close( i_fd );
     exit(EXIT_SUCCESS);
