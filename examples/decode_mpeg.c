@@ -1,7 +1,7 @@
 /*****************************************************************************
  * decode_mpeg.c: MPEG decoder example
  *----------------------------------------------------------------------------
- * (c)2001-2005 VideoLAN
+ * (c)2001-2010 VideoLAN
  * $Id: decode_mpeg.c 104 2005-03-21 13:38:56Z massiot $
  *
  * Authors: Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
@@ -163,7 +163,7 @@ static int ReadPacket( int i_fd, uint8_t* p_dst )
         if(i_rc >= 0)
             i -= i_rc;
     }
-    return (i == 0) ? 1 : 0;
+    return (i_rc <= 0) ? i_rc : 188;
 }
 
 #ifdef HAVE_SYS_SOCKET_H
@@ -175,7 +175,7 @@ static int ReadPacketFromSocket( int i_socket, uint8_t* p_dst, size_t i_size)
     i_rc = read( i_socket, p_dst, i_size );
     if( i_rc < 0 ) fprintf( stderr, "READ INTERRUPTED BY SIGNAL\n" );
     if( i_rc == 0 ) fprintf( stderr, "READ RETURNS 0\n" );
-    return (i_rc <= (int)i_size ) ? 1 : 0;
+    return i_rc;
 }
 
 /*****************************************************************************
@@ -515,12 +515,12 @@ int main(int i_argc, char* pa_argv[])
     const struct option long_options[] =
     {
         { "help",       0, NULL, 'h' },
-        { "file",       0, NULL, 'f' },
+        { "file",       1, NULL, 'f' },
 #ifdef HAVE_SYS_SOCKET_H
-        { "mtu",        0, NULL, 'm' },
-        { "port",       0, NULL, 'p' },
-        { "udp",        0, NULL, 'u' },
-        { "report",     0, NULL, 'r' },
+        { "mtu",        1, NULL, 'm' },
+        { "port",       1, NULL, 'p' },
+        { "udp",        1, NULL, 'u' },
+        { "report",     1, NULL, 'r' },
 #endif
         { "verbose",    0, NULL, 'v' },
         { NULL,         0, NULL, 0 }
@@ -545,7 +545,7 @@ int main(int i_argc, char* pa_argv[])
 
     uint8_t *p_data = NULL;
     ts_stream_t *p_stream = NULL;
-    int b_ok = 0;
+    int i_len = 0;
     int b_verbose = 0;
 
     /* parser commandline arguments */
@@ -600,13 +600,13 @@ int main(int i_argc, char* pa_argv[])
     /* initialize */
     if( filename )
     {
-        i_fd = open( pa_argv[1], 0 );
+        i_fd = open( filename, 0 );
         p_data = (uint8_t *) malloc( sizeof( uint8_t ) * 188 );
         if( !p_data )
             goto out_of_memory;
     }
 #ifdef HAVE_SYS_SOCKET_H
-    if( ipaddress )
+    else if( ipaddress )
     {
         i_fd = create_udp_connection( ipaddress, i_port );
         p_data = (uint8_t *) malloc( sizeof( uint8_t ) * i_mtu );
@@ -614,6 +614,12 @@ int main(int i_argc, char* pa_argv[])
             goto out_of_memory;
     }
 #endif
+    else
+    {
+        usage( pa_argv[0] );
+        goto error;
+    }
+
     p_stream = (ts_stream_t *) malloc( sizeof(ts_stream_t) );
     if( !p_stream )
         goto out_of_memory;
@@ -621,16 +627,10 @@ int main(int i_argc, char* pa_argv[])
 
     /* Read first packet */
     if( filename )
-    {
-        b_ok = ReadPacket( i_fd, p_data );
-        i_bytes += 188;
-    }
+        i_len = ReadPacket( i_fd, p_data );
 #ifdef HAVE_SYS_SOCKET_H
     else 
-    {
-        b_ok = ReadPacketFromSocket( i_fd, p_data, i_mtu );
-        i_bytes += i_mtu;
-    }
+        i_len = ReadPacketFromSocket( i_fd, p_data, i_mtu );
 
     /* print the right report header */
     report_Header( i_report );
@@ -638,12 +638,13 @@ int main(int i_argc, char* pa_argv[])
 
     /* Enter infinite loop */
     p_stream->pat.handle = dvbpsi_AttachPAT( DumpPAT, p_stream );
-    while( b_ok )
+    while( i_len > 0 )
     {
         int i = 0;
         vlc_bool_t b_first = VLC_FALSE;
 
-        for( i = 0; i < i_mtu; i += 188 )
+        i_bytes += i_len;
+        for( i = 0; i < i_len; i += 188 )
         {
             uint8_t   *p_tmp = &p_data[i];
             uint16_t   i_pid = ((uint16_t)(p_tmp[1] & 0x1f) << 8) + p_tmp[2];
@@ -746,20 +747,16 @@ int main(int i_argc, char* pa_argv[])
 
         /* Read next packet */
         if( filename )
-        {
-            b_ok = ReadPacket( i_fd, p_data );
-            i_bytes += 188;
-        }
+            i_len = ReadPacket( i_fd, p_data );
 #ifdef HAVE_SYS_SOCKET_H
         else
-        {
-            b_ok = ReadPacketFromSocket( i_fd, p_data, i_mtu );
-            i_bytes += i_mtu;
-        }
+            i_len = ReadPacketFromSocket( i_fd, p_data, i_mtu );
 #endif
     }
-    dvbpsi_DetachPMT( p_stream->pmt.handle );
-    dvbpsi_DetachPAT( p_stream->pat.handle );
+    if( p_stream->pmt.handle )
+        dvbpsi_DetachPMT( p_stream->pmt.handle );
+    if( p_stream->pat.handle )
+	dvbpsi_DetachPAT( p_stream->pat.handle );
 
     /* clean up */
     if( filename )
