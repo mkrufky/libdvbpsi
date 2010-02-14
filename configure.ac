@@ -1,10 +1,10 @@
-AC_INIT(src/dvbpsi.c)
+AC_INIT(libdvbpsi, 0.1.7)
 
 AC_PREREQ(2.50)
 AC_CONFIG_AUX_DIR(.auto)
 AC_CANONICAL_SYSTEM
 
-AM_INIT_AUTOMAKE(libdvbpsi, 0.1.7)
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 
 #AC_CANONICAL_HOST
@@ -81,7 +81,8 @@ AC_OUTPUT([Makefile
            misc/Makefile
            doc/Makefile
            debian/Makefile
-           wince/Makefile])
+           wince/Makefile
+           libdvbpsi.pc])
 
 echo "
 libdvbpsi configuration
