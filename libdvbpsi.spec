@@ -2,10 +2,9 @@
 %define version		0.1.7
 %define release		1
 
-%define major		5
-%define lib_name	%{name}%{major}
+%define lib_name	%{name}
 
-%define redhat 0
+%define redhat 1
 %if %redhat
 # some mdk macros that do not exist in rh
 %define configure2_5x CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr
@@ -14,30 +13,18 @@
 # adjust define for Redhat.
 %endif
 
-
 Summary:	A library for decoding and generating MPEG 2 and DVB PSI sections.
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-Packager:	Yves Duret <yves@zarb.org>
 License:	GPL
 URL:		http://developers.videolan.org/libdvbpsi/
 Group:		System/Libraries
-Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}%{major}-%{version}.tar.bz2
-BuildRoot:	%_tmppath/%name%major-%version-%release-root
-
-%description
-libdvbpsi is a simple library designed for MPEG 2 TS and DVB PSI tables
-decoding and generating. The important features are:
- * PAT decoder and genarator.
- * PMT decoder and generator.
-
-%package -n %{lib_name}
-Summary:	A library for decoding and generating MPEG 2 and DVB PSI sections.
-Group:		System/Libraries
+Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}-%{version}.tar.bz2
+BuildRoot:	%_tmppath/%name-%version-%release-root
 Provides:	%name
 
-%description -n %{lib_name}
+%description
 libdvbpsi is a simple library designed for MPEG 2 TS and DVB PSI tables
 decoding and generating. The important features are:
  * PAT decoder and genarator.
@@ -58,7 +45,6 @@ If you are going to develop programs which will manipulate MPEG 2 and DVB PSI
 information you should install %{name}-devel.  You'll also need to have
 the %name package installed.
 
-
 %prep
 %setup -q -n %{lib_name}-%{version}
 
@@ -73,28 +59,34 @@ rm -rf %buildroot
 %clean
 rm -rf %buildroot
 
-%post -n %{lib_name} -p /sbin/ldconfig
+%post -p /sbin/ldconfig
 
-%postun -n %{lib_name} -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
-%files -n %{lib_name}
+%files
 %defattr(-,root,root,-)
 %doc AUTHORS README COPYING ChangeLog
 %{_libdir}/*.so.*
+%{_libdir}/*.so
 
 %files -n %{lib_name}-devel
 %defattr(-,root,root)
-%doc COPYING
+%doc COPYING NEWS
 %{_libdir}/*a
-%{_libdir}/*.so
+%{_libdir}/pkgconfig/libdvbpsi.pc
 %{_includedir}/*
 
 %changelog
-* Tue Dec, 18 2007 Jean-Paul Saman <jpsaman@videolan.org>
+* Tue Apr 13 2010 Jean-Paul Saman <jpsaman@videolan.org>
+- add pkgconfig file libdvbpsi.pc
+- removed packager and vendor from specfile, these should
+  be supplied by the package builder from ~/.rpmmacros
+
+* Tue Dec 18 2007 Jean-Paul Saman <jpsaman@videolan.org>
 - New VBI data descriptor support
 - 0.1.7 release
 
-* Thu Oct, 22 2007 Jean-Paul Saman <jpsaman@videolan.org>
+* Thu Oct 22 2007 Jean-Paul Saman <jpsaman@videolan.org>
 - New cat support
 - Fix EIT discontinuities
 - new example tool for checking an MPEG-2 TS file
