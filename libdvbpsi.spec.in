@@ -1,5 +1,5 @@
 %define name		libdvbpsi
-%define version		0.1.7
+%define version		@PACKAGE_VERSION@
 %define release		1
 
 %define lib_name	%{name}
@@ -23,7 +23,7 @@ Group:		System/Libraries
 Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}-%{version}.tar.bz2
 BuildRoot:	%_tmppath/%name-%version-%release-root
 Provides:	%name
-Prefix:         /usr
+Prefix:         @prefix@
 
 %description
 libdvbpsi is a simple library designed for MPEG 2 TS and DVB PSI tables

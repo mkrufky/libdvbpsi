@@ -3,7 +3,7 @@
 SUBDIRS = src examples misc
 DIST_SUBDIRS = $(SUBDIRS) doc debian wince
 
-EXTRA_DIST = libdvbpsi.spec libdvbpsi.pc.in bootstrap
+EXTRA_DIST = libdvbpsi.spec libdvbpsi.spec.in libdvbpsi.pc.in bootstrap
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libdvbpsi.pc

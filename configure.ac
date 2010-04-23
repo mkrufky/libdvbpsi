@@ -82,7 +82,8 @@ AC_OUTPUT([Makefile
            doc/Makefile
            debian/Makefile
            wince/Makefile
-           libdvbpsi.pc])
+           libdvbpsi.pc
+           libdvbpsi.spec])
 
 echo "
 libdvbpsi configuration
