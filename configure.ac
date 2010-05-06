@@ -80,7 +80,6 @@ AC_OUTPUT([Makefile
            examples/Makefile
            misc/Makefile
            doc/Makefile
-           debian/Makefile
            wince/Makefile
            libdvbpsi.pc
            libdvbpsi.spec])
