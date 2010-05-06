@@ -4,6 +4,8 @@
 *.a
 *.exe
 *.pc
+*.*~
+*.spec
 .auto
 .libs
 .deps
@@ -23,6 +25,7 @@ examples/decode_mpeg
 examples/decode_pat
 examples/decode_pmt
 examples/decode_sdt
+examples/get_pcr_pid
 misc/gen_crc
 misc/gen_pat
 misc/gen_pmt
