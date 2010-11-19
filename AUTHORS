@@ -60,3 +60,7 @@ E: jpsaman@videolan.org
 D: VBI Data Descriptor (0x45)
 D: CUE Identifier Descriptor (0x8a)
 D: Splice Information Table
+
+N: Zlu Zu
+E: zluzu@gmail.com
+D: BAT decoder and generator
