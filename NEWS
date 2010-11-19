@@ -1,5 +1,12 @@
 $Id$
 
+Changes between 0.1.7 and 1.0.0:
+--------------------------------
+
+  * Relicense libdvbpsi from GPLv2 to LGPLv2.1
+  * new CUE Identifier descriptor support (0x8a)
+  * new Splice Information Section table support (0xFC) (SCTE 35 2004)
+
 Changes between 0.1.6 and 0.1.7:
 --------------------------------
 
