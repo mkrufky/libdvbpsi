@@ -17,7 +17,7 @@ Summary:	A library for decoding and generating MPEG 2 and DVB PSI sections.
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-License:	GPL
+License:	LGPLv2.1
 URL:		http://developers.videolan.org/libdvbpsi/
 Group:		System/Libraries
 Source:		http://www.videolan.org/pub/videolan/libdvbpsi/%{version}/%{name}-%{version}.tar.bz2
@@ -78,6 +78,9 @@ rm -rf %buildroot
 %{_includedir}/*
 
 %changelog
+* Fri Nov 19 2010 Jean-Paul Saman <jpsaman@videolan.org>
+- Relicensed under LGPLv2.1
+
 * Fri Apr 23 2010 Jean-Paul Saman <jpsaman@videolan.org>
 - generalized libdvbpsi.spec
 
