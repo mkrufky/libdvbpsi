@@ -25,6 +25,12 @@ file:</p>
   <li>Descriptors: descriptor.h</li>
   <li>Program Association Table: pat.h</li>
   <li>Program Map Table: pmt.h</li>
+  <li>Conditional Access Table: cat.h</li>
+  <li>EPG Information Table: eit.h</li>
+  <li>Network Informtation Table: nit.h</li>
+  <li>Stream Description Table: sdt.h</li>
+  <li>Splice Information Section Table: sis.h</li>
+  <li>TOT: tot.h</li>
 </ul>
 
 \ref structure
