@@ -27,9 +27,9 @@
 #ifndef _DVBPSI_DVBPSI_PRIVATE_H_
 #define _DVBPSI_DVBPSI_PRIVATE_H_
 
+#include <stdarg.h>
 
 extern uint32_t dvbpsi_crc32_table[];
-
 
 /*****************************************************************************
  * Error management
@@ -40,7 +40,7 @@ extern uint32_t dvbpsi_crc32_table[];
 #  define DVBPSI_ERROR_ARG(src, str, x...)                              \
         fprintf(stderr, "libdvbpsi error (" src "): " str "\n", x);
 #else
-   inline void DVBPSI_ERROR_ARG( char *src, const char *str, ... )
+   static inline void DVBPSI_ERROR_ARG( char *src, const char *str, ... )
    { va_list ap; va_start( ap, str );
      vfprintf(stderr, str, ap); fprintf(stderr,"\n"); va_end( ap ); }
 #endif
@@ -52,7 +52,7 @@ extern uint32_t dvbpsi_crc32_table[];
 #     define DVBPSI_DEBUG_ARG(src, str, x...)                           \
           fprintf(stderr, "libdvbpsi debug (" src "): " str "\n", x);
 #  else
-      inline void DVBPSI_DEBUG_ARG( char *src, const char *str, ... )
+      static inline void DVBPSI_DEBUG_ARG( char *src, const char *str, ... )
       { va_list ap; va_start( ap, str );
         vfprintf(stderr, str, ap); fprintf(stderr,"\n"); va_end( ap ); }
 #  endif
@@ -61,7 +61,7 @@ extern uint32_t dvbpsi_crc32_table[];
 #  ifdef HAVE_VARIADIC_MACROS
 #     define DVBPSI_DEBUG_ARG(src, str, x...)
 #  else
-      inline void DVBPSI_DEBUG_ARG( char *src, const char *str, ... ) {}
+      static inline void DVBPSI_DEBUG_ARG( char *src, const char *str, ... ) {}
 #  endif
 #endif
 
