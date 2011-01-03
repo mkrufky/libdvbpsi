@@ -56,7 +56,6 @@ dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
 {
   dvbpsi_handle h_dvbpsi = (dvbpsi_decoder_t*)malloc(sizeof(dvbpsi_decoder_t));
   dvbpsi_pmt_decoder_t* p_pmt_decoder;
-  unsigned int i;
 
   if(h_dvbpsi == NULL)
     return NULL;
@@ -85,7 +84,7 @@ dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
   /* PMT decoder initial state */
   p_pmt_decoder->b_current_valid = 0;
   p_pmt_decoder->p_building_pmt = NULL;
-  for(i = 0; i <= 255; i++)
+  for(unsigned int i = 0; i <= 255; i++)
     p_pmt_decoder->ap_sections[i] = NULL;
 
   return h_dvbpsi;
@@ -101,11 +100,10 @@ void dvbpsi_DetachPMT(dvbpsi_handle h_dvbpsi)
 {
   dvbpsi_pmt_decoder_t* p_pmt_decoder
                         = (dvbpsi_pmt_decoder_t*)h_dvbpsi->p_private_decoder;
-  unsigned int i;
 
   free(p_pmt_decoder->p_building_pmt);
 
-  for(i = 0; i <= 255; i++)
+  for(unsigned int i = 0; i <= 255; i++)
   {
     if(p_pmt_decoder->ap_sections[i])
       free(p_pmt_decoder->ap_sections[i]);
@@ -267,7 +265,6 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
                         = (dvbpsi_pmt_decoder_t*)p_decoder->p_private_decoder;
   int b_append = 1;
   int b_reinit = 0;
-  unsigned int i;
 
   DVBPSI_DEBUG_ARG("PMT decoder",
                    "Table version %2d, " "i_extension %5d, "
@@ -361,7 +358,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
       p_pmt_decoder->p_building_pmt = NULL;
     }
     /* Clear the section array */
-    for(i = 0; i <= 255; i++)
+    for(unsigned int i = 0; i <= 255; i++)
     {
       if(p_pmt_decoder->ap_sections[i] != NULL)
       {
@@ -401,7 +398,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
 
     /* Check if we have all the sections */
     b_complete = 0;
-    for(i = 0; i <= p_pmt_decoder->i_last_section_number; i++)
+    for(unsigned int i = 0; i <= p_pmt_decoder->i_last_section_number; i++)
     {
       if(!p_pmt_decoder->ap_sections[i])
         break;
@@ -418,7 +415,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
       /* Chain the sections */
       if(p_pmt_decoder->i_last_section_number)
       {
-        for(i = 0; (int)i <= p_pmt_decoder->i_last_section_number - 1; i++)
+        for(unsigned int i = 0; (int)i <= p_pmt_decoder->i_last_section_number - 1; i++)
           p_pmt_decoder->ap_sections[i]->p_next =
                                         p_pmt_decoder->ap_sections[i + 1];
       }
@@ -432,7 +429,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
                                  p_pmt_decoder->p_building_pmt);
       /* Reinitialize the structures */
       p_pmt_decoder->p_building_pmt = NULL;
-      for(i = 0; i <= p_pmt_decoder->i_last_section_number; i++)
+      for(unsigned int i = 0; i <= p_pmt_decoder->i_last_section_number; i++)
         p_pmt_decoder->ap_sections[i] = NULL;
     }
   }

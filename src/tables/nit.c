@@ -60,7 +60,6 @@ int dvbpsi_AttachNIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
   dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_psi_decoder->p_private_decoder;
   dvbpsi_demux_subdec_t* p_subdec;
   dvbpsi_nit_decoder_t*  p_nit_decoder;
-  unsigned int i;
 
   if(dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
   {
@@ -103,7 +102,7 @@ int dvbpsi_AttachNIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
   /* NIT decoder initial state */
   p_nit_decoder->b_current_valid = 0;
   p_nit_decoder->p_building_nit = NULL;
-  for(i = 0; i <= 255; i++)
+  for(unsigned int i = 0; i <= 255; i++)
     p_nit_decoder->ap_sections[i] = NULL;
 
   return 0;
@@ -122,8 +121,6 @@ void dvbpsi_DetachNIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
   dvbpsi_demux_subdec_t** pp_prev_subdec;
   dvbpsi_nit_decoder_t* p_nit_decoder;
 
-  unsigned int i;
-
   p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
 
   if(p_demux == NULL)
@@ -139,7 +136,7 @@ void dvbpsi_DetachNIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
 
   free(p_nit_decoder->p_building_nit);
 
-  for(i = 0; i <= 255; i++)
+  for(unsigned int i = 0; i <= 255; i++)
   {
     if(p_nit_decoder->ap_sections[i])
       dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[i]);
@@ -305,7 +302,6 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
                         = (dvbpsi_nit_decoder_t*)p_private_decoder;
   int b_append = 1;
   int b_reinit = 0;
-  unsigned int i;
 
   DVBPSI_DEBUG_ARG("NIT decoder",
                    "Table version %2d, " "i_extension %5d, "
@@ -398,7 +394,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
       p_nit_decoder->p_building_nit = NULL;
     }
     /* Clear the section array */
-    for(i = 0; i <= 255; i++)
+    for(unsigned int i = 0; i <= 255; i++)
     {
       if(p_nit_decoder->ap_sections[i] != NULL)
       {
@@ -436,7 +432,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
 
     /* Check if we have all the sections */
     b_complete = 0;
-    for(i = 0; i <= p_nit_decoder->i_last_section_number; i++)
+    for(unsigned int i = 0; i <= p_nit_decoder->i_last_section_number; i++)
     {
       if(!p_nit_decoder->ap_sections[i])
         break;
@@ -453,7 +449,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
       /* Chain the sections */
       if(p_nit_decoder->i_last_section_number)
       {
-        for(i = 0; (int)i <= p_nit_decoder->i_last_section_number - 1; i++)
+        for(unsigned int i = 0; (int)i <= p_nit_decoder->i_last_section_number - 1; i++)
           p_nit_decoder->ap_sections[i]->p_next =
                                         p_nit_decoder->ap_sections[i + 1];
       }
@@ -467,7 +463,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
                                  p_nit_decoder->p_building_nit);
       /* Reinitialize the structures */
       p_nit_decoder->p_building_nit = NULL;
-      for(i = 0; i <= p_nit_decoder->i_last_section_number; i++)
+      for(unsigned int i = 0; i <= p_nit_decoder->i_last_section_number; i++)
         p_nit_decoder->ap_sections[i] = NULL;
     }
   }
