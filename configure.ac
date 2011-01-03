@@ -16,7 +16,7 @@ AM_PROG_LIBTOOL
 
 
 dnl default CFLAGS
-CFLAGS="${CFLAGS} -Wall -DDVBPSI_DIST --std=gnu99"
+CFLAGS="${CFLAGS} -Wall -Werror  -DDVBPSI_DIST --std=gnu99"
 CFLAGS="${CFLAGS} -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-prototypes -Wshadow -Waggregate-return -Wmissing-prototypes -Wnested-externs -Wsign-compare"
 
 dnl check the operating system
