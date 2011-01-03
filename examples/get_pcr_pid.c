@@ -122,7 +122,7 @@ static inline int ts_CheckSync( const uint8_t *p_ts )
     return p_ts[0] == 0x47;
 }
 
-static void TSHandle( const uint8_t *p_ts )
+static void TSHandle( uint8_t *p_ts )
 {
     uint16_t i_pid = ts_GetPID( p_ts );
     int i;
