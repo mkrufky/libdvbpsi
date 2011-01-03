@@ -1,24 +1,24 @@
 /*****************************************************************************
  * decode_pmt.c: PAT decoder example
  *----------------------------------------------------------------------------
- * (c)2001-2002 VideoLAN
+ * Copyright (C) 2001-2010 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *----------------------------------------------------------------------------
  *
@@ -123,9 +123,9 @@ static char* GetTypeName(uint8_t type)
       return "ISO/IEC 13818-1 auxillary";
     default:
       if (type < 0x80)
-	return "ISO/IEC 13818-1 reserved";
+    return "ISO/IEC 13818-1 reserved";
       else
-	return "User Private";
+    return "User Private";
     }
 }
 
@@ -143,9 +143,9 @@ static void DumpMaxBitrateDescriptor(dvbpsi_max_bitrate_dr_t* bitrate_descriptor
 static void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
 {
   printf("External clock: %s, Accuracy: %E\n",
-	 p_clock_descriptor->b_external_clock_ref ? "Yes" : "No",
-	 p_clock_descriptor->i_clock_accuracy_integer *
-	 pow(10.0, -(double)p_clock_descriptor->i_clock_accuracy_exponent));
+     p_clock_descriptor->b_external_clock_ref ? "Yes" : "No",
+     p_clock_descriptor->i_clock_accuracy_integer *
+     pow(10.0, -(double)p_clock_descriptor->i_clock_accuracy_exponent));
 }
 
 /*****************************************************************************
@@ -154,7 +154,7 @@ static void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descript
 static void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_descriptor)
 {
   printf("Component tag: %d\n",
-	 p_si_descriptor->i_component_tag);
+     p_si_descriptor->i_component_tag);
 }
 
 /*****************************************************************************
@@ -168,12 +168,12 @@ static void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor
   for (a = 0; a < p_subtitle_descriptor->i_subtitles_number; ++a)
     {
       printf("       | %d - lang: %c%c%c, type: %d, cpid: %d, apid: %d\n", a,
-	     p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[0],
-	     p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[1],
-	     p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[2],
-	     p_subtitle_descriptor->p_subtitle[a].i_subtitling_type,
-	     p_subtitle_descriptor->p_subtitle[a].i_composition_page_id,
-	     p_subtitle_descriptor->p_subtitle[a].i_ancillary_page_id);
+         p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[0],
+         p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[1],
+         p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[2],
+         p_subtitle_descriptor->p_subtitle[a].i_subtitling_type,
+         p_subtitle_descriptor->p_subtitle[a].i_composition_page_id,
+         p_subtitle_descriptor->p_subtitle[a].i_ancillary_page_id);
     }
 }
 
@@ -190,22 +190,22 @@ static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
     switch (p_descriptor->i_tag)
       {
       case SYSTEM_CLOCK_DR:
-	DumpSystemClockDescriptor(dvbpsi_DecodeSystemClockDr(p_descriptor));
-	break;
+    DumpSystemClockDescriptor(dvbpsi_DecodeSystemClockDr(p_descriptor));
+    break;
       case MAX_BITRATE_DR:
-	DumpMaxBitrateDescriptor(dvbpsi_DecodeMaxBitrateDr(p_descriptor));
-	break;
+    DumpMaxBitrateDescriptor(dvbpsi_DecodeMaxBitrateDr(p_descriptor));
+    break;
       case STREAM_IDENTIFIER_DR:
-	DumpStreamIdentifierDescriptor(dvbpsi_DecodeStreamIdentifierDr(p_descriptor));
-	break;
+    DumpStreamIdentifierDescriptor(dvbpsi_DecodeStreamIdentifierDr(p_descriptor));
+    break;
       case SUBTITLING_DR:
-	DumpSubtitleDescriptor(dvbpsi_DecodeSubtitlingDr(p_descriptor));
-	break;
+    DumpSubtitleDescriptor(dvbpsi_DecodeSubtitlingDr(p_descriptor));
+    break;
       default:
-	printf("\"");
-	for(i = 0; i < p_descriptor->i_length; i++)
-	  printf("%c", p_descriptor->p_data[i]);
-	printf("\"\n");
+    printf("\"");
+    for(i = 0; i < p_descriptor->i_length; i++)
+      printf("%c", p_descriptor->p_data[i]);
+    printf("\"\n");
       }
     p_descriptor = p_descriptor->p_next;
   }
@@ -232,7 +232,7 @@ static void DumpPMT(void* p_zero, dvbpsi_pmt_t* p_pmt)
   {
     printf("    | 0x%02x (%s) @ 0x%x (%d)\n",
            p_es->i_type, GetTypeName(p_es->i_type),
-	   p_es->i_pid, p_es->i_pid);
+       p_es->i_pid, p_es->i_pid);
     DumpDescriptors("    |  ]", p_es->p_first_descriptor);
     p_es = p_es->p_next;
   }

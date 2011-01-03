@@ -1,24 +1,24 @@
 /*****************************************************************************
  * sdt.c: SDT decoder/generator
  *----------------------------------------------------------------------------
- * (c)2001-2002 VideoLAN
+ * Copyright (C) 2001-2010 VideoLAN
  * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *----------------------------------------------------------------------------
  *
@@ -499,7 +499,7 @@ dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t* p_sdt)
   dvbpsi_psi_section_t * p_result = dvbpsi_NewPSISection(1024);
   dvbpsi_psi_section_t * p_current = p_result;
   dvbpsi_psi_section_t * p_prev;
- 
+
   dvbpsi_sdt_service_t *    p_service = p_sdt->p_first_service;
 
   p_current->i_table_id = 0x42;
@@ -517,16 +517,16 @@ dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t* p_sdt)
   p_current->p_data[8] = (p_sdt->i_network_id >> 8) ;
   p_current->p_data[9] = p_sdt->i_network_id;
   p_current->p_data[10] = 0xff;
-  
+
   /* SDT service */
   while(p_service != NULL)
   {
     uint8_t * p_service_start = p_current->p_payload_end;
-    
+
     uint16_t i_service_length = 5;
 
     dvbpsi_descriptor_t * p_descriptor = p_service->p_first_descriptor;
-    
+
     while ( (p_descriptor != NULL)&& ((p_service_start - p_current->p_data) + i_service_length <= 1020) )
     {
       i_service_length += p_descriptor->i_length + 2;
@@ -557,7 +557,7 @@ dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t* p_sdt)
       p_current->p_data[8] = (p_sdt->i_network_id >> 8) ;
       p_current->p_data[9] = p_sdt->i_network_id;
       p_current->p_data[10] = 0xff;
-      
+
       p_service_start = p_current->p_payload_end;
     }
 
@@ -593,7 +593,7 @@ dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t* p_sdt)
     p_service_start[4] = i_service_length;
 
     p_service = p_service->p_next;
-  }    
+  }
 
   /* Finalization */
   p_prev = p_result;

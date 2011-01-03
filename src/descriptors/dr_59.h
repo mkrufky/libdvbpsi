@@ -1,24 +1,24 @@
 /*****************************************************************************
  * dr_59.h
- * (c)2001-2002 VideoLAN
+ * Copyright (C) 2001-2010 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *          Tristan Leteurtre <tristan.leteurtre@anevia.com>
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
@@ -27,7 +27,7 @@
  * \author Tristan Leteurtre <tristan.leteurtre@anevia.com>
  * \brief DVB subtitling descriptor parsing.
  *
- * DVB subtitling descriptor parsing, according to ETSI EN 300 468 
+ * DVB subtitling descriptor parsing, according to ETSI EN 300 468
  * section 6.2.36.
  */
 
@@ -54,7 +54,7 @@ extern "C" {
  */
 typedef struct dvbpsi_subtitle_s
 {
-  uint8_t      i_iso6392_language_code[3];   
+  uint8_t      i_iso6392_language_code[3];
   uint8_t      i_subtitling_type;
   uint16_t      i_composition_page_id;
   uint16_t      i_ancillary_page_id;

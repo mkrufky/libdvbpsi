@@ -1,25 +1,25 @@
 /*****************************************************************************
  * decode_mpeg.c: MPEG decoder example
  *----------------------------------------------------------------------------
- * (c)2001-2010 VideoLAN
+ * Copyright (C) 2001-2010 VideoLAN
  * $Id: decode_mpeg.c 104 2005-03-21 13:38:56Z massiot $
  *
  * Authors: Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
  *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *----------------------------------------------------------------------------
  *
@@ -539,7 +539,7 @@ int main(int i_argc, char* pa_argv[])
     mtime_t  time_base = 0;
 #endif
     mtime_t  i_prev_pcr = 0;  /* 33 bits */
-    int      i_old_cc = -1; 
+    int      i_old_cc = -1;
     uint32_t i_bytes = 0; /* bytes transmitted between PCR's */
     char *filename = NULL;
 
@@ -592,7 +592,7 @@ int main(int i_argc, char* pa_argv[])
     } while( next_option != -1 );
 
 #ifdef HAVE_SYS_SOCKET_H
-    if( b_verbose ) 
+    if( b_verbose )
     {
         fprintf( stderr, "set mtu to %d\n", i_mtu );
     }
@@ -629,7 +629,7 @@ int main(int i_argc, char* pa_argv[])
     if( filename )
         i_len = ReadPacket( i_fd, p_data );
 #ifdef HAVE_SYS_SOCKET_H
-    else 
+    else
         i_len = ReadPacketFromSocket( i_fd, p_data, i_mtu );
 
     /* print the right report header */
@@ -756,7 +756,7 @@ int main(int i_argc, char* pa_argv[])
     if( p_stream->pmt.handle )
         dvbpsi_DetachPMT( p_stream->pmt.handle );
     if( p_stream->pat.handle )
-	dvbpsi_DetachPAT( p_stream->pat.handle );
+    dvbpsi_DetachPAT( p_stream->pat.handle );
 
     /* clean up */
     if( filename )

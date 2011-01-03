@@ -1,23 +1,23 @@
 /*****************************************************************************
  * dr_69.c
- * (c)2007 VideoLAN
+ * Copyright (C) 2007-2010 VideoLAN
  * $Id$
  *
  * Authors: Jiri Pinkava <master_up@post.cz>
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
@@ -78,7 +78,7 @@ dvbpsi_PDC_dr_t * dvbpsi_DecodePDCDr(dvbpsi_descriptor_t * p_descriptor)
   p_decoded->i_PDC[0] = ((p_descriptor->p_data[0] & 0x0f) << 1) |
       (p_descriptor->p_data[1] >> 7);
   p_decoded->i_PDC[1] = ((p_descriptor->p_data[1] >> 3) & 0x0f);
-  p_decoded->i_PDC[2] = ((p_descriptor->p_data[1] << 2) & 0x1c) | 
+  p_decoded->i_PDC[2] = ((p_descriptor->p_data[1] << 2) & 0x1c) |
       (p_descriptor->p_data[2] >> 6);
   p_decoded->i_PDC[3] = p_descriptor->p_data[2] & 0x3f;
 
@@ -102,9 +102,9 @@ dvbpsi_descriptor_t * dvbpsi_GenPDCDr(dvbpsi_PDC_dr_t * p_decoded,
   {
     /* Encode data */
     p_descriptor->p_data[0] = 0xf0 | (p_decoded->i_PDC[0] >> 1);
-    p_descriptor->p_data[1] = (p_decoded->i_PDC[0] << 7) | 
+    p_descriptor->p_data[1] = (p_decoded->i_PDC[0] << 7) |
         (p_decoded->i_PDC[1] << 3) | (p_decoded->i_PDC[2] >> 2);
-    p_descriptor->p_data[2] = (p_decoded->i_PDC[2] << 6 ) | 
+    p_descriptor->p_data[2] = (p_decoded->i_PDC[2] << 6 ) |
         p_decoded->i_PDC[3];
 
     if(b_duplicate)

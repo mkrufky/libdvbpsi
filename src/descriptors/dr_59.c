@@ -1,24 +1,24 @@
 /*****************************************************************************
  * dr_59.c
- * (c)2001-2002 VideoLAN
+ * Copyright (C) 2001-2010 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *          Tristan Leteurtre <tristan.leteurtre@anevia.com>
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
@@ -48,7 +48,7 @@
 dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
-  int i_subtitles_number, i;      
+  int i_subtitles_number, i;
   dvbpsi_subtitling_dr_t * p_decoded;
 
   /* Check the tag */
@@ -87,28 +87,28 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
     free(p_decoded);
     return NULL;
   }
-  
+
   i_subtitles_number = p_descriptor->i_length / 8;
 
   p_decoded->i_subtitles_number = i_subtitles_number;
-  
+
   for (i=0; i < i_subtitles_number; i++)
   {
     memcpy(p_decoded->p_subtitle[i].i_iso6392_language_code,
                      p_descriptor->p_data + 8 * i, 3);
 
-    p_decoded->p_subtitle[i].i_subtitling_type = 
+    p_decoded->p_subtitle[i].i_subtitling_type =
                                  p_descriptor->p_data[8 * i + 3];
-    
-    p_decoded->p_subtitle[i].i_composition_page_id = 
+
+    p_decoded->p_subtitle[i].i_composition_page_id =
               ((uint16_t)(p_descriptor->p_data[8 * i + 4]) << 8)
             | p_descriptor->p_data[8 * i + 5];
-    
-    p_decoded->p_subtitle[i].i_ancillary_page_id = 
+
+    p_decoded->p_subtitle[i].i_ancillary_page_id =
               ((uint16_t)(p_descriptor->p_data[8 * i + 6]) << 8)
-            | p_descriptor->p_data[8 * i + 7]; 
+            | p_descriptor->p_data[8 * i + 7];
   }
-  
+
   p_descriptor->p_decoded = (void*)p_decoded;
 
   return p_decoded;
@@ -123,34 +123,34 @@ dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
                                         int b_duplicate)
 {
   int i;
-  
+
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =
       dvbpsi_NewDescriptor(0x59, p_decoded->i_subtitles_number * 8 , NULL);
-  
+
   if(p_descriptor)
   {
     /* Encode data */
     for (i=0; i < p_decoded->i_subtitles_number; i++ )
-    {     
+    {
       memcpy( p_descriptor->p_data + 8 * i,
               p_decoded->p_subtitle[i].i_iso6392_language_code,
               3);
-         
-      p_descriptor->p_data[8 * i + 3] = 
+
+      p_descriptor->p_data[8 * i + 3] =
                                   p_decoded->p_subtitle[i].i_subtitling_type;
 
-      p_descriptor->p_data[8 * i + 4] = 
+      p_descriptor->p_data[8 * i + 4] =
                            p_decoded->p_subtitle[i].i_composition_page_id >> 8;
-      p_descriptor->p_data[8 * i + 5] = 
+      p_descriptor->p_data[8 * i + 5] =
                            p_decoded->p_subtitle[i].i_composition_page_id % 0xFF;
 
-      p_descriptor->p_data[8 * i + 6] = 
+      p_descriptor->p_data[8 * i + 6] =
                            p_decoded->p_subtitle[i].i_ancillary_page_id >> 8;
-      p_descriptor->p_data[8 * i + 7] = 
+      p_descriptor->p_data[8 * i + 7] =
                            p_decoded->p_subtitle[i].i_ancillary_page_id % 0xFF;
     }
-    
+
     if(b_duplicate)
     {
       /* Duplicate decoded data */
@@ -158,7 +158,7 @@ dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
         (dvbpsi_subtitling_dr_t*)malloc(sizeof(dvbpsi_subtitling_dr_t));
       if(p_dup_decoded)
         memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_subtitling_dr_t));
-  
+
       p_descriptor->p_decoded = (void*)p_dup_decoded;
     }
   }
