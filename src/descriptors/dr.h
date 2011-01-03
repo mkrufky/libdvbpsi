@@ -60,6 +60,7 @@
 #include "dr_59.h"
 #include "dr_5a.h"
 #include "dr_69.h"
+#include "dr_8a.h"
 
 #else
 #error "Multiple inclusions of dr.h"

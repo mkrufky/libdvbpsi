@@ -6,12 +6,12 @@ lib_LTLIBRARIES = libdvbpsi.la
 
 libdvbpsi_la_SOURCES = dvbpsi.c dvbpsi_private.h \
                        psi.c \
-		       demux.c \
+                       demux.c \
                        descriptor.c \
                        $(tables_src) \
                        $(descriptors_src)
 
-libdvbpsi_la_LDFLAGS = -version-info 6:0:0
+libdvbpsi_la_LDFLAGS = -version-info 7:0:0
 
 pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      tables/pat.h tables/pmt.h tables/sdt.h tables/eit.h \
@@ -44,6 +44,7 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      descriptors/dr_59.h \
                      descriptors/dr_5a.h \
                      descriptors/dr_69.h \
+		     descriptors/dr_8a.h \
                      descriptors/dr.h
 
 descriptors_src = descriptors/dr_02.c \
@@ -73,7 +74,8 @@ descriptors_src = descriptors/dr_02.c \
                   descriptors/dr_58.c \
                   descriptors/dr_59.c \
                   descriptors/dr_5a.c \
-                  descriptors/dr_69.c
+                  descriptors/dr_69.c \
+		  descriptors/dr_8a.c
 
 tables_src = tables/pat.c tables/pat_private.h \
              tables/pmt.c tables/pmt_private.h \
