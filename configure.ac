@@ -16,7 +16,7 @@ AM_PROG_LIBTOOL
 
 
 dnl default CFLAGS
-CFLAGS="${CFLAGS} -Wall -Werror  -DDVBPSI_DIST --std=gnu99"
+CFLAGS="${CFLAGS} -Wall -Werror  -DDVBPSI_DIST --std=gnu99 -D_GNU_SOURCE"
 CFLAGS="${CFLAGS} -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-prototypes -Wshadow -Waggregate-return -Wmissing-prototypes -Wnested-externs -Wsign-compare"
 
 dnl check the operating system
@@ -36,7 +36,7 @@ AC_ARG_ENABLE(debug,
 esac],[debug=false])
 if test "$debug" = "true"
 then
-  CFLAGS="${CFLAGS} -DDEBUG -g"
+  CFLAGS="${CFLAGS} -g -ggdb3"
 fi
 
 
