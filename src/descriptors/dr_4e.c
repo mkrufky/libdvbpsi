@@ -54,7 +54,7 @@ dvbpsi_extended_event_dr_t * dvbpsi_DecodeExtendedEventDr(dvbpsi_descriptor_t * 
   if(p_descriptor->i_tag != 0x4e ||
      p_descriptor->i_length < 6 )
   {
-    DVBPSI_ERROR_ARG("dr_4e decoder", "bad tag or corrupted(0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_4e decoder", "bad tag or corrupted(0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -64,11 +64,8 @@ dvbpsi_extended_event_dr_t * dvbpsi_DecodeExtendedEventDr(dvbpsi_descriptor_t * 
 
   /* Allocate memory */
   p_decoded = malloc(sizeof(dvbpsi_extended_event_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_4e decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
+
 
   /* Decode */
   p_decoded->i_descriptor_number = (p_descriptor->p_data[0] >> 4)&0xf;

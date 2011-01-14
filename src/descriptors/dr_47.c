@@ -53,7 +53,7 @@ dvbpsi_bouquet_name_dr_t * dvbpsi_DecodeBouquetNameDr(
   /* Check the tag */
   if(p_descriptor->i_tag != 0x47)
   {
-    DVBPSI_ERROR_ARG("dr_47 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_47 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -64,11 +64,7 @@ dvbpsi_bouquet_name_dr_t * dvbpsi_DecodeBouquetNameDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_bouquet_name_dr_t*)malloc(sizeof(dvbpsi_bouquet_name_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_47 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data */
   p_decoded->i_name_length = p_descriptor->i_length;

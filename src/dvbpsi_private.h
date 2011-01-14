@@ -33,38 +33,29 @@ extern uint32_t dvbpsi_crc32_table[];
 
 /*****************************************************************************
  * Error management
+ *
+ * libdvbpsi messages have the following format:
+ * "libdvbpsi [error | warning | debug] (<component>): <msg>"
  *****************************************************************************/
-#define DVBPSI_ERROR(src, str)                                          \
-        fprintf(stderr, "libdvbpsi error (" src "): " str "\n");
+#define DVBPSI_MSG_NONE   -1 /* No messages */
+#define DVBPSI_MSG_ERROR   0 /* Error messages, only */
+#define DVBPSI_MSG_WARNING 1 /* Error and Warning messages */
+#define DVBPSI_MSG_DEBUG   2 /* Error, warning and debug messages */
+
 #ifdef HAVE_VARIADIC_MACROS
-#  define DVBPSI_ERROR_ARG(src, str, x...)                              \
-        fprintf(stderr, "libdvbpsi error (" src "): " str "\n", x);
-#else
-   static inline void DVBPSI_ERROR_ARG( char *src, const char *str, ... )
-   { va_list ap; va_start( ap, str );
-     vfprintf(stderr, str, ap); fprintf(stderr,"\n"); va_end( ap ); }
-#endif
+void message(dvbpsi_handle dvbpsi, const int level, const char *fmt, ...);
 
-#ifdef DEBUG
-#  define DVBPSI_DEBUG(src, str)                                        \
-          fprintf(stderr, "libdvbpsi debug (" src "): " str "\n");
-#  ifdef HAVE_VARIADIC_MACROS
-#     define DVBPSI_DEBUG_ARG(src, str, x...)                           \
-          fprintf(stderr, "libdvbpsi debug (" src "): " str "\n", x);
-#  else
-      static inline void DVBPSI_DEBUG_ARG( char *src, const char *str, ... )
-      { va_list ap; va_start( ap, str );
-        vfprintf(stderr, str, ap); fprintf(stderr,"\n"); va_end( ap ); }
-#  endif
+#  define dvbpsi_error(hnd, src, str, x...)                             \
+        message(hnd, DVBPSI_MSG_ERROR, "libdvbpsi error ("src"): " str, x)
+#  define dvbpsi_warning(hnd, str, x...)                                \
+        message(hnd, DVBPSI_MSG_WARNING, "libdvbpsi warning ("src"): " str, x)
+#  define dvbpsi_debug(hnd, str, x...)                                  \
+        message(hnd, DVBPSI_MSG_DEBUG, "libdvbpsi debug ("src"): " str, x)
 #else
-#  define DVBPSI_DEBUG(src, str)
-#  ifdef HAVE_VARIADIC_MACROS
-#     define DVBPSI_DEBUG_ARG(src, str, x...)
-#  else
-      static inline void DVBPSI_DEBUG_ARG( char *src, const char *str, ... ) {}
-#  endif
+void dvbpsi_error(dvbpsi_handle dvbpsi, const char *src, const char *fmt, ...);
+void dvbpsi_warning(dvbpsi_handle dvbpsi, const char *src, const char *fmt, ...);
+void dvbpsi_debug(dvbpsi_handle dvbpsi, const char *src, const char *fmt, ...);
 #endif
-
 
 #else
 #error "Multiple inclusions of dvbpsi_private.h"

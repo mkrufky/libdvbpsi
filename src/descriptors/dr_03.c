@@ -51,7 +51,7 @@ dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
   /* Check the tag */
   if(p_descriptor->i_tag != 0x03)
   {
-    DVBPSI_ERROR_ARG("dr_03 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_03 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -61,16 +61,12 @@ dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
 
   /* Allocate memory */
   p_decoded = (dvbpsi_astream_dr_t*)malloc(sizeof(dvbpsi_astream_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_03 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length != 1)
   {
-    DVBPSI_ERROR_ARG("dr_03 decoder", "bad length (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_03 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
     return NULL;

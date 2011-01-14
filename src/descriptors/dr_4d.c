@@ -53,7 +53,7 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
   if(p_descriptor->i_tag != 0x4d ||
      p_descriptor->i_length < 5 )
   {
-    DVBPSI_ERROR_ARG("dr_4d decoder", "bad tag or corrupted(0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_4d decoder", "bad tag or corrupted(0x%x)", p_descriptor->i_tag);
     return NULL;
   }
   /* Check length */
@@ -61,7 +61,7 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
   i_len2 = p_descriptor->p_data[4+i_len1];
   if( p_descriptor->i_length < 5 + i_len1 + i_len2 )
   {
-    DVBPSI_ERROR_ARG("dr_4d decoder", "invalid length/content (tag=0x%x)", p_descriptor->i_tag );
+    dvbpsi_error(h_dvbpsi, "dr_4d decoder", "invalid length/content (tag=0x%x)", p_descriptor->i_tag );
     return NULL;
   }
 
@@ -71,11 +71,7 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
 
   /* Allocate memory */
   p_decoded = malloc(sizeof(dvbpsi_short_event_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_4d decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   memcpy( p_decoded->i_iso_639_code, &p_descriptor->p_data[0], 3 );

@@ -52,7 +52,7 @@ dvbpsi_ds_alignment_dr_t * dvbpsi_DecodeDSAlignmentDr(
   /* Check the tag */
   if(p_descriptor->i_tag != 0x06)
   {
-    DVBPSI_ERROR_ARG("dr_06 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_06 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -63,16 +63,12 @@ dvbpsi_ds_alignment_dr_t * dvbpsi_DecodeDSAlignmentDr(
   /* Allocate memory */
   p_decoded = (dvbpsi_ds_alignment_dr_t*)
                                 malloc(sizeof(dvbpsi_ds_alignment_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_06 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length != 1)
   {
-    DVBPSI_ERROR_ARG("dr_06 decoder", "bad length (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_06 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
     return NULL;

@@ -63,7 +63,7 @@ int dvbpsi_AttachNIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
 
   if(dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
   {
-    DVBPSI_ERROR_ARG("NIT decoder",
+    dvbpsi_error(h_dvbpsi, "NIT decoder",
                      "Already a decoder for (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, i_extension);
@@ -125,7 +125,7 @@ void dvbpsi_DetachNIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
 
   if(p_demux == NULL)
   {
-    DVBPSI_ERROR_ARG("NIT Decoder",
+    dvbpsi_error(h_dvbpsi, "NIT Decoder",
                      "No such NIT decoder (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, i_extension);
@@ -303,7 +303,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
   int b_append = 1;
   int b_reinit = 0;
 
-  DVBPSI_DEBUG_ARG("NIT decoder",
+  dvbpsi_debug(h_dvbpsi, "NIT decoder",
                    "Table version %2d, " "i_extension %5d, "
                    "section %3d up to %3d, " "current %1d",
                    p_section->i_version, p_section->i_extension,
@@ -313,7 +313,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
   if(p_section->i_table_id != 0x40 && p_section->i_table_id != 0x41)
   {
     /* Invalid table_id value */
-    DVBPSI_ERROR_ARG("NIT decoder",
+    dvbpsi_error(h_dvbpsi, "NIT decoder",
                      "invalid section (table_id == 0x%02x)",
                      p_section->i_table_id);
     b_append = 0;
@@ -322,7 +322,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
   if(b_append && !p_section->b_syntax_indicator)
   {
     /* Invalid section_syntax_indicator */
-    DVBPSI_ERROR("NIT decoder",
+    dvbpsi_error(h_dvbpsi, "NIT decoder",
                  "invalid section (section_syntax_indicator == 0)");
     b_append = 0;
   }
@@ -332,7 +332,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
   {
     /* Invalid program_number */
 #if 0
-    DVBPSI_ERROR("NIT decoder", "'network_id' don't match");
+    dvbpsi_error(h_dvbpsi, "NIT decoder", "'network_id' don't match");
 #endif
     b_append = 0;
   }
@@ -353,7 +353,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
         if(p_nit_decoder->p_building_nit->i_version != p_section->i_version)
         {
           /* version_number */
-          DVBPSI_ERROR("NIT decoder",
+          dvbpsi_error(h_dvbpsi, "NIT decoder",
                        "'version_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -362,7 +362,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
                                                 != p_section->i_last_number)
         {
           /* last_section_number */
-          DVBPSI_ERROR("NIT decoder",
+          dvbpsi_error(h_dvbpsi, "NIT decoder",
                        "'last_section_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -424,7 +424,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t * p_decoder,
     /* Fill the section array */
     if(p_nit_decoder->ap_sections[p_section->i_number] != NULL)
     {
-      DVBPSI_DEBUG_ARG("NIT decoder", "overwrite section number %d",
+      dvbpsi_debug(h_dvbpsi, "NIT decoder", "overwrite section number %d",
                        p_section->i_number);
       dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[p_section->i_number]);
     }
@@ -650,7 +650,7 @@ dvbpsi_psi_section_t* dvbpsi_GenNITSections(dvbpsi_nit_t* p_nit,
       p_transport_stream_loop_length[1] = i_transport_stream_loop_length;
 
       /* will put more descriptors in an empty section */
-      DVBPSI_DEBUG("NIT generator",
+      dvbpsi_debug(h_dvbpsi, "NIT generator",
                    "create a new section to carry more TS descriptors");
       p_prev = p_current;
       p_current = dvbpsi_NewPSISection(1024);
@@ -710,7 +710,7 @@ dvbpsi_psi_section_t* dvbpsi_GenNITSections(dvbpsi_nit_t* p_nit,
     }
 
     if(p_descriptor != NULL)
-      DVBPSI_ERROR("NIT generator", "unable to carry all the TS descriptors");
+      dvbpsi_error(h_dvbpsi, "NIT generator", "unable to carry all the TS descriptors");
 
     /* TS_info_length */
     i_ts_length = p_current->p_payload_end - p_ts_start - 5;

@@ -63,7 +63,7 @@ int dvbpsi_AttachTOT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
 
   if(dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0))
   {
-    DVBPSI_ERROR_ARG("TDT/TOT decoder",
+    dvbpsi_error(h_dvbpsi, "TDT/TOT decoder",
                      "Already a decoder for (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, 0);
@@ -117,7 +117,7 @@ void dvbpsi_DetachTOT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
 
   if(p_demux == NULL)
   {
-    DVBPSI_ERROR_ARG("TDT/TOT Decoder",
+    dvbpsi_error(h_dvbpsi, "TDT/TOT Decoder",
                      "No such TDT/TOT decoder (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, 0);
@@ -205,12 +205,12 @@ void dvbpsi_GatherTOTSections(dvbpsi_decoder_t* p_decoder,
   int b_append = 1;
   dvbpsi_tot_t* p_building_tot;
 
-  DVBPSI_DEBUG("TDT/TOT decoder", "got a section");
+  dvbpsi_debug(h_dvbpsi, "TDT/TOT decoder", "got a section");
 
   if(p_section->i_table_id != 0x70 && p_section->i_table_id != 0x73)
   {
     /* Invalid table_id value */
-    DVBPSI_ERROR_ARG("TDT/TOT decoder",
+    dvbpsi_error(h_dvbpsi, "TDT/TOT decoder",
                      "invalid section (table_id == 0x%02x)",
                      p_section->i_table_id);
     b_append = 0;
@@ -219,7 +219,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_decoder_t* p_decoder,
   if(b_append && p_section->b_syntax_indicator != 0)
   {
     /* Invalid section_syntax_indicator */
-    DVBPSI_ERROR("TDT/TOT decoder",
+    dvbpsi_error(h_dvbpsi, "TDT/TOT decoder",
                  "invalid section (section_syntax_indicator != 0)");
     b_append = 0;
   }
@@ -282,7 +282,7 @@ int dvbpsi_ValidTOTSection(dvbpsi_psi_section_t* p_section)
     }
     else
     {
-      DVBPSI_ERROR_ARG("TDT/TOT decoder",
+      dvbpsi_error(h_dvbpsi, "TDT/TOT decoder",
                        "Bad CRC_32 (0x%08x) !!!", i_crc);
       return 0;
     }
@@ -291,7 +291,7 @@ int dvbpsi_ValidTOTSection(dvbpsi_psi_section_t* p_section)
   {
     /* A TDT always has a length of 5 bytes (which is only the UTC time) */
     if(p_section->i_length != 5) {
-      DVBPSI_ERROR_ARG("TDT/TOT decoder",
+      dvbpsi_error(h_dvbpsi, "TDT/TOT decoder",
                        "TDT has an invalid payload size (%d bytes) !!!",
                        p_section->i_length);
       return 0;
@@ -395,7 +395,7 @@ dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_tot_t* p_tot)
       if(   (p_result->p_payload_end - p_result->p_data)
                                   + p_descriptor->i_length > 4090)
       {
-        DVBPSI_ERROR("TDT/TOT generator",
+        dvbpsi_error(h_dvbpsi, "TDT/TOT generator",
                      "TOT does not fit into one section as it ought to be !!!");
         break;
       }
@@ -449,11 +449,11 @@ dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_tot_t* p_tot)
 #ifdef DEBUG
   if(!dvbpsi_ValidTOTSection(p_result))
   {
-    DVBPSI_ERROR("TDT/TOT generator", "********************************************");
-    DVBPSI_ERROR("TDT/TOT generator", "*  Generated TDT/TOT section is invalid.   *");
-    DVBPSI_ERROR("TDT/TOT generator", "* THIS IS A BUG, PLEASE REPORT TO THE LIST *");
-    DVBPSI_ERROR("TDT/TOT generator", "*  ---  libdvbpsi-devel@videolan.org  ---  *");
-    DVBPSI_ERROR("TDT/TOT generator", "********************************************");
+    dvbpsi_error(h_dvbpsi, "TDT/TOT generator", "********************************************");
+    dvbpsi_error(h_dvbpsi, "TDT/TOT generator", "*  Generated TDT/TOT section is invalid.   *");
+    dvbpsi_error(h_dvbpsi, "TDT/TOT generator", "* THIS IS A BUG, PLEASE REPORT TO THE LIST *");
+    dvbpsi_error(h_dvbpsi, "TDT/TOT generator", "*  ---  libdvbpsi-devel@videolan.org  ---  *");
+    dvbpsi_error(h_dvbpsi, "TDT/TOT generator", "********************************************");
   }
 #endif
 

@@ -189,12 +189,13 @@ dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
 void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
                               dvbpsi_psi_section_t* p_section)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_decoder;
   dvbpsi_pat_decoder_t* p_pat_decoder
                         = (dvbpsi_pat_decoder_t*)p_decoder->p_private_decoder;
   int b_append = 1;
   int b_reinit = 0;
 
-  DVBPSI_DEBUG_ARG("PAT decoder",
+  dvbpsi_debug(h_dvbpsi, "PAT decoder",
                    "Table version %2d, " "i_extension %5d, "
                    "section %3d up to %3d, " "current %1d",
                    p_section->i_version, p_section->i_extension,
@@ -204,7 +205,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
   if(p_section->i_table_id != 0x00)
   {
     /* Invalid table_id value */
-    DVBPSI_ERROR_ARG("PAT decoder",
+    dvbpsi_error(h_dvbpsi, "PAT decoder",
                      "invalid section (table_id == 0x%02x)",
                      p_section->i_table_id);
     b_append = 0;
@@ -213,7 +214,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
   if(b_append && !p_section->b_syntax_indicator)
   {
     /* Invalid section_syntax_indicator */
-    DVBPSI_ERROR("PAT decoder",
+    dvbpsi_error(h_dvbpsi, "PAT decoder",
                  "invalid section (section_syntax_indicator == 0)");
     b_append = 0;
   }
@@ -235,7 +236,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
         if(p_pat_decoder->p_building_pat->i_ts_id != p_section->i_extension)
         {
           /* transport_stream_id */
-          DVBPSI_ERROR("PAT decoder",
+          dvbpsi_error(h_dvbpsi, "PAT decoder",
                        "'transport_stream_id' differs"
                        " whereas no TS discontinuity has occured");
           b_reinit = 1;
@@ -244,7 +245,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
                                                 != p_section->i_version)
         {
           /* version_number */
-          DVBPSI_ERROR("PAT decoder",
+          dvbpsi_error(h_dvbpsi, "PAT decoder",
                        "'version_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -253,7 +254,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
                                                 p_section->i_last_number)
         {
           /* last_section_number */
-          DVBPSI_ERROR("PAT decoder",
+          dvbpsi_error(h_dvbpsi, "PAT decoder",
                        "'last_section_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -315,7 +316,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
     /* Fill the section array */
     if(p_pat_decoder->ap_sections[p_section->i_number] != NULL)
     {
-      DVBPSI_DEBUG_ARG("PAT decoder", "overwrite section number %d",
+      dvbpsi_debug(h_dvbpsi, "PAT decoder", "overwrite section number %d",
                        p_section->i_number);
       dvbpsi_DeletePSISections(p_pat_decoder->ap_sections[p_section->i_number]);
     }

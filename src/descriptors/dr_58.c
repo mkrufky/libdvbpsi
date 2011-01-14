@@ -54,7 +54,7 @@ dvbpsi_local_time_offset_dr_t * dvbpsi_DecodeLocalTimeOffsetDr(
   /* Check the tag */
   if(p_descriptor->i_tag != 0x58)
   {
-    DVBPSI_ERROR_ARG("dr_58 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_58 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -65,11 +65,7 @@ dvbpsi_local_time_offset_dr_t * dvbpsi_DecodeLocalTimeOffsetDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_local_time_offset_dr_t*)malloc(sizeof(dvbpsi_local_time_offset_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_58 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data */
   p_decoded->i_local_time_offsets_number = 0;

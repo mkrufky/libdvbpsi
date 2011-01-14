@@ -52,7 +52,7 @@ dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor)
   /* Check the tag */
   if(p_descriptor->i_tag != 0x0a)
   {
-    DVBPSI_ERROR_ARG("dr_0a decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_0a decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -62,16 +62,12 @@ dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor)
 
   /* Allocate memory */
   p_decoded = (dvbpsi_iso639_dr_t*)malloc(sizeof(dvbpsi_iso639_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_0a decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if((p_descriptor->i_length < 1) || (p_descriptor->i_length % 4 != 0))
   {
-    DVBPSI_ERROR_ARG("dr_0a decoder", "bad length (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_0a decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
     return NULL;

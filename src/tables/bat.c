@@ -61,7 +61,7 @@ int dvbpsi_AttachBAT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
 
   if(dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
   {
-    DVBPSI_ERROR_ARG("BAT decoder",
+    dvbpsi_error(h_dvbpsi, "BAT decoder",
                      "Already a decoder for (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, i_extension);
@@ -120,7 +120,7 @@ void dvbpsi_DetachBAT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
   p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
   if(p_subdec == NULL)
   {
-    DVBPSI_ERROR_ARG("BAT Decoder",
+    dvbpsi_error(h_dvbpsi, "BAT Decoder",
                      "No such BAT decoder (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, i_extension);
@@ -292,7 +292,7 @@ void dvbpsi_GatherBATSections(dvbpsi_decoder_t * p_psi_decoder,
   int b_append = 1;
   int b_reinit = 0;
 
-  DVBPSI_DEBUG_ARG("BAT decoder",
+  dvbpsi_debug(h_dvbpsi, "BAT decoder",
                    "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
                    "section %3d up to %3d, " "current %1d",
                    p_section->i_version, p_section->i_table_id,
@@ -303,7 +303,7 @@ void dvbpsi_GatherBATSections(dvbpsi_decoder_t * p_psi_decoder,
   if(!p_section->b_syntax_indicator)
   {
     /* Invalid section_syntax_indicator */
-    DVBPSI_ERROR("BAT decoder",
+    dvbpsi_error(h_dvbpsi, "BAT decoder",
                  "invalid section (section_syntax_indicator == 0)");
     b_append = 0;
   }
@@ -325,7 +325,7 @@ void dvbpsi_GatherBATSections(dvbpsi_decoder_t * p_psi_decoder,
         if(p_bat_decoder->p_building_bat->i_bouquet_id != p_section->i_extension)
         {
           /* bouquet_id */
-          DVBPSI_ERROR("BAT decoder",
+          dvbpsi_error(h_dvbpsi, "BAT decoder",
                        "'bouquet_id' differs"
                        " whereas no TS discontinuity has occured");
           b_reinit = 1;
@@ -334,7 +334,7 @@ void dvbpsi_GatherBATSections(dvbpsi_decoder_t * p_psi_decoder,
                                                 != p_section->i_version)
         {
           /* version_number */
-          DVBPSI_ERROR("BAT decoder",
+          dvbpsi_error(h_dvbpsi, "BAT decoder",
                        "'version_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -343,7 +343,7 @@ void dvbpsi_GatherBATSections(dvbpsi_decoder_t * p_psi_decoder,
                                                 p_section->i_last_number)
         {
           /* last_section_number */
-          DVBPSI_ERROR("BAT decoder",
+          dvbpsi_error(h_dvbpsi, "BAT decoder",
                        "'last_section_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -413,7 +413,7 @@ void dvbpsi_GatherBATSections(dvbpsi_decoder_t * p_psi_decoder,
     /* Fill the section array */
     if(p_bat_decoder->ap_sections[p_section->i_number] != NULL)
     {
-      DVBPSI_DEBUG_ARG("BAT decoder", "overwrite section number %d",
+      dvbpsi_debug(h_dvbpsi, "BAT decoder", "overwrite section number %d",
                        p_section->i_number);
       dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[p_section->i_number]);
     }
@@ -640,7 +640,7 @@ dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_bat_t* p_bat)
       p_transport_stream_loop_length[1] = i_transport_stream_loop_length;
 
       /* will put more descriptors in an empty section */
-      DVBPSI_DEBUG("BAT generator",
+      dvbpsi_debug(h_dvbpsi, "BAT generator",
                    "create a new section to carry more TS descriptors");
       p_prev = p_current;
       p_current = dvbpsi_NewPSISection(1024);
@@ -700,7 +700,7 @@ dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_bat_t* p_bat)
     }
 
     if(p_descriptor != NULL)
-      DVBPSI_ERROR("BAT generator", "unable to carry all the TS descriptors");
+      dvbpsi_error(h_dvbpsi, "BAT generator", "unable to carry all the TS descriptors");
 
     /* transport_descriptors_length */
     i_transport_descriptors_length = p_current->p_payload_end - p_ts_start - 5;

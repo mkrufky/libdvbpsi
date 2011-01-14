@@ -52,7 +52,7 @@ dvbpsi_system_clock_dr_t * dvbpsi_DecodeSystemClockDr(
   /* Check the tag */
   if(p_descriptor->i_tag != 0x0b)
   {
-    DVBPSI_ERROR_ARG("dr_0b decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_0b decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -63,16 +63,12 @@ dvbpsi_system_clock_dr_t * dvbpsi_DecodeSystemClockDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_system_clock_dr_t*)malloc(sizeof(dvbpsi_system_clock_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_0b decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length != 2)
   {
-    DVBPSI_ERROR_ARG("dr_0b decoder", "bad length (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_0b decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
     return NULL;

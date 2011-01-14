@@ -54,7 +54,7 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
   /* Check the tag */
   if(p_descriptor->i_tag != 0x59)
   {
-    DVBPSI_ERROR_ARG("dr_59 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_59 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -65,16 +65,12 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_subtitling_dr_t*)malloc(sizeof(dvbpsi_subtitling_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_59 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length < 3)
   {
-    DVBPSI_ERROR_ARG("dr_59 decoder", "bad length (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_59 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
     return NULL;
@@ -82,7 +78,7 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
 
   if(p_descriptor->i_length % 8)
   {
-    DVBPSI_ERROR_ARG("dr_59 decoder", "length not multiple of 8 (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_59 decoder", "length not multiple of 8 (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
     return NULL;

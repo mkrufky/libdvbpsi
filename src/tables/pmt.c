@@ -261,12 +261,13 @@ dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
 void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
                               dvbpsi_psi_section_t* p_section)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_decoder;
   dvbpsi_pmt_decoder_t* p_pmt_decoder
                         = (dvbpsi_pmt_decoder_t*)p_decoder->p_private_decoder;
   int b_append = 1;
   int b_reinit = 0;
 
-  DVBPSI_DEBUG_ARG("PMT decoder",
+  dvbpsi_debug(h_dvbpsi, "PMT decoder",
                    "Table version %2d, " "i_extension %5d, "
                    "section %3d up to %3d, " "current %1d",
                    p_section->i_version, p_section->i_extension,
@@ -276,7 +277,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
   if(p_section->i_table_id != 0x02)
   {
     /* Invalid table_id value */
-    DVBPSI_ERROR_ARG("PMT decoder",
+    dvbpsi_error(h_dvbpsi, "PMT decoder",
                      "invalid section (table_id == 0x%02x)",
                      p_section->i_table_id);
     b_append = 0;
@@ -285,7 +286,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
   if(b_append && !p_section->b_syntax_indicator)
   {
     /* Invalid section_syntax_indicator */
-    DVBPSI_ERROR("PMT decoder",
+    dvbpsi_error(h_dvbpsi, "PMT decoder",
                  "invalid section (section_syntax_indicator == 0)");
     b_append = 0;
   }
@@ -295,7 +296,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
   {
     /* Invalid program_number */
 #if 0
-    DVBPSI_ERROR("PMT decoder", \
+    dvbpsi_error(h_dvbpsi, "PMT decoder", \
                  "'program_number' don't match");
 #endif
     b_append = 0;
@@ -317,7 +318,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
         if(p_pmt_decoder->p_building_pmt->i_version != p_section->i_version)
         {
           /* version_number */
-          DVBPSI_ERROR("PMT decoder",
+          dvbpsi_error(h_dvbpsi, "PMT decoder",
                        "'version_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -326,7 +327,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
                                                 != p_section->i_last_number)
         {
           /* last_section_number */
-          DVBPSI_ERROR("PMT decoder",
+          dvbpsi_error(h_dvbpsi, "PMT decoder",
                        "'last_section_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -390,7 +391,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
     /* Fill the section array */
     if(p_pmt_decoder->ap_sections[p_section->i_number] != NULL)
     {
-      DVBPSI_DEBUG_ARG("PMT decoder", "overwrite section number %d",
+      dvbpsi_debug(h_dvbpsi, "PMT decoder", "overwrite section number %d",
                        p_section->i_number);
       dvbpsi_DeletePSISections(p_pmt_decoder->ap_sections[p_section->i_number]);
     }
@@ -598,7 +599,7 @@ dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt)
         && (i_es_length <= 1008))
     {
       /* will put more descriptors in an empty section */
-      DVBPSI_DEBUG("PMT generator",
+      dvbpsi_debug(h_dvbpsi, "PMT generator",
                    "create a new section to carry more ES descriptors");
       p_prev = p_current;
       p_current = dvbpsi_NewPSISection(1024);
@@ -657,7 +658,7 @@ dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt)
     }
 
     if(p_descriptor != NULL)
-      DVBPSI_ERROR("PMT generator", "unable to carry all the ES descriptors");
+      dvbpsi_error(h_dvbpsi, "PMT generator", "unable to carry all the ES descriptors");
 
     /* ES_info_length */
     i_es_length = p_current->p_payload_end - p_es_start - 5;

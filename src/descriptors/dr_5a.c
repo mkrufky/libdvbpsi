@@ -52,7 +52,7 @@ dvbpsi_terr_deliv_sys_dr_t * dvbpsi_DecodeTerrDelivSysDr(
   /* Check the tag */
   if(p_descriptor->i_tag != 0x5a)
   {
-    DVBPSI_ERROR_ARG("dr_5a decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_5a decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -63,11 +63,7 @@ dvbpsi_terr_deliv_sys_dr_t * dvbpsi_DecodeTerrDelivSysDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_terr_deliv_sys_dr_t*)malloc(sizeof(dvbpsi_terr_deliv_sys_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_5a decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data */
   p_decoded->i_centre_frequency      =    (uint32_t)(p_descriptor->p_data[0] << 24)

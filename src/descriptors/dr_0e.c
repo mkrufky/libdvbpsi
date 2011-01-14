@@ -52,7 +52,7 @@ dvbpsi_max_bitrate_dr_t * dvbpsi_DecodeMaxBitrateDr(
   /* Check the tag */
   if(p_descriptor->i_tag != 0x0e)
   {
-    DVBPSI_ERROR_ARG("dr_0e decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_0e decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -62,16 +62,12 @@ dvbpsi_max_bitrate_dr_t * dvbpsi_DecodeMaxBitrateDr(
 
   /* Allocate memory */
   p_decoded = (dvbpsi_max_bitrate_dr_t*)malloc(sizeof(dvbpsi_max_bitrate_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_0e decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length != 3)
   {
-    DVBPSI_ERROR_ARG("dr_0e decoder", "bad length (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_0e decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
     return NULL;

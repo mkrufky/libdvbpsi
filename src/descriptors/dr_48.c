@@ -53,7 +53,7 @@ dvbpsi_service_dr_t * dvbpsi_DecodeServiceDr(
   /* Check the tag */
   if(p_descriptor->i_tag != 0x48)
   {
-    DVBPSI_ERROR_ARG("dr_48 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_48 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -64,16 +64,12 @@ dvbpsi_service_dr_t * dvbpsi_DecodeServiceDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_service_dr_t*)malloc(sizeof(dvbpsi_service_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_48 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length < 3)
   {
-    DVBPSI_ERROR_ARG("dr_07 decoder", "bad length (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_07 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
     return NULL;

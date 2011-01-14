@@ -62,7 +62,7 @@ int dvbpsi_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
 
   if(dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
   {
-    DVBPSI_ERROR_ARG("EIT decoder",
+    dvbpsi_error(h_dvbpsi, "EIT decoder",
                      "Already a decoder for (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, i_extension);
@@ -123,7 +123,7 @@ void dvbpsi_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
 
   if(p_demux == NULL)
   {
-    DVBPSI_ERROR_ARG("EIT Decoder",
+    dvbpsi_error(h_dvbpsi, "EIT Decoder",
                      "No such EIT decoder (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, i_extension);
@@ -278,7 +278,7 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
   int b_append = 1;
   int b_reinit = 0;
 
-  DVBPSI_DEBUG_ARG("EIT decoder",
+  dvbpsi_debug(h_dvbpsi, "EIT decoder",
                    "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
                    "section %3d up to %3d, " "current %1d",
                    p_section->i_version, p_section->i_table_id,
@@ -289,7 +289,7 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
   if(!p_section->b_syntax_indicator)
   {
     /* Invalid section_syntax_indicator */
-    DVBPSI_ERROR("EIT decoder",
+    dvbpsi_error(h_dvbpsi, "EIT decoder",
                  "invalid section (section_syntax_indicator == 0)");
     b_append = 0;
   }
@@ -311,7 +311,7 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
         if(p_eit_decoder->p_building_eit->i_service_id != p_section->i_extension)
         {
           /* service_id */
-          DVBPSI_ERROR("EIT decoder",
+          dvbpsi_error(h_dvbpsi, "EIT decoder",
                        "'service_id' differs"
                        " whereas no TS discontinuity has occurred");
           b_reinit = 1;
@@ -320,7 +320,7 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
                                                 != p_section->i_version)
         {
           /* version_number */
-          DVBPSI_ERROR("EIT decoder",
+          dvbpsi_error(h_dvbpsi, "EIT decoder",
                        "'version_number' differs"
                        " whereas no discontinuity has occurred");
           b_reinit = 1;
@@ -329,7 +329,7 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
                                                 p_section->i_last_number)
         {
           /* last_section_number */
-          DVBPSI_ERROR("EIT decoder",
+          dvbpsi_error(h_dvbpsi, "EIT decoder",
                        "'last_section_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -398,7 +398,7 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
     /* Fill the section array */
     if(p_eit_decoder->ap_sections[p_section->i_number] != NULL)
     {
-      DVBPSI_DEBUG_ARG("EIT decoder", "overwrite section number %d",
+      dvbpsi_debug(h_dvbpsi, "EIT decoder", "overwrite section number %d",
                        p_section->i_number);
       dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[p_section->i_number]);
     }

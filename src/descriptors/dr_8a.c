@@ -49,7 +49,7 @@ dvbpsi_cuei_dr_t * dvbpsi_DecodeCUEIDr(dvbpsi_descriptor_t * p_descriptor)
   /* Check the tag */
   if (p_descriptor->i_tag != 0x8a)
   {
-    DVBPSI_ERROR_ARG("dr_8a decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_8a decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -59,16 +59,12 @@ dvbpsi_cuei_dr_t * dvbpsi_DecodeCUEIDr(dvbpsi_descriptor_t * p_descriptor)
 
   /* Allocate memory */
   p_decoded = (dvbpsi_cuei_dr_t*)malloc(sizeof(dvbpsi_cuei_dr_t));
-  if (!p_decoded)
-  {
-    DVBPSI_ERROR("dr_8a decoder", "out of memory");
-    return NULL;
-  }
+  if (!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if (p_descriptor->i_length == 0x01)
   {
-    DVBPSI_ERROR_ARG("dr_8a decoder", "bad length (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_8a decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
     return NULL;

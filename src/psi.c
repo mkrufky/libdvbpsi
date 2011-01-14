@@ -119,8 +119,6 @@ int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
     }
     else
     {
-      DVBPSI_ERROR_ARG("misc PSI",
-                       "Bad CRC_32 (0x%08x) !!!", i_crc);
       return 0;
     }
   }
@@ -182,14 +180,14 @@ void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section)
     p_section->p_payload_end[1] = (p_section->i_crc >> 16) & 0xff;
     p_section->p_payload_end[2] = (p_section->i_crc >> 8) & 0xff;
     p_section->p_payload_end[3] = p_section->i_crc & 0xff;
-#ifdef DEBUG
+#if 0
     if(!dvbpsi_ValidPSISection(p_section))
     {
-      DVBPSI_ERROR("misc PSI", "********************************************");
-      DVBPSI_ERROR("misc PSI", "* Generated PSI section has a bad CRC_32.  *");
-      DVBPSI_ERROR("misc PSI", "* THIS IS A BUG, PLEASE REPORT TO THE LIST *");
-      DVBPSI_ERROR("misc PSI", "*  ---  libdvbpsi-devel@videolan.org  ---  *");
-      DVBPSI_ERROR("misc PSI", "********************************************");
+      dvbpsi_error(h_dvbpsi,"misc PSI", "********************************************");
+      dvbpsi_error(h_dvbpsi,"misc PSI", "* Generated PSI section has a bad CRC_32.  *");
+      dvbpsi_error(h_dvbpsi,"misc PSI", "* THIS IS A BUG, PLEASE REPORT TO THE LIST *");
+      dvbpsi_error(h_dvbpsi,"misc PSI", "*  ---  libdvbpsi-devel@videolan.org  ---  *");
+      dvbpsi_error(h_dvbpsi,"misc PSI", "********************************************");
     }
 #endif
   }

@@ -52,7 +52,7 @@ dvbpsi_sat_deliv_sys_dr_t * dvbpsi_DecodeSatDelivSysDr(
   /* Check the tag */
   if(p_descriptor->i_tag != 0x43)
   {
-    DVBPSI_ERROR_ARG("dr_43 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_43 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -63,11 +63,7 @@ dvbpsi_sat_deliv_sys_dr_t * dvbpsi_DecodeSatDelivSysDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_sat_deliv_sys_dr_t*)malloc(sizeof(dvbpsi_sat_deliv_sys_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_43 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data */
   p_decoded->i_frequency         =   (uint32_t)(p_descriptor->p_data[0] << 24)

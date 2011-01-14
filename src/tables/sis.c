@@ -64,7 +64,7 @@ int dvbpsi_AttachSIS(dvbpsi_decoder_t *p_psi_decoder, uint8_t i_table_id,
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
-        DVBPSI_ERROR_ARG("SIS decoder",
+        dvbpsi_error(h_dvbpsi, "SIS decoder",
                          "Already a decoder for (table_id == 0x%02x,"
                          "extension == 0x%02x)",
                          i_table_id, i_extension);
@@ -119,7 +119,7 @@ void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if (p_demux == NULL)
     {
-        DVBPSI_ERROR_ARG("SIS Decoder",
+        dvbpsi_error(h_dvbpsi, "SIS Decoder",
                          "No such SIS decoder (table_id == 0x%02x,"
                          "extension == 0x%02x)",
                          i_table_id, i_extension);
@@ -229,7 +229,7 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
     int b_append = 1;
     int b_reinit = 0;
 
-    DVBPSI_DEBUG_ARG("SIS decoder",
+    dvbpsi_debug(h_dvbpsi, "SIS decoder",
                      "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
                      "section %3d up to %3d, " "current %1d",
                      p_section->i_version, p_section->i_table_id,
@@ -240,7 +240,7 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
     if (p_section->i_table_id != 0xFC)
     {
         /* Invalid table_id value */
-        DVBPSI_ERROR_ARG("SIS decoder",
+        dvbpsi_error(h_dvbpsi, "SIS decoder",
                          "invalid section (table_id == 0x%02x)",
                           p_section->i_table_id);
         b_append = 0;
@@ -249,7 +249,7 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
     if (p_section->b_syntax_indicator != 0)
     {
         /* Invalid section_syntax_indicator */
-        DVBPSI_ERROR("SIS decoder",
+        dvbpsi_error(h_dvbpsi, "SIS decoder",
                      "invalid section (section_syntax_indicator != 0)");
         b_append = 0;
     }
@@ -257,7 +257,7 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
     if (p_section->b_private_indicator != 0)
     {
         /* Invalid private_syntax_indicator */
-        DVBPSI_ERROR("SIS decoder",
+        dvbpsi_error(h_dvbpsi, "SIS decoder",
                      "invalid private section (private_syntax_indicator != 0)");
         b_append = 0;
     }
@@ -279,7 +279,7 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
                 if (p_sis_decoder->p_building_sis->i_protocol_version != 0)
                 {
                     /* transport_stream_id */
-                    DVBPSI_ERROR("SIS decoder",
+                    dvbpsi_error(h_dvbpsi, "SIS decoder",
                                  "'protocol_version' differs");\
                     b_reinit = 1;
                 }

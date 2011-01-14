@@ -51,7 +51,7 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
   /* Check the tag */
   if( p_descriptor->i_tag != 0x45 )
   {
-    DVBPSI_ERROR_ARG("dr_45 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_45 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -62,14 +62,14 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
   /* Decode data and check the length */
   if(p_descriptor->i_length < 3)
   {
-    DVBPSI_ERROR_ARG("dr_45 decoder", "bad length (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_45 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     return NULL;
   }
 
   if(p_descriptor->i_length % 2)
   {
-    DVBPSI_ERROR_ARG("dr_45 decoder", "length not multiple of 3(%d)",
+    dvbpsi_error(h_dvbpsi, "dr_45 decoder", "length not multiple of 3(%d)",
                      p_descriptor->i_length);
     return NULL;
   }
@@ -79,11 +79,7 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_vbi_dr_t*)malloc(sizeof(dvbpsi_vbi_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_45 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   p_decoded->i_services_number = i_services_number;
 

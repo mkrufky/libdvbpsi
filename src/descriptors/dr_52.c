@@ -51,7 +51,7 @@ dvbpsi_stream_identifier_dr_t * dvbpsi_DecodeStreamIdentifierDr(
   /* Check the tag */
   if(p_descriptor->i_tag != 0x52)
   {
-    DVBPSI_ERROR_ARG("dr_52 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+    dvbpsi_error(h_dvbpsi, "dr_52 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
   }
 
@@ -62,16 +62,12 @@ dvbpsi_stream_identifier_dr_t * dvbpsi_DecodeStreamIdentifierDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_stream_identifier_dr_t*)malloc(sizeof(dvbpsi_stream_identifier_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_52 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length < 1)
   {
-    DVBPSI_ERROR_ARG("dr_52 decoder", "bad length (%d)",
+    dvbpsi_error(h_dvbpsi, "dr_52 decoder", "bad length (%d)",
                      p_descriptor->i_length);
     free(p_decoded);
     return NULL;

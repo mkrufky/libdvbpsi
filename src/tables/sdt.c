@@ -61,7 +61,7 @@ int dvbpsi_AttachSDT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
 
   if(dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
   {
-    DVBPSI_ERROR_ARG("SDT decoder",
+    dvbpsi_error(h_dvbpsi, "SDT decoder",
                      "Already a decoder for (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, i_extension);
@@ -122,7 +122,7 @@ void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
 
   if(p_demux == NULL)
   {
-    DVBPSI_ERROR_ARG("SDT Decoder",
+    dvbpsi_error(h_dvbpsi, "SDT Decoder",
                      "No such SDT decoder (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, i_extension);
@@ -275,7 +275,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
   int b_append = 1;
   int b_reinit = 0;
 
-  DVBPSI_DEBUG_ARG("SDT decoder",
+  dvbpsi_debug(h_dvbpsi, "SDT decoder",
                    "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
                    "section %3d up to %3d, " "current %1d",
                    p_section->i_version, p_section->i_table_id,
@@ -286,7 +286,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
   if(!p_section->b_syntax_indicator)
   {
     /* Invalid section_syntax_indicator */
-    DVBPSI_ERROR("SDT decoder",
+    dvbpsi_error(h_dvbpsi, "SDT decoder",
                  "invalid section (section_syntax_indicator == 0)");
     b_append = 0;
   }
@@ -308,7 +308,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
         if(p_sdt_decoder->p_building_sdt->i_ts_id != p_section->i_extension)
         {
           /* transport_stream_id */
-          DVBPSI_ERROR("SDT decoder",
+          dvbpsi_error(h_dvbpsi, "SDT decoder",
                        "'transport_stream_id' differs"
                        " whereas no TS discontinuity has occured");
           b_reinit = 1;
@@ -317,7 +317,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
                                                 != p_section->i_version)
         {
           /* version_number */
-          DVBPSI_ERROR("SDT decoder",
+          dvbpsi_error(h_dvbpsi, "SDT decoder",
                        "'version_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -326,7 +326,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
                                                 p_section->i_last_number)
         {
           /* last_section_number */
-          DVBPSI_ERROR("SDT decoder",
+          dvbpsi_error(h_dvbpsi, "SDT decoder",
                        "'last_section_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -390,7 +390,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
     /* Fill the section array */
     if(p_sdt_decoder->ap_sections[p_section->i_number] != NULL)
     {
-      DVBPSI_DEBUG_ARG("SDT decoder", "overwrite section number %d",
+      dvbpsi_debug(h_dvbpsi, "SDT decoder", "overwrite section number %d",
                        p_section->i_number);
       dvbpsi_DeletePSISections(p_sdt_decoder->ap_sections[p_section->i_number]);
     }
@@ -532,7 +532,7 @@ dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t* p_sdt)
     if ( (p_descriptor != NULL) && (p_service_start - p_current->p_data != 11) && (i_service_length <= 1009) )
     {
       /* will put more descriptors in an empty section */
-      DVBPSI_DEBUG("SDT generator","create a new section to carry more Service descriptors");
+      dvbpsi_debug(h_dvbpsi, "SDT generator","create a new section to carry more Service descriptors");
       p_prev = p_current;
       p_current = dvbpsi_NewPSISection(1024);
       p_prev->p_next = p_current;
@@ -581,7 +581,7 @@ dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t* p_sdt)
     }
 
     if(p_descriptor != NULL)
-      DVBPSI_ERROR("SDT generator", "unable to carry all the descriptors");
+      dvbpsi_error(h_dvbpsi, "SDT generator", "unable to carry all the descriptors");
 
     /* ES_info_length */
     i_service_length = p_current->p_payload_end - p_service_start - 5;

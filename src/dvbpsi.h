@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dvbpsi.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -33,8 +33,8 @@
 #ifndef _DVBPSI_DVBPSI_H_
 #define _DVBPSI_DVBPSI_H_
 
-#define DVBPSI_VERSION      0.1.7
-#define DVBPSI_VERSION_INT  ((0<<16)+(1<<8)+7)
+#define DVBPSI_VERSION      1.0.0
+#define DVBPSI_VERSION_INT  ((1<<16)+(0<<8)+0)
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,6 +89,17 @@ typedef struct dvbpsi_psi_section_s dvbpsi_psi_section_t;
 typedef void (* dvbpsi_callback)(dvbpsi_handle p_decoder,
                                  dvbpsi_psi_section_t* p_section);
 
+/*****************************************************************************
+ * dvbpsi_message_cb
+ *****************************************************************************/
+/*!
+ * \typedef void (* dvbpsi_message_cb)(dvbpsi_handle p_decoder,
+ *                                     const char* msg)
+ * \brief Callback type definition.
+ */
+typedef void (* dvbpsi_message_cb)(dvbpsi_handle p_decoder,
+                                   const char* msg);
+
 
 /*****************************************************************************
  * dvbpsi_decoder_t
@@ -126,6 +137,11 @@ typedef struct dvbpsi_decoder_s
   int                           b_complete_header;      /*!< Flag for header
                                                              completion */
 
+  /* Messages callback */
+  dvbpsi_message_cb             pf_message;             /*!< Log message callback */
+  int                           i_msg_level;            /*!< Log level -1, 0, 1 or 2
+                                                          (-1=none, 0=error, 1=warning,
+                                                           2=debug) */
 } dvbpsi_decoder_t;
 
 
