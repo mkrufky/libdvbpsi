@@ -50,10 +50,7 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
 
   /* Check the tag */
   if( p_descriptor->i_tag != 0x45 )
-  {
-    dvbpsi_error(h_dvbpsi, "dr_45 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -61,18 +58,10 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
 
   /* Decode data and check the length */
   if(p_descriptor->i_length < 3)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_45 decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     return NULL;
-  }
 
   if(p_descriptor->i_length % 2)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_45 decoder", "length not multiple of 3(%d)",
-                     p_descriptor->i_length);
     return NULL;
-  }
 
   i_services_number = p_descriptor->i_length / 2;
 

@@ -51,10 +51,7 @@ dvbpsi_sat_deliv_sys_dr_t * dvbpsi_DecodeSatDelivSysDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x43)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_43 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)

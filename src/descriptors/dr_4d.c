@@ -52,18 +52,14 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
   /* Check the tag */
   if(p_descriptor->i_tag != 0x4d ||
      p_descriptor->i_length < 5 )
-  {
-    dvbpsi_error(h_dvbpsi, "dr_4d decoder", "bad tag or corrupted(0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
+
   /* Check length */
   i_len1 = p_descriptor->p_data[3];
   i_len2 = p_descriptor->p_data[4+i_len1];
+
   if( p_descriptor->i_length < 5 + i_len1 + i_len2 )
-  {
-    dvbpsi_error(h_dvbpsi, "dr_4d decoder", "invalid length/content (tag=0x%x)", p_descriptor->i_tag );
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)

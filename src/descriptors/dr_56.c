@@ -50,10 +50,7 @@ dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
 
   /* Check the tag */
   if( (p_descriptor->i_tag != 0x56) && (p_descriptor->i_tag != 0x46) )
-  {
-    dvbpsi_error(h_dvbpsi, "dr_46/56 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -61,18 +58,10 @@ dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
 
   /* Decode data and check the length */
   if(p_descriptor->i_length < 3)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_46/dr_56 decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     return NULL;
-  }
 
   if(p_descriptor->i_length % 5)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_46/dr_56 decoder", "length not multiple of 5(%d)",
-                     p_descriptor->i_length);
     return NULL;
-  }
 
   i_pages_number = p_descriptor->i_length / 5;
 

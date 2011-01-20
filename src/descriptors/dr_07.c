@@ -51,10 +51,7 @@ dvbpsi_target_bg_grid_dr_t * dvbpsi_DecodeTargetBgGridDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x07)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_07 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -68,8 +65,6 @@ dvbpsi_target_bg_grid_dr_t * dvbpsi_DecodeTargetBgGridDr(
   /* Decode data and check the length */
   if(p_descriptor->i_length != 4)
   {
-    dvbpsi_error(h_dvbpsi, "dr_07 decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }

@@ -52,10 +52,7 @@ dvbpsi_parental_rating_dr_t * dvbpsi_DecodeParentalRatingDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x55)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_55 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -69,8 +66,6 @@ dvbpsi_parental_rating_dr_t * dvbpsi_DecodeParentalRatingDr(
   /* Decode data and check the length */
   if(p_descriptor->i_length % 4)
   {
-    dvbpsi_error(h_dvbpsi, "dr_55 decoder", "length not multiple of 4 (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }

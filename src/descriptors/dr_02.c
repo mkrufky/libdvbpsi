@@ -50,10 +50,7 @@ dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor)
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x02)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_02 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -69,10 +66,7 @@ dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor)
   if(    (!p_decoded->b_mpeg2 && (p_descriptor->i_length != 1))
       || (p_decoded->b_mpeg2 && (p_descriptor->i_length != 3)))
   {
-    dvbpsi_error(h_dvbpsi, "dr_02 decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
-
     return NULL;
   }
 
@@ -141,4 +135,3 @@ dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(dvbpsi_vstream_dr_t * p_decoded,
 
   return p_descriptor;
 }
-

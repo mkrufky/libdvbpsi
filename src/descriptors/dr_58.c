@@ -53,10 +53,7 @@ dvbpsi_local_time_offset_dr_t * dvbpsi_DecodeLocalTimeOffsetDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x58)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_58 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)

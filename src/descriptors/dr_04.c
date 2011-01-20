@@ -51,10 +51,7 @@ dvbpsi_hierarchy_dr_t * dvbpsi_DecodeHierarchyDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x04)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_04 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -67,8 +64,6 @@ dvbpsi_hierarchy_dr_t * dvbpsi_DecodeHierarchyDr(
   /* Decode data and check the length */
   if(p_descriptor->i_length != 4)
   {
-    dvbpsi_error(h_dvbpsi, "dr_04 decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }

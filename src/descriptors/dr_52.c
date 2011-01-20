@@ -50,10 +50,7 @@ dvbpsi_stream_identifier_dr_t * dvbpsi_DecodeStreamIdentifierDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x52)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_52 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -67,8 +64,6 @@ dvbpsi_stream_identifier_dr_t * dvbpsi_DecodeStreamIdentifierDr(
   /* Decode data and check the length */
   if(p_descriptor->i_length < 1)
   {
-    dvbpsi_error(h_dvbpsi, "dr_52 decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }

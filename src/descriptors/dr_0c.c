@@ -51,10 +51,7 @@ dvbpsi_mx_buff_utilization_dr_t * dvbpsi_DecodeMxBuffUtilizationDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x0c)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_0c decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -68,8 +65,6 @@ dvbpsi_mx_buff_utilization_dr_t * dvbpsi_DecodeMxBuffUtilizationDr(
   /* Decode data and check the length */
   if(p_descriptor->i_length != 3)
   {
-    dvbpsi_error(h_dvbpsi, "dr_0c decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }

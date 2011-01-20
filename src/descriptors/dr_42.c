@@ -52,10 +52,7 @@ dvbpsi_stuffing_dr_t * dvbpsi_DecodeStuffingDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x42)
-  {
-    dvbpsi_error(h_dvbpsi, "dr_42 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
