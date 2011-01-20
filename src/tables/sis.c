@@ -56,6 +56,7 @@ int dvbpsi_AttachSIS(dvbpsi_decoder_t *p_psi_decoder, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sis_callback pf_callback,
                                void* p_cb_data)
 {
+    dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_psi_decoder;
     dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_psi_decoder->p_private_decoder;
     dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_sis_decoder_t*  p_sis_decoder;
@@ -110,6 +111,7 @@ int dvbpsi_AttachSIS(dvbpsi_decoder_t *p_psi_decoder, uint8_t i_table_id,
 void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension)
 {
+    dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_demux->p_decoder;
     dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_demux_subdec_t** pp_prev_subdec;
     dvbpsi_sis_decoder_t* p_sis_decoder;
@@ -224,6 +226,7 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
                               void * p_private_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
+    dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_psi_decoder;
     dvbpsi_sis_decoder_t * p_sis_decoder
                         = (dvbpsi_sis_decoder_t*)p_private_decoder;
     int b_append = 1;

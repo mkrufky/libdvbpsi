@@ -599,8 +599,10 @@ dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt)
         && (i_es_length <= 1008))
     {
       /* will put more descriptors in an empty section */
+#if 0
       dvbpsi_debug(h_dvbpsi, "PMT generator",
                    "create a new section to carry more ES descriptors");
+#endif
       p_prev = p_current;
       p_current = dvbpsi_NewPSISection(1024);
       p_prev->p_next = p_current;
@@ -656,10 +658,10 @@ dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt)
 
       p_descriptor = p_descriptor->p_next;
     }
-
+#if 0
     if(p_descriptor != NULL)
       dvbpsi_error(h_dvbpsi, "PMT generator", "unable to carry all the ES descriptors");
-
+#endif
     /* ES_info_length */
     i_es_length = p_current->p_payload_end - p_es_start - 5;
     p_es_start[3] = (i_es_length >> 8) | 0xf0;

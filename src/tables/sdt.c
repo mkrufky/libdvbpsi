@@ -55,6 +55,7 @@ int dvbpsi_AttachSDT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sdt_callback pf_callback,
                                void* p_cb_data)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_psi_decoder;
   dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_psi_decoder->p_private_decoder;
   dvbpsi_demux_subdec_t* p_subdec;
   dvbpsi_sdt_decoder_t*  p_sdt_decoder;
@@ -114,6 +115,7 @@ int dvbpsi_AttachSDT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
 void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_demux->p_decoder;
   dvbpsi_demux_subdec_t* p_subdec;
   dvbpsi_demux_subdec_t** pp_prev_subdec;
   dvbpsi_sdt_decoder_t* p_sdt_decoder;
@@ -270,6 +272,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t * p_psi_decoder,
                               void * p_private_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_psi_decoder;
   dvbpsi_sdt_decoder_t * p_sdt_decoder
                         = (dvbpsi_sdt_decoder_t*)p_private_decoder;
   int b_append = 1;
@@ -532,7 +535,9 @@ dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t* p_sdt)
     if ( (p_descriptor != NULL) && (p_service_start - p_current->p_data != 11) && (i_service_length <= 1009) )
     {
       /* will put more descriptors in an empty section */
+#if 0
       dvbpsi_debug(h_dvbpsi, "SDT generator","create a new section to carry more Service descriptors");
+#endif
       p_prev = p_current;
       p_current = dvbpsi_NewPSISection(1024);
       p_prev->p_next = p_current;
@@ -580,8 +585,10 @@ dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t* p_sdt)
       p_descriptor = p_descriptor->p_next;
     }
 
+#if 0
     if(p_descriptor != NULL)
       dvbpsi_error(h_dvbpsi, "SDT generator", "unable to carry all the descriptors");
+#endif
 
     /* ES_info_length */
     i_service_length = p_current->p_payload_end - p_service_start - 5;

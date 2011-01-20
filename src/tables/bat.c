@@ -55,6 +55,7 @@
 int dvbpsi_AttachBAT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_bat_callback pf_callback, void* p_cb_data)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_psi_decoder;
   dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_psi_decoder->p_private_decoder;
   dvbpsi_demux_subdec_t* p_subdec;
   dvbpsi_bat_decoder_t*  p_bat_decoder;
@@ -113,6 +114,7 @@ int dvbpsi_AttachBAT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
 void dvbpsi_DetachBAT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_demux->p_decoder;
   dvbpsi_demux_subdec_t* p_subdec;
   dvbpsi_demux_subdec_t** pp_prev_subdec;
   dvbpsi_bat_decoder_t* p_bat_decoder;
@@ -287,6 +289,7 @@ void dvbpsi_GatherBATSections(dvbpsi_decoder_t * p_psi_decoder,
                               void * p_private_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_psi_decoder;
   dvbpsi_bat_decoder_t * p_bat_decoder
                         = (dvbpsi_bat_decoder_t*)p_private_decoder;
   int b_append = 1;
@@ -638,10 +641,11 @@ dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_bat_t* p_bat)
       i_transport_stream_loop_length = (p_current->p_payload_end - p_transport_stream_loop_length) - 2;
       p_transport_stream_loop_length[0] = (i_transport_stream_loop_length >> 8) | 0xf0;
       p_transport_stream_loop_length[1] = i_transport_stream_loop_length;
-
+#if 0 /* FIXME: */
       /* will put more descriptors in an empty section */
       dvbpsi_debug(h_dvbpsi, "BAT generator",
                    "create a new section to carry more TS descriptors");
+#endif
       p_prev = p_current;
       p_current = dvbpsi_NewPSISection(1024);
       p_prev->p_next = p_current;
@@ -698,10 +702,10 @@ dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_bat_t* p_bat)
 
       p_descriptor = p_descriptor->p_next;
     }
-
+#if 0 /* FIXME: */
     if(p_descriptor != NULL)
       dvbpsi_error(h_dvbpsi, "BAT generator", "unable to carry all the TS descriptors");
-
+#endif
     /* transport_descriptors_length */
     i_transport_descriptors_length = p_current->p_payload_end - p_ts_start - 5;
     p_ts_start[4] = (i_transport_descriptors_length >> 8) | 0xf0;

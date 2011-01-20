@@ -182,6 +182,7 @@ dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
 void dvbpsi_GatherCATSections(dvbpsi_decoder_t* p_decoder,
                               dvbpsi_psi_section_t* p_section)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_decoder;
   dvbpsi_cat_decoder_t* p_cat_decoder
                         = (dvbpsi_cat_decoder_t*)p_decoder->p_private_decoder;
   int b_append = 1;

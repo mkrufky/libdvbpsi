@@ -57,6 +57,7 @@ int dvbpsi_AttachTOT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
                      uint16_t i_extension,
                      dvbpsi_tot_callback pf_callback, void* p_cb_data)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_psi_decoder;
   dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_psi_decoder->p_private_decoder;
   dvbpsi_demux_subdec_t* p_subdec;
   dvbpsi_tot_decoder_t*  p_tot_decoder;
@@ -110,6 +111,7 @@ int dvbpsi_AttachTOT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
 void dvbpsi_DetachTOT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
                       uint16_t i_extension)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_demux->p_decoder;
   dvbpsi_demux_subdec_t* p_subdec;
   dvbpsi_demux_subdec_t** pp_prev_subdec;
 
@@ -200,6 +202,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_decoder_t* p_decoder,
                               void * p_private_decoder,
                               dvbpsi_psi_section_t* p_section)
 {
+  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_decoder;
   dvbpsi_tot_decoder_t* p_tot_decoder
                         = (dvbpsi_tot_decoder_t*)p_private_decoder;
   int b_append = 1;
@@ -282,8 +285,10 @@ int dvbpsi_ValidTOTSection(dvbpsi_psi_section_t* p_section)
     }
     else
     {
+#if 0 /* FIXME */
       dvbpsi_error(h_dvbpsi, "TDT/TOT decoder",
                        "Bad CRC_32 (0x%08x) !!!", i_crc);
+#endif
       return 0;
     }
   }
@@ -291,9 +296,11 @@ int dvbpsi_ValidTOTSection(dvbpsi_psi_section_t* p_section)
   {
     /* A TDT always has a length of 5 bytes (which is only the UTC time) */
     if(p_section->i_length != 5) {
+#if 0 /* FIXME */
       dvbpsi_error(h_dvbpsi, "TDT/TOT decoder",
                        "TDT has an invalid payload size (%d bytes) !!!",
                        p_section->i_length);
+#endif
       return 0;
     }
   }
@@ -395,8 +402,10 @@ dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_tot_t* p_tot)
       if(   (p_result->p_payload_end - p_result->p_data)
                                   + p_descriptor->i_length > 4090)
       {
+#if 0 /* FIXME: */
         dvbpsi_error(h_dvbpsi, "TDT/TOT generator",
                      "TOT does not fit into one section as it ought to be !!!");
+#endif
         break;
       }
 
