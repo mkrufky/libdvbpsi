@@ -82,7 +82,7 @@ dvbpsi_bouquet_name_dr_t* dvbpsi_DecodeBouquetNameDr(
  * dvbpsi_GenBouquetNameDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t * dvbpsi_GenStuffingDr(
+ * \fn dvbpsi_descriptor_t * dvbpsi_GenBouquetNameDr(
                         dvbpsi_bouquet_name_dr_t * p_decoded, int b_duplicate)
  * \brief "bouquet name" descriptor generator.
  * \param p_decoded pointer to a decoded "bouquet name" descriptor

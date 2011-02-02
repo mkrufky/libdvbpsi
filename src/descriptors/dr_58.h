@@ -82,8 +82,8 @@ typedef struct dvbpsi_local_time_offset_s
  */
 typedef struct dvbpsi_local_time_offset_dr_s
 {
-  uint8_t      i_local_time_offsets_number;
-  dvbpsi_local_time_offset_t p_local_time_offset[19];
+  uint8_t      i_local_time_offsets_number;             /*!< local time offset number */
+  dvbpsi_local_time_offset_t p_local_time_offset[19];   /*!< local time offset */
 
 } dvbpsi_local_time_offset_dr_t;
 

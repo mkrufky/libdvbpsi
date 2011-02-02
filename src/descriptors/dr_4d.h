@@ -55,11 +55,11 @@ extern "C" {
  */
 typedef struct dvbpsi_short_event_dr_s
 {
-  uint8_t i_iso_639_code[3];
-  int     i_event_name_length;
-  uint8_t i_event_name[256];
-  int     i_text_length;
-  uint8_t i_text[256];
+  uint8_t i_iso_639_code[3];    /*!< ISO 639 language code */
+  int     i_event_name_length;  /*!< length of event name */
+  uint8_t i_event_name[256];    /*!< "short event" name */
+  int     i_text_length;        /*!< text length */
+  uint8_t i_text[256];          /*!< "short event" text */
 
 } dvbpsi_short_event_dr_t;
 

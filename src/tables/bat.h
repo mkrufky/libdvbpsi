@@ -156,7 +156,6 @@ void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * \param i_bouquet_id bouquet ID
  * \param i_version BAT version
  * \param b_current_next current next indicator
- * \param i_network_id original network id
  * \return nothing.
  */
 void dvbpsi_InitBAT(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_version,
@@ -169,7 +168,6 @@ void dvbpsi_InitBAT(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_versio
  * \param i_bouquet_id bouquet ID
  * \param i_version BAT version
  * \param b_current_next current next indicator
- * \param i_network_id original network id
  * \return nothing.
  */
 #define dvbpsi_NewBAT(p_bat, i_bouquet_id, i_version, b_current_next) \

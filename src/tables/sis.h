@@ -178,7 +178,7 @@ void dvbpsi_EmptySIS(dvbpsi_sis_t *p_sis);
 /*!
  * \def dvbpsi_DeleteSIS(p_sis)
  * \brief Clean and free a dvbpsi_sis_t structure.
- * \param p_sIt pointer to the SIS structure
+ * \param p_sis pointer to the SIS structure
  * \return nothing.
  */
 #define dvbpsi_DeleteSIS(p_sis)                                         \

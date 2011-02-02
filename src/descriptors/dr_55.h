@@ -53,8 +53,8 @@ extern "C" {
  */
 typedef struct dvbpsi_parental_rating_s
 {
-  uint32_t      i_country_code;
-  uint8_t       i_rating;
+  uint32_t      i_country_code; /*!< country code of parental rating */
+  uint8_t       i_rating;       /*!< parental rating */
 
 } dvbpsi_parental_rating_t;
 
@@ -75,8 +75,8 @@ typedef struct dvbpsi_parental_rating_s
  */
 typedef struct dvbpsi_parental_rating_dr_s
 {
-  uint8_t       i_ratings_number;
-  dvbpsi_parental_rating_t p_parental_rating[64];
+  uint8_t       i_ratings_number;                   /*!< number of rating */
+  dvbpsi_parental_rating_t p_parental_rating[64];   /*!< parental rating table */
 
 } dvbpsi_parental_rating_dr_t;
 

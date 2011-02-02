@@ -64,7 +64,6 @@ typedef struct dvbpsi_eit_event_s
   dvbpsi_descriptor_t *     p_first_descriptor;     /*!< First of the following
                                                          DVB descriptors */
 
-
   struct dvbpsi_eit_event_s * p_next;               /*!< next element of
                                                              the list */
 
@@ -171,10 +170,13 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
  * \def dvbpsi_NewEIT(p_eit, i_ts_id, i_version, b_current_next, i_network_id)
  * \brief Allocate and initialize a new dvbpsi_eit_t structure.
  * \param p_eit pointer to the EIT structure
- * \param i_ts_id transport stream ID
+ * \param i_service_id service ID
  * \param i_version EIT version
  * \param b_current_next current next indicator
+ * \param i_ts_id transport stream ID
  * \param i_network_id original network id
+ * \param i_segment_last_section_number segment_last_section_number
+ * \param i_last_table_id i_last_table_id
  * \return nothing.
  */
 #define dvbpsi_NewEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id) \

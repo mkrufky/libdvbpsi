@@ -160,7 +160,6 @@ void dvbpsi_InitNIT(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
  * \param i_network_id network id
  * \param i_version NIT version
  * \param b_current_next current next indicator
- * \param i_pcr_pid PCR_PID
  * \return nothing.
  */
 #define dvbpsi_NewNIT(p_nit, i_network_id,                              \
@@ -218,11 +217,11 @@ dvbpsi_descriptor_t* dvbpsi_NITAddDescriptor(dvbpsi_nit_t* p_nit,
  *****************************************************************************/
 /*!
  * \fn dvbpsi_nit_ts_t* dvbpsi_NITAddTS(dvbpsi_nit_t* p_nit,
-                                        uint8_t i_ts_id, uint16_t i_orig_network_id)
+                                        uint16_t i_ts_id, uint16_t i_orig_network_id)
  * \brief Add an TS in the NIT.
  * \param p_nit pointer to the NIT structure
  * \param i_ts_id type of TS
- * \param i_pid PID of the TS
+ * \param i_orig_network_id PID of the TS
  * \return a pointer to the added TS.
  */
 dvbpsi_nit_ts_t* dvbpsi_NITAddTS(dvbpsi_nit_t* p_nit,

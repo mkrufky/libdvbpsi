@@ -40,17 +40,17 @@ extern "C" {
 
 
 /*****************************************************************************
- * dvbpsi_service_dr_t
+ * dvbpsi_stream_identifier_dr_s
  *****************************************************************************/
 /*!
- * \struct dvbpsi_service_dr_s
+ * \struct dvbpsi_stream_identifier_dr_s
  * \brief "stream identifier" descriptor structure.
  *
  * This structure is used to store a decoded "stream identifier"
  * descriptor. (ETSI EN 300 468 section 6.2.37).
  */
 /*!
- * \typedef struct dvbpsi_service_dr_s dvbpsi_stream_identifier_dr_t
+ * \typedef struct dvbpsi_stream_identifier_dr_s dvbpsi_stream_identifier_dr_t
  * \brief dvbpsi_stream_identifier_dr_t type definition.
  */
 typedef struct dvbpsi_stream_identifier_dr_s

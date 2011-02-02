@@ -98,7 +98,7 @@ int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
 /*!
  * \fn int dvbpsi_DetachTOT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
  * \brief Destroy a TDT/TOT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, usually 0x70
  * \param i_extension Table ID extension, unused in the TDT/TOT
  * \return nothing.
@@ -178,7 +178,7 @@ dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
  * dvbpsi_GenTOTSections
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t *p_dvbpsi, dvbpsi_Ttot_t* p_tot)
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t *p_dvbpsi, dvbpsi_tot_t* p_tot)
  * \brief TDT/TOT generator
  * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_tot TDT/TOT structure

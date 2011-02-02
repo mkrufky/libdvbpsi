@@ -112,6 +112,7 @@ typedef void (* dvbpsi_pmt_callback)(void* p_cb_data, dvbpsi_pmt_t* p_new_pmt);
                                       void* p_cb_data)
  * \brief Creates and initialization of a PMT decoder and attaches it to dvbpsi_t
  *        handle
+ * \param p_dvbpsi handle
  * \param i_program_number program number
  * \param pf_callback function to call back on new PMT
  * \param p_cb_data private data given in argument to the callback

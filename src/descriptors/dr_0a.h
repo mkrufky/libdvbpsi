@@ -39,8 +39,8 @@
 extern "C" {
 #endif
 
-#define DR_0A_API_VER 2
-typedef uint8_t iso_639_language_code_t[3];
+#define DR_0A_API_VER 2                     /*!< descriptor 0a API version */
+typedef uint8_t iso_639_language_code_t[3]; /*!< ISO639 three letter language codes */
 
 /*****************************************************************************
  * dvbpsi_iso639_dr_t
@@ -61,9 +61,9 @@ typedef struct dvbpsi_iso639_dr_s
   uint8_t       i_code_count;           /*!< length of the i_iso_639_code
                                              array */
   struct {
-    iso_639_language_code_t  iso_639_code;    /*!< ISO_639_language_code */
-    uint8_t                  i_audio_type;    /*!< audio_type */
-  } code[64];
+    iso_639_language_code_t  iso_639_code; /*!< ISO_639_language_code */
+    uint8_t                  i_audio_type; /*!< audio_type */
+  } code[64];                              /*!< list of ISO 639 codes */
 
 } dvbpsi_iso639_dr_t;
 

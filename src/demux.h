@@ -85,12 +85,12 @@ typedef void (*dvbpsi_demux_subdec_cb_t)
 struct dvbpsi_demux_s;
 typedef struct dvbpsi_demux_subdec_s
 {
-  uint32_t                        i_id;
-  dvbpsi_demux_subdec_cb_t        pf_callback;
-  void *                          p_cb_data;
-  struct dvbpsi_demux_subdec_s *  p_next;
+  uint32_t                        i_id;             /*!< subtable id */
+  dvbpsi_demux_subdec_cb_t        pf_callback;      /*!< subdec callback */
+  void *                          p_cb_data;        /*!< subdec callback data */
+  struct dvbpsi_demux_subdec_s *  p_next;           /*!< next subdec callback */
 
-  void (*pf_detach)(dvbpsi_t *, uint8_t, uint16_t);
+  void (*pf_detach)(dvbpsi_t *, uint8_t, uint16_t); /*!< detach subdec callback */
 
 } dvbpsi_demux_subdec_t;
 
@@ -143,7 +143,8 @@ dvbpsi_t *dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
 /*!
  * \fn void dvbpsi_DetachDemux(dvbpsi_t *p_dvbpsi)
  * \brief Destroys a demux structure.
- * \param h_dvbpsi The handle of the demux to be destroyed.
+ * \param p_dvbpsi The handle of the demux to be destroyed.
+ * \return nothing
  */
 void dvbpsi_DetachDemux(dvbpsi_t *p_dvbpsi);
 
