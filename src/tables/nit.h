@@ -125,7 +125,7 @@ int dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_DetachNIT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachNIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn void dvbpsi_DetachNIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
                              uint16_t i_extension)
  * \brief Destroy a NIT decoder.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
@@ -218,10 +218,10 @@ dvbpsi_descriptor_t* dvbpsi_NITAddDescriptor(dvbpsi_nit_t* p_nit,
  *****************************************************************************/
 /*!
  * \fn dvbpsi_nit_ts_t* dvbpsi_NITAddTS(dvbpsi_nit_t* p_nit,
-                                        uint8_t i_type, uint16_t i_pid)
+                                        uint8_t i_ts_id, uint16_t i_orig_network_id)
  * \brief Add an TS in the NIT.
  * \param p_nit pointer to the NIT structure
- * \param i_type type of TS
+ * \param i_ts_id type of TS
  * \param i_pid PID of the TS
  * \return a pointer to the added TS.
  */
@@ -251,10 +251,10 @@ dvbpsi_descriptor_t* dvbpsi_NITTSAddDescriptor(dvbpsi_nit_ts_t* p_ts,
  * dvbpsi_GenNITSections
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenNITSections(dvbpsi_nit_t* p_nit,
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenNITSections(dvbpsi_t *p_dvbpsi, dvbpsi_nit_t* p_nit,
                                                    uint8_t i_table_id)
  * \brief NIT generator
- * \parma p_dvbpsi dvbpsi handle
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_nit NIT structure
  * \param i_table_id table id, 0x40 = actual network / 0x41 = other network
  * \return a pointer to the list of generated PSI sections.

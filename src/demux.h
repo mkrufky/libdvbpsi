@@ -126,7 +126,7 @@ struct dvbpsi_demux_s
  * dvbpsi_AttachDemux
  *****************************************************************************/
 /*!
- * \fn dvbpsi_t *dvbpsi_NewPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_demux_new_cb_t pf_new_cb, void * p_new_cb_data)
+ * \fn dvbpsi_t *dvbpsi_AttachDemux(dvbpsi_t *p_dvbpsi, dvbpsi_demux_new_cb_t pf_new_cb, void * p_new_cb_data)
  * \brief Creates a new demux structure.
  * \param p_dvbpsi pointer to dvbpsi_t handle
  * \param pf_new_cb A callcack called when a new type of subtable is found.
@@ -141,7 +141,7 @@ dvbpsi_t *dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
  * dvbpsi_DetachDemux
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachDemux(dvbpsi_decoder_t *p_decoder)
+ * \fn void dvbpsi_DetachDemux(dvbpsi_t *p_dvbpsi)
  * \brief Destroys a demux structure.
  * \param h_dvbpsi The handle of the demux to be destroyed.
  */

@@ -91,7 +91,7 @@ struct dvbpsi_s
  * dvbpsi_NewHandle
  *****************************************************************************/
 /*!
- * \fn dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb *callback)
+ * \fn dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb *callback, int level)
  * \brief Create a new dvbpsi_t handle to be used by PSI decoders or encoders
  * \param callback message callback handler, if NULL then no errors, warnings
  *        or debug messages will be sent to the caller application
@@ -122,15 +122,15 @@ void dvbpsi_DeleteHandle(dvbpsi_t *handle);
  * dvbpsi_PushPacket
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
+ * \fn void dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
  * \brief Injection of a TS packet into a PSI decoder.
- * \param h_dvbpsi handle to the decoder
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_data pointer to a 188 bytes playload of a TS packet
  * \return nothing.
  *
  * Injection of a TS packet into a PSI decoder.
  */
-void dvbpsi_PushPacket(dvbpsi_t * h_dvbpsi, uint8_t* p_data);
+void dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data);
 
 /*****************************************************************************
  * The following definitions are just here to allow external decoders but
@@ -188,29 +188,30 @@ struct dvbpsi_decoder_s
  * dvbpsi_NewDecoder
  *****************************************************************************/
 /*!
- * \fn dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *handle, dvbpsi_callback *callback)
+ * \fn dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *p_dvbpsi, dvbpsi_callback *callback)
  * \brief Create a new dvbpsi_decoder_t.
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param callback dvbpsi_callback handler
  * \return pointer to dvbpsi_decoder_t&
  *
  * Creates a dvbpsi_decoder_t pointer to struct dvbpsi_decoder_s. It should be
  * delete with dvbpsi_DeleteDecoder() function.
  */
-dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *handle, dvbpsi_callback *callback);
+dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *p_dvbpsi, dvbpsi_callback *callback);
 
 /*****************************************************************************
- * dvbpsi_DeletDecoder
+ * dvbpsi_DeleteDecoder
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DeleteDecoder(dvbpsi_t *handle);
+ * \fn void dvbpsi_DeleteDecoder(dvbpsi_t *p_dvbpsi);
  * \brief Deletes attached decoder struct from dvbpsi_t handle and frees its memory
- * \param pointer to dvbpsi_t malloced data
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \return nothing
  *
  * Delets a dvbpsi_t handle by calling free(handle). Make sure to detach any
  * decoder of encoder before deleting the dvbpsi handle.
  */
-void dvbpsi_DeleteDecoder(dvbpsi_t *handle);
+void dvbpsi_DeleteDecoder(dvbpsi_t *p_dvbpsi);
 
 #ifdef __cplusplus
 };

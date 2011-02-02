@@ -182,7 +182,7 @@ dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *handle, dvbpsi_callback *callback)
 }
 
 /*****************************************************************************
- * dvbpsi_DeletDecoder
+ * dvbpsi_DeleteDecoder
  *****************************************************************************/
 void dvbpsi_DeleteDecoder(dvbpsi_t *handle)
 {

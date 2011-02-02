@@ -206,8 +206,9 @@ do {                                                                    \
  * dvbpsi_GenBATSections
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_bat_t* p_bat)
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_bat)
  * \brief BAT generator
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_bat BAT structure
  * \return a pointer to the list of generated PSI sections.
  *

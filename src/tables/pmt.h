@@ -255,7 +255,7 @@ dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
  * \fn dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_t *p_dvbpsi,
                                                    dvbpsi_pmt_t* p_pmt)
  * \brief PMT generator
- * \param p_dvbpsi is a pointer to dvbpsi_t
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_pmt PMT structure
  * \return a pointer to the list of generated PSI sections.
  *

@@ -92,8 +92,9 @@ dvbpsi_t *dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
  * dvbpsi_DetachCAT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachCAT(dvbpsi_handle h_dvbpsi)
+ * \fn void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
  * \brief Destroy a CAT decoder.
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_dvbpsi handle holds the decoder pointer
  * \return nothing.
  *
@@ -179,9 +180,9 @@ dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
  * dvbpsi_GenCATSections
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_cat_t* p_cat)
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_t *p_dvbpsi, dvbpsi_cat_t* p_cat)
  * \brief CAT generator
- * \param p_dvbpsi is a pointer to dvbpsi_t
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_cat CAT structure
  * \return a pointer to the list of generated PSI sections.
  *

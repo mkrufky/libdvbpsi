@@ -78,7 +78,7 @@ typedef void (* dvbpsi_tot_callback)(void* p_cb_data, dvbpsi_tot_t* p_new_tot);
  * dvbpsi_AttachTOT
  *****************************************************************************/
 /*!
- * \fn int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
+ * \fn int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
                             dvbpsi_tot_callback pf_callback, void* p_cb_data)
  * \brief Creation and initialization of a TDT/TOT decoder.
  * \param p_dvbpsi dvbpsi handle pointing to Subtable demultiplexor to which the decoder is attached.
@@ -96,7 +96,7 @@ int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_DetachTOT
  *****************************************************************************/
 /*!
- * \fn int dvbpsi_DetachTOT(dvbpsi_demux_t * p_demux, uint8_t i_table_id)
+ * \fn int dvbpsi_DetachTOT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
  * \brief Destroy a TDT/TOT decoder.
  * \param p_demux Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, usually 0x70
@@ -110,7 +110,7 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_InitTOT/dvbpsi_NewTOT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot)
+ * \fn void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time)
  * \brief Initialize a user-allocated dvbpsi_tot_t structure.
  * \param p_tot pointer to the TDT/TOT structure
  * \param i_utc_time the time in UTC
@@ -119,7 +119,7 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
 void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time);
 
 /*!
- * \def dvbpsi_NewTOT(p_tot)
+ * \def dvbpsi_NewTOT(p_tot, i_utc_time)
  * \brief Allocate and initialize a new dvbpsi_tot_t structure.
  * \param p_tot pointer to the TDT/TOT structure
  * \param i_utc_time the time in UTC
@@ -178,9 +178,9 @@ dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
  * dvbpsi_GenTOTSections
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_Ttot_t* p_tot)
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t *p_dvbpsi, dvbpsi_Ttot_t* p_tot)
  * \brief TDT/TOT generator
- * \param p_dvbpsi dvbpsi handle
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_tot TDT/TOT structure
  * \return a pointer to the list of generated PSI sections.
  *

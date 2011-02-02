@@ -108,7 +108,7 @@ typedef void (* dvbpsi_sis_callback)(void* p_cb_data, dvbpsi_sis_t* p_new_sis);
  * dvbpsi_AttachSIS
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_AttachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn void dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sis_callback pf_callback,
                                void* p_cb_data)
  * \brief Creation and initialization of a SIS decoder.
@@ -127,8 +127,8 @@ int dvbpsi_AttachSIS(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_DetachSIS
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-          uint16_t i_extension)
+ * \fn void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+                             uint16_t i_extension)
  * \brief Destroy a SIS decoder.
  * \param p_dvbpsi pointer to dvbpsi to hold decoder/demuxer structure
  * \param i_table_id Table ID, 0xFC.
@@ -142,8 +142,7 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_InitSIS/dvbpsi_NewSIS
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_InitSIS(dvbpsi_sis_t* p_sis, uint16_t i_ts_id,
-          uint8_t i_version, int b_current_next, uint16_t i_network_id)
+ * \fn void dvbpsi_InitSIS(dvbpsi_sis_t* p_sis, uint8_t i_protocol_version)
  * \brief Initialize a user-allocated dvbpsi_sis_t structure.
  * \param p_sis pointer to the SIS structure
  * \param i_protocol_version SIS protocol version (currently 0)
@@ -211,6 +210,15 @@ dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor(dvbpsi_sis_t *p_sis,
  *****************************************************************************
  * Generate SIS sections based on the dvbpsi_sis_t structure.
  *****************************************************************************/
+/*!
+ * \fn dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t * p_sis);
+ * \brief SIS generator
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
+ * \param p_sis SIS structure
+ * \return a pointer to the list of generated PSI sections.
+ *
+ * Generate SIS sections based on the dvbpsi_sis_t structure.
+ */
 dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t * p_sis);
 
 #ifdef __cplusplus

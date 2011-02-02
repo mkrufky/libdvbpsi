@@ -98,21 +98,19 @@ typedef struct dvbpsi_pat_s
  */
 typedef void (* dvbpsi_pat_callback)(void* p_cb_data, dvbpsi_pat_t* p_new_pat);
 
-
 /*****************************************************************************
  * dvbpsi_AttachPAT
  *****************************************************************************/
 /*!
- * \fn dvbpsi_t *dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback, void* p_cb_data)
+ * \fn dvbpsi_t *dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback, void* p_cb_data)
  * \brief Creation and initialization of a PAT decoder.
- * \param p_dvbpsi pointer to dvbpsi_t handle
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param pf_callback function to call back on new PAT
  * \param p_cb_data private data given in argument to the callback
  * \return a pointer to the decoder for future calls.
  */
 dvbpsi_t *dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
                            void* p_cb_data);
-
 
 /*****************************************************************************
  * dvbpsi_DetachPAT
@@ -126,7 +124,6 @@ dvbpsi_t *dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
  * The handle isn't valid any more.
  */
 void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi);
-
 
 /*****************************************************************************
  * dvbpsi_InitPAT/dvbpsi_NewPAT
@@ -160,7 +157,6 @@ do {                                                                    \
     dvbpsi_InitPAT(p_pat, i_ts_id, i_version, b_current_next);          \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_EmptyPAT/dvbpsi_DeletePAT
  *****************************************************************************/
@@ -184,7 +180,6 @@ do {                                                                    \
   free(p_pat);                                                          \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_PATAddProgram
  *****************************************************************************/
@@ -205,10 +200,10 @@ dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
  * dvbpsi_GenPATSections
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi, dvbpsi_pat_t* p_pat,
                                                    int i_max_pps);
  * \brief PAT generator.
- * \param p_dvbpsi is a pointer to dvbpsi_t
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_pat pointer to the PAT structure
  * \param i_max_pps limitation of the number of program in each section
  * (max: 253).

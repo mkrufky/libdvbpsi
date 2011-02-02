@@ -110,7 +110,7 @@ typedef void (* dvbpsi_sdt_callback)(void* p_cb_data, dvbpsi_sdt_t* p_new_sdt);
  * dvbpsi_AttachSDT
  *****************************************************************************/
 /*!
- * \fn int dvbpsi_AttachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn int dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sdt_callback pf_callback,
                                void* p_cb_data)
  * \brief Creation and initialization of a SDT decoder.
@@ -129,7 +129,7 @@ dvbpsi_t *dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_DetachSDT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachSDT(dvbpsi_demux_t *p_demux, uint8_t i_table_id,
+ * \fn void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
                              uint16_t i_extension)
  * \brief Destroy a SDT decoder.
  * \param p_dvbpsi pointer holding decoder/demuxer structure
@@ -248,11 +248,11 @@ dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
  * \fn dvbpsi_psi_section_t* dvbpsi_GenSDTSections(dvbpsi_t *p_dvbpsi,
                                                     dvbpsi_sdt_t * p_sdt)
  * \brief SDT generator
- * \param p_dvbpsi is a pointer to dvbpsi_t
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_sdt SDT structure
  * \return a pointer to the list of generated PSI sections.
  *
- * Generate PMT sections based on the dvbpsi_pmt_t structure.
+ * Generate SDT sections based on the dvbpsi_sdt_t structure.
  */
 dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_t * p_sdt);
 
