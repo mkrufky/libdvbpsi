@@ -79,7 +79,7 @@ dvbpsi_stream_identifier_dr_t* dvbpsi_DecodeStreamIdentifierDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenStreamIdentifierDr(
-                        dvbpsi_service_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_stream_identifier_dr_t *p_decoded, int b_duplicate)
  * \brief "stream identifier" descriptor generator.
  * \param p_decoded pointer to a decoded "stream identifier" descriptor
  * structure

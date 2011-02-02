@@ -84,7 +84,7 @@ dvbpsi_stuffing_dr_t* dvbpsi_DecodeStuffingDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenStuffingDr(
-                        dvbpsi_stuffing_data_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_stuffing_dr_t *p_decoded, int b_duplicate)
  * \brief "stuffing" descriptor generator.
  * \param p_decoded pointer to a decoded "stuffing" descriptor
  * structure

@@ -78,7 +78,7 @@ dvbpsi_PDC_dr_t* dvbpsi_DecodePDCDr(dvbpsi_descriptor_t * p_descriptor);
  * dvbpsi_GenPDCDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(
+ * \fn dvbpsi_descriptor_t * dvbpsi_GenPDCDr(
                         dvbpsi_PDC_dr_t * p_decoded, int b_duplicate)
  * \brief PDC descriptor generator.
  * \param p_decoded pointer to a decoded PDC descriptor structure

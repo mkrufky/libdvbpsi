@@ -108,7 +108,7 @@ dvbpsi_local_time_offset_dr_t* dvbpsi_DecodeLocalTimeOffsetDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenLocalTimeOffsetDr(
-                        dvbpsi_local_time_offset_data_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_local_time_offset_dr_t * p_decoded, int b_duplicate)
  * \brief "local time offset" descriptor generator.
  * \param p_decoded pointer to a decoded "local time offset" descriptor
  * structure

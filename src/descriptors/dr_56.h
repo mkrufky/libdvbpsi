@@ -89,7 +89,7 @@ typedef struct dvbpsi_teletext_dr_s
  * dvbpsi_DecodeTeletextDataDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDataDr(
+ * \fn dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
                                         dvbpsi_descriptor_t * p_descriptor)
  * \brief "teletext" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
