@@ -4,6 +4,7 @@
  * $Id: eit.h 88 2004-02-24 14:31:18Z sam $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,7 +38,6 @@
 extern "C" {
 #endif
 
-
 /*****************************************************************************
  * dvbpsi_eit_event_t
  *****************************************************************************/
@@ -70,7 +70,6 @@ typedef struct dvbpsi_eit_event_s
 
 } dvbpsi_eit_event_t;
 
-
 /*****************************************************************************
  * dvbpsi_eit_t
  *****************************************************************************/
@@ -99,7 +98,6 @@ typedef struct dvbpsi_eit_s
 
 } dvbpsi_eit_t;
 
-
 /*****************************************************************************
  * dvbpsi_eit_callback
  *****************************************************************************/
@@ -110,26 +108,24 @@ typedef struct dvbpsi_eit_s
  */
 typedef void (* dvbpsi_eit_callback)(void* p_cb_data, dvbpsi_eit_t* p_new_eit);
 
-
 /*****************************************************************************
  * dvbpsi_AttachEIT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_AttachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn dvbpsi_t *dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_eit_callback pf_callback,
                                void* p_cb_data)
  * \brief Creation and initialization of a EIT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi pointer to Subtable demultiplexor to which the EIT decoder is attached.
  * \param i_table_id Table ID, 0x4E, 0x4F, or 0x50-0x6F.
  * \param i_extension Table ID extension, here service ID.
  * \param pf_callback function to call back on new EIT.
  * \param p_cb_data private data given in argument to the callback.
- * \return 0 if everything went ok.
+ * \return p_dvbpsi or NULL on error
  */
-int dvbpsi_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+dvbpsi_t *dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_eit_callback pf_callback,
                                void* p_cb_data);
-
 
 /*****************************************************************************
  * dvbpsi_DetachEIT
@@ -138,14 +134,14 @@ int dvbpsi_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  * \fn void dvbpsi_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension)
  * \brief Destroy a EIT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi dvbpsi handle pointing to Subtable demultiplexor to which the
+                   eit decoder is attached.
  * \param i_table_id Table ID, 0x4E, 0x4F, or 0x50-0x6F.
  * \param i_extension Table ID extension, here service ID.
  * \return nothing.
  */
-void dvbpsi_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension);
-
 
 /*****************************************************************************
  * dvbpsi_InitEIT/dvbpsi_NewEIT
@@ -188,7 +184,6 @@ do {                                                                    \
     dvbpsi_InitEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id); \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_EmptyEIT/dvbpsi_DeleteEIT
  *****************************************************************************/
@@ -211,7 +206,6 @@ do {                                                                    \
   dvbpsi_EmptyEIT(p_eit);                                               \
   free(p_eit);                                                          \
 } while(0);
-
 
 /*****************************************************************************
  * dvbpsi_EITAddEvent

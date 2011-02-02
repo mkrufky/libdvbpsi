@@ -6,6 +6,7 @@
  * Authors: Johann Hanne
  *          heavily based on pmt.h which was written by
  *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,7 +40,6 @@
 extern "C" {
 #endif
 
-
 /*****************************************************************************
  * dvbpsi_cat_t
  *****************************************************************************/
@@ -63,7 +63,6 @@ typedef struct dvbpsi_cat_s
 
 } dvbpsi_cat_t;
 
-
 /*****************************************************************************
  * dvbpsi_cat_callback
  *****************************************************************************/
@@ -74,21 +73,20 @@ typedef struct dvbpsi_cat_s
  */
 typedef void (* dvbpsi_cat_callback)(void* p_cb_data, dvbpsi_cat_t* p_new_cat);
 
-
 /*****************************************************************************
  * dvbpsi_AttachCAT
  *****************************************************************************/
 /*!
- * \fn dvbpsi_handle dvbpsi_AttachCAT(dvbpsi_cat_callback pf_callback,
-                                      void* p_cb_data)
+ * \fn dvbpsi_t *dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi,
+                            dvbpsi_cat_callback pf_callback, void* p_cb_data)
  * \brief Creation and initialization of a CAT decoder.
+ * \param p_dvbpsi is a pointer to dvbpsi_t which holds a pointer to the decoder
  * \param pf_callback function to call back on new CAT
  * \param p_cb_data private data given in argument to the callback
- * \return a pointer to the decoder for future calls.
+ * \return a pointer to dvbpsi_t holding the decoder for future calls.
  */
-dvbpsi_handle dvbpsi_AttachCAT(dvbpsi_cat_callback pf_callback,
-                               void* p_cb_data);
-
+dvbpsi_t *dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
+                           void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachCAT
@@ -96,13 +94,12 @@ dvbpsi_handle dvbpsi_AttachCAT(dvbpsi_cat_callback pf_callback,
 /*!
  * \fn void dvbpsi_DetachCAT(dvbpsi_handle h_dvbpsi)
  * \brief Destroy a CAT decoder.
- * \param h_dvbpsi handle to the decoder
+ * \param p_dvbpsi handle holds the decoder pointer
  * \return nothing.
  *
  * The handle isn't valid any more.
  */
-void dvbpsi_DetachCAT(dvbpsi_handle h_dvbpsi);
-
+void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi);
 
 /*****************************************************************************
  * dvbpsi_InitCAT/dvbpsi_NewCAT
@@ -136,7 +133,6 @@ do {                                                                    \
     dvbpsi_InitCAT(p_cat, i_version, b_current_next);                   \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_EmptyCAT/dvbpsi_DeleteCAT
  *****************************************************************************/
@@ -160,7 +156,6 @@ do {                                                                    \
   free(p_cat);                                                          \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_CATAddDescriptor
  *****************************************************************************/
@@ -180,20 +175,19 @@ dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);
 
-
 /*****************************************************************************
  * dvbpsi_GenCATSections
  *****************************************************************************/
 /*!
  * \fn dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_cat_t* p_cat)
  * \brief CAT generator
+ * \param p_dvbpsi is a pointer to dvbpsi_t
  * \param p_cat CAT structure
  * \return a pointer to the list of generated PSI sections.
  *
  * Generate CAT sections based on the dvbpsi_cat_t structure.
  */
-dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_cat_t* p_cat);
-
+dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_t *p_dvbpsi, dvbpsi_cat_t* p_cat);
 
 #ifdef __cplusplus
 };

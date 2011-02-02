@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +25,6 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
@@ -36,54 +36,50 @@
 #include <stdint.h>
 #endif
 
+#include <assert.h>
+
 #include "../dvbpsi.h"
 #include "../dvbpsi_private.h"
 #include "../psi.h"
 #include "pat.h"
 #include "pat_private.h"
 
-
 /*****************************************************************************
  * dvbpsi_AttachPAT
  *****************************************************************************
  * Initialize a PAT decoder and return a handle on it.
  *****************************************************************************/
-dvbpsi_handle dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback,
-                               void* p_cb_data)
+dvbpsi_t *dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
+                           void* p_cb_data)
 {
-  dvbpsi_handle h_dvbpsi = (dvbpsi_decoder_t*)malloc(sizeof(dvbpsi_decoder_t));
-  dvbpsi_pat_decoder_t* p_pat_decoder;
+    assert(p_dvbpsi);
 
-  if(h_dvbpsi == NULL)
-    return NULL;
+    dvbpsi_pat_decoder_t* p_pat_decoder = (dvbpsi_pat_decoder_t*) calloc(1, sizeof(dvbpsi_pat_decoder_t));
+    if (p_pat_decoder == NULL)
+        return NULL;
 
-  p_pat_decoder = (dvbpsi_pat_decoder_t*)malloc(sizeof(dvbpsi_pat_decoder_t));
+    /* PSI decoder configuration */
+    p_pat_decoder->pf_callback = &dvbpsi_GatherPATSections;
+    p_pat_decoder->i_section_max_size = 1024;
 
-  if(p_pat_decoder == NULL)
-  {
-    free(h_dvbpsi);
-    return NULL;
-  }
+    /* PSI decoder initial state */
+    p_pat_decoder->i_continuity_counter = 31;
+    p_pat_decoder->b_discontinuity = 1;
+    p_pat_decoder->p_current_section = NULL;
 
-  /* PSI decoder configuration */
-  h_dvbpsi->pf_callback = &dvbpsi_GatherPATSections;
-  h_dvbpsi->p_private_decoder = p_pat_decoder;
-  h_dvbpsi->i_section_max_size = 1024;
-  /* PSI decoder initial state */
-  h_dvbpsi->i_continuity_counter = 31;
-  h_dvbpsi->b_discontinuity = 1;
-  h_dvbpsi->p_current_section = NULL;
+    /* PAT decoder information */
+    p_pat_decoder->pf_pat_callback = pf_callback;
+    p_pat_decoder->p_cb_data = p_cb_data;
 
-  /* PAT decoder information */
-  p_pat_decoder->pf_callback = pf_callback;
-  p_pat_decoder->p_cb_data = p_cb_data;
-  /* PAT decoder initial state */
-  p_pat_decoder->b_current_valid = 0;
-  p_pat_decoder->p_building_pat = NULL;
-  for(unsigned int i = 0; i <= 255; i++)
-    p_pat_decoder->ap_sections[i] = NULL;
+    /* PAT decoder initial state */
+    p_pat_decoder->b_current_valid = 0;
+    p_pat_decoder->p_building_pat = NULL;
 
-  return h_dvbpsi;
+    for(unsigned int i = 0; i <= 255; i++)
+        p_pat_decoder->ap_sections[i] = NULL;
+
+    p_dvbpsi->p_private = (void *)p_pat_decoder;
+    return p_dvbpsi;
 }
 
 
@@ -92,23 +88,21 @@ dvbpsi_handle dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback,
  *****************************************************************************
  * Close a PAT decoder. The handle isn't valid any more.
  *****************************************************************************/
-void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi)
+void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi)
 {
-  dvbpsi_pat_decoder_t* p_pat_decoder
-                        = (dvbpsi_pat_decoder_t*)h_dvbpsi->p_private_decoder;
+    dvbpsi_pat_decoder_t* p_pat_decoder = (dvbpsi_pat_decoder_t*)p_dvbpsi->p_private;
+    free(p_pat_decoder->p_building_pat);
 
-  free(p_pat_decoder->p_building_pat);
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_pat_decoder->ap_sections[i])
+            free(p_pat_decoder->ap_sections[i]);
+    }
 
-  for(unsigned int i = 0; i <= 255; i++)
-  {
-    if(p_pat_decoder->ap_sections[i])
-      free(p_pat_decoder->ap_sections[i]);
-  }
+    if (p_pat_decoder->p_current_section)
+        dvbpsi_DeletePSISections(p_pat_decoder->p_current_section);
+    free(p_pat_decoder);
 
-  free(h_dvbpsi->p_private_decoder);
-  if(h_dvbpsi->p_current_section)
-    dvbpsi_DeletePSISections(h_dvbpsi->p_current_section);
-  free(h_dvbpsi);
 }
 
 
@@ -120,10 +114,10 @@ void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi)
 void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
                     int b_current_next)
 {
-  p_pat->i_ts_id = i_ts_id;
-  p_pat->i_version = i_version;
-  p_pat->b_current_next = b_current_next;
-  p_pat->p_first_program = NULL;
+    p_pat->i_ts_id = i_ts_id;
+    p_pat->i_version = i_version;
+    p_pat->b_current_next = b_current_next;
+    p_pat->p_first_program = NULL;
 }
 
 
@@ -134,16 +128,15 @@ void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
  *****************************************************************************/
 void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat)
 {
-  dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
+    dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
 
-  while(p_program != NULL)
-  {
-    dvbpsi_pat_program_t* p_tmp = p_program->p_next;
-    free(p_program);
-    p_program = p_tmp;
-  }
-
-  p_pat->p_first_program = NULL;
+    while(p_program != NULL)
+    {
+        dvbpsi_pat_program_t* p_tmp = p_program->p_next;
+        free(p_program);
+        p_program = p_tmp;
+    }
+    p_pat->p_first_program = NULL;
 }
 
 
@@ -155,29 +148,27 @@ void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat)
 dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
                                            uint16_t i_number, uint16_t i_pid)
 {
-  dvbpsi_pat_program_t* p_program
-                = (dvbpsi_pat_program_t*)malloc(sizeof(dvbpsi_pat_program_t));
+    dvbpsi_pat_program_t* p_program;
 
-  if(p_program)
-  {
+    p_program = (dvbpsi_pat_program_t*) malloc(sizeof(dvbpsi_pat_program_t));
+    if (p_program == NULL)
+        return NULL;
+
     p_program->i_number = i_number;
     p_program->i_pid = i_pid;
     p_program->p_next = NULL;
 
-    if(p_pat->p_first_program == NULL)
-    {
-      p_pat->p_first_program = p_program;
-    }
+    if (p_pat->p_first_program == NULL)
+        p_pat->p_first_program = p_program;
     else
     {
-      dvbpsi_pat_program_t* p_last_program = p_pat->p_first_program;
-      while(p_last_program->p_next != NULL)
-        p_last_program = p_last_program->p_next;
-      p_last_program->p_next = p_program;
+        dvbpsi_pat_program_t* p_last_program = p_pat->p_first_program;
+        while (p_last_program->p_next != NULL)
+            p_last_program = p_last_program->p_next;
+        p_last_program->p_next = p_program;
     }
-  }
 
-  return p_program;
+    return p_program;
 }
 
 
@@ -186,26 +177,27 @@ dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
-                              dvbpsi_psi_section_t* p_section)
+void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
-  dvbpsi_handle h_dvbpsi = (dvbpsi_handle) p_decoder;
-  dvbpsi_pat_decoder_t* p_pat_decoder
-                        = (dvbpsi_pat_decoder_t*)p_decoder->p_private_decoder;
+  dvbpsi_pat_decoder_t* p_pat_decoder;
   int b_append = 1;
   int b_reinit = 0;
 
-  dvbpsi_debug(h_dvbpsi, "PAT decoder",
+  assert(p_dvbpsi->p_private);
+
+  dvbpsi_debug(p_dvbpsi, "PAT decoder",
                    "Table version %2d, " "i_extension %5d, "
                    "section %3d up to %3d, " "current %1d",
                    p_section->i_version, p_section->i_extension,
                    p_section->i_number, p_section->i_last_number,
                    p_section->b_current_next);
 
+  p_pat_decoder = (dvbpsi_pat_decoder_t *)p_dvbpsi->p_private;
+
   if(p_section->i_table_id != 0x00)
   {
     /* Invalid table_id value */
-    dvbpsi_error(h_dvbpsi, "PAT decoder",
+    dvbpsi_error(p_dvbpsi, "PAT decoder",
                      "invalid section (table_id == 0x%02x)",
                      p_section->i_table_id);
     b_append = 0;
@@ -214,7 +206,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
   if(b_append && !p_section->b_syntax_indicator)
   {
     /* Invalid section_syntax_indicator */
-    dvbpsi_error(h_dvbpsi, "PAT decoder",
+    dvbpsi_error(p_dvbpsi, "PAT decoder",
                  "invalid section (section_syntax_indicator == 0)");
     b_append = 0;
   }
@@ -223,10 +215,10 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
   if(b_append)
   {
     /* TS discontinuity check */
-    if(p_decoder->b_discontinuity)
+    if(p_pat_decoder->b_discontinuity)
     {
       b_reinit = 1;
-      p_decoder->b_discontinuity = 0;
+      p_pat_decoder->b_discontinuity = 0;
     }
     else
     {
@@ -236,7 +228,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
         if(p_pat_decoder->p_building_pat->i_ts_id != p_section->i_extension)
         {
           /* transport_stream_id */
-          dvbpsi_error(h_dvbpsi, "PAT decoder",
+          dvbpsi_error(p_dvbpsi, "PAT decoder",
                        "'transport_stream_id' differs"
                        " whereas no TS discontinuity has occured");
           b_reinit = 1;
@@ -245,7 +237,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
                                                 != p_section->i_version)
         {
           /* version_number */
-          dvbpsi_error(h_dvbpsi, "PAT decoder",
+          dvbpsi_error(p_dvbpsi, "PAT decoder",
                        "'version_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -254,7 +246,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
                                                 p_section->i_last_number)
         {
           /* last_section_number */
-          dvbpsi_error(h_dvbpsi, "PAT decoder",
+          dvbpsi_error(p_dvbpsi, "PAT decoder",
                        "'last_section_number' differs"
                        " whereas no discontinuity has occured");
           b_reinit = 1;
@@ -316,7 +308,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
     /* Fill the section array */
     if(p_pat_decoder->ap_sections[p_section->i_number] != NULL)
     {
-      dvbpsi_debug(h_dvbpsi, "PAT decoder", "overwrite section number %d",
+      dvbpsi_debug(p_dvbpsi, "PAT decoder", "overwrite section number %d",
                        p_section->i_number);
       dvbpsi_DeletePSISections(p_pat_decoder->ap_sections[p_section->i_number]);
     }
@@ -351,7 +343,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
       /* Delete the sections */
       dvbpsi_DeletePSISections(p_pat_decoder->ap_sections[0]);
       /* signal the new PAT */
-      p_pat_decoder->pf_callback(p_pat_decoder->p_cb_data,
+      p_pat_decoder->pf_pat_callback(p_pat_decoder->p_cb_data,
                                  p_pat_decoder->p_building_pat);
       /* Reinitialize the structures */
       p_pat_decoder->p_building_pat = NULL;
@@ -372,7 +364,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
  * PAT decoder.
  *****************************************************************************/
 void dvbpsi_DecodePATSections(dvbpsi_pat_t* p_pat,
-                               dvbpsi_psi_section_t* p_section)
+                              dvbpsi_psi_section_t* p_section)
 {
   while(p_section)
   {
@@ -396,8 +388,8 @@ void dvbpsi_DecodePATSections(dvbpsi_pat_t* p_pat,
  * Generate PAT sections based on the dvbpsi_pat_t structure. The third
  * argument is used to limit the number of program in each section (max: 253).
  *****************************************************************************/
-dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
-                                            int i_max_pps)
+dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi,
+                                            dvbpsi_pat_t* p_pat, int i_max_pps)
 {
   dvbpsi_psi_section_t* p_result = dvbpsi_NewPSISection(1024);
   dvbpsi_psi_section_t* p_current = p_result;
@@ -467,4 +459,3 @@ dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
 
   return p_result;
 }
-

@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,19 +38,18 @@
 extern "C" {
 #endif
 
-
 /*****************************************************************************
  * dvbpsi_demux_new_cb_t
  *****************************************************************************/
 /*!
  * \typedef void(* dvbpsi_demux_new_cb_t) (void *   p_cb_data,
-                                           dvbpsi_handle h_dvbpsi,
+                                           dvbpsi_decoder_t *p_decoder,
                                            uint8_t  i_table_id,
                                            uint16_t i_extension);
  * \brief Callback used in case of a new subtable detected.
  */
 typedef void (*dvbpsi_demux_new_cb_t) (void *   p_cb_data,
-                                       dvbpsi_handle h_dvbpsi,
+                                       dvbpsi_decoder_t *p_decoder,
                                        uint8_t  i_table_id,
                                        uint16_t i_extension);
 
@@ -58,15 +58,15 @@ typedef void (*dvbpsi_demux_new_cb_t) (void *   p_cb_data,
  *****************************************************************************/
 /*!
  * \typedef void (*dvbpsi_demux_subdec_cb_t)
-                    (dvbpsi_decoder_t*     p_psi_decoder,
-                     void*                 p_private_decoder,
-                     dvbpsi_psi_section_t* p_section);
+                    (dvbpsi_t             *p_dvbpsi,
+                     void                 *p_private_decoder,
+                     dvbpsi_psi_section_t *p_section);
  * \brief Subtable specific decoder.
  */
 typedef void (*dvbpsi_demux_subdec_cb_t)
-                     (dvbpsi_decoder_t*     p_psi_decoder,
-                      void*                 p_private_decoder,
-                      dvbpsi_psi_section_t* p_section);
+                     (dvbpsi_t             *p_dvbpsi,
+                      void                 *p_private_decoder,
+                      dvbpsi_psi_section_t *p_section);
 
 /*****************************************************************************
  * dvbpsi_demux_subdec_t
@@ -90,12 +90,12 @@ typedef struct dvbpsi_demux_subdec_s
   void *                          p_cb_data;
   struct dvbpsi_demux_subdec_s *  p_next;
 
-  void (*pf_detach)(struct dvbpsi_demux_s *, uint8_t, uint16_t);
+  void (*pf_detach)(dvbpsi_t *, uint8_t, uint16_t);
 
 } dvbpsi_demux_subdec_t;
 
 /*****************************************************************************
- * dvbpsi_demux_t
+ * dvbpsi_demux_s
  *****************************************************************************/
 /*!
  * \struct dvbpsi_demux_s
@@ -108,41 +108,44 @@ typedef struct dvbpsi_demux_subdec_s
  * \typedef struct dvbpsi_demux_s dvbpsi_demux_t
  * \brief dvbpsi_demux_t type definition.
  */
-typedef struct dvbpsi_demux_s
+typedef struct dvbpsi_demux_s dvbpsi_demux_t;
+
+struct dvbpsi_demux_s
 {
-  dvbpsi_handle             p_decoder;          /*!< Parent PSI Decoder */
-  dvbpsi_demux_subdec_t *   p_first_subdec;     /*!< First subtable decoder */
-  /* New subtable callback */
-  dvbpsi_demux_new_cb_t     pf_new_callback;    /*!< New subtable callback */
-  void *                    p_new_cb_data;      /*!< Data provided to the
+    DVBPSI_DECODER_COMMON
+
+    dvbpsi_demux_subdec_t *   p_first_subdec;     /*!< First subtable decoder */
+
+    /* New subtable callback */
+    dvbpsi_demux_new_cb_t     pf_new_callback;    /*!< New subtable callback */
+    void *                    p_new_cb_data;      /*!< Data provided to the
                                                      previous callback */
-
-} dvbpsi_demux_t;
-
+};
 
 /*****************************************************************************
  * dvbpsi_AttachDemux
  *****************************************************************************/
 /*!
- * \fn dvbpsi_handle_t dvbpsi_NewPSISection(dvbpsi_demux_new_cb_t pf_new_cb, void * p_new_cb_data)
+ * \fn dvbpsi_t *dvbpsi_NewPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_demux_new_cb_t pf_new_cb, void * p_new_cb_data)
  * \brief Creates a new demux structure.
+ * \param p_dvbpsi pointer to dvbpsi_t handle
  * \param pf_new_cb A callcack called when a new type of subtable is found.
  * \param p_new_cb_data Data given to the previous callback.
- * \return a handle to the new demux structure.
+ * \return a handle to the new attached demux structure.
  */
-dvbpsi_handle dvbpsi_AttachDemux(dvbpsi_demux_new_cb_t pf_new_cb,
-                                 void *                p_new_cb_data);
+dvbpsi_t *dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
+                             dvbpsi_demux_new_cb_t pf_new_cb,
+                             void *                p_new_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachDemux
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachDemux(dvbpsi_handle h_dvbpsi)
+ * \fn void dvbpsi_DetachDemux(dvbpsi_decoder_t *p_decoder)
  * \brief Destroys a demux structure.
  * \param h_dvbpsi The handle of the demux to be destroyed.
  */
-
-void dvbpsi_DetachDemux(dvbpsi_handle h_dvbpsi);
+void dvbpsi_DetachDemux(dvbpsi_t *p_dvbpsi);
 
 /*****************************************************************************
  * dvbpsi_demuxGetSubDec
@@ -163,14 +166,13 @@ dvbpsi_demux_subdec_t * dvbpsi_demuxGetSubDec(dvbpsi_demux_t * p_demux,
  * dvbpsi_Demux
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_Demux(dvbpsi_handle h_dvbpsi,
+ * \fn void dvbpsi_Demux(dvbpsi_t *p_dvbpsi,
                          dvbpsi_psi_section_t * p_section)
  * \brief Sends the PSI sections to the right subtable decoder according to their table ID and extension.
- * \param h_dvbpsi PSI decoder handle.
+ * \param p_dvbpsi PSI decoder handle.
  * \param p_section PSI section.
  */
-void dvbpsi_Demux(dvbpsi_handle h_dvbpsi,
-                  dvbpsi_psi_section_t * p_section);
+void dvbpsi_Demux(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section);
 
 #ifdef __cplusplus
 };

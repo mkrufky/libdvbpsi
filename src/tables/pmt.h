@@ -4,6 +4,7 @@
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,7 +38,6 @@
 extern "C" {
 #endif
 
-
 /*****************************************************************************
  * dvbpsi_pmt_es_t
  *****************************************************************************/
@@ -63,7 +63,6 @@ typedef struct dvbpsi_pmt_es_s
                                                              the list */
 
 } dvbpsi_pmt_es_t;
-
 
 /*****************************************************************************
  * dvbpsi_pmt_t
@@ -93,7 +92,6 @@ typedef struct dvbpsi_pmt_s
 
 } dvbpsi_pmt_t;
 
-
 /*****************************************************************************
  * dvbpsi_pmt_callback
  *****************************************************************************/
@@ -104,38 +102,37 @@ typedef struct dvbpsi_pmt_s
  */
 typedef void (* dvbpsi_pmt_callback)(void* p_cb_data, dvbpsi_pmt_t* p_new_pmt);
 
-
 /*****************************************************************************
  * dvbpsi_AttachPMT
  *****************************************************************************/
 /*!
- * \fn dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
+ * \fn dvbpsi_t *dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi,
+                                      uint16_t i_program_number,
                                       dvbpsi_pmt_callback pf_callback,
                                       void* p_cb_data)
- * \brief Creation and initialization of a PMT decoder.
+ * \brief Creates and initialization of a PMT decoder and attaches it to dvbpsi_t
+ *        handle
  * \param i_program_number program number
  * \param pf_callback function to call back on new PMT
  * \param p_cb_data private data given in argument to the callback
  * \return a pointer to the decoder for future calls.
  */
-dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
+dvbpsi_t *dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
                                dvbpsi_pmt_callback pf_callback,
                                void* p_cb_data);
-
 
 /*****************************************************************************
  * dvbpsi_DetachPMT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachPMT(dvbpsi_handle h_dvbpsi)
+ * \fn void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
  * \brief Destroy a PMT decoder.
- * \param h_dvbpsi handle to the decoder
+ * \param p_dvbpsi handle
  * \return nothing.
  *
  * The handle isn't valid any more.
  */
-void dvbpsi_DetachPMT(dvbpsi_handle h_dvbpsi);
-
+void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi);
 
 /*****************************************************************************
  * dvbpsi_InitPMT/dvbpsi_NewPMT
@@ -175,7 +172,6 @@ do {                                                                    \
                    i_pcr_pid);                                          \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_EmptyPMT/dvbpsi_DeletePMT
  *****************************************************************************/
@@ -199,7 +195,6 @@ do {                                                                    \
   free(p_pmt);                                                          \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_PMTAddDescriptor
  *****************************************************************************/
@@ -219,7 +214,6 @@ dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);
 
-
 /*****************************************************************************
  * dvbpsi_PMTAddES
  *****************************************************************************/
@@ -234,7 +228,6 @@ dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
  */
 dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
                                  uint8_t i_type, uint16_t i_pid);
-
 
 /*****************************************************************************
  * dvbpsi_PMTESAddDescriptor
@@ -255,20 +248,20 @@ dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data);
 
-
 /*****************************************************************************
  * dvbpsi_GenPMTSections
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt)
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_t *p_dvbpsi,
+                                                   dvbpsi_pmt_t* p_pmt)
  * \brief PMT generator
+ * \param p_dvbpsi is a pointer to dvbpsi_t
  * \param p_pmt PMT structure
  * \return a pointer to the list of generated PSI sections.
  *
  * Generate PMT sections based on the dvbpsi_pmt_t structure.
  */
-dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt);
-
+dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_t* p_pmt);
 
 #ifdef __cplusplus
 };
@@ -277,4 +270,3 @@ dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt);
 #else
 #error "Multiple inclusions of pmt.h"
 #endif
-

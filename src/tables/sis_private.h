@@ -34,36 +34,35 @@
  *****************************************************************************/
 typedef struct dvbpsi_sis_decoder_s
 {
-  dvbpsi_sis_callback           pf_callback;
-  void *                        p_cb_data;
+    DVBPSI_DECODER_COMMON
 
-  /* */
-  dvbpsi_sis_t                  *current_sis;
-  dvbpsi_sis_t                  *p_building_sis;
+    dvbpsi_sis_callback           pf_sis_callback;
+    void *                        p_cb_data;
 
-  int                           b_current_valid;
+    /* */
+    dvbpsi_sis_t                  *current_sis;
+    dvbpsi_sis_t                  *p_building_sis;
+
+    int                           b_current_valid;
 
 } dvbpsi_sis_decoder_t;
-
 
 /*****************************************************************************
  * dvbpsi_GatherSISSections
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherSISSections(dvbpsi_decoder_t* p_psi_decoder,
+void dvbpsi_GatherSISSections(dvbpsi_t* p_dvbpsi,
                               void* p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
-
 
 /*****************************************************************************
  * dvbpsi_DecodeSISSection
  *****************************************************************************
  * SIS decoder.
  *****************************************************************************/
-void dvbpsi_DecodeSISSections(dvbpsi_sis_t* p_sis,
+void dvbpsi_DecodeSISSections(dvbpsi_t* p_dvbpsi, dvbpsi_sis_t* p_sis,
                               dvbpsi_psi_section_t* p_section);
-
 
 #else
 #error "Multiple inclusions of sis_private.h"

@@ -5,6 +5,7 @@
  * $Id: bat_private.h 88 2004-02-24 14:31:18Z sam $
  *
  * Authors: Zhu zhenglu <zhuzlu@gmail.com>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +29,6 @@
 #ifndef _DVBPSI_BAT_PRIVATE_H_
 #define _DVBPSI_BAT_PRIVATE_H_
 
-
 /*****************************************************************************
  * dvbpsi_bat_decoder_t
  *****************************************************************************
@@ -36,38 +36,36 @@
  *****************************************************************************/
 typedef struct dvbpsi_bat_decoder_s
 {
-  dvbpsi_bat_callback           pf_callback;
-  void *                        p_cb_data;
+    DVBPSI_DECODER_COMMON
 
-  dvbpsi_bat_t                  current_bat;
-  dvbpsi_bat_t *                p_building_bat;
+    dvbpsi_bat_callback           pf_bat_callback;
+    void *                        p_cb_data;
 
-  int                           b_current_valid;
+    dvbpsi_bat_t                  current_bat;
+    dvbpsi_bat_t *                p_building_bat;
 
-  uint8_t                       i_last_section_number;
-  dvbpsi_psi_section_t *        ap_sections [256];
+    int                           b_current_valid;
+
+    uint8_t                       i_last_section_number;
+    dvbpsi_psi_section_t *        ap_sections [256];
 
 } dvbpsi_bat_decoder_t;
-
 
 /*****************************************************************************
  * dvbpsi_GatherBATSections
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherBATSections(dvbpsi_decoder_t* p_psi_decoder,
-                      void* p_private_decoder,
-                              dvbpsi_psi_section_t* p_section);
-
+void dvbpsi_GatherBATSections(dvbpsi_t* p_dvbpsi,
+                      void* p_private_decoder, dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
  * dvbpsi_DecodeBATSections
  *****************************************************************************
  * BAT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
+void dvbpsi_DecodeBATSections(dvbpsi_t* p_dvbpsi,dvbpsi_bat_t* p_bat,
                               dvbpsi_psi_section_t* p_section);
-
 
 /*****************************************************************************
  * dvbpsi_BATAddTS

@@ -6,6 +6,7 @@
  * Authors: Johann Hanne
  *          heavily based on pmt.c which was written by
  *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,7 +40,6 @@
 extern "C" {
 #endif
 
-
 /*****************************************************************************
  * dvbpsi_tot_t
  *****************************************************************************/
@@ -64,7 +64,6 @@ typedef struct dvbpsi_tot_s
 
 } dvbpsi_tot_t;
 
-
 /*****************************************************************************
  * dvbpsi_tot_callback
  *****************************************************************************/
@@ -75,25 +74,23 @@ typedef struct dvbpsi_tot_s
  */
 typedef void (* dvbpsi_tot_callback)(void* p_cb_data, dvbpsi_tot_t* p_new_tot);
 
-
 /*****************************************************************************
  * dvbpsi_AttachTOT
  *****************************************************************************/
 /*!
- * \fn int dvbpsi_AttachTOT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                             dvbpsi_tot_callback pf_callback, void* p_cb_data)
  * \brief Creation and initialization of a TDT/TOT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi dvbpsi handle pointing to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, usually 0x70
  * \param i_extension Table ID extension, unused in the TDT/TOT
  * \param pf_callback function to call back on new TDT/TOT.
  * \param p_cb_data private data given in argument to the callback.
  * \return 0 if everything went ok.
  */
-int dvbpsi_AttachTOT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                      uint16_t i_extension,
                      dvbpsi_tot_callback pf_callback, void* p_cb_data);
-
 
 /*****************************************************************************
  * dvbpsi_DetachTOT
@@ -106,9 +103,8 @@ int dvbpsi_AttachTOT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  * \param i_extension Table ID extension, unused in the TDT/TOT
  * \return nothing.
  */
-void dvbpsi_DetachTOT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                       uint16_t i_extension);
-
 
 /*****************************************************************************
  * dvbpsi_InitTOT/dvbpsi_NewTOT
@@ -136,7 +132,6 @@ do {                                                                    \
     dvbpsi_InitTOT(p_tot, i_utc_time);                                  \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_EmptyTOT/dvbpsi_DeleteTOT
  *****************************************************************************/
@@ -160,7 +155,6 @@ do {                                                                    \
   free(p_tot);                                                          \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_TOTAddDescriptor
  *****************************************************************************/
@@ -180,20 +174,19 @@ dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);
 
-
 /*****************************************************************************
  * dvbpsi_GenTOTSections
  *****************************************************************************/
 /*!
  * \fn dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_Ttot_t* p_tot)
  * \brief TDT/TOT generator
+ * \param p_dvbpsi dvbpsi handle
  * \param p_tot TDT/TOT structure
  * \return a pointer to the list of generated PSI sections.
  *
  * Generate TDT/TOT sections based on the dvbpsi_tot_t structure.
  */
-dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_tot_t* p_tot);
-
+dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot);
 
 #ifdef __cplusplus
 };

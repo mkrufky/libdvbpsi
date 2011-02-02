@@ -4,6 +4,7 @@
  * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,7 +38,6 @@
 extern "C" {
 #endif
 
-
 /*****************************************************************************
  * dvbpsi_sdt_service_t
  *****************************************************************************/
@@ -65,12 +65,10 @@ typedef struct dvbpsi_sdt_service_s
   dvbpsi_descriptor_t *     p_first_descriptor;     /*!< First of the following
                                                          DVB descriptors */
 
-
   struct dvbpsi_sdt_service_s * p_next;             /*!< next element of
                                                              the list */
 
 } dvbpsi_sdt_service_t;
-
 
 /*****************************************************************************
  * dvbpsi_sdt_t
@@ -98,7 +96,6 @@ typedef struct dvbpsi_sdt_s
 
 } dvbpsi_sdt_t;
 
-
 /*****************************************************************************
  * dvbpsi_sdt_callback
  *****************************************************************************/
@@ -109,42 +106,38 @@ typedef struct dvbpsi_sdt_s
  */
 typedef void (* dvbpsi_sdt_callback)(void* p_cb_data, dvbpsi_sdt_t* p_new_sdt);
 
-
 /*****************************************************************************
  * dvbpsi_AttachSDT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_AttachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn int dvbpsi_AttachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sdt_callback pf_callback,
                                void* p_cb_data)
  * \brief Creation and initialization of a SDT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi pointer to dvbpsi to hold decoder/demuxer structure
  * \param i_table_id Table ID, 0x42 or 0x46.
  * \param i_extension Table ID extension, here TS ID.
  * \param pf_callback function to call back on new SDT.
  * \param p_cb_data private data given in argument to the callback.
- * \return 0 if everything went ok.
+ * \return pointer to dvbpsi handle or NULL on error
  */
-int dvbpsi_AttachSDT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+dvbpsi_t *dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sdt_callback pf_callback,
                                void* p_cb_data);
-
 
 /*****************************************************************************
  * dvbpsi_DetachSDT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-          uint16_t i_extension)
+ * \fn void dvbpsi_DetachSDT(dvbpsi_demux_t *p_demux, uint8_t i_table_id,
+                             uint16_t i_extension)
  * \brief Destroy a SDT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi pointer holding decoder/demuxer structure
  * \param i_table_id Table ID, 0x42 or 0x46.
  * \param i_extension Table ID extension, here TS ID.
  * \return nothing.
  */
-void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-          uint16_t i_extension);
-
+void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
 
 /*****************************************************************************
  * dvbpsi_InitSDT/dvbpsi_NewSDT
@@ -180,7 +173,6 @@ do {                                                                    \
     dvbpsi_InitSDT(p_sdt, i_ts_id, i_version, b_current_next, i_network_id); \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_EmptySDT/dvbpsi_DeleteSDT
  *****************************************************************************/
@@ -203,7 +195,6 @@ do {                                                                    \
   dvbpsi_EmptySDT(p_sdt);                                               \
   free(p_sdt);                                                          \
 } while(0);
-
 
 /*****************************************************************************
  * dvbpsi_SDTAddService
@@ -228,7 +219,6 @@ dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
     uint16_t i_service_id, int b_eit_schedule, int b_eit_present,
     uint8_t i_running_status,int b_free_ca);
 
-
 /*****************************************************************************
  * dvbpsi_SDTServiceAddDescriptor
  *****************************************************************************/
@@ -249,13 +239,22 @@ dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data);
 
-
 /*****************************************************************************
  * dvbpsi_GenSDTSections
  *****************************************************************************
  * Generate SDT sections based on the dvbpsi_sdt_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t * p_sdt);
+/*!
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenSDTSections(dvbpsi_t *p_dvbpsi,
+                                                    dvbpsi_sdt_t * p_sdt)
+ * \brief SDT generator
+ * \param p_dvbpsi is a pointer to dvbpsi_t
+ * \param p_sdt SDT structure
+ * \return a pointer to the list of generated PSI sections.
+ *
+ * Generate PMT sections based on the dvbpsi_pmt_t structure.
+ */
+dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_t * p_sdt);
 
 #ifdef __cplusplus
 };

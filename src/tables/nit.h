@@ -6,6 +6,7 @@
  * Authors: Johann Hanne
  *          heavily based on pmt.c which was written by
  *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,7 +40,6 @@
 extern "C" {
 #endif
 
-
 /*****************************************************************************
  * dvbpsi_nit_ts_t
  *****************************************************************************/
@@ -65,7 +65,6 @@ typedef struct dvbpsi_nit_ts_s
                                                              the list */
 
 } dvbpsi_nit_ts_t;
-
 
 /*****************************************************************************
  * dvbpsi_nit_t
@@ -93,7 +92,6 @@ typedef struct dvbpsi_nit_s
 
 } dvbpsi_nit_t;
 
-
 /*****************************************************************************
  * dvbpsi_nit_callback
  *****************************************************************************/
@@ -104,26 +102,24 @@ typedef struct dvbpsi_nit_s
  */
 typedef void (* dvbpsi_nit_callback)(void* p_cb_data, dvbpsi_nit_t* p_new_nit);
 
-
 /*****************************************************************************
  * dvbpsi_AttachNIT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_AttachNIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn int dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                              uint16_t i_extension, dvbpsi_nit_callback pf_callback,
                              void* p_cb_data)
  * \brief Creation and initialization of a NIT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0x4E, 0x4F, or 0x50-0x6F.
  * \param i_extension Table ID extension, here service ID.
  * \param pf_callback function to call back on new NIT.
  * \param p_cb_data private data given in argument to the callback.
  * \return 0 if everything went ok.
  */
-int dvbpsi_AttachNIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+int dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                      uint16_t i_extension, dvbpsi_nit_callback pf_callback,
                      void* p_cb_data);
-
 
 /*****************************************************************************
  * dvbpsi_DetachNIT
@@ -132,14 +128,13 @@ int dvbpsi_AttachNIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  * \fn void dvbpsi_DetachNIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
                              uint16_t i_extension)
  * \brief Destroy a NIT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0x4E, 0x4F, or 0x50-0x6F.
  * \param i_extension Table ID extension, here service ID.
  * \return nothing.
  */
-void dvbpsi_DetachNIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+void dvbpsi_DetachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                       uint16_t i_extension);
-
 
 /*****************************************************************************
  * dvbpsi_InitNIT/dvbpsi_NewNIT
@@ -176,7 +171,6 @@ do {                                                                    \
     dvbpsi_InitNIT(p_nit, i_network_id, i_version, b_current_next);     \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_EmptyNIT/dvbpsi_DeleteNIT
  *****************************************************************************/
@@ -200,7 +194,6 @@ do {                                                                    \
   free(p_nit);                                                          \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_NITAddDescriptor
  *****************************************************************************/
@@ -220,7 +213,6 @@ dvbpsi_descriptor_t* dvbpsi_NITAddDescriptor(dvbpsi_nit_t* p_nit,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);
 
-
 /*****************************************************************************
  * dvbpsi_NITAddTS
  *****************************************************************************/
@@ -235,7 +227,6 @@ dvbpsi_descriptor_t* dvbpsi_NITAddDescriptor(dvbpsi_nit_t* p_nit,
  */
 dvbpsi_nit_ts_t* dvbpsi_NITAddTS(dvbpsi_nit_t* p_nit,
                                  uint16_t i_ts_id, uint16_t i_orig_network_id);
-
 
 /*****************************************************************************
  * dvbpsi_NITTSAddDescriptor
@@ -256,7 +247,6 @@ dvbpsi_descriptor_t* dvbpsi_NITTSAddDescriptor(dvbpsi_nit_ts_t* p_ts,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data);
 
-
 /*****************************************************************************
  * dvbpsi_GenNITSections
  *****************************************************************************/
@@ -264,15 +254,15 @@ dvbpsi_descriptor_t* dvbpsi_NITTSAddDescriptor(dvbpsi_nit_ts_t* p_ts,
  * \fn dvbpsi_psi_section_t* dvbpsi_GenNITSections(dvbpsi_nit_t* p_nit,
                                                    uint8_t i_table_id)
  * \brief NIT generator
+ * \parma p_dvbpsi dvbpsi handle
  * \param p_nit NIT structure
  * \param i_table_id table id, 0x40 = actual network / 0x41 = other network
  * \return a pointer to the list of generated PSI sections.
  *
  * Generate NIT sections based on the dvbpsi_nit_t structure.
  */
-dvbpsi_psi_section_t* dvbpsi_GenNITSections(dvbpsi_nit_t* p_nit,
+dvbpsi_psi_section_t* dvbpsi_GenNITSections(dvbpsi_t* p_dvbpsi, dvbpsi_nit_t* p_nit,
                                             uint8_t i_table_id);
-
 
 #ifdef __cplusplus
 };

@@ -90,7 +90,6 @@ typedef struct dvbpsi_sis_s
                                                          DVB descriptors */
 
   /* FIXME: alignment stuffing */
-
   uint32_t i_ecrc; /*!< CRC 32 of decrypted splice_info_section */
 
 } dvbpsi_sis_t;
@@ -105,7 +104,6 @@ typedef struct dvbpsi_sis_s
  */
 typedef void (* dvbpsi_sis_callback)(void* p_cb_data, dvbpsi_sis_t* p_new_sis);
 
-
 /*****************************************************************************
  * dvbpsi_AttachSIS
  *****************************************************************************/
@@ -114,17 +112,16 @@ typedef void (* dvbpsi_sis_callback)(void* p_cb_data, dvbpsi_sis_t* p_new_sis);
           uint16_t i_extension, dvbpsi_sis_callback pf_callback,
                                void* p_cb_data)
  * \brief Creation and initialization of a SIS decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi pointer to dvbpsi to hold decoder/demuxer structure
  * \param i_table_id Table ID, 0xFC.
  * \param i_extension Table ID extension, here TS ID.
  * \param pf_callback function to call back on new SIS.
  * \param p_cb_data private data given in argument to the callback.
  * \return 0 if everything went ok.
  */
-int dvbpsi_AttachSIS(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+int dvbpsi_AttachSIS(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sis_callback pf_callback,
                                void* p_cb_data);
-
 
 /*****************************************************************************
  * dvbpsi_DetachSIS
@@ -133,14 +130,13 @@ int dvbpsi_AttachSIS(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  * \fn void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension)
  * \brief Destroy a SIS decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi pointer to dvbpsi to hold decoder/demuxer structure
  * \param i_table_id Table ID, 0xFC.
  * \param i_extension Table ID extension, here TS ID.
  * \return nothing.
  */
-void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension);
-
 
 /*****************************************************************************
  * dvbpsi_InitSIS/dvbpsi_NewSIS
@@ -206,16 +202,16 @@ do {                                                                    \
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor( dvbpsi_sis_t *p_sis,
-                                              uint8_t i_tag, uint8_t i_length,
-                                              uint8_t *p_data);
+dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor(dvbpsi_sis_t *p_sis,
+                                             uint8_t i_tag, uint8_t i_length,
+                                             uint8_t *p_data);
 
 /*****************************************************************************
  * dvbpsi_GenSISSections
  *****************************************************************************
  * Generate SIS sections based on the dvbpsi_sis_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_sis_t * p_sis);
+dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t * p_sis);
 
 #ifdef __cplusplus
 };

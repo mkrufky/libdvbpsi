@@ -130,7 +130,7 @@ void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section);
  * \fn int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
  * \brief Validity check of a PSI section.
  * \param p_section pointer to the PSI section structure
- * \return boolean value (0 if the section is not valid).
+ * \return boolean value (false if the section is not valid).
  *
  * Check the CRC_32 if the section has b_syntax_indicator set.
  */

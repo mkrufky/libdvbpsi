@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -52,9 +53,9 @@ void message(dvbpsi_handle dvbpsi, const int level, const char *fmt, ...);
 #  define dvbpsi_debug(hnd, str, x...)                                  \
         message(hnd, DVBPSI_MSG_DEBUG, "libdvbpsi debug ("src"): " str, x)
 #else
-void dvbpsi_error(dvbpsi_handle dvbpsi, const char *src, const char *fmt, ...);
-void dvbpsi_warning(dvbpsi_handle dvbpsi, const char *src, const char *fmt, ...);
-void dvbpsi_debug(dvbpsi_handle dvbpsi, const char *src, const char *fmt, ...);
+void dvbpsi_error(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...);
+void dvbpsi_warning(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...);
+void dvbpsi_debug(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...);
 #endif
 
 #else

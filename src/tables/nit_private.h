@@ -7,6 +7,7 @@
  * Authors: Johann Hanne
  *          heavily based on pmt.c which was written by
  *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,40 +37,39 @@
  *****************************************************************************/
 typedef struct dvbpsi_nit_decoder_s
 {
-  uint16_t                      i_network_id;
+    DVBPSI_DECODER_COMMON
 
-  dvbpsi_nit_callback           pf_callback;
-  void *                        p_cb_data;
+    uint16_t                      i_network_id;
 
-  dvbpsi_nit_t                  current_nit;
-  dvbpsi_nit_t *                p_building_nit;
+    dvbpsi_nit_callback           pf_nit_callback;
+    void *                        p_cb_data;
 
-  int                           b_current_valid;
+    dvbpsi_nit_t                  current_nit;
+    dvbpsi_nit_t *                p_building_nit;
 
-  uint8_t                       i_last_section_number;
-  dvbpsi_psi_section_t *        ap_sections [256];
+    int                           b_current_valid;
+
+    uint8_t                       i_last_section_number;
+    dvbpsi_psi_section_t *        ap_sections [256];
 
 } dvbpsi_nit_decoder_t;
-
 
 /*****************************************************************************
  * dvbpsi_GatherNITSections
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherNITSections(dvbpsi_decoder_t* p_psi_decoder,
+void dvbpsi_GatherNITSections(dvbpsi_t* p_dvbpsi,
                               void* p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
-
 
 /*****************************************************************************
  * dvbpsi_DecodeNITSections
  *****************************************************************************
  * NIT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeNITSections(dvbpsi_nit_t* p_nit,
+void dvbpsi_DecodeNITSections(dvbpsi_t* p_dvbpsi, dvbpsi_nit_t* p_nit,
                               dvbpsi_psi_section_t* p_section);
-
 
 #else
 #error "Multiple inclusions of nit_private.h"

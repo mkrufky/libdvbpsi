@@ -35,16 +35,18 @@
  *****************************************************************************/
 typedef struct dvbpsi_pat_decoder_s
 {
-  dvbpsi_pat_callback           pf_callback;
-  void *                        p_cb_data;
+    DVBPSI_DECODER_COMMON
 
-  dvbpsi_pat_t                  current_pat;
-  dvbpsi_pat_t *                p_building_pat;
+    dvbpsi_pat_callback           pf_pat_callback;
+    void *                        p_cb_data;
 
-  int                           b_current_valid;
+    dvbpsi_pat_t                  current_pat;
+    dvbpsi_pat_t *                p_building_pat;
 
-  uint8_t                       i_last_section_number;
-  dvbpsi_psi_section_t *        ap_sections [256];
+    int                           b_current_valid;
+
+    uint8_t                       i_last_section_number;
+    dvbpsi_psi_section_t *        ap_sections [256];
 
 } dvbpsi_pat_decoder_t;
 
@@ -54,9 +56,7 @@ typedef struct dvbpsi_pat_decoder_s
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
-                              dvbpsi_psi_section_t* p_section);
-
+void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
  * dvbpsi_DecodePATSection
@@ -65,7 +65,6 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
  *****************************************************************************/
 void dvbpsi_DecodePATSections(dvbpsi_pat_t* p_pat,
                               dvbpsi_psi_section_t* p_section);
-
 
 #else
 #error "Multiple inclusions of pat_private.h"
