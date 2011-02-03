@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gen_pmt.c: PMT generator
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -97,6 +97,10 @@ static void writePSI(uint8_t* p_packet, dvbpsi_psi_section_t* p_section)
   }
 }
 
+static void message(dvbpsi_t *handle, const char* msg)
+{
+     fprintf(stderr, "%s\n", msg);
+}
 
 /*****************************************************************************
  * main
@@ -111,6 +115,10 @@ int main(int i_argc, char* pa_argv[])
   dvbpsi_psi_section_t* p_section3, * p_section4;
   dvbpsi_psi_section_t* p_section5, * p_section6;
 
+  dvbpsi_t *p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  if (p_dvbpsi == NULL)
+      return 1;
+
   /* PMT generation */
   dvbpsi_InitPMT(&pmt, 12, 0, 0, 42);
   dvbpsi_PMTAddDescriptor(&pmt, 12, 26, data);
@@ -123,23 +131,23 @@ int main(int i_argc, char* pa_argv[])
   dvbpsi_PMTESAddDescriptor(p_es, 2, 1, data + 4);
   dvbpsi_PMTESAddDescriptor(p_es, 0, 4, data + 7);
 
-  p_section1 = dvbpsi_GenPMTSections(&pmt);
+  p_section1 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
   pmt.b_current_next = 1;
-  p_section2 = dvbpsi_GenPMTSections(&pmt);
+  p_section2 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
 
   pmt.i_version = 1;
 
   pmt.b_current_next = 0;
-  p_section3 = dvbpsi_GenPMTSections(&pmt);
+  p_section3 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
   pmt.b_current_next = 1;
-  p_section4 = dvbpsi_GenPMTSections(&pmt);
+  p_section4 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
 
   pmt.i_version = 2;
 
   pmt.b_current_next = 0;
-  p_section5 = dvbpsi_GenPMTSections(&pmt);
+  p_section5 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
   pmt.b_current_next = 1;
-  p_section6 = dvbpsi_GenPMTSections(&pmt);
+  p_section6 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
 
   /* TS packets generation */
   packet[0] = 0x47;
@@ -163,7 +171,7 @@ int main(int i_argc, char* pa_argv[])
   dvbpsi_DeletePSISections(p_section6);
 
   dvbpsi_EmptyPMT(&pmt);
-
+  dvbpsi_DeleteHandle(p_dvbpsi);
   return 0;
 }
 

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gen_pat.c: PAT generator
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: gen_pat.c,v 1.3 2002/10/07 14:15:14 sam Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -45,7 +45,6 @@
 #include <dvbpsi/psi.h>
 #include <dvbpsi/pat.h>
 #endif
-
 
 /*****************************************************************************
  * writePSI
@@ -95,6 +94,10 @@ static void writePSI(uint8_t* p_packet, dvbpsi_psi_section_t* p_section)
   }
 }
 
+static void message(dvbpsi_t *handle, const char* msg)
+{
+     fprintf(stderr, "%s\n", msg);
+}
 
 /*****************************************************************************
  * main
@@ -108,6 +111,10 @@ int main(int i_argc, char* pa_argv[])
   dvbpsi_psi_section_t* p_section5, * p_section6;
   int i;
 
+  dvbpsi_t *p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  if (p_dvbpsi == NULL)
+      return 1;
+
   /* PAT generation */
   dvbpsi_InitPAT(&pat, 1, 0, 0);
   dvbpsi_PATAddProgram(&pat, 0, 0x12);
@@ -117,23 +124,23 @@ int main(int i_argc, char* pa_argv[])
   for(i = 4; i < 43; i++)
     dvbpsi_PATAddProgram(&pat, i, i);
 
-  p_section1 = dvbpsi_GenPATSections(&pat, 4);
+  p_section1 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 4);
   pat.b_current_next = 1;
-  p_section2 = dvbpsi_GenPATSections(&pat, 8);
+  p_section2 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 8);
 
   pat.i_version = 1;
 
   pat.b_current_next = 0;
-  p_section3 = dvbpsi_GenPATSections(&pat, 16);
+  p_section3 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 16);
   pat.b_current_next = 1;
-  p_section4 = dvbpsi_GenPATSections(&pat, 300);
+  p_section4 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 300);
 
   pat.i_version = 2;
 
   pat.b_current_next = 0;
-  p_section5 = dvbpsi_GenPATSections(&pat, 16);
+  p_section5 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 16);
   pat.b_current_next = 1;
-  p_section6 = dvbpsi_GenPATSections(&pat, 16);
+  p_section6 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 16);
 
   /* TS packets generation */
   packet[0] = 0x47;
@@ -147,7 +154,6 @@ int main(int i_argc, char* pa_argv[])
   writePSI(packet, p_section5);
   writePSI(packet, p_section6);
 
-
   dvbpsi_DeletePSISections(p_section1);
   dvbpsi_DeletePSISections(p_section2);
   dvbpsi_DeletePSISections(p_section3);
@@ -157,6 +163,7 @@ int main(int i_argc, char* pa_argv[])
 
   dvbpsi_EmptyPAT(&pat);
 
+  dvbpsi_DeleteHandle(p_dvbpsi);
   return 0;
 }
 
