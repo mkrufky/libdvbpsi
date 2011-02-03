@@ -105,12 +105,11 @@ struct dvbpsi_s
  * dvbpsi_NewHandle
  *****************************************************************************/
 /*!
- * \fn dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, int level)
+ * \fn dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, enum dvbpsi_msg_level level)
  * \brief Create a new dvbpsi_t handle to be used by PSI decoders or encoders
  * \param callback message callback handler, if NULL then no errors, warnings
  *        or debug messages will be sent to the caller application
- * \param level for filtering logging messages, possible values are:
- *              -1=none, 0=error, 1=warning, 2=debug.
+ * \param level enum dvbpsi_msg_level for filtering logging messages
  * \return pointer to dvbpsi_t malloced data
  *
  * Creates a handle to use with PSI decoder and encoder API functions. The
