@@ -1,7 +1,7 @@
 /*****************************************************************************
  * decode_mpeg.c: MPEG decoder example
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: decode_mpeg.c 104 2005-03-21 13:38:56Z massiot $
  *
  * Authors: Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
@@ -100,7 +100,7 @@ typedef int64_t mtime_t;
 
 typedef struct
 {
-    dvbpsi_handle handle;
+    dvbpsi_t * handle;
 
     int i_pat_version;
     int i_ts_id;
@@ -119,7 +119,7 @@ typedef struct ts_pid_s
 
 typedef struct ts_pmt_s
 {
-    dvbpsi_handle handle;
+    dvbpsi_t * handle;
 
     int         i_number; /* i_number = 0 is actually a NIT */
     int         i_pmt_version;
@@ -285,6 +285,11 @@ static void report_PCRPacketTiming( int i_cc, ts_pid_t *ts_pid,
 #endif
 }
 
+static void message(dvbpsi_t *handle, const char* msg)
+{
+    fprintf(stderr, "%s\n", msg);
+}
+
 /*****************************************************************************
  * DumpPAT
  *****************************************************************************/
@@ -292,6 +297,14 @@ static void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
 {
     dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
     ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    if (p_stream->pmt.handle)
+    {
+        fprintf(stderr, "freeing old PMT\n");
+        dvbpsi_DetachPMT(p_stream->pmt.handle);
+        dvbpsi_DeleteHandle(p_stream->pmt.handle);
+        p_stream->pmt.handle = NULL;
+    }
 
     p_stream->pat.i_pat_version = p_pat->i_version;
     p_stream->pat.i_ts_id = p_pat->i_ts_id;
@@ -307,8 +320,19 @@ static void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
             p_stream->pmt.i_number = p_program->i_number;
             p_stream->pmt.pid_pmt = &p_stream->pid[p_program->i_pid];
             p_stream->pmt.pid_pmt->i_pid = p_program->i_pid;
-            p_stream->pmt.handle = dvbpsi_AttachPMT( p_program->i_number, DumpPMT, p_stream );
-
+            dvbpsi_t *p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+            if (p_dvbpsi == NULL)
+            {
+                fprintf(stderr, "could not allocate new dvbpsi_t handle\n");
+                break;
+            }
+            p_stream->pmt.handle = dvbpsi_AttachPMT(p_dvbpsi, p_program->i_number, DumpPMT, p_stream );
+            if (p_stream->pmt.handle == NULL)
+            {
+                dvbpsi_DeleteHandle(p_dvbpsi);
+                fprintf(stderr, "could not attach PMT\n");
+                break;
+            }
             fprintf( stderr, "    | %14d @ 0x%x (%d)\n",
                 p_program->i_number, p_program->i_pid, p_program->i_pid);
             p_program = p_program->p_next;
@@ -636,8 +660,15 @@ int main(int i_argc, char* pa_argv[])
     report_Header( i_report );
 #endif
 
+    dvbpsi_t *p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+    if (p_dvbpsi == NULL)
+        goto dvbpsi_out;
+    p_stream->pat.handle = dvbpsi_AttachPAT(p_dvbpsi, DumpPAT, p_stream);
+    if (p_stream->pat.handle == NULL)
+    {
+        goto dvbpsi_out;
+    }
     /* Enter infinite loop */
-    p_stream->pat.handle = dvbpsi_AttachPAT( DumpPAT, p_stream );
     while( i_len > 0 )
     {
         int i = 0;
@@ -754,9 +785,15 @@ int main(int i_argc, char* pa_argv[])
 #endif
     }
     if( p_stream->pmt.handle )
+    {
         dvbpsi_DetachPMT( p_stream->pmt.handle );
+        dvbpsi_DeleteHandle( p_stream->pmt.handle );
+    }
     if( p_stream->pat.handle )
-    dvbpsi_DetachPAT( p_stream->pat.handle );
+    {
+        dvbpsi_DetachPAT( p_stream->pat.handle );
+        dvbpsi_DeleteHandle( p_stream->pat.handle );
+    }
 
     /* clean up */
     if( filename )
@@ -778,6 +815,13 @@ int main(int i_argc, char* pa_argv[])
 
 out_of_memory:
     fprintf( stderr, "Out of memory\n" );
+
+dvbpsi_out:
+    if( p_stream->pat.handle )
+    {
+        dvbpsi_DetachPAT( p_stream->pat.handle );
+        dvbpsi_DeleteHandle( p_stream->pat.handle );
+    }
 
 error:
     if( p_data )    free( p_data );

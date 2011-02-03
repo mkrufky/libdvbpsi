@@ -1,7 +1,7 @@
 /*****************************************************************************
  * decode_pmt.c: PAT decoder example
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -23,7 +23,6 @@
  *----------------------------------------------------------------------------
  *
  *****************************************************************************/
-
 
 #include "config.h"
 
@@ -239,6 +238,10 @@ static void DumpPMT(void* p_zero, dvbpsi_pmt_t* p_pmt)
   dvbpsi_DeletePMT(p_pmt);
 }
 
+static void message(dvbpsi_t *handle, const char* msg)
+{
+     fprintf(stderr, "%s\n", msg);
+}
 
 /*****************************************************************************
  * main
@@ -247,18 +250,27 @@ int main(int i_argc, char* pa_argv[])
 {
   int i_fd;
   uint8_t data[188];
-  dvbpsi_handle h_dvbpsi;
+  dvbpsi_t *p_dvbpsi;
   int b_ok;
   uint16_t i_program_number, i_pmt_pid;
 
-  if(i_argc != 4)
+  if (i_argc != 4)
     return 1;
 
   i_fd = open(pa_argv[1], 0);
+  if (i_fd < 0)
+      return 1;
+
   i_program_number = atoi(pa_argv[2]);
   i_pmt_pid = atoi(pa_argv[3]);
 
-  h_dvbpsi = dvbpsi_AttachPMT(i_program_number, DumpPMT, NULL);
+  p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  if (p_dvbpsi == NULL)
+        goto out;
+
+  dvbpsi_t *p_tmp = dvbpsi_AttachPMT(p_dvbpsi, i_program_number, DumpPMT, NULL);
+  if (p_tmp == NULL)
+      goto out;
 
   b_ok = ReadPacket(i_fd, data);
 
@@ -266,11 +278,17 @@ int main(int i_argc, char* pa_argv[])
   {
     uint16_t i_pid = ((uint16_t)(data[1] & 0x1f) << 8) + data[2];
     if(i_pid == i_pmt_pid)
-      dvbpsi_PushPacket(h_dvbpsi, data);
+      dvbpsi_PushPacket(p_dvbpsi, data);
     b_ok = ReadPacket(i_fd, data);
   }
 
-  dvbpsi_DetachPMT(h_dvbpsi);
+out:
+  if (p_dvbpsi)
+  {
+    dvbpsi_DetachPMT(p_dvbpsi);
+    dvbpsi_DeleteHandle(p_dvbpsi);
+  }
+  close(i_fd);
 
   return 0;
 }

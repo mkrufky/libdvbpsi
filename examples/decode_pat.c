@@ -1,7 +1,7 @@
 /*****************************************************************************
  * decode_pat.c: PAT decoder example
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -23,7 +23,6 @@
  *----------------------------------------------------------------------------
  *
  *****************************************************************************/
-
 
 #include "config.h"
 
@@ -48,7 +47,6 @@
 #include <dvbpsi/psi.h>
 #include <dvbpsi/pat.h>
 #endif
-
 
 /*****************************************************************************
  * ReadPacket
@@ -97,6 +95,10 @@ static void DumpPAT(void* p_zero, dvbpsi_pat_t* p_pat)
   dvbpsi_DeletePAT(p_pat);
 }
 
+static void message(dvbpsi_t *handle, const char* msg)
+{
+     fprintf(stderr, "%s\n", msg);
+}
 
 /*****************************************************************************
  * main
@@ -105,15 +107,23 @@ int main(int i_argc, char* pa_argv[])
 {
   int i_fd;
   uint8_t data[188];
-  dvbpsi_handle h_dvbpsi;
+  dvbpsi_t *p_dvbpsi;
   int b_ok;
 
-  if(i_argc != 2)
-    return 1;
+  if (i_argc != 2)
+      return 1;
 
   i_fd = open(pa_argv[1], 0);
+  if (i_fd < 0)
+      return 1;
 
-  h_dvbpsi = dvbpsi_AttachPAT(DumpPAT, NULL);
+  p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  if (p_dvbpsi == NULL)
+      goto out;
+
+  dvbpsi_t *p_tmp = dvbpsi_AttachPAT(p_dvbpsi, DumpPAT, NULL);
+  if (p_tmp == NULL)
+      goto out;
 
   b_ok = ReadPacket(i_fd, data);
 
@@ -121,11 +131,17 @@ int main(int i_argc, char* pa_argv[])
   {
     uint16_t i_pid = ((uint16_t)(data[1] & 0x1f) << 8) + data[2];
     if(i_pid == 0x0)
-      dvbpsi_PushPacket(h_dvbpsi, data);
+      dvbpsi_PushPacket(p_dvbpsi, data);
     b_ok = ReadPacket(i_fd, data);
   }
 
-  dvbpsi_DetachPAT(h_dvbpsi);
+out:
+  if (p_dvbpsi == NULL)
+  {
+    dvbpsi_DetachPAT(p_dvbpsi);
+    dvbpsi_DeleteHandle(p_dvbpsi);
+  }
+  close(i_fd);
 
   return 0;
 }
