@@ -43,13 +43,13 @@ extern "C" {
  *****************************************************************************/
 /*!
  * \typedef void(* dvbpsi_demux_new_cb_t) (void *   p_cb_data,
-                                           dvbpsi_decoder_t *p_decoder,
+                                           dvbpsi_t *p_dvbpsi,
                                            uint8_t  i_table_id,
                                            uint16_t i_extension);
  * \brief Callback used in case of a new subtable detected.
  */
 typedef void (*dvbpsi_demux_new_cb_t) (void *   p_cb_data,
-                                       dvbpsi_decoder_t *p_decoder,
+                                       dvbpsi_t *p_dvbpsi,
                                        uint8_t  i_table_id,
                                        uint16_t i_extension);
 

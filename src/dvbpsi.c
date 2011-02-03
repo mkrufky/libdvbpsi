@@ -144,7 +144,7 @@ uint32_t dvbpsi_crc32_table[256] =
 /*****************************************************************************
  * dvbpsi_NewHandle
  *****************************************************************************/
-dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, int level)
+dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, enum dvbpsi_msg_level level)
 {
     dvbpsi_t *handle = calloc(1, sizeof(dvbpsi_t));
     if (handle != NULL)
@@ -492,7 +492,7 @@ void dvbpsi_error(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...)
 
 void dvbpsi_warning(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...)
 {
-    if (DVBPSI_MSG_WARNING <= dvbpsi->i_msg_level)
+    if (DVBPSI_MSG_WARN <= dvbpsi->i_msg_level)
     {
         va_list ap;
         va_start(ap, fmt);

@@ -61,6 +61,22 @@ typedef struct dvbpsi_s dvbpsi_t;
 typedef void (* dvbpsi_message_cb)(dvbpsi_t *handle,
                                    const char* msg);
 
+/*!
+ * \enum dvbpsi_msg_level
+ * \brief DVBPSI message level enum
+ * DVBPSI_MSG_NONE   -1 : No messages
+ * DVBPSI_MSG_ERROR   0 : Error messages, only
+ * DVBPSI_MSG_WARNING 1 : Error and Warning messages
+ * DVBPSI_MSG_DEBUG   2 : Error, warning and debug messages
+ */
+enum dvbpsi_msg_level
+{
+    DVBPSI_MSG_NONE  = -1,
+    DVBPSI_MSG_ERROR =  0,
+    DVBPSI_MSG_WARN  =  1,
+    DVBPSI_MSG_DEBUG =  2,
+};
+
 /*****************************************************************************
  * dvbpsi_t
  *****************************************************************************/
@@ -82,9 +98,7 @@ struct dvbpsi_s
                                                           encoder */
     /* Messages callback */
     dvbpsi_message_cb             pf_message;           /*!< Log message callback */
-    int                           i_msg_level;          /*!< Log level -1, 0, 1 or 2
-                                                          (-1=none, 0=error, 1=warning,
-                                                            2=debug) */
+    enum dvbpsi_msg_level         i_msg_level;          /*!< Log level */
 };
 
 /*****************************************************************************
@@ -102,7 +116,7 @@ struct dvbpsi_s
  * Creates a handle to use with PSI decoder and encoder API functions. The
  * handle must be freed with dvbpsi_DeleteHandle().
  */
-dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, int level);
+dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, enum dvbpsi_msg_level level);
 
 /*****************************************************************************
  * dvbpsi_DeleteHandle

@@ -38,10 +38,6 @@ extern uint32_t dvbpsi_crc32_table[];
  * libdvbpsi messages have the following format:
  * "libdvbpsi [error | warning | debug] (<component>): <msg>"
  *****************************************************************************/
-#define DVBPSI_MSG_NONE   -1 /* No messages */
-#define DVBPSI_MSG_ERROR   0 /* Error messages, only */
-#define DVBPSI_MSG_WARNING 1 /* Error and Warning messages */
-#define DVBPSI_MSG_DEBUG   2 /* Error, warning and debug messages */
 
 #ifdef HAVE_VARIADIC_MACROS
 void message(dvbpsi_handle dvbpsi, const int level, const char *fmt, ...);

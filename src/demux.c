@@ -118,7 +118,7 @@ void dvbpsi_Demux(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
     {
         /* Tell the application we found a new subtable, so that it may attach a
          * subtable decoder */
-        p_demux->pf_new_callback(p_demux->p_new_cb_data, (dvbpsi_decoder_t *)p_demux,
+        p_demux->pf_new_callback(p_demux->p_new_cb_data, p_dvbpsi,
                                  p_section->i_table_id, p_section->i_extension);
 
         /* Check if a new subtable decoder is available */
