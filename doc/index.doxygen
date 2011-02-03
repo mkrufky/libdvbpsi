@@ -15,7 +15,9 @@ describes how to use it and the "C" API.</p>
 
 <h2>What is libdvbpsi ?</h2>
 
-<p><em>libdvbpsi</em> is a set of tools which allows to decode and generate all the Program specific Information (<em>PSI</em>) present in a MPEG2 TS or a DVB stream.</p>
+<p><em>libdvbpsi</em> is a library that provides API's to decode and generate all the Program specific Information (<em>PSI</em>) and descriptors present in a MPEG2 TS or a DVB stream.</p>
+
+<p><b><em>libdvbpsi</em> version 1.0.0 breaks API compatibility with earlier versions</b>. The benefits are a more consistent API and the library no longer makes calls to printf which improves its use in threaded applications.</p>
 
 <p>The two keywords are <em>portability</em> and <em>simplicity</em>.</p>
 
