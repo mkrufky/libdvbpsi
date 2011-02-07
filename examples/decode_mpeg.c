@@ -183,6 +183,10 @@ static int ReadPacketFromSocket( int i_socket, uint8_t* p_dst, size_t i_size)
  *****************************************************************************/
 static void report_Header( int i_report )
 {
+#ifndef HAVE_GETTIMEOFDAY
+    printf("*** WARNING: !!! no gettimeofday support found !!! timing information will not be given !!! ***\n");
+#endif
+
     switch(i_report)
     {
         case REPORT_PCR:
@@ -200,11 +204,7 @@ static void report_Header( int i_report )
  *****************************************************************************/
 #ifdef HAVE_GETTIMEOFDAY
 static mtime_t report_UDPPacketTiming( int32_t i_seqno, int32_t bytes, mtime_t time_prev, mtime_t *time_base )
-#else
-static void report_UDPPacketTiming( int32_t i_seqno, int32_t bytes )
-#endif
 {
-#ifdef HAVE_GETTIMEOFDAY
     mtime_t time_current;
     mtime_t tv_delta;
     struct timeval tv;
@@ -226,10 +226,14 @@ static void report_UDPPacketTiming( int32_t i_seqno, int32_t bytes )
     time_prev = time_current;
     printf( "%d\n", bytes );
     return time_prev;
-#else
-    printf( "\n" );
-#endif
 }
+#else
+static void report_UDPPacketTiming( int32_t i_seqno, int32_t bytes )
+{
+    printf( "%.2d %"PRId64" %"PRId64" ", i_seqno, 0UL, 0UL );
+    printf( "%d\n", bytes );
+}
+#endif
 
 #ifdef HAVE_GETTIMEOFDAY
 static mtime_t report_PCRPacketTiming( int i_cc, ts_pid_t *ts_pid,
