@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -327,16 +328,15 @@ static void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
             p_stream->pmt.i_number = p_program->i_number;
             p_stream->pmt.pid_pmt = &p_stream->pid[p_program->i_pid];
             p_stream->pmt.pid_pmt->i_pid = p_program->i_pid;
-            dvbpsi_t *p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
-            if (p_dvbpsi == NULL)
+            p_stream->pmt.handle  = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+            if (p_stream->pmt.handle == NULL)
             {
                 fprintf(stderr, "could not allocate new dvbpsi_t handle\n");
                 break;
             }
-            p_stream->pmt.handle = dvbpsi_AttachPMT(p_dvbpsi, p_program->i_number, DumpPMT, p_stream );
-            if (p_stream->pmt.handle == NULL)
+            if (!dvbpsi_AttachPMT(p_stream->pmt.handle, p_program->i_number, DumpPMT, p_stream ))
             {
-                dvbpsi_DeleteHandle(p_dvbpsi);
+                dvbpsi_DeleteHandle(p_stream->pmt.handle);
                 fprintf(stderr, "could not attach PMT\n");
                 break;
             }
@@ -667,14 +667,12 @@ int main(int i_argc, char* pa_argv[])
     report_Header( i_report );
 #endif
 
-    dvbpsi_t *p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
-    if (p_dvbpsi == NULL)
-        goto dvbpsi_out;
-    p_stream->pat.handle = dvbpsi_AttachPAT(p_dvbpsi, DumpPAT, p_stream);
+    p_stream->pat.handle = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
     if (p_stream->pat.handle == NULL)
-    {
         goto dvbpsi_out;
-    }
+    if (!dvbpsi_AttachPAT(p_stream->pat.handle, DumpPAT, p_stream))
+        goto dvbpsi_out;
+
     /* Enter infinite loop */
     while( i_len > 0 )
     {

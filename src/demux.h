@@ -126,14 +126,14 @@ struct dvbpsi_demux_s
  * dvbpsi_AttachDemux
  *****************************************************************************/
 /*!
- * \fn dvbpsi_t *dvbpsi_AttachDemux(dvbpsi_t *p_dvbpsi, dvbpsi_demux_new_cb_t pf_new_cb, void * p_new_cb_data)
- * \brief Creates a new demux structure.
+ * \fn bool dvbpsi_AttachDemux(dvbpsi_t *p_dvbpsi, dvbpsi_demux_new_cb_t pf_new_cb, void * p_new_cb_data)
+ * \brief Attaches a new demux structure on dvbpsi_t* handle.
  * \param p_dvbpsi pointer to dvbpsi_t handle
  * \param pf_new_cb A callcack called when a new type of subtable is found.
  * \param p_new_cb_data Data given to the previous callback.
- * \return a handle to the new attached demux structure.
+ * \return true on success, false on failure
  */
-dvbpsi_t *dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
+bool dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
                              dvbpsi_demux_new_cb_t pf_new_cb,
                              void *                p_new_cb_data);
 

@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -51,15 +52,16 @@
  *****************************************************************************
  * Initialize a PMT decoder and return a handle on it.
  *****************************************************************************/
-dvbpsi_t *dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
-                               dvbpsi_pmt_callback pf_callback,
-                               void* p_cb_data)
+bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
+                      dvbpsi_pmt_callback pf_callback, void* p_cb_data)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private == NULL);
+
     dvbpsi_pmt_decoder_t* p_pmt_decoder;
     p_pmt_decoder = (dvbpsi_pmt_decoder_t*)malloc(sizeof(dvbpsi_pmt_decoder_t));
-
     if (p_pmt_decoder == NULL)
-        return NULL;
+        return false;
 
     p_dvbpsi->p_private = (void *)p_pmt_decoder;
 
@@ -83,7 +85,7 @@ dvbpsi_t *dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
     for (unsigned int i = 0; i <= 255; i++)
         p_pmt_decoder->ap_sections[i] = NULL;
 
-    return p_dvbpsi;
+    return true;
 }
 
 /*****************************************************************************
@@ -93,6 +95,9 @@ dvbpsi_t *dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
  *****************************************************************************/
 void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
     dvbpsi_pmt_decoder_t* p_pmt_decoder
                         = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_private;
     free(p_pmt_decoder->p_building_pmt);
@@ -236,6 +241,9 @@ dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
  *****************************************************************************/
 void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
     dvbpsi_pmt_decoder_t* p_pmt_decoder = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_private;
     assert(p_pmt_decoder);
 

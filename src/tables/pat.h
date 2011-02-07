@@ -102,15 +102,15 @@ typedef void (* dvbpsi_pat_callback)(void* p_cb_data, dvbpsi_pat_t* p_new_pat);
  * dvbpsi_AttachPAT
  *****************************************************************************/
 /*!
- * \fn dvbpsi_t *dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback, void* p_cb_data)
- * \brief Creation and initialization of a PAT decoder.
+ * \fn bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback, void* p_cb_data)
+ * \brief Creation and initialization of a PAT decoder. The decoder will be attached to 'p_dvbpsi' argument.
  * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param pf_callback function to call back on new PAT
  * \param p_cb_data private data given in argument to the callback
- * \return a pointer to the decoder for future calls.
+ * \return true on success, false on failure
  */
-dvbpsi_t *dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
-                           void* p_cb_data);
+bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
+                      void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachPAT

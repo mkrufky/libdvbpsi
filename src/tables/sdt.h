@@ -110,20 +110,19 @@ typedef void (* dvbpsi_sdt_callback)(void* p_cb_data, dvbpsi_sdt_t* p_new_sdt);
  * dvbpsi_AttachSDT
  *****************************************************************************/
 /*!
- * \fn int dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+ * \fn bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sdt_callback pf_callback,
                                void* p_cb_data)
- * \brief Creation and initialization of a SDT decoder.
+ * \brief Creation and initialization of a SDT decoder. It is attached to p_dvbpsi.
  * \param p_dvbpsi pointer to dvbpsi to hold decoder/demuxer structure
  * \param i_table_id Table ID, 0x42 or 0x46.
  * \param i_extension Table ID extension, here TS ID.
  * \param pf_callback function to call back on new SDT.
  * \param p_cb_data private data given in argument to the callback.
- * \return pointer to dvbpsi handle or NULL on error
+ * \return true on success, false on failure
  */
-dvbpsi_t *dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_sdt_callback pf_callback,
-                               void* p_cb_data);
+bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                      dvbpsi_sdt_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachSDT

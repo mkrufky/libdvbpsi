@@ -106,21 +106,20 @@ typedef void (* dvbpsi_pmt_callback)(void* p_cb_data, dvbpsi_pmt_t* p_new_pmt);
  * dvbpsi_AttachPMT
  *****************************************************************************/
 /*!
- * \fn dvbpsi_t *dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi,
-                                      uint16_t i_program_number,
-                                      dvbpsi_pmt_callback pf_callback,
-                                      void* p_cb_data)
+ * \fn bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi,
+                             uint16_t i_program_number,
+                             dvbpsi_pmt_callback pf_callback,
+                             void* p_cb_data)
  * \brief Creates and initialization of a PMT decoder and attaches it to dvbpsi_t
  *        handle
  * \param p_dvbpsi handle
  * \param i_program_number program number
  * \param pf_callback function to call back on new PMT
  * \param p_cb_data private data given in argument to the callback
- * \return a pointer to the decoder for future calls.
+ * \return true on success, false on failure
  */
-dvbpsi_t *dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
-                               dvbpsi_pmt_callback pf_callback,
-                               void* p_cb_data);
+bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
+                      dvbpsi_pmt_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachPMT

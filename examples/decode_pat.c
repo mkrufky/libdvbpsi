@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -121,8 +122,7 @@ int main(int i_argc, char* pa_argv[])
   if (p_dvbpsi == NULL)
       goto out;
 
-  dvbpsi_t *p_tmp = dvbpsi_AttachPAT(p_dvbpsi, DumpPAT, NULL);
-  if (p_tmp == NULL)
+  if (!dvbpsi_AttachPAT(p_dvbpsi, DumpPAT, NULL))
       goto out;
 
   b_ok = ReadPacket(i_fd, data);

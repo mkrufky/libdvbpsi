@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -137,7 +138,8 @@ static void NewSubtable(void * p_zero, dvbpsi_t *p_dvbpsi,
 {
   if(i_table_id == 0x42)
   {
-    dvbpsi_AttachSDT(p_dvbpsi, i_table_id, i_extension, DumpSDT, NULL);
+     if (!dvbpsi_AttachSDT(p_dvbpsi, i_table_id, i_extension, DumpSDT, NULL))
+         fprintf(stderr, "Failed to attach SDT subdecoder\n");
   }
 }
 
@@ -162,8 +164,7 @@ int main(int i_argc, char* pa_argv[])
   if (p_dvbpsi == NULL)
       goto out;
 
-  dvbpsi_t *p_demux= dvbpsi_AttachDemux(p_dvbpsi, NewSubtable, NULL);
-  if (p_demux == NULL)
+  if (!dvbpsi_AttachDemux(p_dvbpsi, NewSubtable, NULL))
       goto out;
 
   b_ok = ReadPacket(i_fd, data);

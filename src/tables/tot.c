@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -38,6 +39,8 @@
 #elif defined(HAVE_STDINT_H)
 #include <stdint.h>
 #endif
+
+#include <assert.h>
 
 #include "../dvbpsi.h"
 #include "../dvbpsi_private.h"
@@ -52,9 +55,12 @@
  *****************************************************************************
  * Initialize a TDT/TOT subtable decoder.
  *****************************************************************************/
-int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
                      dvbpsi_tot_callback pf_callback, void* p_cb_data)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
     dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
     dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_tot_decoder_t*  p_tot_decoder;
@@ -65,18 +71,18 @@ int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensio
                      "Already a decoder for (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, 0);
-        return 1;
+        return false;
     }
 
     p_subdec = (dvbpsi_demux_subdec_t*)calloc(1, sizeof(dvbpsi_demux_subdec_t));
     if(p_subdec == NULL)
-        return 1;
+        return false;
 
     p_tot_decoder = (dvbpsi_tot_decoder_t*)calloc(1, sizeof(dvbpsi_tot_decoder_t));
     if (p_tot_decoder == NULL)
     {
         free(p_subdec);
-        return 1;
+        return false;
     }
 
     /* subtable decoder configuration */
@@ -93,7 +99,7 @@ int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensio
     p_tot_decoder->pf_tot_callback = pf_callback;
     p_tot_decoder->p_cb_data = p_cb_data;
 
-    return 0;
+    return true;
 }
 
 /*****************************************************************************
@@ -104,6 +110,9 @@ int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensio
 void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                       uint16_t i_extension)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_private;
     dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_demux_subdec_t** pp_prev_subdec;
@@ -186,6 +195,9 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
                               void * p_private_decoder,
                               dvbpsi_psi_section_t* p_section)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
     dvbpsi_tot_decoder_t* p_tot_decoder
                         = (dvbpsi_tot_decoder_t*)p_private_decoder;
     int b_append = 1;

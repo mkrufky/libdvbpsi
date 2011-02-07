@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
@@ -113,15 +114,13 @@ static void PATCallback( void *_unused, dvbpsi_pat_t *p_pat )
         if( p_program->i_number != 0
              && (!i_program || i_program == p_program->i_number) )
         {
-            dvbpsi_t *p_dvbpsi;
             pi_pmt_pids[i_nb_programs] = p_program->i_pid;
-            p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
-            if (p_dvbpsi)
+            p_pmt_dvbpsi_fds[i_nb_programs] = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+            if (p_pmt_dvbpsi_fds[i_nb_programs])
             {
-                p_pmt_dvbpsi_fds[i_nb_programs] =
-                        dvbpsi_AttachPMT(p_dvbpsi, p_program->i_number, PMTCallback,
-                                          NULL );
-                i_nb_programs++;
+                if (dvbpsi_AttachPMT(p_pmt_dvbpsi_fds[i_nb_programs],
+                                      p_program->i_number, PMTCallback, NULL))
+                    i_nb_programs++;
             }
         }
     }
@@ -171,7 +170,6 @@ static void TSHandle( uint8_t *p_ts )
  *****************************************************************************/
 int main( int i_argc, char **pp_argv )
 {
-    dvbpsi_t *p_dvbpsi;
     uint8_t *p_buffer;
     int result = EXIT_FAILURE;
 
@@ -191,12 +189,11 @@ int main( int i_argc, char **pp_argv )
     if ( i_argc == 3 )
         i_program = strtol( pp_argv[2], NULL, 0 );
 
-    p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
-    if (p_dvbpsi == NULL)
+    p_pat_dvbpsi_fd = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+    if (p_pat_dvbpsi_fd == NULL)
         goto out;
 
-    p_pat_dvbpsi_fd = dvbpsi_AttachPAT(p_dvbpsi, PATCallback, NULL );
-    if (p_pat_dvbpsi_fd == NULL)
+    if (!dvbpsi_AttachPAT(p_pat_dvbpsi_fd, PATCallback, NULL ))
         goto out;
 
     p_buffer = malloc( TS_SIZE * READ_ONCE );
@@ -238,10 +235,10 @@ int main( int i_argc, char **pp_argv )
     result = EXIT_SUCCESS;
 
 out:
-    if (p_dvbpsi)
+    if (p_pat_dvbpsi_fd)
     {
-      dvbpsi_DetachPAT(p_dvbpsi);
-      dvbpsi_DeleteHandle(p_dvbpsi);
+      dvbpsi_DetachPAT(p_pat_dvbpsi_fd);
+      dvbpsi_DeleteHandle(p_pat_dvbpsi_fd);
     }
     close( i_fd );
 

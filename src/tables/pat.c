@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
@@ -49,14 +50,15 @@
  *****************************************************************************
  * Initialize a PAT decoder and return a handle on it.
  *****************************************************************************/
-dvbpsi_t *dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
-                           void* p_cb_data)
+bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
+                      void* p_cb_data)
 {
     assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private == NULL);
 
     dvbpsi_pat_decoder_t* p_pat_decoder = (dvbpsi_pat_decoder_t*) calloc(1, sizeof(dvbpsi_pat_decoder_t));
     if (p_pat_decoder == NULL)
-        return NULL;
+        return false;
 
     /* PSI decoder configuration */
     p_pat_decoder->pf_callback = &dvbpsi_GatherPATSections;
@@ -79,7 +81,7 @@ dvbpsi_t *dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
         p_pat_decoder->ap_sections[i] = NULL;
 
     p_dvbpsi->p_private = (void *)p_pat_decoder;
-    return p_dvbpsi;
+    return true;
 }
 
 
@@ -90,6 +92,9 @@ dvbpsi_t *dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
  *****************************************************************************/
 void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
     dvbpsi_pat_decoder_t* p_pat_decoder = (dvbpsi_pat_decoder_t*)p_dvbpsi->p_private;
     free(p_pat_decoder->p_building_pat);
 
@@ -183,6 +188,7 @@ void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sectio
   int b_append = 1;
   int b_reinit = 0;
 
+  assert(p_dvbpsi);
   assert(p_dvbpsi->p_private);
 
   dvbpsi_debug(p_dvbpsi, "PAT decoder",

@@ -77,16 +77,16 @@ typedef void (* dvbpsi_cat_callback)(void* p_cb_data, dvbpsi_cat_t* p_new_cat);
  * dvbpsi_AttachCAT
  *****************************************************************************/
 /*!
- * \fn dvbpsi_t *dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi,
+ * \fn bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi,
                             dvbpsi_cat_callback pf_callback, void* p_cb_data)
- * \brief Creation and initialization of a CAT decoder.
+ * \brief Creation and initialization of a CAT decoder. It will be attached to p_dvbpsi
  * \param p_dvbpsi is a pointer to dvbpsi_t which holds a pointer to the decoder
  * \param pf_callback function to call back on new CAT
  * \param p_cb_data private data given in argument to the callback
- * \return a pointer to dvbpsi_t holding the decoder for future calls.
+ * \return true on success, false on failure
  */
-dvbpsi_t *dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
-                           void* p_cb_data);
+bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
+                      void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachCAT

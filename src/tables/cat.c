@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -53,15 +54,16 @@
  *****************************************************************************
  * Initialize a CAT decoder and return a handle on it.
  *****************************************************************************/
-dvbpsi_t *dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
-                               void* p_cb_data)
+bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
+                      void* p_cb_data)
 {
     assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private == NULL);
 
     dvbpsi_cat_decoder_t* p_cat_decoder;
     p_cat_decoder = (dvbpsi_cat_decoder_t*)calloc(1, sizeof(dvbpsi_cat_decoder_t));
     if (p_cat_decoder == NULL)
-        return NULL;
+        return false;
 
     /* PSI decoder configuration */
     p_cat_decoder->pf_callback = &dvbpsi_GatherCATSections;
@@ -81,7 +83,7 @@ dvbpsi_t *dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
     for (unsigned int i = 0; i <= 255; i++)
         p_cat_decoder->ap_sections[i] = NULL;
 
-    return p_dvbpsi;
+    return true;
 }
 
 /*****************************************************************************
@@ -91,6 +93,9 @@ dvbpsi_t *dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
  *****************************************************************************/
 void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
     dvbpsi_cat_decoder_t* p_cat_decoder
                         = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_private;
     free(p_cat_decoder->p_building_cat);
@@ -165,6 +170,9 @@ dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
 void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
                               dvbpsi_psi_section_t* p_section)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
     dvbpsi_cat_decoder_t* p_cat_decoder
                           = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_private;
 

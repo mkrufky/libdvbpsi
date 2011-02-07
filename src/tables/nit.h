@@ -106,18 +106,18 @@ typedef void (* dvbpsi_nit_callback)(void* p_cb_data, dvbpsi_nit_t* p_new_nit);
  * dvbpsi_AttachNIT
  *****************************************************************************/
 /*!
- * \fn int dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
+ * \fn bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                              uint16_t i_extension, dvbpsi_nit_callback pf_callback,
                              void* p_cb_data)
- * \brief Creation and initialization of a NIT decoder.
+ * \brief Creation and initialization of a NIT decoder. It is attached to p_dvbpsi.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0x4E, 0x4F, or 0x50-0x6F.
  * \param i_extension Table ID extension, here service ID.
  * \param pf_callback function to call back on new NIT.
  * \param p_cb_data private data given in argument to the callback.
- * \return 0 if everything went ok.
+ * \return true on success, false on failure
  */
-int dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
+bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                      uint16_t i_extension, dvbpsi_nit_callback pf_callback,
                      void* p_cb_data);
 

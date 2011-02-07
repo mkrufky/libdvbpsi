@@ -108,20 +108,19 @@ typedef void (* dvbpsi_sis_callback)(void* p_cb_data, dvbpsi_sis_t* p_new_sis);
  * dvbpsi_AttachSIS
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+ * \fn bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sis_callback pf_callback,
                                void* p_cb_data)
- * \brief Creation and initialization of a SIS decoder.
+ * \brief Creation and initialization of a SIS decoder. It is attached to p_dvbpsi.
  * \param p_dvbpsi pointer to dvbpsi to hold decoder/demuxer structure
  * \param i_table_id Table ID, 0xFC.
  * \param i_extension Table ID extension, here TS ID.
  * \param pf_callback function to call back on new SIS.
  * \param p_cb_data private data given in argument to the callback.
- * \return 0 if everything went ok.
+ * \return true on success, false on failure
  */
-int dvbpsi_AttachSIS(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_sis_callback pf_callback,
-                               void* p_cb_data);
+bool dvbpsi_AttachSIS(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                      dvbpsi_sis_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachSIS

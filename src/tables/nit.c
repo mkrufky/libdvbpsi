@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -38,6 +39,8 @@
 #elif defined(HAVE_STDINT_H)
 #include <stdint.h>
 #endif
+
+#include <assert.h>
 
 #include "../dvbpsi.h"
 #include "../dvbpsi_private.h"
@@ -52,10 +55,13 @@
  *****************************************************************************
  * Initialize a NIT subtable decoder.
  *****************************************************************************/
-int dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
-                     uint16_t i_extension, dvbpsi_nit_callback pf_callback,
-                     void* p_cb_data)
+bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
+                      uint16_t i_extension, dvbpsi_nit_callback pf_callback,
+                      void* p_cb_data)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
     dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
     dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_nit_decoder_t*  p_nit_decoder;
@@ -66,18 +72,18 @@ int dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                      "Already a decoder for (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, i_extension);
-        return 1;
+        return false;
     }
 
     p_subdec = (dvbpsi_demux_subdec_t*)calloc(1, sizeof(dvbpsi_demux_subdec_t));
     if (p_subdec == NULL)
-        return 1;
+        return false;
 
     p_nit_decoder = (dvbpsi_nit_decoder_t*)calloc(1, sizeof(dvbpsi_nit_decoder_t));
     if (p_nit_decoder == NULL)
     {
         free(p_subdec);
-        return 1;
+        return false;
     }
 
     /* subtable decoder configuration */
@@ -100,7 +106,7 @@ int dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
     for (unsigned int i = 0; i <= 255; i++)
         p_nit_decoder->ap_sections[i] = NULL;
 
-    return 0;
+    return true;
 }
 
 /*****************************************************************************

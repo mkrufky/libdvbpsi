@@ -111,7 +111,7 @@ typedef void (* dvbpsi_eit_callback)(void* p_cb_data, dvbpsi_eit_t* p_new_eit);
  * dvbpsi_AttachEIT
  *****************************************************************************/
 /*!
- * \fn dvbpsi_t *dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+ * \fn bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_eit_callback pf_callback,
                                void* p_cb_data)
  * \brief Creation and initialization of a EIT decoder.
@@ -120,11 +120,10 @@ typedef void (* dvbpsi_eit_callback)(void* p_cb_data, dvbpsi_eit_t* p_new_eit);
  * \param i_extension Table ID extension, here service ID.
  * \param pf_callback function to call back on new EIT.
  * \param p_cb_data private data given in argument to the callback.
- * \return p_dvbpsi or NULL on error
+ * \return true on success, false on failure
  */
-dvbpsi_t *dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_eit_callback pf_callback,
-                               void* p_cb_data);
+bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+          uint16_t i_extension, dvbpsi_eit_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachEIT

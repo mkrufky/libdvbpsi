@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -202,7 +203,8 @@ static void NewSubtableBAT(void * p_zero, dvbpsi_t *p_dvbpsi,
 {
   if(i_table_id == 0x4a)
   {
-    dvbpsi_AttachBAT(p_dvbpsi, i_table_id, i_extension, DumpBAT, NULL);
+    if (!dvbpsi_AttachBAT(p_dvbpsi, i_table_id, i_extension, DumpBAT, NULL))
+        fprintf(stderr, "failed to attach BAT subdecoder\n");
   }
 }
 
@@ -231,8 +233,7 @@ int main(int i_argc, char* pa_argv[])
   p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
   if (p_dvbpsi == NULL)
       goto out;
-  dvbpsi_t *p_demux = dvbpsi_AttachDemux(p_dvbpsi, NewSubtableBAT, NULL);
-  if(p_demux == NULL)
+  if (!dvbpsi_AttachDemux(p_dvbpsi, NewSubtableBAT, NULL))
       goto out;
 
   b_ok = ReadPacket(i_fd, data);

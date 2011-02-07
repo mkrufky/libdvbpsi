@@ -78,7 +78,7 @@ typedef void (* dvbpsi_tot_callback)(void* p_cb_data, dvbpsi_tot_t* p_new_tot);
  * dvbpsi_AttachTOT
  *****************************************************************************/
 /*!
- * \fn int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+ * \fn bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
                             dvbpsi_tot_callback pf_callback, void* p_cb_data)
  * \brief Creation and initialization of a TDT/TOT decoder.
  * \param p_dvbpsi dvbpsi handle pointing to Subtable demultiplexor to which the decoder is attached.
@@ -86,11 +86,10 @@ typedef void (* dvbpsi_tot_callback)(void* p_cb_data, dvbpsi_tot_t* p_new_tot);
  * \param i_extension Table ID extension, unused in the TDT/TOT
  * \param pf_callback function to call back on new TDT/TOT.
  * \param p_cb_data private data given in argument to the callback.
- * \return 0 if everything went ok.
+ * \return true on success, false on failure
  */
-int dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
-                     uint16_t i_extension,
-                     dvbpsi_tot_callback pf_callback, void* p_cb_data);
+bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                      dvbpsi_tot_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachTOT

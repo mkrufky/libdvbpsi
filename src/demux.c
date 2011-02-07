@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
@@ -48,16 +49,16 @@
  *****************************************************************************
  * Creation of the demux structure
  *****************************************************************************/
-dvbpsi_t *dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
-                             dvbpsi_demux_new_cb_t pf_new_cb,
-                             void *                p_new_cb_data)
+bool dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
+                        dvbpsi_demux_new_cb_t pf_new_cb,
+                        void *                p_new_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_private == NULL);
 
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t*)malloc(sizeof(dvbpsi_demux_t));
     if (p_demux == NULL)
-        return NULL;
+        return false;
 
     /* PSI decoder configuration */
     p_demux->pf_callback = &dvbpsi_Demux;
@@ -74,7 +75,7 @@ dvbpsi_t *dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
     p_demux->p_new_cb_data = p_new_cb_data;
 
     p_dvbpsi->p_private = (void *)p_demux;
-    return p_dvbpsi;
+    return true;
 }
 
 /*****************************************************************************
