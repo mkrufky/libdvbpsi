@@ -228,20 +228,22 @@ int main( int i_argc, char **pp_argv )
 
     for( int i = 0; i < MAX_PROGRAMS; i++)
     {
-        dvbpsi_DetachPMT(p_pmt_dvbpsi_fds[i]);
-        dvbpsi_DeleteHandle(p_pmt_dvbpsi_fds[i]);
+        if (p_pmt_dvbpsi_fds[i])
+        {
+            dvbpsi_DetachPMT(p_pmt_dvbpsi_fds[i]);
+            dvbpsi_DeleteHandle(p_pmt_dvbpsi_fds[i]);
+        }
         p_pmt_dvbpsi_fds[i] = NULL;
     }
     result = EXIT_SUCCESS;
 
 out:
-    if (p_dvbpsi == NULL)
+    if (p_dvbpsi)
     {
       dvbpsi_DetachPAT(p_dvbpsi);
       dvbpsi_DeleteHandle(p_dvbpsi);
     }
     close( i_fd );
-    fprintf( stderr, "no PAT/PMT found\n" );
 
     return result;
 }
