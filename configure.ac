@@ -56,7 +56,7 @@ else
 fi
 
 dnl Check for headers
-AC_CHECK_HEADERS(stdint.h inttypes.h getopt.h sys/time.h)
+AC_CHECK_HEADERS(stdbool.h stdint.h inttypes.h getopt.h strings.h sys/time.h)
 dnl AC_CHECK_FUNCS([gettimeofday])
 
 AC_CHECK_HEADERS(sys/socket.h, [ac_have_sys_socket_h=yes])
