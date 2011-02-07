@@ -27,6 +27,7 @@ examples/decode_pmt
 examples/decode_sdt
 examples/decode_bat
 examples/get_pcr_pid
+examples/dvbinfo/dvbinfo
 misc/gen_crc
 misc/gen_pat
 misc/gen_pmt

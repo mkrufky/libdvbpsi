@@ -1,0 +1,1593 @@
+/*****************************************************************************
+ * dvbpsi.c: DVB PSI Information
+ *****************************************************************************
+ * Copyright (C) 2010-2011 M2X BV
+ *
+ * Authors: Jean-Paul Saman <jpsaman@videolan.org>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *****************************************************************************/
+
+#include "config.h"
+
+#if defined(HAVE_INTTYPES_H)
+#   include <inttypes.h>
+#elif defined(HAVE_STDINT_H)
+#   include <stdint.h>
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <math.h>
+
+#if defined(HAVE_SYS_TIME_H)
+#   include <sys/time.h>
+#endif
+
+#include <assert.h>
+
+/* The libdvbpsi distribution defines DVBPSI_DIST */
+#ifdef DVBPSI_DIST
+#   include "../../src/dvbpsi.h"
+#   include "../../src/demux.h"
+#   include "../../src/psi.h"
+#   include "../../src/descriptor.h"
+#   include "../../src/tables/pat.h"
+#   include "../../src/tables/pmt.h"
+#   include "../../src/tables/cat.h"
+#   include "../../src/tables/bat.h"
+#   include "../../src/tables/eit.h"
+#   include "../../src/tables/nit.h"
+#   include "../../src/tables/sdt.h"
+#   include "../../src/tables/tot.h"
+#   include "../../src/descriptors/dr.h"
+#else
+#   include <dvbpsi/dvbpsi.h>
+#   include <dvbpsi/demux.h>
+#   include <dvbpsi/psi.h>
+#   include <dvbpsi/descriptor.h>
+#   include <dvbpsi/pat.h>
+#   include <dvbpsi/pmt.h>
+#   include <dvbpsi/cat.h>
+#   include <dvbpsi/bat.h>
+#   include <dvbpsi/eit.h>
+#   include <dvbpsi/nit.h>
+#   include <dvbpsi/sdt.h>
+#   include <dvbpsi/tot.h>
+#   include <dvbpsi/dr.h>
+#endif
+
+#include "libdvbpsi.h"
+
+/* DVB CUEI Descriptors */
+/* SIS support (SCTE 35 2004) */
+#ifdef _DVBPSI_DR_8A_H_
+#   define TS_USE_DVB_CUEI 1
+#   define TS_USE_SCTE_SIS 1
+#   ifdef DVBPSI_DIST
+#       include "../../src/tables/sis.h"
+#   else
+#       include <dvbpsi/sis.h>
+#   endif
+#endif
+
+/*****************************************************************************
+ * Data structures
+ *****************************************************************************/
+typedef struct ts_pid_s
+{
+    int         i_pid;
+    int         i_cc;   /* countinuity counter */
+
+    bool        b_seen;
+
+    /* flags */
+    bool        b_transport_error_indicator;
+    bool        b_payload_unit_start_indicator;
+    bool        b_transport_priority;
+    uint8_t     i_transport_scrambling_control;
+
+    /* adaptation field: indicators and flags */
+    bool        b_adaptation_field;
+    bool        b_discontinuity_indicator;
+    bool        b_random_access_indicator;
+    bool        b_elementary_stream_priority_indicator;
+    bool        b_transport_private_data;
+    bool        b_splicing_point;
+    int8_t      i_splice_countdown;
+    uint8_t     i_splice_type;
+    uint8_t     i_transport_private_data_length;
+
+    bool        b_opcr;
+    bool        b_pcr;  /* this PID is the PCR_PID */
+    mtime_t     i_pcr;  /* last know PCR value */
+
+    /* adaptation field extension */
+    bool        b_adaptation_field_extension;
+    uint32_t    i_adaptation_field_extension_length;
+    bool        b_ltw;
+    bool        b_ltw_valid;
+    uint16_t    i_ltw_offset;
+    bool        b_piecewise_rate;
+    uint32_t    i_piecewise_rate;
+    bool        b_seamless_splice;
+
+    /* statistics */
+    uint64_t    i_packets;    /* number of packets for this pid */
+    mtime_t     i_first_pcr;  /* first pcr seen for this pid */
+    mtime_t     i_prev_pcr;   /* previous pcr seen for this pid */
+    mtime_t     i_last_pcr;   /* last pcr seen for this pid */
+    mtime_t     i_prev_received; /* capture time of previous packet for this pid */
+    mtime_t     i_received;   /* last capture time for packet of this pid */
+} ts_pid_t;
+
+typedef struct
+{
+    dvbpsi_t    *handle;
+
+    int         i_pat_version;
+    int         i_ts_id;
+
+    ts_pid_t    *pid;
+} ts_pat_t;
+
+typedef struct ts_pmt_s
+{
+    dvbpsi_t    *handle;
+
+    int         i_number; /* i_number = 0 is actually a NIT */
+    int         i_pmt_version;
+    ts_pid_t    *pid_pmt;
+    ts_pid_t    *pid_pcr;
+} ts_pmt_t;
+
+typedef struct ts_cat_s
+{
+    dvbpsi_t    *handle;
+
+    uint8_t     i_version;
+
+    /* */
+    ts_pid_t    *pid;
+} ts_cat_t;
+
+#ifdef TS_USE_SCTE_SIS
+typedef struct ts_sis_s
+{
+    uint8_t       i_protocol_version;
+
+    /* */
+} ts_sis_t;
+#endif
+
+typedef struct ts_sdt_s
+{
+    dvbpsi_t    *handle;
+    ts_pid_t    *pid;
+} ts_sdt_t;
+
+typedef struct ts_eit_s
+{
+    dvbpsi_t    *handle;
+    ts_pid_t    *pid;
+} ts_eit_t;
+
+typedef struct ts_tdt_s
+{
+    dvbpsi_t    *handle;
+    ts_pid_t    *pid;
+} ts_tdt_t;
+
+struct ts_stream_t
+{
+    /* Program Association Table */
+    ts_pat_t    pat;
+
+    /* Program Map Table */
+    int         i_pmt;
+    ts_pmt_t    pmt;
+
+    /* Conditional Access Table */
+    ts_cat_t    cat;
+
+#ifdef TS_USE_SCTE_SIS
+    /* Splice Information Section */
+    ts_sis_t    sis;
+#endif
+
+    /* Subbtables */
+    ts_sdt_t    sdt;
+    ts_eit_t    eit;
+    ts_tdt_t    tdt;
+
+    /* pid */
+    ts_pid_t    pid[8192];
+
+    enum dvbpsi_msg_level level;
+
+    /* statistics */
+    uint64_t    i_packets;
+    uint64_t    i_null_packets;
+    uint64_t    i_lost_bytes;
+};
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+
+static void handle_PMT(void* p_data, dvbpsi_pmt_t* p_pmt);
+static void handle_CAT(void* p_data, dvbpsi_cat_t* p_cat);
+static void handle_SDT(void* p_data, dvbpsi_sdt_t* p_sdt);
+static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot);
+static void handle_EIT(void* p_data, dvbpsi_eit_t* p_eit);
+static void handle_NIT(void* p_data, dvbpsi_nit_t* p_nit);
+static void handle_BAT(void* p_data, dvbpsi_bat_t* p_bat);
+#ifdef TS_USE_SCTE_SIS
+static void handle_SIS(void* p_data, dvbpsi_sis_t* p_sis);
+#endif
+
+/*****************************************************************************
+ * mdate: current time in milliseconds
+ *****************************************************************************/
+mtime_t mdate(void)
+{
+#if defined(HAVE_SYS_TIME_H)
+    struct timeval tv;
+
+    if (gettimeofday(&tv, NULL) < 0)
+    {
+        fprintf(stderr, "gettimeofday() error: %s\n", strerror(errno));
+    }
+
+    return (tv.tv_sec * (mtime_t)1000) + (tv.tv_usec / (mtime_t)1000);
+#else
+    return -1;
+#endif
+}
+
+/*****************************************************************************
+ * libdvbpsi message callback functions
+ *****************************************************************************/
+static void dvbpsi_message(dvbpsi_t *p_dvbpsi, const char* msg)
+{
+    fprintf(stderr, "%s\n", msg);
+}
+
+/*****************************************************************************
+ * Dump TS packet as hex
+ *****************************************************************************/
+static void ts_hexdump(const uint8_t * const data, const uint32_t length)
+{
+    uint32_t i;
+    printf("\t");
+    for (i=0; i < length; i++)
+    {
+        if ((i%8) == 0) printf(" ");
+        if ((i%16) == 0) printf("\n\t %.4x: ", i);
+            printf("%.2x ", data[i]);
+    }
+}
+
+static void summary(ts_stream_t *stream)
+{
+    uint64_t i_packets = 0;
+    mtime_t i_first_pcr = 0, i_last_pcr = 0;
+    mtime_t start = 0, end = 0;
+
+    printf("\n\t---------------------------------------------------------\n");
+
+    /* Find PCR PID and get pcr timestamps */
+    for (int i_pid = 0; i_pid < 8192; i_pid++)
+    {
+        if (stream->pid[i_pid].b_pcr)
+        {
+            start = stream->pid[i_pid].i_first_pcr;
+            end = stream->pid[i_pid].i_last_pcr;
+            if (stream->pid[i_pid].b_discontinuity_indicator)
+            {
+                printf("\tPCR discontinuity was signalled for PID: %4d (0x%4x)\n",
+                       i_pid, i_pid);
+            }
+        }
+    }
+
+    for (int i_pid = 0; i_pid < 8192; i_pid++)
+    {
+        if (stream->pid[i_pid].b_seen)
+        {
+            printf("\tFound PID: %4d (0x%4x), DRM: %s,", i_pid, i_pid,
+                   (stream->pid[i_pid].i_transport_scrambling_control != 0x00) ? "yes" : " no" );
+
+            double bitrate = 0;
+            if ((end - start) > 0)
+            {
+                bitrate = (double) (stream->pid[i_pid].i_packets * 188 * 8) /
+                                    ((double)(end - start)/1000.0);
+            }
+            printf(" bitrate %0.4f kbit/s,", bitrate);
+            printf(" seen %"PRId64" packets",
+                   stream->pid[i_pid].i_packets);
+            printf("\n");
+
+            i_packets += stream->pid[i_pid].i_packets;
+            if (i_first_pcr == 0)
+                i_first_pcr = start;
+            else
+                i_first_pcr = (i_first_pcr < start) ? i_first_pcr : start;
+            i_last_pcr = (i_last_pcr > end) ? i_last_pcr : end;
+        }
+    }
+    printf("\n\tNumber of packets: %"PRId64", stuffing %"PRId64" packets, lost %"PRId64" bytes, bitrate: %0.4f kbit/s\n",
+            i_packets, stream->i_null_packets, stream->i_lost_bytes,
+            (double)(((i_packets*188) + stream->i_lost_bytes) * 8)/((double)(i_last_pcr - i_first_pcr)/1000.0));
+    printf("\tPCR first: %"PRId64", last: %"PRId64", duration: %"PRId64"\n",
+            i_first_pcr, i_last_pcr, (mtime_t)(i_last_pcr - i_first_pcr));
+    printf("\n\t---------------------------------------------------------\n");
+}
+
+static void ts_header_dump(ts_pid_t *ts)
+{
+    printf("\tPID 0x%x seen %s\n",
+           ts->i_pid, ts->b_seen ? "yes" : "no");
+    printf("\tContinuity counter: %d\n", ts->i_cc);
+    printf("\tTransport Error indicator: %s\n",
+           ts->b_transport_error_indicator ? "yes" : "no");
+    printf("\tPayload unit start indicator: %s\n",
+           ts->b_payload_unit_start_indicator ? "yes" : "no");
+    printf("\tScrambling control: %s\n",
+           (ts->i_transport_scrambling_control != 0x0) ? "yes" : "no");
+    if (ts->i_transport_scrambling_control > 0x0)
+        printf("\tScrambling control word: 0x%x\n", ts->i_transport_scrambling_control);
+    printf("\tAdaptation field control: %s\n",
+           ts->b_adaptation_field ? "yes" : "no");
+    if (ts->b_adaptation_field)
+    {
+        printf("\tDiscontinuity indicator: %s\n",
+           ts->b_discontinuity_indicator ? "yes" : "no");
+        printf("\tRandom access indicator: %s\n",
+           ts->b_random_access_indicator ? "yes" : "no");
+        printf("\tElementary stream priority indicator: %s\n",
+           ts->b_elementary_stream_priority_indicator ? "yes" : "no");
+        printf("\tTransport private data: %s\n",
+           ts->b_transport_private_data ? "yes" : "no");
+        if (ts->b_transport_private_data )
+            printf("\tTransport private data length: %d\n",
+                ts->i_transport_private_data_length);
+        printf("\tSplicing point: %s\n",
+           ts->b_splicing_point ? "yes" : "no");
+        if (ts->b_splicing_point)
+            printf("\tSplice countdown: %d (0x%x)\n",
+                ts->i_splice_countdown, ts->i_splice_countdown);
+
+        printf("\tOriginal PCR: %s\n", ts->b_opcr ? "yes" : "no");
+        printf("\tPCR PID: %s\n", ts->b_pcr ? "yes" : "no");
+        if (ts->b_pcr)
+            printf("\tPCR: %"PRId64"\n", ts->i_pcr);
+
+        /* adaptation field extension */
+        if (ts->b_adaptation_field_extension &&
+            ts->i_adaptation_field_extension_length > 0)
+        {
+            printf("\tadaptation field extension, length: %d\n",
+               ts->i_adaptation_field_extension_length);
+            printf("\tlegal time window (ltw): %s\n", ts->b_ltw ? "yes" : "no");
+            printf("\tltw valid: %s\n", ts->b_ltw_valid ? "yes" : "no");
+            if (ts->b_ltw)
+                printf("\tlegal time window offset: %d\n", ts->i_ltw_offset);
+            printf("\tpiecewise rate: %s\n", ts->b_piecewise_rate ? "yes" : "no");
+            if (ts->b_piecewise_rate)
+                printf("\tpiecewise rate: %d\n", ts->i_piecewise_rate);
+            printf("\tseamless splice: %s\n",
+               ts->b_seamless_splice ? "yes" : "no");
+            if (ts->b_seamless_splice)
+            {
+                /* FIXME: this is only one of the definitions of splice_type
+                 * tables. They depend on profiles, but the exact link with the
+                 * rest of the TS headers is not clear to me at this point.
+                 */
+                const char *descr;
+                switch(ts->i_splice_type)
+                {
+                case 0x00:
+                    descr = "splice_decoding_delay = 120 ms; max_splice_rate = 15.0 × 106 bit/s";
+                    break;
+                case 0x01:
+                    descr = "splice_decoding_delay = 150 ms; max_splice_rate = 12.0 × 106 bit/s";
+                    break;
+                case 0x02:
+                    descr = "splice_decoding_delay = 225 ms; max_splice_rate = 8.0 × 106 bit/s";
+                    break;
+                case 0x03:
+                    descr = "splice_decoding_delay = 250 ms; max_splice_rate = 7.2 × 106 bit/s";
+                    break;
+                default:
+                    /* 0100-1011  Reserved */
+                    /* 1100-1111  User-defined */
+                    descr = "Reserved/User-defined";
+                    break;
+                }
+                printf("\tsplice type 0x%x (%s)\n", ts->i_splice_type, descr);
+            }
+        }
+    }
+}
+
+/*****************************************************************************
+ * handle_subtable
+ *****************************************************************************/
+static void handle_subtable(void *p_data, dvbpsi_t *p_dvbpsi,
+                            uint8_t i_table_id, uint16_t i_extension)
+{
+    switch (i_table_id)
+    {
+#if 0 /* already handled */
+        case 0x00: // PAT
+        case 0x01: // CAT
+        case 0x02: // program_map_section
+        case 0x03: // transport_stream_description_section
+        case 0x04: /* ISO_IEC_14496_scene_description_section */
+        case 0x05: /* ISO_IEC_14496_object_descriptor_section */
+        case 0x06: /* Metadata_section */
+        case 0x07: /* IPMP_Control_Information_section (defined in ISO/IEC 13818-11) */
+        /* 0x08-0x3F: ITU-T Rec. H.222.0 | ISO/IEC 13818-1 reserved */
+#endif
+        case 0x40: // NIT network_information_section - actual_network
+        case 0x41: // NIT network_information_section - other_network
+            if (!dvbpsi_AttachNIT(p_dvbpsi, i_table_id, i_extension, handle_NIT, p_data))
+                    fprintf(stderr, "dvbinfo: Failed to attach NIT subdecoder\n");
+            break;
+        case 0x42:
+            if (!dvbpsi_AttachSDT(p_dvbpsi, i_table_id, i_extension, handle_SDT, p_data))
+                    fprintf(stderr, "dvbinfo: Failed to attach SDT subdecoder\n");
+            break;
+#if 0
+        //0x43 to 0x45 reserved for future use
+        case 0x46: //      service_description_section - other_transport_stream
+        //0x47 to 0x49 reserved for future use
+#endif
+        case 0x4A: // BAT bouquet_association_section
+            if (!dvbpsi_AttachBAT(p_dvbpsi, i_table_id, i_extension, handle_BAT, p_data))
+                    fprintf(stderr, "dvbinfo: Failed to attach BAT subdecoder\n");
+            break;
+        //0x4B to 0x4D reserved for future use
+        case 0x4E: // EIT event_information_section - actual_transport_stream, present/following
+        case 0x4F: // EIT event_information_section - other_transport_stream, present/following
+        //0x50 to 0x5F event_information_section - actual_transport_stream, schedule
+        case 0x50:
+        case 0x51:
+        case 0x52:
+        case 0x53:
+        case 0x54:
+        case 0x55:
+        case 0x56:
+        case 0x57:
+        case 0x58:
+        case 0x59:
+        case 0x5A:
+        case 0x5B:
+        case 0x5C:
+        case 0x5D:
+        case 0x5E:
+        case 0x5F:
+        //0x60 to 0x6F event_information_section - other_transport_stream, schedule
+        case 0x60:
+        case 0x61:
+        case 0x62:
+        case 0x63:
+        case 0x64:
+        case 0x65:
+        case 0x66:
+        case 0x67:
+        case 0x68:
+        case 0x69:
+        case 0x6A:
+        case 0x6B:
+        case 0x6C:
+        case 0x6D:
+        case 0x6E:
+        case 0x6F:
+            if (!dvbpsi_AttachEIT(p_dvbpsi, i_table_id, i_extension, handle_EIT, p_data))
+                    fprintf(stderr, "dvbinfo: Failed to attach EIT subdecoder\n");
+            break;
+        case 0x70:
+        case 0x73: /* TOT only */
+            if (!dvbpsi_AttachTOT(p_dvbpsi, i_table_id, i_extension, handle_TOT, p_data))
+                    fprintf(stderr, "dvbinfo: Failed to attach TOT subdecoder\n");
+            break;
+#if 0
+        case 0x71: // RST running_status_section
+        case 0x72: // ST  stuffing_section
+        case 0x74: // application information section (TS 102 812 [15])
+        case 0x75: // container section (TS 102 323 [13])
+        case 0x76: // related content section (TS 102 323 [13])
+        case 0x77: // content identifier section (TS 102 323 [13])
+        case 0x78: // MPE-FEC section (EN 301 192 [4])
+        case 0x79: // resolution notification section (TS 102 323 [13])
+#endif
+#ifdef TS_USE_SCTE_SIS
+        case 0xFC:
+            if (!dvbpsi_AttachSIS(p_dvbpsi, i_table_id, i_extension, handle_SIS, p_data))
+                    fprintf(stderr, "dvbinfo: Failed to attach SIS subdecoder\n");
+            break;
+#endif
+    }
+}
+
+/*****************************************************************************
+ * handle_PAT
+ *****************************************************************************/
+static void handle_PAT(void* p_data, dvbpsi_pat_t* p_pat)
+{
+    dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
+    ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    p_stream->pat.i_pat_version = p_pat->i_version;
+    p_stream->pat.i_ts_id = p_pat->i_ts_id;
+
+    printf("\n");
+    printf("  PAT: Program Association Table\n");
+    printf("\tTransport stream id : %d\n", p_pat->i_ts_id);
+    printf("\tVersion number : %d\n", p_pat->i_version);
+    printf("\tCurrent next   : %s\n", p_pat->b_current_next ? "yes" : "no");
+    if (p_stream->pat.pid->i_prev_received > 0)
+        printf("\tLast received  : %"PRId64" ms ago\n",
+               (mtime_t)(p_stream->pat.pid->i_received - p_stream->pat.pid->i_prev_received));
+    printf("\t\t| program_number @ [NIT|PMT]_PID\n");
+    while (p_program)
+    {
+        /* Remove old PMT table decoder */
+        if (p_stream->pmt.handle)
+        {
+            dvbpsi_DetachPMT(p_stream->pmt.handle);
+            dvbpsi_DeleteHandle(p_stream->pmt.handle);
+            p_stream->pmt.handle = NULL;
+        }
+
+        /* Attach new PMT decoder */
+        p_stream->i_pmt++;
+        p_stream->pmt.i_number = p_program->i_number;
+        p_stream->pmt.pid_pmt = &p_stream->pid[p_program->i_pid];
+        p_stream->pmt.pid_pmt->i_pid = p_program->i_pid;
+
+        p_stream->pmt.handle = dvbpsi_NewHandle(&dvbpsi_message, p_stream->level);
+        if (p_stream->pmt.handle == NULL)
+        {
+            fprintf(stderr, "dvbinfo: Failed to allocate new dvbpsi handle\n");
+            break;
+        }
+        if (!dvbpsi_AttachPMT(p_stream->pmt.handle, p_program->i_number, handle_PMT, p_stream))
+        {
+             dvbpsi_DeleteHandle(p_stream->pmt.handle);
+             p_stream->pmt.handle = NULL;
+             fprintf(stderr, "dvbinfo: Failed to attach new pmt decoder\n");
+             break;
+        }
+        printf("\t\t| %14d @ pid: 0x%x (%d)\n",
+                p_program->i_number, p_program->i_pid, p_program->i_pid);
+        p_program = p_program->p_next;
+    }
+    printf("\tActive         : %s\n", p_pat->b_current_next ? "yes" : "no");
+    dvbpsi_DeletePAT(p_pat);
+}
+
+/*****************************************************************************
+ * GetTypeName of PMT stream_type
+ *****************************************************************************/
+static char const* GetTypeName(uint8_t type)
+{
+    switch (type)
+    {
+    case 0x00: return "ITU-T | ISO/IEC Reserved";
+    case 0x01: return "ISO/IEC 11172-2 Video";
+    case 0x02: return "ITU-T Rec H.262 | ISO/IEC 13818-2 Video stream descriptor or ISO/IEC 11172-2 constrained parameter video stream";
+    case 0x03: return "ISO/IEC 11172-3 Audio stream descriptor";
+    case 0x04: return "ISO/IEC 13818-3 Audio MPEG Audio layer 1/2";
+    case 0x05: return "ITU-T Rec H.222.0 | ISO/IEC 13818-1 Private Section: Registration descriptor";
+    case 0x06: return "ITU-T Rec H.222.0 | ISO/IEC 13818-1 Private PES data packets";
+    case 0x07: return "ISO/IEC 13522 MHEG";
+    case 0x08: return "ITU-T Rec H.222.0 | ISO/IEC 13818-1 Annex A DSM CC";
+    case 0x09: return "ITU-T Rec H222.1";
+    case 0x0a: return "ISO/IEC 13818-6 type A";
+    case 0x0b: return "ISO/IEC 13818-6 type B";
+    case 0x0c: return "ISO/IEC 13818-6 type C";
+    case 0x0d: return "ISO/IEC 13818-6 type D";
+    case 0x0e: return "ITU-T Rec H.222.0 | ISO/IEC 13818-1 auxillary";
+
+    case 0x0f: return "ISO/IEC 13818-7 MPEG2 Audio with ADTS transport syntax";
+    case 0x10: return "ISO/IEC 14496-2 Visual";
+    case 0x11: return "ISO/IEC 14496-3 MPEG4 Audio with the LATM transport syntax as defined in ISO/IEC 14496-3";
+    case 0x12: return "ISO/IEC 14496-1 SL-packetized stream or FlexMux stream carried in PES packets";
+    case 0x13: return "ISO/IEC 14496-1 SL-packetized stream or FlexMux stream carried in ISO/IEC 14496_sections";
+    case 0x14: return "ISO/IEC 13818-6 Synchronized Download Protocol";
+    case 0x15: return "Metadata carried in PES packets";
+    case 0x16: return "Metadata carried in metadata_sections";
+    case 0x17: return "Metadata carried in ISO/IEC 13818-6 Data Carousel";
+    case 0x18: return "Metadata carried in ISO/IEC 13818-6 Object Carousel";
+    case 0x19: return "Metadata carried in ISO/IEC 13818-6 Synchronized Download Protocol";
+    case 0x1A: return "IPMP stream (defined in ISO/IEC 13818-11, MPEG-2 IPMP)";
+    case 0x1B: return "AVC video stream as defined in ITU-T Rec. H.264 | ISO/IEC 14496-10 Video";
+    case 0x7F: return "IPMP stream";
+    default:
+        if ((type >= 0x80) && (type <= 0xFF))
+            return "User Private";
+        else if ((type >= 0x1C) && (type <= 0x7E))
+            return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 Reserved";
+        else
+            return "Unknown";
+        break;
+    };
+}
+
+/*****************************************************************************
+ * GetDescriptorName:
+ *****************************************************************************/
+static char const* GetDescriptorName(uint8_t tag)
+{
+    switch (tag)
+    {
+    case 0x00:
+    case 0x01: return "Reserved";
+    case 0x02: return "Video stream descriptor";
+    case 0x03: return "Audio stream descriptor";
+    case 0x04: return "Hierarchy descriptor";
+    case 0x05: return "Registration descriptor";
+    case 0x06: return "Data stream alignment descriptor";
+    case 0x07: return "Target background grid descriptor";
+    case 0x08: return "Video window descriptor";
+    case 0x09: return "CA descriptor";
+    case 0x0a: return "ISO 639 language descriptor";
+    case 0x0b: return "System clock descriptor";
+    case 0x0c: return "Multiplex buffer utilization descriptor";
+    case 0x0d: return "Copyright descriptor";
+    case 0x0e: return "Maximum bitrate descriptor";
+    case 0x0f: return "Private data indicator descriptor";
+    case 0x10: return "Soothing buffer descriptor";
+    case 0x11: return "STD descriptor";
+    case 0x12: return "IBP descriptor";
+    // case 0x13..0x1a: return "Defined in ISO/IEC 13818-6";
+    case 0x1b: return "MPEG-4 video descriptor";
+    case 0x1c: return "MPEG-4 audio descriptor";
+    case 0x1d: return "IOD descriptor";
+    case 0x1e: return "SL descriptor";
+    case 0x1f: return "FMC descriptor";
+    case 0x20: return "External ES ID descriptor";
+    case 0x21: return "Mux Code descriptor";
+    case 0x22: return "Fmx Buffer Size descriptor";
+    case 0x23: return "Multiplex buffer descriptor";
+    case 0x24: return "Content labeling descriptor";
+    case 0x25: return "Metadata pointer descriptor";
+    case 0x26: return "Metadata descriptor";
+    case 0x27: return "Metadata STD descriptor";
+    case 0x28: return "AVC video descriptor";
+    case 0x29: return "IPMP descriptor (defined in ISO/IEC 13818-11; break; MPEG-2 IPMP)";
+    case 0x2a: return "AVC timing and HRD descriptor";
+    case 0x2b: return "MPEG-2 AAC audio descriptor";
+    case 0x2c: return "FlexMuxTiming descriptor";
+    // case 0x2d..0x3f: return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 Reserved";
+    case 0x40: return "User Private | Network Name";
+    case 0x41: return "User Private | Service List";
+    case 0x42: return "User Private | Stuffing";
+    case 0x43: return "Satellite Delivery System descriptor";
+    case 0x44: return "Cable Delivery System descriptor";
+    case 0x45: /*69*/ return "VBI Data descriptor";
+    case 0x46: /*70*/ return "VBI Teletext descriptor";
+    case 0x47: return "User Private | Bouquet Name";
+    case 0x48: return "User Private | Service";
+    case 0x49: return "User Private | Country Availability";
+    case 0x4a: return "User Private | Linkage";
+    case 0x4b: return "User Private | NVOD Reference";
+    case 0x4c: return "User Private | Timeshifted Service";
+    case 0x4d: return "User Private | ShortEvent";
+    case 0x4e: return "User Private | Extended Event";
+    case 0x4f: return "User Private | Timeshifted Event";
+    case 0x50: return "User Private | Component";
+    case 0x51: return "User Private | Mosaic";
+    case 0x52: /*82*/ return "User Private | Stream Component Identifier";
+    case 0x53: return "User Private | CA Identifier";
+    case 0x54: return "User Private | Content";
+    case 0x55: return "User Private | Parental Rating";
+    case 0x56: /*86*/ return "EBU Teletext";
+    case 0x57: return "Telephone";
+    case 0x58: return "Local Time Offset";
+    case 0x59: return "Subtitling";
+    case 0x5A: return "Terrestrial Delivery System";
+    case 0x5B: return "Multilingual Network Name";
+    case 0x5C: return "Multilingual Bouquet Name";
+    case 0x5D: return "Multilingual Service Name";
+    case 0x5E: return "Multilingual Component";
+    case 0x5F: return "Private Data Specifier";
+    case 0x60: return "Service Move";
+    case 0x61: return "Short Smoothing Buffer";
+    case 0x62: return "Frequency List";
+    case 0x63: return "Partial Transport Stream";
+    case 0x64: return "Data Broadcast";
+    case 0x65: return "CA System descriptor";
+    case 0x66: return "Data Broadcast Identifier";
+    case 0x67: return "Transport Stream Identifier";
+    case 0x68: return "DSNG descriptor";
+    case 0x69: return "PDC descriptor";
+    case 0x6A: return "AC3 audio descriptor";
+    case 0x6B: return "Ancilliary Data descriptor";
+    case 0x6C: return "Cell List";
+    case 0x6D: return "Cell Frequency Link";
+    case 0x6E: return "Announcement Support";
+    case 0x6F: return "Application Signalling";
+    case 0x70: return "Adaptation Field";
+    case 0x71: return "Service Identifier";
+    case 0x72: return "Service Availability";
+    case 0x73: return "Default Authority";
+    case 0x74: return "Related Content";
+    case 0x75: return "TVA ID";
+    case 0x76: return "Content Identifier";
+    case 0x77: return "Time Slice FEC Identifier";
+    case 0x78: return "ECM Repeater Rate";
+    case 0x79: return "DVB S2 Satellite Delivery System descriptor";
+    case 0x7A: return "Enhanced AC3 audio descriptor";
+    case 0x7B: return "DTS audio descriptor";
+    case 0x7C: return "AAC audio descriptor";
+    // case 0x7d..0xff: return "User Private";
+    case 0x8a: return "CUE Identifier descriptor";
+    default:
+        if (tag >= 0x13 && tag <= 0x1a) {
+            /*19-26*/ return "Defined in ISO/IEC 13818-6";
+        } else if (tag >= 0x2d && tag <= 0x3f) {
+            /*45-63*/ return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 Reserved";
+        } else if ((tag >= 0x40 && tag <= 0x51) ||
+                   (tag >= 0x53 && tag <= 0x55)) {
+            /*64-81 and 83-84*/ return "User Private";
+        }
+        else
+            /*87-255*/ return "User Private";
+        break;
+    };
+}
+
+/*****************************************************************************
+ * DumpMaxBitrateDescriptor
+ *****************************************************************************/
+static void DumpMaxBitrateDescriptor(dvbpsi_max_bitrate_dr_t* bitrate_descriptor)
+{
+    printf("Bitrate: %d\n", bitrate_descriptor->i_max_bitrate);
+}
+
+/*****************************************************************************
+ * DumpSystemClockDescriptor
+ *****************************************************************************/
+static void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
+{
+    printf("External clock: %s, Accuracy: %E\n",
+    p_clock_descriptor->b_external_clock_ref ? "Yes" : "No",
+    p_clock_descriptor->i_clock_accuracy_integer *
+    pow(10.0, -(double)p_clock_descriptor->i_clock_accuracy_exponent));
+}
+
+/*****************************************************************************
+ * DumpStreamIdentifierDescriptor
+ *****************************************************************************/
+static void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_descriptor)
+{
+    printf("Component tag: %d\n",
+    p_si_descriptor->i_component_tag);
+}
+
+/*****************************************************************************
+ * DumpSubtitleDescriptor
+ *****************************************************************************/
+static void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor)
+{
+    int a;
+
+    printf("%d subtitles,\n", p_subtitle_descriptor->i_subtitles_number);
+    for (a = 0; a < p_subtitle_descriptor->i_subtitles_number; ++a)
+    {
+        printf("\t\t   | %d - lang: %c%c%c, type: %d, cpid: %d, apid: %d\n", a,
+            p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[0],
+            p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[1],
+            p_subtitle_descriptor->p_subtitle[a].i_iso6392_language_code[2],
+            p_subtitle_descriptor->p_subtitle[a].i_subtitling_type,
+            p_subtitle_descriptor->p_subtitle[a].i_composition_page_id,
+            p_subtitle_descriptor->p_subtitle[a].i_ancillary_page_id);
+    }
+}
+
+/*****************************************************************************
+ * DumpCUEIdentifierDescriptor
+ *****************************************************************************/
+#ifdef TS_USE_DVB_CUEI
+static void DumpCUEIDescriptor(dvbpsi_cuei_dr_t* p_cuei_descriptor)
+{
+    const char *cuei_stream_type;
+
+    switch(p_cuei_descriptor->i_cue_stream_type)
+    {
+        case 0x00:
+            cuei_stream_type = "splice_insert, splice_null, splice_schedule";
+            break;
+        case 0x01: cuei_stream_type = "All Commands"; break;
+        case 0x02: cuei_stream_type = "Segmentation"; break;
+        case 0x03: cuei_stream_type = "Tiered Splicing"; break;
+        case 0x04: cuei_stream_type = "Tiered Segmentation"; break;
+        default:
+            if ((p_cuei_descriptor->i_cue_stream_type >= 0x05) &&
+                (p_cuei_descriptor->i_cue_stream_type <= 0x7f))
+                cuei_stream_type = "Reserved";
+            else if ((p_cuei_descriptor->i_cue_stream_type >= 0x80) &&
+                     (p_cuei_descriptor->i_cue_stream_type <= 0xff))
+                cuei_stream_type = "User defined";
+            break;
+    }
+    printf("CUE Identifier stream type: (%0xd) %s\n",
+           p_cuei_descriptor->i_cue_stream_type, cuei_stream_type );
+}
+#endif
+
+#ifdef TS_USE_SCTE_SIS
+/*****************************************************************************
+ * DumpSISSegmentationDescriptor: SCTE 35 2004
+ *****************************************************************************/
+static void DumpSISSegmentationDescriptor(dvbpsi_descriptor_t* p_descriptor)
+{
+    /* FIXME: decode segmentation descriptor */
+    printf("\"");
+    for (int i = 4; i < p_descriptor->i_length; i++)
+        printf("%c", p_descriptor->p_data[i]);
+    printf("\" (%s)\n", "segmentation descriptor");
+}
+
+/*****************************************************************************
+ * DumpSISDescriptors: SCTE 35 2004
+ *****************************************************************************/
+static void DumpSISDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
+{
+    while (p_descriptor)
+    {
+        assert(p_descriptor->i_length >= 4);
+        uint32_t i_identifier = ((uint32_t)p_descriptor->p_data[0] << 24) |
+                                ((uint32_t)p_descriptor->p_data[1] << 16) |
+                                ((uint32_t)p_descriptor->p_data[2] << 8)  |
+                                ((uint32_t)p_descriptor->p_data[3]);
+
+        printf("%s 0x%02x : ", str, p_descriptor->i_tag);
+        if (i_identifier == 0x43554549)
+            printf("CUEI");
+        else
+            printf("unknown");
+
+        switch (p_descriptor->i_tag)
+        {
+            case 0x00: /* avail_descriptor */
+            {
+                assert(p_descriptor->i_length >= 8);
+
+                uint32_t id = ((uint32_t)p_descriptor->p_data[4] << 24) |
+                              ((uint32_t)p_descriptor->p_data[5] << 16) |
+                              ((uint32_t)p_descriptor->p_data[6] << 8)  |
+                              ((uint32_t)p_descriptor->p_data[7]);
+
+                printf("\"0x%x\" (%s)\n", id, "avail descriptor");
+                break;
+            }
+            case 0x01: /* DTMF_descriptor */
+            {
+                assert(p_descriptor->i_length >= 6);
+                double i_preroll = p_descriptor->p_data[4] * 0.1;
+                uint8_t i_dtmf_count = (p_descriptor->p_data[5] & 0xE0);
+                printf("\"");
+                for (int i = 0; i < i_dtmf_count; i++)
+                     printf("%c", p_descriptor->p_data[6 + i]);
+                printf("\" preroll %.2f sec. (%s)\n", i_preroll, "DTMF descriptor");
+                break;
+            }
+            case 0x02: /* segmentation_descriptor */
+                DumpSISSegmentationDescriptor(p_descriptor);
+                break;
+            /* 0x03 - 0xFF : Reserved for future SCTE splice_descriptors */
+            default:
+                printf("\"");
+                for (int i = 4; i < p_descriptor->i_length; i++)
+                     printf("%c", p_descriptor->p_data[i]);
+                printf("\" (%s)\n", GetDescriptorName(p_descriptor->i_tag));
+                break;
+        }
+        p_descriptor = p_descriptor->p_next;
+    }
+}
+
+static void handle_SIS(void* p_data, dvbpsi_sis_t* p_sis)
+{
+    ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    p_stream->sis.i_protocol_version = p_sis->i_protocol_version;
+
+    printf("\n" );
+    printf("  SIS: Splice Info Section\n" );
+    printf("\tProtocol version : %d\n", p_sis->i_protocol_version );
+    printf("\tEncrypted        : %s\n", p_sis->b_encrypted_packet ? "yes" : "no");
+    printf("\tEncryption algorithm  : %d\n", p_sis->i_encryption_algorithm);
+    printf("\tPTS adjustment   : %"PRId64"\n", p_sis->i_pts_adjustment);
+    printf("\tCA Control word index : %d\n", p_sis->cw_index);
+    printf("\tSplice command length : %d\n", p_sis->i_splice_command_length);
+
+    printf("\tSplice command : ");
+    switch(p_sis->i_splice_command_type)
+    {
+        default:
+        case 0x00:
+            printf("splice_null");
+            break;
+        case 0x04:
+            printf("splice_schedule");
+            break;
+        case 0x05:
+            printf("splice_insert");
+            break;
+        case 0x06:
+            printf("time_signal");
+            break;
+        case 0x07:
+            printf("bandwidth_reservation");
+            break;
+    }
+    printf("\n");
+    DumpSISDescriptors("\t   ]", p_sis->p_first_descriptor);
+    dvbpsi_DeleteSIS(p_sis);
+}
+#endif
+
+/*****************************************************************************
+ * DumpDescriptors
+ *****************************************************************************/
+static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
+{
+    while (p_descriptor)
+    {
+        printf("%s 0x%02x : ", str, p_descriptor->i_tag);
+        switch (p_descriptor->i_tag)
+        {
+            case 0x06: /* data_stream_alignment_descriptor */
+                /* ISO/IEC 11172-2 video, ITU-T Rec. H.262 | ISO/IEC 13818-2 video,
+                   or ISO/IEC 14496-2 visual streams */
+            case 0x28:
+                printf("\"");
+                for(int i = 0; i < p_descriptor->i_length; i++)
+                {
+                    switch(p_descriptor->p_data[i])
+                    {
+                    case 0x00: printf("0"); break;
+                    case 0x01: printf("1"); break;
+                    case 0x02: printf("2"); break;
+                    case 0x03: printf("3"); break;
+                    /* unknown or reserved values  */
+                    default: printf("?"); break;
+                    }
+                }
+                printf("\" (%s)\n", GetDescriptorName(p_descriptor->i_tag));
+                break;
+            case 0x6a:
+                printf("\"a52\" (%s)\n", GetDescriptorName(p_descriptor->i_tag));
+                break;
+            case 0x08:
+                DumpSystemClockDescriptor(dvbpsi_DecodeSystemClockDr(p_descriptor));
+                break;
+#ifdef TS_USE_DVB_CUEI
+            case 0x8a:
+                DumpCUEIDescriptor(dvbpsi_DecodeCUEIDr(p_descriptor));
+                break;
+#endif
+            case 0x0e:
+                DumpMaxBitrateDescriptor(dvbpsi_DecodeMaxBitrateDr(p_descriptor));
+                break;
+            case 0x52:
+                DumpStreamIdentifierDescriptor(dvbpsi_DecodeStreamIdentifierDr(p_descriptor));
+                break;
+            case 0x59:
+                DumpSubtitleDescriptor(dvbpsi_DecodeSubtitlingDr(p_descriptor));
+                break;
+            default:
+                printf("\"");
+                for (int i = 0; i < p_descriptor->i_length; i++)
+                     printf("%c", p_descriptor->p_data[i]);
+                printf("\" (%s)\n", GetDescriptorName(p_descriptor->i_tag));
+                break;
+        }
+        p_descriptor = p_descriptor->p_next;
+    }
+}
+
+/*****************************************************************************
+ * handle_SDT
+ *****************************************************************************/
+static void handle_SDT(void* p_data, dvbpsi_sdt_t* p_sdt)
+{
+    dvbpsi_sdt_service_t* p_service = p_sdt->p_first_service;
+
+    printf("\n");
+    printf("  SDT: Session Descriptor Table\n");
+    printf("\tVersion number : %d\n", p_sdt->i_version);
+    printf("\tTransport stream id : %d\n", p_sdt->i_ts_id);
+    printf("\tNetwork id     : %d\n", p_sdt->i_network_id);
+    while (p_service)
+    {
+        printf("\t  | Service id   : 0x%02x \n", p_service->i_service_id);
+        printf("\t  | EIT schedule : %s\n", p_service->b_eit_schedule ? "yes" : "no");
+        printf("\t  | EIT present  : %s\n", p_service->b_eit_present ? "yes" : "no");
+        printf("\t  | Running      : %s\n", p_service->i_running_status ? "yes" : "no");
+        printf("\t  | Free CA      : %s\n", p_service->b_free_ca ? "yes" : "no");
+        printf("\t  | Descriptor loop length: %d\n", p_service->i_descriptors_length);
+        DumpDescriptors("\t  |  ]", p_service->p_first_descriptor);
+        p_service = p_service->p_next;
+    }
+    dvbpsi_DeleteSDT(p_sdt);
+}
+
+static void DumpEITEventDescriptors(dvbpsi_eit_event_t *p_eit_event)
+{
+    dvbpsi_eit_event_t *p_event = p_eit_event;
+
+    while (p_event)
+    {
+        printf("\t  | Event id: %d\n", p_event->i_event_id);
+        printf("\t  | Start time: %"PRId64"\n", p_event->i_start_time);
+        printf("\t  | Duration: %d\n", p_event->i_duration);
+        printf("\t  | Running status: %d\n", p_event->i_running_status);
+        printf("\t  | Free CA mode: %s\n", p_event->b_free_ca ? "yes" : "no");
+        printf("\t  | Descriptor loop length: %d\n", p_event->i_descriptors_length);
+        DumpDescriptors("\t  |  ]", p_event->p_first_descriptor);
+
+        p_event = p_event->p_next;
+    }
+}
+
+static void handle_EIT(void* p_data, dvbpsi_eit_t* p_eit)
+{
+    //ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    printf("\n");
+    printf("  EIT: Event Information Table\n");
+    printf("\tVersion number : %d\n", p_eit->i_version);
+    printf("\tService id     : %d\n", p_eit->i_service_id);
+    printf("\tCurrent next   : %s\n", p_eit->b_current_next ? "yes" : "no");
+    printf("\tTransport stream id : %d\n", p_eit->i_ts_id);
+    printf("\tOriginal network id : %d\n", p_eit->i_network_id);
+    printf("\tSegment last section number : %d\n", p_eit->i_segment_last_section_number);
+    printf("\tLast Table id  : %d\n", p_eit->i_last_table_id);
+
+    DumpEITEventDescriptors(p_eit->p_first_event);
+
+    dvbpsi_DeleteEIT(p_eit);
+}
+
+static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot)
+{
+    //ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    printf("\n");
+    printf("  TDT/TOT: TDT/TOT Table\n");
+    printf("\tUTC time       : %"PRId64"\n", p_tot->i_utc_time);
+    printf("\tCRC 32         : %d\n", p_tot->i_crc);
+    DumpDescriptors("\t  |  ]", p_tot->p_first_descriptor);
+    dvbpsi_DeleteTOT(p_tot);
+}
+
+/*****************************************************************************
+ * handle_NIT
+ *****************************************************************************/
+static void DumpTSDescriptorsNIT(dvbpsi_nit_ts_t *p_nit_ts)
+{
+  dvbpsi_nit_ts_t *p_ts = p_nit_ts;
+
+  while (p_ts)
+  {
+      printf("\t  | transport id: %d\n", p_ts->i_ts_id);
+      printf("\t  | original network id: %d\n", p_ts->i_orig_network_id);
+      DumpDescriptors("\t  |  ]", p_nit_ts->p_first_descriptor);
+      p_ts = p_ts->p_next;
+  }
+}
+
+static void handle_NIT(void* p_data, dvbpsi_nit_t* p_nit)
+{
+    //ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    printf("\n");
+    printf("  NIT: Network Information Table\n");
+    printf("\tVersion number : %d\n", p_nit->i_version);
+    printf("\tNetwork id     : %d\n", p_nit->i_network_id);
+    printf("\tCurrent next   : %s\n", p_nit->b_current_next ? "yes" : "no");
+    DumpDescriptors("\t  |  ]", p_nit->p_first_descriptor);
+    DumpTSDescriptorsNIT(p_nit->p_first_ts);
+    dvbpsi_DeleteNIT(p_nit);
+}
+
+/*****************************************************************************
+ * handle_BAT
+ *****************************************************************************/
+static void DumpTSDescriptorsBAT(dvbpsi_bat_ts_t *p_bat_ts)
+{
+  dvbpsi_bat_ts_t *p_ts = p_bat_ts;
+
+  while (p_ts)
+  {
+      printf("\t  | transport id: %d\n", p_ts->i_ts_id);
+      printf("\t  | original network id: %d\n", p_ts->i_orig_network_id);
+      DumpDescriptors("\t  |  ]", p_bat_ts->p_first_descriptor);
+      p_ts = p_ts->p_next;
+  }
+}
+
+static void handle_BAT(void* p_data, dvbpsi_bat_t* p_bat)
+{
+    //ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    printf("\n");
+    printf("  BAT: Bouque Association Table\n");
+    printf("\tVersion number : %d\n", p_bat->i_version);
+    printf("\tBouquet id     : %d\n", p_bat->i_bouquet_id);
+    printf("\tCurrent next   : %s\n", p_bat->b_current_next ? "yes" : "no");
+    DumpDescriptors("\t  |  ]", p_bat->p_first_descriptor);
+    DumpTSDescriptorsBAT(p_bat->p_first_ts);
+    dvbpsi_DeleteBAT(p_bat);
+}
+
+/*****************************************************************************
+ * handle_PMT
+ *****************************************************************************/
+static void handle_PMT(void* p_data, dvbpsi_pmt_t* p_pmt)
+{
+    dvbpsi_pmt_es_t* p_es = p_pmt->p_first_es;
+    ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    p_stream->pmt.i_pmt_version = p_pmt->i_version;
+    p_stream->pmt.pid_pcr = &p_stream->pid[p_pmt->i_pcr_pid];
+    p_stream->pid[p_pmt->i_pcr_pid].b_pcr = true;
+
+    printf("\n");
+    printf("  PMT: Program Map Table\n");
+    printf("\tProgram number : %d\n", p_pmt->i_program_number);
+    printf("\tVersion number : %d\n", p_pmt->i_version);
+    printf("\tPCR_PID        : 0x%x (%d)\n", p_pmt->i_pcr_pid, p_pmt->i_pcr_pid);
+    printf("\tCurrent next   : %s\n", p_pmt->b_current_next ? "yes" : "no");
+    DumpDescriptors("\t   ]", p_pmt->p_first_descriptor);
+    printf("\t| type @ elementary_PID : Description\n");
+    while(p_es)
+    {
+        printf("\t| 0x%02x @ pid 0x%x (%d): %s\n",
+                 p_es->i_type, p_es->i_pid, p_es->i_pid,
+                 GetTypeName(p_es->i_type) );
+        DumpDescriptors("\t|  ]", p_es->p_first_descriptor);
+        p_es = p_es->p_next;
+    }
+    dvbpsi_DeletePMT(p_pmt);
+}
+
+/*****************************************************************************
+ * handle_CAT
+ *****************************************************************************/
+static void handle_CAT(void *p_data, dvbpsi_cat_t *p_cat)
+{
+    ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    p_stream->cat.i_version = p_cat->i_version;
+
+    printf("\n" );
+    printf("  CAT: Conditional Association Table\n" );
+    printf("\tVersion number : %d\n", p_cat->i_version );
+    printf("\tCurrent next   : %s\n", p_cat->b_current_next ? "yes" : "no");
+    DumpDescriptors("\t   ]", p_cat->p_first_descriptor);
+    printf("\n");
+    dvbpsi_DeleteCAT(p_cat);
+}
+
+/*****************************************************************************
+ * Public API
+ *****************************************************************************/
+ts_stream_t *libdvbpsi_init(int debug)
+{
+    ts_stream_t *stream = (ts_stream_t *)calloc(1, sizeof(ts_stream_t));
+    if (stream == NULL)
+        return NULL;
+
+    /* print PSI tables debug anyway, unless no debug is wanted at all */
+    enum dvbpsi_msg_level level = (debug == 0) ? DVBPSI_MSG_NONE : DVBPSI_MSG_DEBUG;
+    switch (debug)
+    {
+        case 0: stream->level = DVBPSI_MSG_NONE; break;
+        case 1: stream->level = DVBPSI_MSG_ERROR; break;
+        case 2: stream->level = DVBPSI_MSG_WARN; break;
+        case 3: stream->level = DVBPSI_MSG_DEBUG; break;
+    }
+
+    /* PAT */
+    stream->pat.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    if (stream->pat.handle == NULL)
+        goto error;
+    if (!dvbpsi_AttachPAT(stream->pat.handle, handle_PAT, stream))
+    {
+        dvbpsi_DeleteHandle(stream->pat.handle);
+        stream->pat.handle = NULL;
+        goto error;
+    }
+    /* CAT */
+    stream->cat.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    if (stream->pat.handle == NULL)
+        goto error;
+    if (!dvbpsi_AttachCAT(stream->cat.handle, handle_CAT, stream))
+    {
+        dvbpsi_DeleteHandle(stream->cat.handle);
+        stream->cat.handle = NULL;
+        goto error;
+    }
+    /* SDT demuxer */
+    stream->sdt.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    if (stream->sdt.handle == NULL)
+        goto error;
+    if (!dvbpsi_AttachDemux(stream->sdt.handle, handle_subtable, stream))
+    {
+        dvbpsi_DeleteHandle(stream->sdt.handle);
+        stream->sdt.handle = NULL;
+        goto error;
+    }
+    /* EIT demuxer */
+    stream->eit.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    if (stream->eit.handle == NULL)
+        goto error;
+    if (!dvbpsi_AttachDemux(stream->eit.handle, handle_subtable, stream))
+    {
+        dvbpsi_DeleteHandle(stream->eit.handle);
+        stream->eit.handle = NULL;
+        goto error;
+    }
+    /* TDT demuxer */
+    stream->tdt.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    if (stream->tdt.handle == NULL)
+        goto error;
+    if (!dvbpsi_AttachDemux(stream->tdt.handle, handle_subtable, stream))
+    {
+        dvbpsi_DeleteHandle(stream->tdt.handle);
+        stream->tdt.handle = NULL;
+        goto error;
+    }
+
+    /* */
+    stream->pat.pid = &stream->pid[0x00];
+    stream->cat.pid = &stream->pid[0x01];
+#if 0
+    stream->tsdt.pid = &stream->pid[0x02];
+    stream->ipmp.pid = &stream->pid[0x03];
+#endif
+    stream->sdt.pid = &stream->pid[0x11];
+    stream->eit.pid = &stream->pid[0x12];
+    stream->tdt.pid = &stream->pid[0x14];
+    return stream;
+
+error:
+    if (stream->pat.handle)
+    {
+        dvbpsi_DetachPAT(stream->pat.handle);
+        dvbpsi_DeleteHandle(stream->pat.handle);
+    }
+    if (stream->cat.handle)
+    {
+        dvbpsi_DetachCAT(stream->cat.handle);
+        dvbpsi_DeleteHandle(stream->cat.handle);
+    }
+    if (stream->sdt.handle)
+    {
+        dvbpsi_DetachDemux(stream->sdt.handle);
+        dvbpsi_DeleteHandle(stream->sdt.handle);
+    }
+    if (stream->eit.handle)
+    {
+        dvbpsi_DetachDemux(stream->eit.handle);
+        dvbpsi_DeleteHandle(stream->eit.handle);
+    }
+    if (stream->tdt.handle)
+    {
+        dvbpsi_DetachDemux(stream->tdt.handle);
+        dvbpsi_DeleteHandle(stream->tdt.handle);
+    }
+    free(stream);
+    return NULL;
+}
+
+void libdvbpsi_exit(ts_stream_t *stream)
+{
+   printf("\nSummary:\n");
+   summary(stream);
+
+   if (stream->pat.handle)
+   {
+       dvbpsi_DetachPAT(stream->pat.handle);
+       dvbpsi_DeleteHandle(stream->pat.handle);
+   }
+   if (stream->cat.handle)
+   {
+       dvbpsi_DetachCAT(stream->cat.handle);
+       dvbpsi_DeleteHandle(stream->cat.handle);
+   }
+   if (stream->sdt.handle)
+   {
+       dvbpsi_DetachDemux(stream->sdt.handle);
+       dvbpsi_DeleteHandle(stream->sdt.handle);
+   }
+   if (stream->eit.handle)
+   {
+       dvbpsi_DetachDemux(stream->eit.handle);
+       dvbpsi_DeleteHandle(stream->eit.handle);
+   }
+   if (stream->tdt.handle)
+   {
+       dvbpsi_DetachDemux(stream->tdt.handle);
+       dvbpsi_DeleteHandle(stream->tdt.handle);
+   }
+
+   free(stream);
+   stream = NULL;
+}
+
+static ssize_t check_sync_word(uint8_t *buf, ssize_t length)
+{
+    ssize_t i_lost = 0;
+
+    for (i_lost = 0; i_lost < length; i_lost++)
+    {
+        if (buf[i_lost] == 0x47)
+            break;
+    }
+
+    if ((length - i_lost) < 188)
+        i_lost = length;
+
+    return i_lost;
+}
+
+bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length)
+{
+    mtime_t  i_prev_pcr = 0;  /* 33 bits */
+    int      i_old_cc = -1;
+
+    for (ssize_t i = 0; i < length; i += 188)
+    {
+        /* check sync */
+        ssize_t i_lost = check_sync_word(buf+i, length - i);
+        if (i_lost > 0)
+        {
+            stream->i_lost_bytes += i_lost;
+            i += i_lost;
+            fprintf(stderr, "dvbinfo: Lost %ld bytes out of %ld in buffer\n", i_lost, length);
+            if (i >= length)
+                return true;
+        }
+
+        assert(buf[i] == 0x47);
+
+        /* parse packet */
+        uint8_t  *p_tmp = &buf[i];
+        uint16_t i_pid = ((uint16_t)(p_tmp[1] & 0x1f) << 8) + p_tmp[2];
+        int      i_cc = (p_tmp[3] & 0x0f);
+        bool     b_discontinuity_seen = false;
+
+        /* keep track nr of packets for this ES */
+        stream->pid[i_pid].i_packets++;
+        stream->i_packets++;
+
+        /* received times */
+        stream->pid[i_pid].i_prev_received = stream->pid[i_pid].i_received;
+        stream->pid[i_pid].i_received = mdate();
+
+        if (i_pid == 0x0) /* PAT */
+            dvbpsi_PushPacket(stream->pat.handle, p_tmp);
+        else if (i_pid == 0x01) /* CAT */
+            dvbpsi_PushPacket(stream->cat.handle, p_tmp);
+#if 0
+        else if (i_pid == 0x02) /* Transport Stream Description Table */
+            dvbpsi_PushPacket(stream->tdt.handle, p_tmp);
+        else if (i_pid == 0x03) /* IPMP Control Information Table */
+            dvbpsi_PushPacket(stream->ipmp.handle, p_tmp);
+#endif
+        else if (i_pid == 0x11) /* SDT */
+            dvbpsi_PushPacket(stream->sdt.handle, p_tmp);
+        else if (i_pid == 0x12) /* EIT */
+            dvbpsi_PushPacket(stream->eit.handle, p_tmp);
+        else if (i_pid == 0x14) /* TDT */
+            dvbpsi_PushPacket(stream->tdt.handle, p_tmp);
+        else if (stream->pmt.pid_pmt && i_pid == stream->pmt.pid_pmt->i_pid)
+            dvbpsi_PushPacket(stream->pmt.handle, p_tmp);
+#if 0 /* Testing to generate errors */
+        else
+            dvbpsi_PushPacket(stream->handle, p_tmp);
+#endif
+
+        /* Remember PID */
+        if (!stream->pid[i_pid].b_seen)
+        {
+            stream->pid[i_pid].i_pid = i_pid;
+            stream->pid[i_pid].b_seen = true;
+            i_old_cc = i_cc;
+            stream->pid[i_pid].i_cc = i_cc;
+        }
+        else
+        {
+            /* Check continuity counter */
+            int i_diff = 0;
+
+            i_diff = i_cc - (stream->pid[i_pid].i_cc+1)%16;
+            b_discontinuity_seen = (i_diff != 0);
+
+            /* Update CC */
+            i_old_cc = stream->pid[i_pid].i_cc;
+            stream->pid[i_pid].i_cc = i_cc;
+        }
+
+        if (i_pid == 0x1FFF)
+        {
+            stream->i_null_packets++;
+            continue;  /* NULL packet - skip it */
+        }
+
+        /* */
+        stream->pid[i_pid].b_transport_error_indicator = ((p_tmp[1] & 0x80) == 0x80);
+        stream->pid[i_pid].b_payload_unit_start_indicator = ((p_tmp[1] & 0x40) == 0x40);
+        stream->pid[i_pid].b_transport_priority = ((p_tmp[1] & 0x20) == 0x20);
+        stream->pid[i_pid].i_transport_scrambling_control = ((p_tmp[3] & 0xC0) >> 6);
+        stream->pid[i_pid].b_adaptation_field = (p_tmp[3] & 0x20);
+
+        /* Handle discontinuities if they occurred,
+         * according to ISO/IEC 13818-1: DIS pages 20-22 */
+        if (stream->pid[i_pid].b_adaptation_field && (p_tmp[4] > 0))
+        {
+            bool b_pcr  = (p_tmp[5]&0x10) == 0x10;  /* PCR flag */
+            bool b_opcr = (p_tmp[5]&0x08) == 0x08;  /* OPCR flag */
+
+            stream->pid[i_pid].b_discontinuity_indicator = (p_tmp[5]&0x80) == 0x80;
+            stream->pid[i_pid].b_random_access_indicator = (p_tmp[5]&0x40) == 0x40;
+            stream->pid[i_pid].b_elementary_stream_priority_indicator = (p_tmp[5]&0x20) == 0x20;
+            stream->pid[i_pid].b_splicing_point = (p_tmp[5]&0x04) == 0x04;
+            stream->pid[i_pid].b_transport_private_data = (p_tmp[5]&0x02) == 0x02;
+            stream->pid[i_pid].b_adaptation_field_extension = (p_tmp[5]&0x01) == 0x01;
+
+            uint32_t i_ext = 5;
+
+            if (b_pcr) i_ext += 6;
+
+            /* PCR */
+            if (b_pcr && (p_tmp[4] >= 7))
+            {
+                mtime_t i_pcr;  /* 33 bits */
+
+                i_pcr = (( (mtime_t)p_tmp[6] << 25 ) |
+                         ( (mtime_t)p_tmp[7] << 17 ) |
+                         ( (mtime_t)p_tmp[8] << 9 ) |
+                         ( (mtime_t)p_tmp[9] << 1 ) |
+                         ( (mtime_t)(p_tmp[10]&0x80) >> 7 ));
+                i_pcr = i_pcr * 100 / 9;
+                i_prev_pcr = stream->pid[i_pid].i_pcr;
+                stream->pid[i_pid].i_pcr = i_pcr;
+
+                if (stream->pid[i_pid].i_first_pcr == 0)
+                    stream->pid[i_pid].i_first_pcr = i_pcr;
+                if (i_pcr < stream->pid[i_pid].i_last_pcr)
+                {
+                    fprintf(stderr, "dvbinfo: Warning wrapping PCR");
+                    if (b_discontinuity_seen)
+                        fprintf(stderr, " on discontinuity");
+                    fprintf(stderr, "\n");
+                }
+                stream->pid[i_pid].i_prev_pcr = i_prev_pcr;
+                stream->pid[i_pid].i_last_pcr = i_pcr;
+
+                if (stream->pid[i_pid].b_discontinuity_indicator)
+                {
+                    /* cc discontinuity is expected */
+                    fprintf(stderr, "dvbinfo: Server signalled the continuity counter discontinuity\n");
+
+                    /* Discontinuity has been handled */
+                    b_discontinuity_seen = false;
+                }
+            }
+
+            if (b_opcr) i_ext += 6;
+
+            if (stream->pid[i_pid].b_splicing_point)
+            {
+                i_ext++;
+                /* calculate tcimsbf */
+                stream->pid[i_pid].i_splice_countdown = ((p_tmp[i_ext] & 0x80) == 0x80) ?
+                                        -1 * (p_tmp[i_ext] & 0x7f) : (p_tmp[i_ext] & 0x7f);
+            }
+
+            if (stream->pid[i_pid].b_transport_private_data)
+            {
+                i_ext++;
+                stream->pid[i_pid].i_transport_private_data_length = p_tmp[i_ext];
+                i_ext += stream->pid[i_pid].i_transport_private_data_length;
+            }
+
+            if (stream->pid[i_pid].b_adaptation_field_extension)
+            {
+                /* i_ext is start of adaptation_extension field */
+                i_ext++;
+                uint8_t *p_ext = &p_tmp[i_ext];
+                uint32_t i_seamless_splice = i_ext;
+
+                stream->pid[i_pid].i_adaptation_field_extension_length = p_ext[0];
+
+                if (stream->pid[i_pid].i_adaptation_field_extension_length > 0)
+                {
+                    stream->pid[i_pid].b_ltw = (p_ext[1]&0x80) == 0x80;
+                    stream->pid[i_pid].b_piecewise_rate = (p_ext[1]&0x40) == 0x40;
+                    stream->pid[i_pid].b_seamless_splice = (p_ext[1]&0x20) == 0x20;
+
+                    if (stream->pid[i_pid].b_ltw)
+                    {
+                        stream->pid[i_pid].b_ltw_valid = ((p_ext[2]&0x80) == 0x80);
+                        stream->pid[i_pid].i_ltw_offset = ((uint16_t)p_ext[2]&0x7F);
+                        i_seamless_splice += 2;
+                    }
+
+                    if (stream->pid[i_pid].b_piecewise_rate)
+                    {
+                        stream->pid[i_pid].i_piecewise_rate =
+                          (((uint32_t)p_ext[i_seamless_splice] & 0x3F) << 16) |
+                          (((uint32_t)p_ext[i_seamless_splice + 1]) << 8) |
+                           ((uint32_t)p_ext[i_seamless_splice + 2]);
+                        i_seamless_splice += 3;
+                    }
+
+                    if (stream->pid[i_pid].b_seamless_splice)
+                    {
+                        stream->pid[i_pid].i_splice_type =
+                            (p_tmp[i_seamless_splice]&0xF0);
+                    }
+                }
+            } /* end of adaptation_extension_field */
+        }
+
+        if (b_discontinuity_seen)
+        {
+            fprintf(stderr, "dvbinfo: Continuity counter discontinuity (pid %d found %d expected %d)\n",
+                   i_pid, stream->pid[i_pid].i_cc, i_old_cc+1 );
+
+            /* Discontinuity has been handled */
+            b_discontinuity_seen = false;
+        }
+
+        if (stream->level >= DVBPSI_MSG_DEBUG)
+        {
+            printf("\n\t---------------------------------------------------------\n");
+            printf("\tTS Packet number %"PRId64", ES number %"PRId64", pid %d (0x%x)\n",
+                   stream->i_packets, stream->pid[i_pid].i_packets, i_pid, i_pid);
+#if defined(HAVE_SYS_TIME_H)
+            printf("\tReceived time: %"PRId64" ms\n", stream->pid[i_pid].i_received);
+#endif
+            ts_header_dump(&stream->pid[i_pid]);
+            ts_hexdump(&buf[i],188);
+            printf("\n\t---------------------------------------------------------\n");
+        }
+    }
+
+    return true;
+}
+
+void libdvbpsi_summary(ts_stream_t *stream)
+{
+    summary(stream);
+}

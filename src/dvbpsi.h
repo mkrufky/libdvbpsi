@@ -64,17 +64,13 @@ typedef void (* dvbpsi_message_cb)(dvbpsi_t *handle,
 /*!
  * \enum dvbpsi_msg_level
  * \brief DVBPSI message level enum
- * DVBPSI_MSG_NONE   -1 : No messages
- * DVBPSI_MSG_ERROR   0 : Error messages, only
- * DVBPSI_MSG_WARNING 1 : Error and Warning messages
- * DVBPSI_MSG_DEBUG   2 : Error, warning and debug messages
  */
 enum dvbpsi_msg_level
 {
-    DVBPSI_MSG_NONE  = -1,
-    DVBPSI_MSG_ERROR =  0,
-    DVBPSI_MSG_WARN  =  1,
-    DVBPSI_MSG_DEBUG =  2,
+    DVBPSI_MSG_NONE  = -1, /*!< No messages */
+    DVBPSI_MSG_ERROR =  0, /*!< Error messages only */
+    DVBPSI_MSG_WARN  =  1, /*!< Error and Warning messages */
+    DVBPSI_MSG_DEBUG =  2, /*!< Error, warning and debug messages */
 };
 
 /*****************************************************************************

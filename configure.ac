@@ -7,16 +7,15 @@ AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 
-#AC_CANONICAL_HOST
+dnl AC_CANONICAL_HOST
 AC_PROG_CC
 AC_STDC_HEADERS
 AC_C_INLINE
 
 AM_PROG_LIBTOOL
 
-
 dnl default CFLAGS
-CFLAGS="${CFLAGS} -Wall -Werror  -DDVBPSI_DIST --std=gnu99 -D_GNU_SOURCE"
+CFLAGS="${CFLAGS} -Wall -Werror --std=gnu99 -D_GNU_SOURCE"
 CFLAGS="${CFLAGS} -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-prototypes -Wshadow -Waggregate-return -Wmissing-prototypes -Wnested-externs -Wsign-compare"
 
 dnl check the operating system
@@ -52,7 +51,7 @@ if test "$release" = "true"
 then
   CFLAGS="${CFLAGS} -O6"
 else
-  CFLAGS="${CFLAGS} -O2"
+  CFLAGS="${CFLAGS} -O2 -DDVBPSI_DIST"
 fi
 
 dnl Check for headers
@@ -78,6 +77,7 @@ fi
 AC_OUTPUT([Makefile
            src/Makefile
            examples/Makefile
+           examples/dvbinfo/Makefile
            misc/Makefile
            doc/Makefile
            wince/Makefile
