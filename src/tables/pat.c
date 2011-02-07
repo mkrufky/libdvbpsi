@@ -102,7 +102,7 @@ void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi)
     if (p_pat_decoder->p_current_section)
         dvbpsi_DeletePSISections(p_pat_decoder->p_current_section);
     free(p_pat_decoder);
-
+    p_dvbpsi->p_private = NULL;
 }
 
 

@@ -161,7 +161,7 @@ dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, enum dvbpsi_msg_level lev
  *****************************************************************************/
 void dvbpsi_DeleteHandle(dvbpsi_t *handle)
 {
-    assert(handle->p_private != NULL);
+    assert(handle->p_private == NULL);
     handle->pf_message = NULL;
     free(handle);
 }
