@@ -693,6 +693,15 @@ int main(int i_argc, char* pa_argv[])
                 b_first = VLC_TRUE;
             }
 
+            if (p_data[i] != 0x47) /* no sync skip this packet */
+            {
+                fprintf( stderr, "Missing TS sync word, skipping 188 bytes\n" );
+                break;
+            }
+
+            if (i_pid == 0x1FFF) /* null packet - TS content undefined */
+                continue;
+
             if( i_pid == 0x0 )
                 dvbpsi_PushPacket(p_stream->pat.handle, p_tmp);
             else if( p_stream->pmt.pid_pmt && i_pid == p_stream->pmt.pid_pmt->i_pid )
@@ -754,7 +763,7 @@ int main(int i_argc, char* pa_argv[])
                     }
                     i_bytes = 0; /* reset byte counter */
 
-                    if( b_discontinuity_seen )
+                    if( b_discontinuity_indicator )
                     {
                         /* cc discontinuity is expected */
                         fprintf( stderr, "Server signalled the continuity counter discontinuity\n" );
