@@ -32,7 +32,10 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
+#ifdef HAVE_SYS_TIME_H
+#define HAVE_GETTIMEOFDAY 1
 #include <sys/time.h>
+#endif
 #include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
