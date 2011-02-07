@@ -136,7 +136,7 @@ int main(int i_argc, char* pa_argv[])
   }
 
 out:
-  if (p_dvbpsi == NULL)
+  if (p_dvbpsi)
   {
     dvbpsi_DetachPAT(p_dvbpsi);
     dvbpsi_DeleteHandle(p_dvbpsi);
