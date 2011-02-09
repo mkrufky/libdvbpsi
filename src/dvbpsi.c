@@ -431,8 +431,9 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
  *  1 is warning and errors
  *  2 is debug, warning and errors
  *****************************************************************************/
-
-#define DVBPSI_MSG_FORMAT "libdvbpsi (%s): "
+#if !defined(_GNU_SOURCE)
+#   define DVBPSI_MSG_SIZE 1024
+#endif
 
 #ifdef HAVE_VARIADIC_MACROS
 void message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...)
@@ -442,111 +443,97 @@ void message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...)
     {
         va_list ap;
         va_start(ap, fmt);
-#if defined(_GNU_SOURCE)
         char *msg = NULL;
+#if defined(_GNU_SOURCE)
         int err = vasprintf(&msg, fmt, ap);
 #else
-        char msg[1024];
-        int err = vsnprintf(&msg, 1024, fmt, ap);
+        msg = malloc(DVBPSI_MSG_SIZE);
+        if (msg == NULL)
+            return;
+        if (snprintf(&msg, DVBPSI_MSG_SIZE, DVBPSI_MSG_FORMAT, src) < 0) {
+            free(msg);
+            return;
+        }
+        int err = vsnprintf(&msg, DVBPSI_MSG_SIZE, fmt, ap);
 #endif
         va_end(ap);
         if (err > DVBPSI_MSG_NONE) {
             if (dvbpsi->pf_message)
                 dvbpsi->pf_message(dvbpsi, msg);
-#if defined(_GNU_SOURCE)
-            free(msg);
-#endif
         }
+        free(msg);
     }
 }
 #else
+#   define DVBPSI_MSG_FORMAT "libdvbpsi (%s): %s"
+
+/* Common code for printing messages */
+#   if defined(_GNU_SOURCE)
+#       define DVBPSI_MSG_COMMON                                \
+    do {                                                        \
+        va_list ap;                                             \
+        va_start(ap, fmt);                                      \
+        char *tmp = NULL;                                       \
+        int err = vasprintf(&tmp, fmt, ap);                     \
+        if (err < 0)                                            \
+            return;                                             \
+        char *msg = NULL;                                       \
+        if (asprintf(&msg, DVBPSI_MSG_FORMAT, src, tmp) < 0) {  \
+            free(tmp);                                          \
+            return;                                             \
+        }                                                       \
+        free(tmp);                                              \
+        va_end(ap);                                             \
+        if (err > 0) {                                          \
+            if (dvbpsi->pf_message)                             \
+                dvbpsi->pf_message(dvbpsi, msg);                \
+        }                                                       \
+        free(msg);                                              \
+    } while(0);
+#   else
+#       define DVBPSI_MSG_COMMON                                \
+    do {                                                        \
+        va_list ap;                                             \
+        va_start(ap, fmt);                                      \
+        char *msg = malloc(DVBPSI_MSG_SIZE);                    \
+        if (msg == NULL)                                        \
+            return;                                             \
+        if (snprintf(&msg, DVBPSI_MSG_SIZE, DVBPSI_MSG_FORMAT, src) < 0) \
+            return;                                             \
+        int err = vsnprintf(&msg, DVBPSI_MSG_SIZE, fmt, ap);    \
+        va_end(ap);                                             \
+        if (err > 0) {                                          \
+            if (dvbpsi->pf_message)                             \
+                dvbpsi->pf_message(dvbpsi, msg);                \
+        }                                                       \
+        free(msg);                                              \
+    } while(0);
+#   endif
+
 void dvbpsi_error(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...)
 {
-    if (DVBPSI_MSG_ERROR <= dvbpsi->i_msg_level)
+    if ((dvbpsi->i_msg_level > DVBPSI_MSG_NONE) &&
+        (DVBPSI_MSG_ERROR <= dvbpsi->i_msg_level))
     {
-        va_list ap;
-        va_start(ap, fmt);
-#if defined(_GNU_SOURCE)
-        char *msg = NULL;
-        if (asprintf(&msg, DVBPSI_MSG_FORMAT, src) < 0)
-            return;
-        int err = vasprintf(&msg, fmt, ap);
-#else
-        char *msg = malloc(1024);
-        if (msg == NULL)
-            return;
-        if (snprintf(&msg, 1024, DVBPSI_MSG_FORMAT, src) < 0)
-            return;
-        int err = vsnprintf(&msg, 1024, fmt, ap);
-#endif
-        va_end(ap);
-        if (err > 0) {
-            if (dvbpsi->pf_message)
-                dvbpsi->pf_message(dvbpsi, msg);
-#if defined(_GNU_SOURCE)
-            free(msg);
-#endif
-        }
+        DVBPSI_MSG_COMMON
     }
 }
 
 void dvbpsi_warning(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...)
 {
-    if (DVBPSI_MSG_WARN <= dvbpsi->i_msg_level)
+    if ((dvbpsi->i_msg_level > DVBPSI_MSG_NONE) &&
+        (DVBPSI_MSG_WARN <= dvbpsi->i_msg_level))
     {
-        va_list ap;
-        va_start(ap, fmt);
-#if defined(_GNU_SOURCE)
-        char *msg = NULL;
-        if (asprintf(&msg, DVBPSI_MSG_FORMAT, src) < 0)
-            return;
-        int err = vasprintf(&msg, fmt, ap);
-#else
-        char *msg = malloc(1024);
-        if (msg == NULL)
-            return;
-        if (snprintf(&msg, 1024, DVBPSI_MSG_FORMAT, src) < 0)
-            return;
-        int err = vsnprintf(&msg, 1024, fmt, ap);
-#endif
-        va_end(ap);
-        if (err > 0) {
-            if (dvbpsi->pf_message)
-                dvbpsi->pf_message(dvbpsi, msg);
-#if defined(_GNU_SOURCE)
-            free(msg);
-#endif
-        }
+        DVBPSI_MSG_COMMON
     }
 }
 
 void dvbpsi_debug(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...)
 {
-    if (DVBPSI_MSG_DEBUG <= dvbpsi->i_msg_level)
+    if ((dvbpsi->i_msg_level > DVBPSI_MSG_NONE) &&
+        (DVBPSI_MSG_DEBUG <= dvbpsi->i_msg_level))
     {
-        va_list ap;
-        va_start(ap, fmt);
-#if defined(_GNU_SOURCE)
-        char *msg = NULL;
-        if (asprintf(&msg, DVBPSI_MSG_FORMAT, src) < 0)
-            return;
-        int err = vasprintf(&msg, fmt, ap);
-#else
-        char *msg = malloc(1024);
-        if (msg == NULL)
-            return;
-        if (snprintf(&msg, 1024, DVBPSI_MSG_FORMAT, src) < 0)
-            return;
-        int err = vsnprintf(&msg, 1024, fmt, ap);
-#endif
-        va_end(ap);
-        if (err > 0) {
-            if (dvbpsi->pf_message)
-                dvbpsi->pf_message(dvbpsi, msg);
-#if defined(_GNU_SOURCE)
-            free(msg);
-#endif
-        }
+        DVBPSI_MSG_COMMON
     }
 }
 #endif
