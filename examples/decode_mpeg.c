@@ -324,6 +324,12 @@ static void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
     fprintf( stderr, "    | program_number @ [NIT|PMT]_PID\n");
     while( p_program )
     {
+            if (p_stream->pmt.handle)
+            {
+                dvbpsi_DetachPMT(p_stream->pmt.handle);
+                dvbpsi_DeleteHandle(p_stream->pmt.handle);
+                p_stream->pmt.handle = NULL;
+            }
             p_stream->i_pmt++;
             p_stream->pmt.i_number = p_program->i_number;
             p_stream->pmt.pid_pmt = &p_stream->pid[p_program->i_pid];
