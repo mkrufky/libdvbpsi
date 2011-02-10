@@ -258,7 +258,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
  *****************************************************************************
  * Check the CRC_32 if the section has b_syntax_indicator set.
  *****************************************************************************/
-int dvbpsi_ValidTOTSection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
+bool dvbpsi_ValidTOTSection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
     if (p_section->i_table_id != 0x73)
     {
@@ -268,9 +268,9 @@ int dvbpsi_ValidTOTSection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
             dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
                          "TDT has an invalid payload size (%d bytes) !!!",
                           p_section->i_length);
-            return 0;
+            return false;
         }
-        return 1;
+        return true;
     }
 
     /* Check the CRC_32 if it's a TOT */
@@ -284,15 +284,15 @@ int dvbpsi_ValidTOTSection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
     }
 
     if (i_crc == 0)
-        return 1;
+        return true;
     else
     {
         dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
                                "Bad CRC_32 (0x%08x) !!!", i_crc);
-        return 0;
+        return false;
     }
 
-    return 1;
+    return true;
 }
 
 /*****************************************************************************
@@ -413,7 +413,7 @@ dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t *p_dvbpsi, dvbpsi_tot_t* p_
         p_result->i_length += 4;
     }
 
-    dvbpsi_BuildPSISection(p_result);
+    dvbpsi_BuildPSISection(p_dvbpsi, p_result);
 
     if (p_result->i_table_id == 0x73)
     {

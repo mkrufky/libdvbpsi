@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
@@ -99,7 +100,7 @@ void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section)
  *****************************************************************************
  * Check the CRC_32 if the section has b_syntax_indicator set.
  *****************************************************************************/
-int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
+bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
 {
   if(p_section->b_syntax_indicator)
   {
@@ -114,14 +115,14 @@ int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
     }
 
     if(i_crc == 0)
-      return 1;
+      return true;
     else
-      return 0;
+      return false;
   }
   else
   {
     /* No check to do if b_syntax_indicator is 0 */
-    return 0;
+    return false;
   }
 }
 
@@ -131,7 +132,7 @@ int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
  *****************************************************************************
  * Build the section based on the information in the structure.
  *****************************************************************************/
-void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section)
+void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
   uint8_t* p_byte = p_section->p_data;
 
@@ -177,16 +178,14 @@ void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section)
     p_section->p_payload_end[2] = (p_section->i_crc >> 8) & 0xff;
     p_section->p_payload_end[3] = p_section->i_crc & 0xff;
 
-#if 0
     if(!dvbpsi_ValidPSISection(p_section))
     {
-      dvbpsi_error(handle,"misc PSI", "********************************************");
-      dvbpsi_error(handle,"misc PSI", "* Generated PSI section has a bad CRC_32.  *");
-      dvbpsi_error(handle,"misc PSI", "* THIS IS A BUG, PLEASE REPORT TO THE LIST *");
-      dvbpsi_error(handle,"misc PSI", "*  ---  libdvbpsi-devel@videolan.org  ---  *");
-      dvbpsi_error(handle,"misc PSI", "********************************************");
+      dvbpsi_error(p_dvbpsi, "misc PSI", "********************************************");
+      dvbpsi_error(p_dvbpsi, "misc PSI", "* Generated PSI section has a bad CRC_32.  *");
+      dvbpsi_error(p_dvbpsi, "misc PSI", "* THIS IS A BUG, PLEASE REPORT TO THE LIST *");
+      dvbpsi_error(p_dvbpsi, "misc PSI", "*  ---  libdvbpsi-devel@videolan.org  ---  *");
+      dvbpsi_error(p_dvbpsi, "misc PSI", "********************************************");
     }
-#endif
   }
 }
 

@@ -59,7 +59,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
  *****************************************************************************
  * Check the CRC_32 if the section has b_syntax_indicator set.
  *****************************************************************************/
-int dvbpsi_ValidTOTSection(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
+bool dvbpsi_ValidTOTSection(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
  * dvbpsi_DecodeTOTSections

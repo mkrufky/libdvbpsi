@@ -578,7 +578,7 @@ dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_t* p_
     while (p_prev != NULL)
     {
         p_prev->i_last_number = p_current->i_number;
-        dvbpsi_BuildPSISection(p_prev);
+        dvbpsi_BuildPSISection(p_dvbpsi, p_prev);
         p_prev = p_prev->p_next;
     }
     return p_result;

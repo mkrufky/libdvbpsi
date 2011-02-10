@@ -127,26 +127,27 @@ void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section);
  * dvbpsi_ValidPSISection
  *****************************************************************************/
 /*!
- * \fn int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
+ * \fn bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
  * \brief Validity check of a PSI section.
  * \param p_section pointer to the PSI section structure
  * \return boolean value (false if the section is not valid).
  *
  * Check the CRC_32 if the section has b_syntax_indicator set.
  */
-int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
+bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
 
 
 /*****************************************************************************
  * dvbpsi_BuildPSISection
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section)
+ * \fn void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
  * \brief Build a valid section based on the information in the structure.
+ * \param p_dvbpsi dvbpsi handle
  * \param p_section pointer to the PSI section structure
  * \return nothing.
  */
-void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section);
+void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section);
 
 
 #ifdef __cplusplus

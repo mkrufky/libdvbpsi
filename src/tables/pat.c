@@ -459,7 +459,7 @@ dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi,
   while(p_prev != NULL)
   {
     p_prev->i_last_number = p_current->i_number;
-    dvbpsi_BuildPSISection(p_prev);
+    dvbpsi_BuildPSISection(p_dvbpsi, p_prev);
     p_prev = p_prev->p_next;
   }
 

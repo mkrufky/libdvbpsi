@@ -477,6 +477,6 @@ dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t* p_
     assert( i_desc_length == p_sis->i_descriptors_length);
 
     /* Finalization */
-    dvbpsi_BuildPSISection(p_current);
+    dvbpsi_BuildPSISection(p_dvbpsi, p_current);
     return p_current;
 }
