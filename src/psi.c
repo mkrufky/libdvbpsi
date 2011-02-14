@@ -1,7 +1,7 @@
 /*****************************************************************************
  * psi.c: common PSI functions
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -24,7 +24,6 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
@@ -41,59 +40,52 @@
 #include "dvbpsi_private.h"
 #include "psi.h"
 
-
 /*****************************************************************************
  * dvbpsi_NewPSISection
  *****************************************************************************
  * Creation of a new dvbpsi_psi_section_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t * dvbpsi_NewPSISection(int i_max_size)
+dvbpsi_psi_section_t *dvbpsi_NewPSISection(int i_max_size)
 {
-  /* Allocate the dvbpsi_psi_section_t structure */
-  dvbpsi_psi_section_t * p_section
-                = (dvbpsi_psi_section_t*)malloc(sizeof(dvbpsi_psi_section_t));
+    /* Allocate the dvbpsi_psi_section_t structure */
+    dvbpsi_psi_section_t * p_section
+                  = (dvbpsi_psi_section_t*)malloc(sizeof(dvbpsi_psi_section_t));
+    if (p_section == NULL)
+        return NULL;
 
-  if(p_section != NULL)
-  {
     /* Allocate the p_data memory area */
     p_section->p_data = (uint8_t*)malloc(i_max_size * sizeof(uint8_t));
 
-    if(p_section->p_data != NULL)
-    {
-      p_section->p_payload_end = p_section->p_data;
-    }
+    if (p_section->p_data != NULL)
+        p_section->p_payload_end = p_section->p_data;
     else
     {
-      free(p_section);
-      return NULL;
+        free(p_section);
+        return NULL;
     }
-
     p_section->p_next = NULL;
-  }
 
-  return p_section;
+    return p_section;
 }
-
 
 /*****************************************************************************
  * dvbpsi_DeletePSISections
  *****************************************************************************
  * Destruction of a dvbpsi_psi_section_t structure.
  *****************************************************************************/
-void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section)
+void dvbpsi_DeletePSISections(dvbpsi_psi_section_t *p_section)
 {
-  while(p_section != NULL)
-  {
-    dvbpsi_psi_section_t* p_next = p_section->p_next;
+    while(p_section != NULL)
+    {
+        dvbpsi_psi_section_t* p_next = p_section->p_next;
 
-    if(p_section->p_data != NULL)
-      free(p_section->p_data);
+        if (p_section->p_data != NULL)
+            free(p_section->p_data);
 
-    free(p_section);
-    p_section = p_next;
-  }
+        free(p_section);
+        p_section = p_next;
+    }
 }
-
 
 /*****************************************************************************
  * dvbpsi_ValidPSISection
@@ -102,30 +94,29 @@ void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section)
  *****************************************************************************/
 bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
 {
-  if(p_section->b_syntax_indicator)
-  {
-    /* Check the CRC_32 if b_syntax_indicator is 0 */
-    uint32_t i_crc = 0xffffffff;
-    uint8_t* p_byte = p_section->p_data;
-
-    while(p_byte < p_section->p_payload_end + 4)
+    if (p_section->b_syntax_indicator)
     {
-      i_crc = (i_crc << 8) ^ dvbpsi_crc32_table[(i_crc >> 24) ^ (*p_byte)];
-      p_byte++;
+        /* Check the CRC_32 if b_syntax_indicator is 0 */
+        uint32_t i_crc = 0xffffffff;
+        uint8_t* p_byte = p_section->p_data;
+
+        while(p_byte < p_section->p_payload_end + 4)
+        {
+            i_crc = (i_crc << 8) ^ dvbpsi_crc32_table[(i_crc >> 24) ^ (*p_byte)];
+            p_byte++;
+        }
+
+        if (i_crc == 0)
+            return true;
+        else
+            return false;
     }
-
-    if(i_crc == 0)
-      return true;
     else
-      return false;
-  }
-  else
-  {
-    /* No check to do if b_syntax_indicator is 0 */
-    return false;
-  }
+    {
+        /* No check to do if b_syntax_indicator is 0 */
+        return false;
+    }
 }
-
 
 /*****************************************************************************
  * dvbpsi_BuildPSISection
@@ -148,7 +139,7 @@ void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
   p_section->p_data[2] = p_section->i_length & 0xff;
 
   /* Optional part of a PSI section */
-  if(p_section->b_syntax_indicator)
+  if (p_section->b_syntax_indicator)
   {
     /* 8 MSB of table_id_extension */
     p_section->p_data[3] = (p_section->i_extension >> 8) & 0xff;
@@ -166,7 +157,7 @@ void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
     /* CRC_32 */
     p_section->i_crc = 0xffffffff;
 
-    while(p_byte < p_section->p_payload_end)
+    while (p_byte < p_section->p_payload_end)
     {
       p_section->i_crc =   (p_section->i_crc << 8)
                          ^ dvbpsi_crc32_table[(p_section->i_crc >> 24) ^ (*p_byte)];
@@ -178,7 +169,7 @@ void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
     p_section->p_payload_end[2] = (p_section->i_crc >> 8) & 0xff;
     p_section->p_payload_end[3] = p_section->i_crc & 0xff;
 
-    if(!dvbpsi_ValidPSISection(p_section))
+    if (!dvbpsi_ValidPSISection(p_section))
     {
       dvbpsi_error(p_dvbpsi, "misc PSI", "********************************************");
       dvbpsi_error(p_dvbpsi, "misc PSI", "* Generated PSI section has a bad CRC_32.  *");
@@ -188,4 +179,3 @@ void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
     }
   }
 }
-

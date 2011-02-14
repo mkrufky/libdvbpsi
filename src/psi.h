@@ -1,6 +1,6 @@
 /*****************************************************************************
  * psi.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: psi.h,v 1.6 2002/04/02 17:55:30 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -36,7 +36,6 @@
 extern "C" {
 #endif
 
-
 /*****************************************************************************
  * dvbpsi_psi_section_t
  *****************************************************************************/
@@ -70,8 +69,8 @@ struct dvbpsi_psi_section_s
 {
   /* non-specific section data */
   uint8_t       i_table_id;             /*!< table_id */
-  int           b_syntax_indicator;     /*!< section_syntax_indicator */
-  int           b_private_indicator;    /*!< private_indicator */
+  bool          b_syntax_indicator;     /*!< section_syntax_indicator */
+  bool          b_private_indicator;    /*!< private_indicator */
   uint16_t      i_length;               /*!< section_length */
 
   /* used if b_syntax_indicator is true */
@@ -79,7 +78,7 @@ struct dvbpsi_psi_section_s
                                         /*!< transport_stream_id for a
                                              PAT section */
   uint8_t       i_version;              /*!< version_number */
-  int           b_current_next;         /*!< current_next_indicator */
+  bool          b_current_next;         /*!< current_next_indicator */
   uint8_t       i_number;               /*!< section_number */
   uint8_t       i_last_number;          /*!< last_section_number */
 
@@ -95,9 +94,7 @@ struct dvbpsi_psi_section_s
   /* list handling */
   struct dvbpsi_psi_section_s *         p_next;         /*!< next element of
                                                              the list */
-
 };
-
 
 /*****************************************************************************
  * dvbpsi_NewPSISection
@@ -110,7 +107,6 @@ struct dvbpsi_psi_section_s
  */
 dvbpsi_psi_section_t * dvbpsi_NewPSISection(int i_max_size);
 
-
 /*****************************************************************************
  * dvbpsi_DeletePSISections
  *****************************************************************************/
@@ -121,7 +117,6 @@ dvbpsi_psi_section_t * dvbpsi_NewPSISection(int i_max_size);
  * \return nothing.
  */
 void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section);
-
 
 /*****************************************************************************
  * dvbpsi_ValidPSISection
@@ -136,7 +131,6 @@ void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section);
  */
 bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
 
-
 /*****************************************************************************
  * dvbpsi_BuildPSISection
  *****************************************************************************/
@@ -148,7 +142,6 @@ bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
  * \return nothing.
  */
 void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section);
-
 
 #ifdef __cplusplus
 };
