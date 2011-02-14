@@ -43,7 +43,7 @@ typedef struct dvbpsi_pat_decoder_s
     dvbpsi_pat_t                  current_pat;
     dvbpsi_pat_t *                p_building_pat;
 
-    int                           b_current_valid;
+    bool                          b_current_valid;
 
     uint8_t                       i_last_section_number;
     dvbpsi_psi_section_t *        ap_sections [256];

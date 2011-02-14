@@ -81,7 +81,7 @@ typedef struct dvbpsi_pat_s
 {
   uint16_t                  i_ts_id;            /*!< transport_stream_id */
   uint8_t                   i_version;          /*!< version_number */
-  int                       b_current_next;     /*!< current_next_indicator */
+  bool                      b_current_next;     /*!< current_next_indicator */
 
   dvbpsi_pat_program_t *    p_first_program;    /*!< program list */
 
