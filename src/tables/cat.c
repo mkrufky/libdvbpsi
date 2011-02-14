@@ -280,9 +280,11 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
         {
             p_cat_decoder->p_building_cat =
                                 (dvbpsi_cat_t*)malloc(sizeof(dvbpsi_cat_t));
-            dvbpsi_InitCAT(p_cat_decoder->p_building_cat,
-                     p_section->i_version,
-                     p_section->b_current_next);
+            if (p_cat_decoder->p_building_cat)
+                    dvbpsi_InitCAT(p_cat_decoder->p_building_cat,
+                                p_section->i_version, p_section->b_current_next);
+            else
+                 dvbpsi_error(p_dvbpsi, "CAT decoder", "failed decoding section");
             p_cat_decoder->i_last_section_number = p_section->i_last_number;
         }
 

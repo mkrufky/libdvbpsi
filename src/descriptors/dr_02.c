@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_02.c
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: dr_02.c,v 1.7 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -21,7 +21,6 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
@@ -39,7 +38,6 @@
 #include "../descriptor.h"
 
 #include "dr_02.h"
-
 
 /*****************************************************************************
  * dvbpsi_DecodeVStreamDr
@@ -62,7 +60,6 @@ dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor)
 
   /* Decode data and check the length */
   p_decoded->b_mpeg2 = (p_descriptor->p_data[0] & 0x04) ? 1 : 0;
-
   if(    (!p_decoded->b_mpeg2 && (p_descriptor->i_length != 1))
       || (p_decoded->b_mpeg2 && (p_descriptor->i_length != 3)))
   {

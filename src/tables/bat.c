@@ -401,10 +401,14 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
         {
             p_bat_decoder->p_building_bat =
                                 (dvbpsi_bat_t*)malloc(sizeof(dvbpsi_bat_t));
-            dvbpsi_InitBAT(p_bat_decoder->p_building_bat,
-                     p_section->i_extension,
-                     p_section->i_version,
-                     p_section->b_current_next);
+            if (p_bat_decoder->p_building_bat)
+                dvbpsi_InitBAT(p_bat_decoder->p_building_bat,
+                         p_section->i_extension,
+                         p_section->i_version,
+                         p_section->b_current_next);
+            else
+                dvbpsi_error(p_dvbpsi, "BAT decoder", "failed decoding BAT section");
+
             p_bat_decoder->i_last_section_number = p_section->i_last_number;
         }
 

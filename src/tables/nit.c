@@ -392,10 +392,13 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
         if (!p_nit_decoder->p_building_nit)
         {
             p_nit_decoder->p_building_nit = (dvbpsi_nit_t*)malloc(sizeof(dvbpsi_nit_t));
-            dvbpsi_InitNIT(p_nit_decoder->p_building_nit,
-                           p_nit_decoder->i_network_id,
-                           p_section->i_version,
-                           p_section->b_current_next);
+            if (p_nit_decoder->p_building_nit)
+                dvbpsi_InitNIT(p_nit_decoder->p_building_nit,
+                               p_nit_decoder->i_network_id,
+                               p_section->i_version,
+                               p_section->b_current_next);
+            else
+                 dvbpsi_debug(p_dvbpsi, "NIT decoder", "failed decoding section");
             p_nit_decoder->i_last_section_number = p_section->i_last_number;
         }
 

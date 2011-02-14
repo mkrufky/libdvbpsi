@@ -1,7 +1,7 @@
 /*****************************************************************************
  * descriptor.c: descriptors functions
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: descriptor.c,v 1.6 2002/10/07 14:15:14 sam Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -23,7 +23,6 @@
  *----------------------------------------------------------------------------
  *
  *****************************************************************************/
-
 
 #include "config.h"
 
@@ -48,32 +47,30 @@
 dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
                                           uint8_t* p_data)
 {
-  dvbpsi_descriptor_t* p_descriptor
+    dvbpsi_descriptor_t* p_descriptor
                 = (dvbpsi_descriptor_t*)malloc(sizeof(dvbpsi_descriptor_t));
 
-  if(p_descriptor)
-  {
-    p_descriptor->p_data = (uint8_t*)malloc(i_length * sizeof(uint8_t));
+    if (p_descriptor == NULL)
+        return NULL;
 
-    if(p_descriptor->p_data)
+    p_descriptor->p_data = (uint8_t*)malloc(i_length * sizeof(uint8_t));
+    if (p_descriptor->p_data)
     {
-      p_descriptor->i_tag = i_tag;
-      p_descriptor->i_length = i_length;
-      if(p_data)
-        memcpy(p_descriptor->p_data, p_data, i_length);
-      p_descriptor->p_decoded = NULL;
-      p_descriptor->p_next = NULL;
+        p_descriptor->i_tag = i_tag;
+        p_descriptor->i_length = i_length;
+        if (p_data)
+            memcpy(p_descriptor->p_data, p_data, i_length);
+        p_descriptor->p_decoded = NULL;
+        p_descriptor->p_next = NULL;
     }
     else
     {
-      free(p_descriptor);
-      p_descriptor = NULL;
+        free(p_descriptor);
+        p_descriptor = NULL;
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
-
 
 /*****************************************************************************
  * dvbpsi_DeleteDescriptors
@@ -82,18 +79,17 @@ dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
  *****************************************************************************/
 void dvbpsi_DeleteDescriptors(dvbpsi_descriptor_t* p_descriptor)
 {
-  while(p_descriptor != NULL)
-  {
-    dvbpsi_descriptor_t* p_next = p_descriptor->p_next;
+    while(p_descriptor != NULL)
+    {
+        dvbpsi_descriptor_t* p_next = p_descriptor->p_next;
 
-    if(p_descriptor->p_data != NULL)
-      free(p_descriptor->p_data);
+        if (p_descriptor->p_data != NULL)
+        free(p_descriptor->p_data);
 
-    if(p_descriptor->p_decoded != NULL)
-      free(p_descriptor->p_decoded);
+        if (p_descriptor->p_decoded != NULL)
+          free(p_descriptor->p_decoded);
 
-    free(p_descriptor);
-    p_descriptor = p_next;
-  }
+        free(p_descriptor);
+        p_descriptor = p_next;
+    }
 }
-

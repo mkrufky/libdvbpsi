@@ -304,10 +304,14 @@ void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sectio
     {
       p_pat_decoder->p_building_pat =
                                 (dvbpsi_pat_t*)malloc(sizeof(dvbpsi_pat_t));
-      dvbpsi_InitPAT(p_pat_decoder->p_building_pat,
-                     p_section->i_extension,
-                     p_section->i_version,
-                     p_section->b_current_next);
+      if (p_pat_decoder->p_building_pat)
+          dvbpsi_InitPAT(p_pat_decoder->p_building_pat,
+                         p_section->i_extension,
+                         p_section->i_version,
+                         p_section->b_current_next);
+      else
+           dvbpsi_error(p_dvbpsi, "PAT decoder", "failed decoding section" );
+
       p_pat_decoder->i_last_section_number = p_section->i_last_number;
     }
 

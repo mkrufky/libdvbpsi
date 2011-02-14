@@ -234,11 +234,14 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
         }
 
         p_building_tot = (dvbpsi_tot_t*)malloc(sizeof(dvbpsi_tot_t));
-        dvbpsi_InitTOT(p_building_tot,   ((uint64_t)p_section->p_payload_start[0] << 32)
+        if (p_building_tot)
+            dvbpsi_InitTOT(p_building_tot,   ((uint64_t)p_section->p_payload_start[0] << 32)
                                    | ((uint64_t)p_section->p_payload_start[1] << 24)
                                    | ((uint64_t)p_section->p_payload_start[2] << 16)
                                    | ((uint64_t)p_section->p_payload_start[3] <<  8)
                                    |  (uint64_t)p_section->p_payload_start[4]);
+        else
+            dvbpsi_error(p_dvbpsi, "TOT decoder", "failed decoding section");
 
         /* Decode the section */
         dvbpsi_DecodeTOTSections(p_dvbpsi, p_building_tot, p_section);

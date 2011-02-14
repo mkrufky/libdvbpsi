@@ -321,8 +321,10 @@ void dvbpsi_GatherSISSections(dvbpsi_t *p_dvbpsi,
         {
             p_sis_decoder->p_building_sis =
                                 (dvbpsi_sis_t*)malloc(sizeof(dvbpsi_sis_t));
-            // FIXME: potiential crash on OUT OF MEMORY
-            dvbpsi_InitSIS(p_sis_decoder->p_building_sis, 0);
+            if (p_sis_decoder->p_building_sis)
+                dvbpsi_InitSIS(p_sis_decoder->p_building_sis, 0);
+            else
+                dvbpsi_error(p_dvbpsi, "SIS decoder", "failed decoding section");
         }
     }
     else

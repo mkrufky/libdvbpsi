@@ -361,12 +361,15 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
         {
             p_pmt_decoder->p_building_pmt =
                                 (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));
-            dvbpsi_InitPMT(p_pmt_decoder->p_building_pmt,
-                     p_pmt_decoder->i_program_number,
-                     p_section->i_version,
-                     p_section->b_current_next,
-                       ((uint16_t)(p_section->p_payload_start[0] & 0x1f) << 8)
-                     | p_section->p_payload_start[1]);
+            if (p_pmt_decoder->p_building_pmt)
+                dvbpsi_InitPMT(p_pmt_decoder->p_building_pmt,
+                         p_pmt_decoder->i_program_number,
+                         p_section->i_version,
+                         p_section->b_current_next,
+                           ((uint16_t)(p_section->p_payload_start[0] & 0x1f) << 8)
+                         | p_section->p_payload_start[1]);
+            else
+                 dvbpsi_debug(p_dvbpsi, "PMT decoder", "failed decoding section");
             p_pmt_decoder->i_last_section_number = p_section->i_last_number;
         }
 
