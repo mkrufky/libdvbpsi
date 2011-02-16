@@ -82,7 +82,7 @@ typedef struct dvbpsi_pmt_s
 {
   uint16_t                  i_program_number;   /*!< program_number */
   uint8_t                   i_version;          /*!< version_number */
-  int                       b_current_next;     /*!< current_next_indicator */
+  bool                      b_current_next;     /*!< current_next_indicator */
 
   uint16_t                  i_pcr_pid;          /*!< PCR_PID */
 
@@ -139,7 +139,7 @@ void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi);
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
-                           uint8_t i_version, int b_current_next,
+                           uint8_t i_version, bool b_current_next,
                            uint16_t i_pcr_pid)
  * \brief Initialize a user-allocated dvbpsi_pmt_t structure.
  * \param p_pmt pointer to the PMT structure
@@ -150,7 +150,7 @@ void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi);
  * \return nothing.
  */
 void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
-                    uint8_t i_version, int b_current_next, uint16_t i_pcr_pid);
+                    uint8_t i_version, bool b_current_next, uint16_t i_pcr_pid);
 
 /*!
  * \def dvbpsi_NewPMT(p_pmt, i_program_number,
