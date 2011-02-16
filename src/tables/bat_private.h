@@ -44,7 +44,7 @@ typedef struct dvbpsi_bat_decoder_s
     dvbpsi_bat_t                  current_bat;
     dvbpsi_bat_t *                p_building_bat;
 
-    int                           b_current_valid;
+    bool                          b_current_valid;
 
     uint8_t                       i_last_section_number;
     dvbpsi_psi_section_t *        ap_sections [256];

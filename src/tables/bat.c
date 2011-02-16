@@ -99,7 +99,7 @@ bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     p_bat_decoder->pf_bat_callback = pf_callback;
     p_bat_decoder->p_cb_data = p_cb_data;
     /* BAT decoder initial state */
-    p_bat_decoder->b_current_valid = 0;
+    p_bat_decoder->b_current_valid = false;
     p_bat_decoder->p_building_bat = NULL;
 
     for (unsigned int i = 0; i < 256; i++)
@@ -158,7 +158,7 @@ void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * Initialize a pre-allocated dvbpsi_bat_t structure.
  *****************************************************************************/
 void dvbpsi_InitBAT(dvbpsi_bat_t* p_bat, uint16_t i_bouquet_id, uint8_t i_version,
-                    int b_current_next)
+                    bool b_current_next)
 {
     p_bat->i_bouquet_id = i_bouquet_id;
     p_bat->i_version = i_version;
@@ -287,8 +287,20 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
     dvbpsi_bat_decoder_t * p_bat_decoder
                         = (dvbpsi_bat_decoder_t*)p_private_decoder;
-    int b_append = 1;
-    int b_reinit = 0;
+
+    bool b_reinit = false;
+
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
+    if (!p_section->b_syntax_indicator)
+    {
+        /* Invalid section_syntax_indicator */
+        dvbpsi_error(p_dvbpsi, "BAT decoder",
+                     "invalid section (section_syntax_indicator == 0)");
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
 
     dvbpsi_debug(p_dvbpsi, "BAT decoder",
                    "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
@@ -298,74 +310,64 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
                    p_section->i_number, p_section->i_last_number,
                    p_section->b_current_next);
 
-    if (!p_section->b_syntax_indicator)
+    /* We have a valid BAT section */
+    /* TS discontinuity check */
+    if (p_demux->b_discontinuity)
     {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "BAT decoder",
-                     "invalid section (section_syntax_indicator == 0)");
-        b_append = 0;
+        b_reinit = true;
+        p_demux->b_discontinuity = false;
     }
-
-    /* Now if b_append is true then we have a valid BAT section */
-    if (b_append)
+    else
     {
-        /* TS discontinuity check */
-        if (p_demux->b_discontinuity)
+        /* Perform a few sanity checks */
+        if (p_bat_decoder->p_building_bat)
         {
-            b_reinit = 1;
-            p_demux->b_discontinuity = 0;
+            if (p_bat_decoder->p_building_bat->i_bouquet_id != p_section->i_extension)
+            {
+                /* bouquet_id */
+                dvbpsi_error(p_dvbpsi, "BAT decoder", "'bouquet_id' differs"
+                                " whereas no TS discontinuity has occured");
+                b_reinit = true;
+            }
+            else if (p_bat_decoder->p_building_bat->i_version
+                                                != p_section->i_version)
+            {
+                /* version_number */
+                dvbpsi_error(p_dvbpsi, "BAT decoder", "'version_number' differs"
+                                " whereas no discontinuity has occured");
+                b_reinit = true;
+            }
+            else if (p_bat_decoder->i_last_section_number !=
+                                                p_section->i_last_number)
+            {
+                /* last_section_number */
+                dvbpsi_error(p_dvbpsi, "BAT decoder", "'last_section_number' differs"
+                                " whereas no discontinuity has occured");
+                b_reinit = true;
+            }
         }
         else
         {
-            /* Perform a few sanity checks */
-            if (p_bat_decoder->p_building_bat)
+            if (   (p_bat_decoder->b_current_valid)
+                && (p_bat_decoder->current_bat.i_version == p_section->i_version)
+                && (p_bat_decoder->current_bat.b_current_next ==
+                                               p_section->b_current_next))
             {
-                if (p_bat_decoder->p_building_bat->i_bouquet_id != p_section->i_extension)
-                {
-                    /* bouquet_id */
-                    dvbpsi_error(p_dvbpsi, "BAT decoder",
-                                "'bouquet_id' differs"
-                                " whereas no TS discontinuity has occured");
-                    b_reinit = 1;
-                }
-                else if (p_bat_decoder->p_building_bat->i_version
-                                                != p_section->i_version)
-                {
-                    /* version_number */
-                    dvbpsi_error(p_dvbpsi, "BAT decoder",
-                                "'version_number' differs"
-                                " whereas no discontinuity has occured");
-                    b_reinit = 1;
-                }
-                else if (p_bat_decoder->i_last_section_number !=
-                                                p_section->i_last_number)
-                {
-                    /* last_section_number */
-                    dvbpsi_error(p_dvbpsi, "BAT decoder",
-                                "'last_section_number' differs"
-                                " whereas no discontinuity has occured");
-                    b_reinit = 1;
-                }
+                /* Don't decode since this version is already decoded */
+                dvbpsi_debug(p_dvbpsi, "BAT decoder",
+                             "ignoring already decoded section %d",
+                             p_section->i_number);
             }
-            else
-            {
-                if (   (p_bat_decoder->b_current_valid)
-                    && (p_bat_decoder->current_bat.i_version == p_section->i_version))
-                {
-                    /* Signal a new BAT if the previous one wasn't active */
-                    if (   (!p_bat_decoder->current_bat.b_current_next)
-                        && (p_section->b_current_next))
-                    {
-                        dvbpsi_bat_t *p_bat = NULL;
-                        p_bat_decoder->current_bat.b_current_next = 1;
-                        *p_bat = p_bat_decoder->current_bat;
-                        p_bat_decoder->pf_bat_callback(p_bat_decoder->p_cb_data, p_bat);
-                    }
-
-                    /* Don't decode since this version is already decoded */
-                    b_append = 0;
-                }
+            else if (  (!p_bat_decoder->current_bat.b_current_next)
+                     && (p_section->b_current_next))
+            {   /* Signal a new BAT if the previous one wasn't active */
+                dvbpsi_bat_t *p_bat = NULL;
+                p_bat_decoder->current_bat.b_current_next = true;
+                *p_bat = p_bat_decoder->current_bat;
+                p_bat_decoder->pf_bat_callback(p_bat_decoder->p_cb_data, p_bat);
             }
+            dvbpsi_DeletePSISections(p_section);
+            return;
         }
     }
 
@@ -373,7 +375,7 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
     if (b_reinit)
     {
         /* Force redecoding */
-        p_bat_decoder->b_current_valid = 0;
+        p_bat_decoder->b_current_valid = false;
         /* Free structures */
         if (p_bat_decoder->p_building_bat)
         {
@@ -392,73 +394,66 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Append the section to the list if wanted */
-    if (b_append)
-    {
-        int b_complete = 0;
+    bool b_complete = false;
 
-        /* Initialize the structures if it's the first section received */
-        if (!p_bat_decoder->p_building_bat)
-        {
-            p_bat_decoder->p_building_bat =
-                                (dvbpsi_bat_t*)malloc(sizeof(dvbpsi_bat_t));
-            if (p_bat_decoder->p_building_bat)
-                dvbpsi_InitBAT(p_bat_decoder->p_building_bat,
+    /* Initialize the structures if it's the first section received */
+    if (!p_bat_decoder->p_building_bat)
+    {
+        p_bat_decoder->p_building_bat =
+                            (dvbpsi_bat_t*)malloc(sizeof(dvbpsi_bat_t));
+        if (p_bat_decoder->p_building_bat)
+            dvbpsi_InitBAT(p_bat_decoder->p_building_bat,
                          p_section->i_extension,
                          p_section->i_version,
                          p_section->b_current_next);
-            else
-                dvbpsi_error(p_dvbpsi, "BAT decoder", "failed decoding BAT section");
+        else
+            dvbpsi_error(p_dvbpsi, "BAT decoder", "failed decoding BAT section");
 
-            p_bat_decoder->i_last_section_number = p_section->i_last_number;
-        }
-
-        /* Fill the section array */
-        if (p_bat_decoder->ap_sections[p_section->i_number] != NULL)
-        {
-            dvbpsi_debug(p_dvbpsi, "BAT decoder", "overwrite section number %d",
-                        p_section->i_number);
-            dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[p_section->i_number]);
-        }
-        p_bat_decoder->ap_sections[p_section->i_number] = p_section;
-
-        /* Check if we have all the sections */
-        for (unsigned int i = 0; i <= p_bat_decoder->i_last_section_number; i++)
-        {
-            if (!p_bat_decoder->ap_sections[i])
-                break;
-            if (i == p_bat_decoder->i_last_section_number)
-                b_complete = 1;
-        }
-
-        if (b_complete)
-        {
-            /* Save the current information */
-            p_bat_decoder->current_bat = *p_bat_decoder->p_building_bat;
-            p_bat_decoder->b_current_valid = 1;
-            /* Chain the sections */
-            if (p_bat_decoder->i_last_section_number)
-            {
-                for (int j = 0; j <= p_bat_decoder->i_last_section_number - 1; j++)
-                p_bat_decoder->ap_sections[j]->p_next =
-                                        p_bat_decoder->ap_sections[j + 1];
-            }
-            /* Decode the sections */
-            dvbpsi_DecodeBATSections(p_dvbpsi, p_bat_decoder->p_building_bat,
-                                     p_bat_decoder->ap_sections[0]);
-            /* Delete the sections */
-            dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[0]);
-            /* signal the new BAT */
-            p_bat_decoder->pf_bat_callback(p_bat_decoder->p_cb_data,
-                                           p_bat_decoder->p_building_bat);
-            /* Reinitialize the structures */
-            p_bat_decoder->p_building_bat = NULL;
-            for (unsigned int i = 0; i <= p_bat_decoder->i_last_section_number; i++)
-                p_bat_decoder->ap_sections[i] = NULL;
-        }
+        p_bat_decoder->i_last_section_number = p_section->i_last_number;
     }
-    else
+
+    /* Fill the section array */
+    if (p_bat_decoder->ap_sections[p_section->i_number] != NULL)
     {
-        dvbpsi_DeletePSISections(p_section);
+        dvbpsi_debug(p_dvbpsi, "BAT decoder", "overwrite section number %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[p_section->i_number]);
+    }
+    p_bat_decoder->ap_sections[p_section->i_number] = p_section;
+
+    /* Check if we have all the sections */
+    for (unsigned int i = 0; i <= p_bat_decoder->i_last_section_number; i++)
+    {
+        if (!p_bat_decoder->ap_sections[i])
+            break;
+        if (i == p_bat_decoder->i_last_section_number)
+            b_complete = true;
+    }
+
+    if (b_complete)
+    {
+        /* Save the current information */
+        p_bat_decoder->current_bat = *p_bat_decoder->p_building_bat;
+        p_bat_decoder->b_current_valid = true;
+        /* Chain the sections */
+        if (p_bat_decoder->i_last_section_number)
+        {
+            for (int j = 0; j <= p_bat_decoder->i_last_section_number - 1; j++)
+                p_bat_decoder->ap_sections[j]->p_next =
+                                    p_bat_decoder->ap_sections[j + 1];
+        }
+        /* Decode the sections */
+        dvbpsi_DecodeBATSections(p_dvbpsi, p_bat_decoder->p_building_bat,
+                                 p_bat_decoder->ap_sections[0]);
+        /* Delete the sections */
+        dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[0]);
+        /* signal the new BAT */
+        p_bat_decoder->pf_bat_callback(p_bat_decoder->p_cb_data,
+                                       p_bat_decoder->p_building_bat);
+        /* Reinitialize the structures */
+        p_bat_decoder->p_building_bat = NULL;
+        for (unsigned int i = 0; i <= p_bat_decoder->i_last_section_number; i++)
+            p_bat_decoder->ap_sections[i] = NULL;
     }
 }
 
@@ -544,8 +539,8 @@ dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_
     uint8_t * p_transport_stream_loop_length;
 
     p_current->i_table_id = 0x4a;
-    p_current->b_syntax_indicator = 1;
-    p_current->b_private_indicator = 1;
+    p_current->b_syntax_indicator = true;
+    p_current->b_private_indicator = true;
     p_current->i_length = 13;                     /* including CRC_32 */
     p_current->i_extension = p_bat->i_bouquet_id;
     p_current->i_version = p_bat->i_version;
@@ -577,8 +572,8 @@ dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_
             p_prev->p_next = p_current;
 
             p_current->i_table_id = 0x4a;
-            p_current->b_syntax_indicator = 1;
-            p_current->b_private_indicator = 1;
+            p_current->b_syntax_indicator = true;
+            p_current->b_private_indicator = true;
             p_current->i_length = 13;                 /* including CRC_32 */
             p_current->i_extension = p_bat->i_bouquet_id;
             p_current->i_version = p_bat->i_version;
@@ -648,8 +643,8 @@ dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_
             p_prev->p_next = p_current;
 
             p_current->i_table_id = 0x4a;
-            p_current->b_syntax_indicator = 1;
-            p_current->b_private_indicator = 1;
+            p_current->b_syntax_indicator = true;
+            p_current->b_private_indicator = true;
             p_current->i_length = 13;                 /* including CRC_32 */
             p_current->i_extension = p_bat->i_bouquet_id;
             p_current->i_version = p_bat->i_version;

@@ -91,7 +91,7 @@ typedef struct dvbpsi_bat_s
 {
   uint16_t                  i_bouquet_id;            /*!< bouquet_id */
   uint8_t                   i_version;          /*!< version_number */
-  int                       b_current_next;     /*!< current_next_indicator */
+  bool                      b_current_next;     /*!< current_next_indicator */
 
   dvbpsi_descriptor_t *     p_first_descriptor; /*!< descriptor list */
 
@@ -150,7 +150,7 @@ void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_InitBAT(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_version,
-                    int b_current_next)
+                    bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_bat_t structure.
  * \param p_bat pointer to the BAT structure
  * \param i_bouquet_id bouquet ID
@@ -159,7 +159,7 @@ void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * \return nothing.
  */
 void dvbpsi_InitBAT(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_version,
-                    int b_current_next);
+                    bool b_current_next);
 
 /*!
  * \def dvbpsi_NewBAT(p_bat, i_bouquet_id, i_version, b_current_next)
