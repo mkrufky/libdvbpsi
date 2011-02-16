@@ -21,6 +21,7 @@ configure
 libtool
 stamp-*
 *-stamp
+doc/doxygen
 examples/decode_mpeg
 examples/decode_pat
 examples/decode_pmt
