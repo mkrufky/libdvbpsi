@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_55.c
- * Copyright (C) 2004-2010 VideoLAN
+ * Copyright (C) 2004-2011 VideoLAN
  * $Id: dr_55.c 89 2004-06-28 19:17:23Z gbazin $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)

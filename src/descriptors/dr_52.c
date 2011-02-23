@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_52.c
- * Copyright (C) 2005-2010 Andrew John Hughes
+ * Copyright (C) 2005-2011 Andrew John Hughes
  *
  * Authors: Andrew John Hughes <gnu_andrew@member.fsf.org>
  *
@@ -20,11 +20,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)

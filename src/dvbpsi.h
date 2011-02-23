@@ -222,6 +222,21 @@ dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *p_dvbpsi, dvbpsi_callback *callbac
  */
 void dvbpsi_DeleteDecoder(dvbpsi_t *p_dvbpsi);
 
+/*****************************************************************************
+ * dvbpsi_HasDecoder
+ *****************************************************************************/
+/*!
+ * \fn bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi);
+ * \brief Determines if a decoder has been attached to dvbpsi_t handle
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
+ * \return true when decoder is attached, else it will return false.
+ *
+ * Determines if a decoder is attached to this dvbpsi_t handle. When the dvbpsi
+ * handle is invalid the fuction will return false.
+ */
+bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi);
+
+
 #ifdef __cplusplus
 };
 #endif

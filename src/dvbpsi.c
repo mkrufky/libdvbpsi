@@ -196,6 +196,17 @@ void dvbpsi_DeleteDecoder(dvbpsi_t *handle)
 }
 
 /*****************************************************************************
+ * dvbpsi_HasDecoder
+ *****************************************************************************/
+bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi)
+{
+    if (p_dvbpsi && p_dvbpsi->p_private)
+        return true;
+    else
+        return false;
+}
+
+/*****************************************************************************
  * dvbpsi_PushPacket
  *****************************************************************************
  * Injection of a TS packet into a PSI decoder.

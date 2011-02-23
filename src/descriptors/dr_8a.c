@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_8a.c
- * Copyright (c) 2010 VideoLAN
+ * Copyright (c) 2010-2011 VideoLAN
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)

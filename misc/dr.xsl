@@ -14,6 +14,7 @@
 #include "config.h"
 
 #include &lt;stdio.h&gt;
+#include &lt;stdbool.h&gt;
 
 #if defined(HAVE_INTTYPES_H)
 #include &lt;inttypes.h&gt;

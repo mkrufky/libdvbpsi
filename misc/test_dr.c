@@ -5,6 +5,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>

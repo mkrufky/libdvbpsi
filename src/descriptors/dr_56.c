@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_56.c
- * Copyright (C) 2004-2010 VideoLAN
+ * Copyright (C) 2004-2011 VideoLAN
  * $Id: dr_56.c 93 2004-10-19 19:17:49Z massiot $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)

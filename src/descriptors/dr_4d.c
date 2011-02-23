@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_4d.c
- * Copyright (C) 2005-2010 VideoLAN
+ * Copyright (C) 2005-2011 VideoLAN
  * $Id: dr_4d.c,v 1.7 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
