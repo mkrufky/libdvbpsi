@@ -554,12 +554,8 @@ static void handle_PAT(void* p_data, dvbpsi_pat_t* p_pat)
     while (p_program)
     {
         /* Remove old PMT table decoder */
-        if (p_stream->pmt.handle)
-        {
+        if (dvbpsi_HasDecoder(p_stream->pmt.handle))
             dvbpsi_DetachPMT(p_stream->pmt.handle);
-            dvbpsi_DeleteHandle(p_stream->pmt.handle);
-            p_stream->pmt.handle = NULL;
-        }
 
         /* Attach new PMT decoder */
         p_stream->i_pmt++;
@@ -567,16 +563,8 @@ static void handle_PAT(void* p_data, dvbpsi_pat_t* p_pat)
         p_stream->pmt.pid_pmt = &p_stream->pid[p_program->i_pid];
         p_stream->pmt.pid_pmt->i_pid = p_program->i_pid;
 
-        p_stream->pmt.handle = dvbpsi_NewHandle(&dvbpsi_message, p_stream->level);
-        if (p_stream->pmt.handle == NULL)
-        {
-            fprintf(stderr, "dvbinfo: Failed to allocate new dvbpsi handle\n");
-            break;
-        }
         if (!dvbpsi_AttachPMT(p_stream->pmt.handle, p_program->i_number, handle_PMT, p_stream))
         {
-             dvbpsi_DeleteHandle(p_stream->pmt.handle);
-             p_stream->pmt.handle = NULL;
              fprintf(stderr, "dvbinfo: Failed to attach new pmt decoder\n");
              break;
         }
@@ -1225,6 +1213,10 @@ ts_stream_t *libdvbpsi_init(int debug)
         stream->pat.handle = NULL;
         goto error;
     }
+    /* PMT */
+    stream->pmt.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    if (stream->pmt.handle == NULL)
+        goto error;
     /* CAT */
     stream->cat.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
     if (stream->pat.handle == NULL)
@@ -1279,31 +1271,30 @@ ts_stream_t *libdvbpsi_init(int debug)
     return stream;
 
 error:
-    if (stream->pat.handle)
-    {
+    if (dvbpsi_HasDecoder(stream->pat.handle))
         dvbpsi_DetachPAT(stream->pat.handle);
-        dvbpsi_DeleteHandle(stream->pat.handle);
-    }
-    if (stream->cat.handle)
-    {
+    if (dvbpsi_HasDecoder(stream->cat.handle))
         dvbpsi_DetachCAT(stream->cat.handle);
-        dvbpsi_DeleteHandle(stream->cat.handle);
-    }
-    if (stream->sdt.handle)
-    {
+    if (dvbpsi_HasDecoder(stream->sdt.handle))
         dvbpsi_DetachDemux(stream->sdt.handle);
-        dvbpsi_DeleteHandle(stream->sdt.handle);
-    }
-    if (stream->eit.handle)
-    {
+    if (dvbpsi_HasDecoder(stream->eit.handle))
         dvbpsi_DetachDemux(stream->eit.handle);
-        dvbpsi_DeleteHandle(stream->eit.handle);
-    }
-    if (stream->tdt.handle)
-    {
+    if (dvbpsi_HasDecoder(stream->tdt.handle))
         dvbpsi_DetachDemux(stream->tdt.handle);
+
+    if (stream->pat.handle)
+        dvbpsi_DeleteHandle(stream->pat.handle);
+    if (stream->pmt.handle)
+        dvbpsi_DeleteHandle(stream->pmt.handle);
+    if (stream->cat.handle)
+        dvbpsi_DeleteHandle(stream->cat.handle);
+    if (stream->sdt.handle)
+        dvbpsi_DeleteHandle(stream->sdt.handle);
+    if (stream->eit.handle)
+        dvbpsi_DeleteHandle(stream->eit.handle);
+    if (stream->tdt.handle)
         dvbpsi_DeleteHandle(stream->tdt.handle);
-    }
+
     free(stream);
     return NULL;
 }
@@ -1313,31 +1304,31 @@ void libdvbpsi_exit(ts_stream_t *stream)
    printf("\nSummary:\n");
    summary(stream);
 
-   if (stream->pat.handle)
-   {
+   if (dvbpsi_HasDecoder(stream->pat.handle))
        dvbpsi_DetachPAT(stream->pat.handle);
-       dvbpsi_DeleteHandle(stream->pat.handle);
-   }
-   if (stream->cat.handle)
-   {
+   if (dvbpsi_HasDecoder(stream->pmt.handle))
+       dvbpsi_DetachPMT(stream->pmt.handle);
+   if (dvbpsi_HasDecoder(stream->cat.handle))
        dvbpsi_DetachCAT(stream->cat.handle);
-       dvbpsi_DeleteHandle(stream->cat.handle);
-   }
-   if (stream->sdt.handle)
-   {
+   if (dvbpsi_HasDecoder(stream->sdt.handle))
        dvbpsi_DetachDemux(stream->sdt.handle);
-       dvbpsi_DeleteHandle(stream->sdt.handle);
-   }
-   if (stream->eit.handle)
-   {
+   if (dvbpsi_HasDecoder(stream->eit.handle))
        dvbpsi_DetachDemux(stream->eit.handle);
-       dvbpsi_DeleteHandle(stream->eit.handle);
-   }
-   if (stream->tdt.handle)
-   {
+   if (dvbpsi_HasDecoder(stream->tdt.handle))
        dvbpsi_DetachDemux(stream->tdt.handle);
+
+   if (stream->pat.handle)
+       dvbpsi_DeleteHandle(stream->pat.handle);
+   if (stream->pmt.handle)
+       dvbpsi_DeleteHandle(stream->pmt.handle);
+   if (stream->cat.handle)
+       dvbpsi_DeleteHandle(stream->cat.handle);
+   if (stream->sdt.handle)
+       dvbpsi_DeleteHandle(stream->sdt.handle);
+   if (stream->eit.handle)
+       dvbpsi_DeleteHandle(stream->eit.handle);
+   if (stream->tdt.handle)
        dvbpsi_DeleteHandle(stream->tdt.handle);
-   }
 
    free(stream);
    stream = NULL;
