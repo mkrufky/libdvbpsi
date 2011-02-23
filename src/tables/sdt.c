@@ -288,7 +288,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
         if (p_demux->b_discontinuity)
         {
             b_reinit = 1;
-            p_demux->b_discontinuity = 0;
+            p_demux->b_discontinuity = false;
         }
         else
         {

@@ -252,7 +252,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
                      "TS discontinuity (received %d, expected %d) for PID %d",
                      p_decoder->i_continuity_counter, i_expected_counter,
                      ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
-    p_decoder->b_discontinuity = 1;
+    p_decoder->b_discontinuity = true;
     if(p_decoder->p_current_section)
     {
       dvbpsi_DeletePSISections(p_decoder->p_current_section);
@@ -297,7 +297,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
       p_new_pos = NULL;
       /* Just need the header to know how long is the section */
       p_decoder->i_need = 3;
-      p_decoder->b_complete_header = 0;
+      p_decoder->b_complete_header = false;
     }
     else
     {
@@ -323,7 +323,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
       if(!p_decoder->b_complete_header)
       {
         /* Header is complete */
-        p_decoder->b_complete_header = 1;
+        p_decoder->b_complete_header = true;
         /* Compute p_section->i_length and update p_decoder->i_need */
         p_decoder->i_need = p_section->i_length
                          =   ((uint16_t)(p_section->p_data[1] & 0xf)) << 8
@@ -344,7 +344,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
             p_payload_pos = p_new_pos;
             p_new_pos = NULL;
             p_decoder->i_need = 3;
-            p_decoder->b_complete_header = 0;
+            p_decoder->b_complete_header = false;
             i_available = 188 + p_data - p_payload_pos;
           }
           else
@@ -414,7 +414,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
           p_payload_pos = p_new_pos;
           p_new_pos = NULL;
           p_decoder->i_need = 3;
-          p_decoder->b_complete_header = 0;
+          p_decoder->b_complete_header = false;
           i_available = 188 + p_data - p_payload_pos;
         }
         else

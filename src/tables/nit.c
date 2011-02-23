@@ -322,7 +322,7 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
         if (p_nit_decoder->b_discontinuity)
         {
             b_reinit = 1;
-            p_nit_decoder->b_discontinuity = 0;
+            p_nit_decoder->b_discontinuity = false;
         }
         else
         {

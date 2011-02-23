@@ -288,7 +288,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
     if (p_pmt_decoder->b_discontinuity)
     {
         b_reinit = true;
-        p_pmt_decoder->b_discontinuity = 0;
+        p_pmt_decoder->b_discontinuity = false;
     }
     else
     {

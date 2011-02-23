@@ -230,7 +230,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
         {
             /* We don't care about discontinuities with the TDT/TOT as it
                only consists of one section anyway */
-            p_tot_decoder->b_discontinuity = 0;
+            p_tot_decoder->b_discontinuity = false;
         }
 
         p_building_tot = (dvbpsi_tot_t*)malloc(sizeof(dvbpsi_tot_t));

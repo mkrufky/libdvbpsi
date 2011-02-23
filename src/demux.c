@@ -66,7 +66,7 @@ bool dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
 
     /* PSI decoder initial state */
     p_demux->i_continuity_counter = 31;
-    p_demux->b_discontinuity = 1;
+    p_demux->b_discontinuity = true;
     p_demux->p_current_section = NULL;
 
     /* Subtables demux configuration */

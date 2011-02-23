@@ -183,10 +183,10 @@ typedef void (* dvbpsi_callback)(dvbpsi_t *p_dvbpsi,
     dvbpsi_callback  pf_callback;  /*!< PSI decoder's callback */                 \
     int      i_section_max_size;   /*!< Max size of a section for this decoder */ \
     uint8_t  i_continuity_counter; /*!< Continuity counter */                     \
-    int      b_discontinuity;      /*!< Discontinuity flag */                     \
+    bool     b_discontinuity;      /*!< Discontinuity flag */                     \
     dvbpsi_psi_section_t *p_current_section; /*!< Current section */              \
     int      i_need;               /*!< Bytes needed */                           \
-    int      b_complete_header;    /*!< Flag for header completion */
+    bool     b_complete_header;    /*!< Flag for header completion */
 
 struct dvbpsi_decoder_s
 {
