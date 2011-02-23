@@ -45,7 +45,7 @@ typedef struct dvbpsi_cat_decoder_s
     dvbpsi_cat_t                  current_cat;
     dvbpsi_cat_t *                p_building_cat;
 
-    int                           b_current_valid;
+    bool                          b_current_valid;
 
     uint8_t                       i_last_section_number;
     dvbpsi_psi_section_t *        ap_sections [256];

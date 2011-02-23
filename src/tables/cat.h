@@ -57,7 +57,7 @@ extern "C" {
 typedef struct dvbpsi_cat_s
 {
   uint8_t                   i_version;          /*!< version_number */
-  int                       b_current_next;     /*!< current_next_indicator */
+  bool                      b_current_next;     /*!< current_next_indicator */
 
   dvbpsi_descriptor_t *     p_first_descriptor; /*!< descriptor list */
 
@@ -107,7 +107,7 @@ void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi);
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat,
-                           uint8_t i_version, int b_current_next)
+                           uint8_t i_version, bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_cat_t structure.
  * \param p_cat pointer to the CAT structure
  * \param i_version CAT version
@@ -115,7 +115,7 @@ void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi);
  * \return nothing.
  */
 void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat,
-                    uint8_t i_version, int b_current_next);
+                    uint8_t i_version, bool b_current_next);
 
 /*!
  * \def dvbpsi_NewCAT(p_cat,

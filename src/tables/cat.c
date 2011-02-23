@@ -71,14 +71,14 @@ bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
     p_cat_decoder->i_section_max_size = 1024;
     /* PSI decoder initial state */
     p_cat_decoder->i_continuity_counter = 31;
-    p_cat_decoder->b_discontinuity = 1;
+    p_cat_decoder->b_discontinuity = true;
     p_cat_decoder->p_current_section = NULL;
 
     /* CAT decoder configuration */
     p_cat_decoder->pf_cat_callback = pf_callback;
     p_cat_decoder->p_cb_data = p_cb_data;
     /* CAT decoder initial state */
-    p_cat_decoder->b_current_valid = 0;
+    p_cat_decoder->b_current_valid = false;
     p_cat_decoder->p_building_cat = NULL;
     for (unsigned int i = 0; i <= 255; i++)
         p_cat_decoder->ap_sections[i] = NULL;
@@ -117,8 +117,7 @@ void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_cat_t structure.
  *****************************************************************************/
-void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat,
-                    uint8_t i_version, int b_current_next)
+void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat, uint8_t i_version, bool b_current_next)
 {
     p_cat->i_version = i_version;
     p_cat->b_current_next = b_current_next;
@@ -176,8 +175,27 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
     dvbpsi_cat_decoder_t* p_cat_decoder
                           = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_private;
 
-    int b_append = 1;
-    int b_reinit = 0;
+    bool b_append = true;
+    bool b_reinit = false;
+
+    if (p_section->i_table_id != 0x01)
+    {
+        /* Invalid table_id value */
+        dvbpsi_error(p_dvbpsi, "CAT decoder",
+                     "invalid section (table_id == 0x%02x)",
+                     p_section->i_table_id);
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
+
+    if (b_append && !p_section->b_syntax_indicator)
+    {
+        /* Invalid section_syntax_indicator */
+        dvbpsi_error(p_dvbpsi, "CAT decoder",
+                    "invalid section (section_syntax_indicator == 0)");
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
 
     dvbpsi_debug(p_dvbpsi, "CAT decoder",
                         "Table version %2d, " "i_extension %5d, "
@@ -186,30 +204,13 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
                         p_section->i_number, p_section->i_last_number,
                         p_section->b_current_next);
 
-    if (p_section->i_table_id != 0x01)
-    {
-        /* Invalid table_id value */
-        dvbpsi_error(p_dvbpsi, "CAT decoder",
-                     "invalid section (table_id == 0x%02x)",
-                     p_section->i_table_id);
-        b_append = 0;
-    }
-
-    if (b_append && !p_section->b_syntax_indicator)
-    {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "CAT decoder",
-                    "invalid section (section_syntax_indicator == 0)");
-        b_append = 0;
-    }
-
     if (b_append)
     {
         /* TS discontinuity check */
         if (p_cat_decoder->b_discontinuity)
         {
-            b_reinit = 1;
-            p_cat_decoder->b_discontinuity = 0;
+            b_reinit = true;
+            p_cat_decoder->b_discontinuity = false;
         }
         else
         {
@@ -222,7 +223,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
                     dvbpsi_error(p_dvbpsi, "CAT decoder",
                                 "'version_number' differs"
                                 " whereas no discontinuity has occured");
-                     b_reinit = 1;
+                     b_reinit = true;
                 }
                 else if (p_cat_decoder->i_last_section_number
                                                     != p_section->i_last_number)
@@ -231,7 +232,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
                     dvbpsi_error(p_dvbpsi, "CAT decoder",
                                 "'last_section_number' differs"
                                 " whereas no discontinuity has occured");
-                    b_reinit = 1;
+                    b_reinit = true;
                 }
             }
             else
@@ -242,7 +243,8 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
                                                    p_section->b_current_next))
                 {
                     /* Don't decode since this version is already decoded */
-                    b_append = 0;
+                    dvbpsi_DeletePSISections(p_section);
+                    return;
                 }
             }
         }
@@ -252,7 +254,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
     if (b_reinit)
     {
         /* Force redecoding */
-        p_cat_decoder->b_current_valid = 0;
+        p_cat_decoder->b_current_valid = false;
         /* Free structures */
         if (p_cat_decoder->p_building_cat)
         {
@@ -273,7 +275,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
     /* Append the section to the list if wanted */
     if (b_append)
     {
-        int b_complete = 0;
+        int b_complete = false;
 
         /* Initialize the structures if it's the first section received */
         if (!p_cat_decoder->p_building_cat)
@@ -304,7 +306,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
                 break;
 
             if (i == p_cat_decoder->i_last_section_number)
-                b_complete = 1;
+                b_complete = true;
         }
 
         if (b_complete)
@@ -377,8 +379,8 @@ dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_t* p_dvbpsi, dvbpsi_cat_t* p_
     dvbpsi_descriptor_t* p_descriptor = p_cat->p_first_descriptor;
 
     p_current->i_table_id = 0x01;
-    p_current->b_syntax_indicator = 1;
-    p_current->b_private_indicator = 0;
+    p_current->b_syntax_indicator = true;
+    p_current->b_private_indicator = false;
     p_current->i_length = 9;                      /* header + CRC_32 */
     p_current->i_extension = 0;                   /* Not used in the CAT */
     p_current->i_version = p_cat->i_version;
@@ -400,8 +402,8 @@ dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_t* p_dvbpsi, dvbpsi_cat_t* p_
             p_prev->p_next = p_current;
 
             p_current->i_table_id = 0x01;
-            p_current->b_syntax_indicator = 1;
-            p_current->b_private_indicator = 0;
+            p_current->b_syntax_indicator = true;
+            p_current->b_private_indicator = false;
             p_current->i_length = 9;                  /* header + CRC_32 */
             p_current->i_extension = 0;               /* Not used in the CAT */
             p_current->i_version = p_cat->i_version;
