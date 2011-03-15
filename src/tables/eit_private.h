@@ -43,7 +43,7 @@ typedef struct dvbpsi_eit_decoder_s
     dvbpsi_eit_t                  current_eit;
     dvbpsi_eit_t *                p_building_eit;
 
-    int                           b_current_valid;
+    bool                          b_current_valid;
 
     uint8_t                       i_last_section_number;
     uint8_t                       i_first_received_section_number;

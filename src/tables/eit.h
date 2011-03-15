@@ -1,6 +1,6 @@
 /*****************************************************************************
  * eit.h
- * Copyright (C) 2004-2010 VideoLAN
+ * Copyright (C) 2004-2011 VideoLAN
  * $Id: eit.h 88 2004-02-24 14:31:18Z sam $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -58,7 +58,7 @@ typedef struct dvbpsi_eit_event_s
   uint64_t                  i_start_time;           /*!< start_time */
   uint32_t                  i_duration;             /*!< duration */
   uint8_t                   i_running_status;       /*!< Running status */
-  int                       b_free_ca;              /*!< Free CA mode flag */
+  bool                      b_free_ca;              /*!< Free CA mode flag */
   uint16_t                  i_descriptors_length;   /*!< Descriptors loop
                                                          length */
   dvbpsi_descriptor_t *     p_first_descriptor;     /*!< First of the following
@@ -87,7 +87,7 @@ typedef struct dvbpsi_eit_s
 {
   uint16_t                  i_service_id;       /*!< service_id */
   uint8_t                   i_version;          /*!< version_number */
-  int                       b_current_next;     /*!< current_next_indicator */
+  bool                      b_current_next;     /*!< current_next_indicator */
   uint16_t                  i_ts_id;            /*!< transport stream id */
   uint16_t                  i_network_id;       /*!< original network id */
   uint8_t                   i_segment_last_section_number; /*!< segment last section number */
@@ -138,15 +138,14 @@ bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * \param i_extension Table ID extension, here service ID.
  * \return nothing.
  */
-void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension);
+void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
 
 /*****************************************************************************
  * dvbpsi_InitEIT/dvbpsi_NewEIT
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id,
-          uint8_t i_version, int b_current_next, uint16_t i_ts_id,
+          uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
           uint16_t i_network_id, uint8_t i_segment_last_section_number,
           uint8_t i_last_table_id)
  * \brief Initialize a user-allocated dvbpsi_eit_t structure.
@@ -161,7 +160,7 @@ void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * \return nothing.
  */
 void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
-                    int b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
+                    bool b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
                     uint8_t i_segment_last_section_number,
                     uint8_t i_last_table_id);
 
@@ -217,7 +216,7 @@ do {                                                                    \
                                               uint64_t i_start_time,
                                               uint32_t i_duration,
                                               uint8_t i_running_status,
-                                              int b_free_ca)
+                                              bool b_free_ca)
  * \brief Add a service description at the end of the EIT.
  * \param p_eit pointer to the EIT structure
  * \param i_event_id Event ID
@@ -229,7 +228,7 @@ do {                                                                    \
  */
 dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
     uint16_t i_event_id, uint64_t i_start_time, uint32_t i_duration,
-    uint8_t i_running_status, int b_free_ca);
+    uint8_t i_running_status, bool b_free_ca);
 
 /*****************************************************************************
  * dvbpsi_EITEventAddDescriptor
