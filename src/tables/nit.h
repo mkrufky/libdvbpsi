@@ -1,6 +1,6 @@
 /*****************************************************************************
  * nit.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -84,7 +84,7 @@ typedef struct dvbpsi_nit_s
 {
   uint16_t                  i_network_id;       /*!< network_id */
   uint8_t                   i_version;          /*!< version_number */
-  int                       b_current_next;     /*!< current_next_indicator */
+  bool                      b_current_next;     /*!< current_next_indicator */
 
   dvbpsi_descriptor_t *     p_first_descriptor; /*!< descriptor list */
 
@@ -141,7 +141,7 @@ void dvbpsi_DetachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_InitNIT(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
-                           uint8_t i_version, int b_current_next)
+                           uint8_t i_version, bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_nit_t structure.
  * \param p_nit pointer to the NIT structure
  * \param i_network_id network id
@@ -150,7 +150,7 @@ void dvbpsi_DetachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * \return nothing.
  */
 void dvbpsi_InitNIT(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
-                    uint8_t i_version, int b_current_next);
+                    uint8_t i_version, bool b_current_next);
 
 /*!
  * \def dvbpsi_NewNIT(p_nit, i_network_id,
@@ -208,9 +208,9 @@ do {                                                                    \
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-dvbpsi_descriptor_t* dvbpsi_NITAddDescriptor(dvbpsi_nit_t* p_nit,
+dvbpsi_descriptor_t* dvbpsi_NITAddDescriptor(dvbpsi_nit_t *p_nit,
                                              uint8_t i_tag, uint8_t i_length,
-                                             uint8_t* p_data);
+                                             uint8_t *p_data);
 
 /*****************************************************************************
  * dvbpsi_NITAddTS

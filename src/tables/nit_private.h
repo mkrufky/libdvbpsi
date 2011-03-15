@@ -1,7 +1,7 @@
 /*****************************************************************************
  * nit_private.h: private NIT structures
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -47,7 +47,7 @@ typedef struct dvbpsi_nit_decoder_s
     dvbpsi_nit_t                  current_nit;
     dvbpsi_nit_t *                p_building_nit;
 
-    int                           b_current_valid;
+    bool                          b_current_valid;
 
     uint8_t                       i_last_section_number;
     dvbpsi_psi_section_t *        ap_sections [256];
