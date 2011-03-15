@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sdt_private.h: private SDT structures
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: sdt_private.h,v 1.1 2002/12/11 13:04:57 jobi Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
@@ -43,7 +43,7 @@ typedef struct dvbpsi_sdt_decoder_s
     dvbpsi_sdt_t                  current_sdt;
     dvbpsi_sdt_t *                p_building_sdt;
 
-    int                           b_current_valid;
+    bool                          b_current_valid;
 
     uint8_t                       i_last_section_number;
     dvbpsi_psi_section_t *        ap_sections [256];

@@ -1,6 +1,6 @@
 /*****************************************************************************
  * sdt.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
@@ -55,11 +55,11 @@ extern "C" {
 typedef struct dvbpsi_sdt_service_s
 {
   uint16_t                  i_service_id;           /*!< service_id */
-  int                       b_eit_schedule;         /*!< EIT schedule flag */
-  int                       b_eit_present;          /*!< EIT present/following
+  bool                      b_eit_schedule;         /*!< EIT schedule flag */
+  bool                      b_eit_present;          /*!< EIT present/following
                                                          flag */
   uint8_t                   i_running_status;       /*!< Running status */
-  int                       b_free_ca;              /*!< Free CA mode flag */
+  bool                      b_free_ca;              /*!< Free CA mode flag */
   uint16_t                  i_descriptors_length;   /*!< Descriptors loop
                                                          length */
   dvbpsi_descriptor_t *     p_first_descriptor;     /*!< First of the following
@@ -88,7 +88,7 @@ typedef struct dvbpsi_sdt_s
 {
   uint16_t                  i_ts_id;            /*!< transport_stream_id */
   uint8_t                   i_version;          /*!< version_number */
-  int                       b_current_next;     /*!< current_next_indicator */
+  bool                      b_current_next;     /*!< current_next_indicator */
   uint16_t                  i_network_id;       /*!< original network id */
 
   dvbpsi_sdt_service_t *    p_first_service;    /*!< service description
@@ -143,7 +143,7 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_InitSDT(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id,
-          uint8_t i_version, int b_current_next, uint16_t i_network_id)
+          uint8_t i_version, bool b_current_next, uint16_t i_network_id)
  * \brief Initialize a user-allocated dvbpsi_sdt_t structure.
  * \param p_sdt pointer to the SDT structure
  * \param i_ts_id transport stream ID
@@ -153,7 +153,7 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \return nothing.
  */
 void dvbpsi_InitSDT(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
-                    int b_current_next, uint16_t i_network_id);
+                    bool b_current_next, uint16_t i_network_id);
 
 /*!
  * \def dvbpsi_NewSDT(p_sdt, i_ts_id, i_version, b_current_next, i_network_id)
@@ -201,10 +201,10 @@ do {                                                                    \
 /*!
  * \fn dvbpsi_sdt_service_t* dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
                                                   uint16_t i_service_id,
-                                                  int b_eit_schedule,
-                                                  int b_eit_present,
+                                                  bool b_eit_schedule,
+                                                  bool b_eit_present,
                                                   uint8_t i_running_status,
-                                                  int b_free_ca)
+                                                  bool b_free_ca)
  * \brief Add a service description at the end of the SDT.
  * \param p_sdt pointer to the SDT structure
  * \param i_service_id Service ID
@@ -215,8 +215,8 @@ do {                                                                    \
  * \return a pointer to the added service description.
  */
 dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
-    uint16_t i_service_id, int b_eit_schedule, int b_eit_present,
-    uint8_t i_running_status,int b_free_ca);
+    uint16_t i_service_id, bool b_eit_schedule, bool b_eit_present,
+    uint8_t i_running_status, bool b_free_ca);
 
 /*****************************************************************************
  * dvbpsi_SDTServiceAddDescriptor
