@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sis_private.h: private SIS structures
  *----------------------------------------------------------------------------
- * Copyright (c) 2010 VideoLAN
+ * Copyright (c) 2010-2011 VideoLAN
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
@@ -43,7 +43,7 @@ typedef struct dvbpsi_sis_decoder_s
     dvbpsi_sis_t                  *current_sis;
     dvbpsi_sis_t                  *p_building_sis;
 
-    int                           b_current_valid;
+    bool                          b_current_valid;
 
 } dvbpsi_sis_decoder_t;
 

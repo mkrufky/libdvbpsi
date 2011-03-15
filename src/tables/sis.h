@@ -1,6 +1,6 @@
 /*****************************************************************************
  * sis.h
- * Copyright (c) 2010 VideoLAN
+ * Copyright (c) 2010-2011 VideoLAN
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
@@ -58,7 +58,7 @@ typedef struct dvbpsi_sis_s
                                                          shall be 0 */
 
   /* encryption */
-  int                       b_encrypted_packet;     /*!< 1 when packet is
+  bool                      b_encrypted_packet;     /*!< 1 when packet is
                                                          encrypted */
   uint8_t                   i_encryption_algorithm; /*!< Encryption algorithm
                                                          used */
@@ -134,8 +134,7 @@ bool dvbpsi_AttachSIS(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \param i_extension Table ID extension, here TS ID.
  * \return nothing.
  */
-void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension);
+void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
 
 /*****************************************************************************
  * dvbpsi_InitSIS/dvbpsi_NewSIS
