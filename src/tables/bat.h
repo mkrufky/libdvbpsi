@@ -32,8 +32,8 @@
  *
  * Application interface for the BAT decoder. New
  * decoded BAT are sent by callback to the application. If a table
- * wasn't active (b_current_next == 0) and the next is the same but active
- * (b_current_next == 1) then the service description list is empty and should
+ * wasn't active (b_current_next == false) and the next is the same but active
+ * (b_current_next == true) then the service description list is empty and should
  * be caught from the previous structure.
  * This is a simulation to sdt.h
  */
@@ -221,4 +221,3 @@ dvbpsi_psi_section_t *dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t * p
 #else
 #error "Multiple inclusions of bat.h"
 #endif
-
