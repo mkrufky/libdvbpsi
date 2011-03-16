@@ -84,7 +84,6 @@ bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
     return true;
 }
 
-
 /*****************************************************************************
  * dvbpsi_DetachPAT
  *****************************************************************************
@@ -402,8 +401,8 @@ dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi,
     i_max_pps = 253;
 
   p_current->i_table_id = 0;
-  p_current->b_syntax_indicator = 1;
-  p_current->b_private_indicator = 0;
+  p_current->b_syntax_indicator = true;
+  p_current->b_private_indicator = false;
   p_current->i_length = 9;                      /* header + CRC_32 */
   p_current->i_extension = p_pat->i_ts_id;
   p_current->i_version = p_pat->i_version;
@@ -424,8 +423,8 @@ dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi,
       i_count = 1;
 
       p_current->i_table_id = 0;
-      p_current->b_syntax_indicator = 1;
-      p_current->b_private_indicator = 0;
+      p_current->b_syntax_indicator = true;
+      p_current->b_private_indicator = false;
       p_current->i_length = 9;                  /* header + CRC_32 */
       p_current->i_extension = p_pat->i_ts_id;
       p_current->i_version = p_pat->i_version;

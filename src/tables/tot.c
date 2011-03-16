@@ -214,7 +214,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
         b_append = 0;
     }
 
-    if (b_append && p_section->b_syntax_indicator != 0)
+    if (b_append && p_section->b_syntax_indicator != false)
     {
         /* Invalid section_syntax_indicator */
         dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
@@ -358,8 +358,8 @@ dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t *p_dvbpsi, dvbpsi_tot_t* p_
     p_result = dvbpsi_NewPSISection((p_descriptor != NULL) ? 4096 : 8);
 
     p_result->i_table_id = (p_descriptor != NULL) ? 0x73 : 0x70;
-    p_result->b_syntax_indicator = 0;
-    p_result->b_private_indicator = 0;
+    p_result->b_syntax_indicator = false;
+    p_result->b_private_indicator = false;
     p_result->i_length = 5;
     p_result->p_payload_start = p_result->p_data + 3;
     p_result->p_payload_end = p_result->p_data + 8;

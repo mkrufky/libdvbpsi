@@ -486,8 +486,8 @@ dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_t* p_
     uint16_t i_info_length;
 
     p_current->i_table_id = 0x02;
-    p_current->b_syntax_indicator = 1;
-    p_current->b_private_indicator = 0;
+    p_current->b_syntax_indicator = true;
+    p_current->b_private_indicator = false;
     p_current->i_length = 13;                     /* header + CRC_32 */
     p_current->i_extension = p_pmt->i_program_number;
     p_current->i_version = p_pmt->i_version;
@@ -518,8 +518,8 @@ dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_t* p_
             p_prev->p_next = p_current;
 
             p_current->i_table_id = 0x02;
-            p_current->b_syntax_indicator = 1;
-            p_current->b_private_indicator = 0;
+            p_current->b_syntax_indicator = true;
+            p_current->b_private_indicator = false;
             p_current->i_length = 13;                 /* header + CRC_32 */
             p_current->i_extension = p_pmt->i_program_number;
             p_current->i_version = p_pmt->i_version;
