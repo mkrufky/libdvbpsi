@@ -49,17 +49,17 @@ extern "C" {
  * dvbpsi_psi_section_s::p_data stores the complete section including the
  * header.
  *
- * When dvbpsi_psi_section_s::b_syntax_indicator == 0,
+ * When dvbpsi_psi_section_s::b_syntax_indicator == false,
  * dvbpsi_psi_section_s::p_payload_start points immediately after the
  * section_length field and dvbpsi_psi_section_s::p_payload_end points
  * immediately after the end of the section (don't try to access this byte).
  *
- * When dvbpsi_psi_section_s::b_syntax_indicator != 0,
+ * When dvbpsi_psi_section_s::b_syntax_indicator != false,
  * dvbpsi_psi_section_s::p_payload_start points immediately after the
  * last_section_number field and dvbpsi_psi_section_s::p_payload_end points to
  * the first byte of the CRC_32 field.
  *
- * When dvbpsi_psi_section_s::b_syntax_indicator == 0
+ * When dvbpsi_psi_section_s::b_syntax_indicator == false
  * dvbpsi_psi_section_s::i_extension, dvbpsi_psi_section_s::i_version,
  * dvbpsi_psi_section_s::b_current_next, dvbpsi_psi_section_s::i_number,
  * dvbpsi_psi_section_s::i_last_number, and dvbpsi_psi_section_s::i_crc are

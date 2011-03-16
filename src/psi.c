@@ -96,7 +96,7 @@ bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
 {
     if (p_section->b_syntax_indicator)
     {
-        /* Check the CRC_32 if b_syntax_indicator is 0 */
+        /* Check the CRC_32 if b_syntax_indicator is false */
         uint32_t i_crc = 0xffffffff;
         uint8_t* p_byte = p_section->p_data;
 
@@ -113,7 +113,7 @@ bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
     }
     else
     {
-        /* No check to do if b_syntax_indicator is 0 */
+        /* No check to do if b_syntax_indicator is false */
         return false;
     }
 }
