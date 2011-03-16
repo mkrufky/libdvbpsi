@@ -7,6 +7,7 @@ Changes between 0.1.7 and 1.0.0:
   * new CUE Identifier descriptor support (0x8a)
   * new Splice Information Section table support (0xFC) (SCTE 35 2004)
   * new BAT table (decoder and generator)
+  * new descriptor 0x44
 
 Changes between 0.1.6 and 0.1.7:
 --------------------------------
