@@ -194,9 +194,9 @@ void dvbpsi_EmptySIS(dvbpsi_sis_t* p_sis)
  *****************************************************************************
  * Add a descriptor in the SIS service description.
  *****************************************************************************/
-dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor( dvbpsi_sis_t *p_sis,
-                                              uint8_t i_tag, uint8_t i_length,
-                                              uint8_t *p_data)
+dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor(dvbpsi_sis_t *p_sis,
+                                             uint8_t i_tag, uint8_t i_length,
+                                             uint8_t *p_data)
 {
     dvbpsi_descriptor_t * p_descriptor;
     p_descriptor = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
@@ -359,7 +359,20 @@ void dvbpsi_DecodeSISSections(dvbpsi_t* p_dvbpsi, dvbpsi_sis_t* p_sis,
                 /* FIXME: size 0xfff of splice_command_section is undefined */
                 assert(p_sis->i_splice_command_length != 0xfff);
             }
+
             /* FIXME: handle splice_command_sections */
+            switch(p_sis->i_splice_command_type)
+            {
+                case 0x00: /* splice_null */
+                case 0x04: /* splice_schedule */
+                case 0x05: /* splice_insert */
+                case 0x06: /* time_signal */
+                case 0x07: /* bandwidth_reservation */
+                    break;
+                default:
+                    dvbpsi_error(p_dvbpsi, "SIS decoder", "invalid SIS Command found");
+                    break;
+            }
 
             /* Service descriptors */
             uint8_t *p_desc = p_byte + 13 + i_splice_command_length;
