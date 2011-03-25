@@ -1,4 +1,4 @@
-AC_INIT(libdvbpsi, 1.0.0)
+AC_INIT(libdvbpsi, 0.2.0)
 
 AC_PREREQ(2.50)
 AC_CONFIG_AUX_DIR(.auto)
@@ -16,7 +16,7 @@ AM_PROG_LIBTOOL
 
 
 dnl default CFLAGS
-CFLAGS="${CFLAGS} -Wall -Werror  -DDVBPSI_DIST --std=gnu99"
+CFLAGS="${CFLAGS} -Wall -DDVBPSI_DIST --std=gnu99"
 CFLAGS="${CFLAGS} -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-prototypes -Wshadow -Waggregate-return -Wmissing-prototypes -Wnested-externs -Wsign-compare"
 
 dnl check the operating system

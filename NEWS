@@ -1,13 +1,22 @@
 $Id$
 
-Changes between 0.1.7 and 1.0.0:
+Changes between 0.1.7 and 0.2.0:
 --------------------------------
 
   * Relicense libdvbpsi from GPLv2 to LGPLv2.1
+  * bump version number to 0.2.0 (skipping 0.1.8 and 0.1.9) to indicate
+    GPL -> LGPL license change
   * new CUE Identifier descriptor support (0x8a)
   * new Splice Information Section table support (0xFC) (SCTE 35 2004)
   * new BAT table (decoder and generator)
   * new descriptor 0x44
+  * depreceated all API's in preparation for 1.0.0 release with revamped API
+    packagers and application developers should anticipate:
+    - structure renames dvbpsi_handle to dvbpsi_t
+    - prototype changes
+    - removal of printf for message printing
+    - message callback function
+    For more information see changes in libdvbpsi-ng branch.
 
 Changes between 0.1.6 and 0.1.7:
 --------------------------------

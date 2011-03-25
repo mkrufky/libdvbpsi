@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dvbpsi.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -33,8 +33,8 @@
 #ifndef _DVBPSI_DVBPSI_H_
 #define _DVBPSI_DVBPSI_H_
 
-#define DVBPSI_VERSION      0.1.7
-#define DVBPSI_VERSION_INT  ((0<<16)+(1<<8)+7)
+#define DVBPSI_VERSION      0.2.0
+#define DVBPSI_VERSION_INT  ((0<<16)+(2<<8)+0)
 
 #ifdef __cplusplus
 extern "C" {
