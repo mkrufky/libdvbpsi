@@ -48,7 +48,7 @@ extern "C" {
  * \typedef struct dvbpsi_decoder_s * dvbpsi_handle
  * \brief Decoder abstration.
  */
-typedef struct dvbpsi_decoder_s * dvbpsi_handle;
+typedef struct dvbpsi_decoder_s * dvbpsi_handle __attribute__((depreceated));
 
 
 /*****************************************************************************
@@ -63,6 +63,7 @@ typedef struct dvbpsi_decoder_s * dvbpsi_handle;
  *
  * Injection of a TS packet into a PSI decoder.
  */
+__attribute__((deprecated))
 void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data);
 
 

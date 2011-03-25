@@ -1,6 +1,6 @@
 /*****************************************************************************
  * pmt.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -118,6 +118,7 @@ typedef void (* dvbpsi_pmt_callback)(void* p_cb_data, dvbpsi_pmt_t* p_new_pmt);
  * \param p_cb_data private data given in argument to the callback
  * \return a pointer to the decoder for future calls.
  */
+__attribute__((deprecated))
 dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
                                dvbpsi_pmt_callback pf_callback,
                                void* p_cb_data);
@@ -134,6 +135,7 @@ dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
  *
  * The handle isn't valid any more.
  */
+__attribute__((deprecated))
 void dvbpsi_DetachPMT(dvbpsi_handle h_dvbpsi);
 
 
@@ -152,6 +154,7 @@ void dvbpsi_DetachPMT(dvbpsi_handle h_dvbpsi);
  * \param i_pcr_pid PCR_PID
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
                     uint8_t i_version, int b_current_next, uint16_t i_pcr_pid);
 
@@ -185,6 +188,7 @@ do {                                                                    \
  * \param p_pmt pointer to the PMT structure
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt);
 
 /*!
@@ -215,6 +219,7 @@ do {                                                                    \
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
+__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);
@@ -232,6 +237,7 @@ dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
  * \param i_pid PID of the ES
  * \return a pointer to the added ES.
  */
+__attribute__((deprecated))
 dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
                                  uint8_t i_type, uint16_t i_pid);
 
@@ -251,6 +257,7 @@ dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
+__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data);
@@ -267,6 +274,7 @@ dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
  *
  * Generate PMT sections based on the dvbpsi_pmt_t structure.
  */
+__attribute__((deprecated))
 dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt);
 
 

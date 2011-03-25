@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sis_private.h: private SIS structures
  *----------------------------------------------------------------------------
- * Copyright (c) 2010 VideoLAN
+ * Copyright (c) 2011 VideoLAN
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
@@ -51,6 +51,7 @@ typedef struct dvbpsi_sis_decoder_s
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_GatherSISSections(dvbpsi_decoder_t* p_psi_decoder,
                               void* p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
@@ -61,6 +62,7 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t* p_psi_decoder,
  *****************************************************************************
  * SIS decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_DecodeSISSections(dvbpsi_sis_t* p_sis,
                               dvbpsi_psi_section_t* p_section);
 

@@ -134,6 +134,7 @@ void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section);
  *
  * Check the CRC_32 if the section has b_syntax_indicator set.
  */
+__attribute__((deprecated))
 int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
 
 
@@ -146,6 +147,7 @@ int dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
  * \param p_section pointer to the PSI section structure
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_BuildPSISection(dvbpsi_psi_section_t* p_section);
 
 

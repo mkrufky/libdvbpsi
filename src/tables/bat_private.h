@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bat_private.h: private BAT structures
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: bat_private.h 88 2004-02-24 14:31:18Z sam $
  *
  * Authors: Zhu zhenglu <zhuzlu@gmail.com>
@@ -55,6 +55,7 @@ typedef struct dvbpsi_bat_decoder_s
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_GatherBATSections(dvbpsi_decoder_t* p_psi_decoder,
                       void* p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
@@ -65,6 +66,7 @@ void dvbpsi_GatherBATSections(dvbpsi_decoder_t* p_psi_decoder,
  *****************************************************************************
  * BAT decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
                               dvbpsi_psi_section_t* p_section);
 
@@ -74,6 +76,7 @@ void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
  *****************************************************************************
  * Add a TS description at the end of the BAT.
  *****************************************************************************/
+__attribute__((deprecated))
 dvbpsi_bat_ts_t *dvbpsi_BATAddTS(dvbpsi_bat_t* p_bat,
                                  uint16_t i_ts_id, uint16_t i_orig_network_id);
 
@@ -83,6 +86,7 @@ dvbpsi_bat_ts_t *dvbpsi_BATAddTS(dvbpsi_bat_t* p_bat,
  * Add a descriptor in the BAT Bouquet descriptors (the first loop description),
  *  which is in the first loop of BAT.
  *****************************************************************************/
+__attribute__((deprecated))
 dvbpsi_descriptor_t *dvbpsi_BATBouquetAddDescriptor(
                                                dvbpsi_bat_t *p_bat,
                                                uint8_t i_tag, uint8_t i_length,
@@ -93,6 +97,7 @@ dvbpsi_descriptor_t *dvbpsi_BATBouquetAddDescriptor(
  *****************************************************************************
  * Add a descriptor in the BAT TS descriptors, which is in the second loop of BAT.
  *****************************************************************************/
+__attribute__((deprecated))
 dvbpsi_descriptor_t *dvbpsi_BATTSAddDescriptor(
                                                dvbpsi_bat_ts_t *p_ts,
                                                uint8_t i_tag, uint8_t i_length,

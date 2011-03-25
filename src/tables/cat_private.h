@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cat_private.h: private CAT structures
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -55,6 +55,7 @@ typedef struct dvbpsi_cat_decoder_s
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_GatherCATSections(dvbpsi_decoder_t* p_decoder,
                               dvbpsi_psi_section_t* p_section);
 
@@ -64,6 +65,7 @@ void dvbpsi_GatherCATSections(dvbpsi_decoder_t* p_decoder,
  *****************************************************************************
  * CAT decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_DecodeCATSections(dvbpsi_cat_t* p_cat,
                               dvbpsi_psi_section_t* p_section);
 

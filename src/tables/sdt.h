@@ -1,6 +1,6 @@
 /*****************************************************************************
  * sdt.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
@@ -125,6 +125,7 @@ typedef void (* dvbpsi_sdt_callback)(void* p_cb_data, dvbpsi_sdt_t* p_new_sdt);
  * \param p_cb_data private data given in argument to the callback.
  * \return 0 if everything went ok.
  */
+__attribute__((deprecated))
 int dvbpsi_AttachSDT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sdt_callback pf_callback,
                                void* p_cb_data);
@@ -142,6 +143,7 @@ int dvbpsi_AttachSDT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  * \param i_extension Table ID extension, here TS ID.
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension);
 
@@ -160,6 +162,7 @@ void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
  * \param i_network_id original network id
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_InitSDT(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
                     int b_current_next, uint16_t i_network_id);
 
@@ -190,6 +193,7 @@ do {                                                                    \
  * \param p_sdt pointer to the SDT structure
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_EmptySDT(dvbpsi_sdt_t *p_sdt);
 
 /*!
@@ -224,6 +228,7 @@ do {                                                                    \
  * \param b_free_ca Free CA flag
  * \return a pointer to the added service description.
  */
+__attribute__((deprecated))
 dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
     uint16_t i_service_id, int b_eit_schedule, int b_eit_present,
     uint8_t i_running_status,int b_free_ca);
@@ -244,6 +249,7 @@ dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
+__attribute__((deprecated))
 dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
                                                dvbpsi_sdt_service_t *p_service,
                                                uint8_t i_tag, uint8_t i_length,

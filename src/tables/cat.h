@@ -1,6 +1,6 @@
 /*****************************************************************************
  * cat.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -86,6 +86,7 @@ typedef void (* dvbpsi_cat_callback)(void* p_cb_data, dvbpsi_cat_t* p_new_cat);
  * \param p_cb_data private data given in argument to the callback
  * \return a pointer to the decoder for future calls.
  */
+__attribute__((deprecated))
 dvbpsi_handle dvbpsi_AttachCAT(dvbpsi_cat_callback pf_callback,
                                void* p_cb_data);
 
@@ -101,6 +102,7 @@ dvbpsi_handle dvbpsi_AttachCAT(dvbpsi_cat_callback pf_callback,
  *
  * The handle isn't valid any more.
  */
+__attribute__((deprecated))
 void dvbpsi_DetachCAT(dvbpsi_handle h_dvbpsi);
 
 
@@ -116,6 +118,7 @@ void dvbpsi_DetachCAT(dvbpsi_handle h_dvbpsi);
  * \param b_current_next current next indicator
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat,
                     uint8_t i_version, int b_current_next);
 
@@ -146,6 +149,7 @@ do {                                                                    \
  * \param p_cat pointer to the CAT structure
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_EmptyCAT(dvbpsi_cat_t* p_cat);
 
 /*!
@@ -176,6 +180,7 @@ do {                                                                    \
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
+__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);
@@ -192,6 +197,7 @@ dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
  *
  * Generate CAT sections based on the dvbpsi_cat_t structure.
  */
+__attribute__((deprecated))
 dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_cat_t* p_cat);
 
 

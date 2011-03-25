@@ -1,6 +1,6 @@
 /*****************************************************************************
  * pat.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -110,6 +110,7 @@ typedef void (* dvbpsi_pat_callback)(void* p_cb_data, dvbpsi_pat_t* p_new_pat);
  * \param p_cb_data private data given in argument to the callback
  * \return a pointer to the decoder for future calls.
  */
+__attribute__((deprecated))
 dvbpsi_handle dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback,
                                void* p_cb_data);
 
@@ -125,6 +126,7 @@ dvbpsi_handle dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback,
  *
  * The handle isn't valid any more.
  */
+__attribute__((deprecated))
 void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi);
 
 
@@ -141,6 +143,7 @@ void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi);
  * \param b_current_next current next indicator
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
                     int b_current_next);
 
@@ -170,6 +173,7 @@ do {                                                                    \
  * \param p_pat pointer to the PAT structure
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat);
 
 /*!
@@ -198,6 +202,7 @@ do {                                                                    \
  * \param i_pid PID of the NIT/PMT
  * \return a pointer to the added program.
  */
+__attribute__((deprecated))
 dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
                                            uint16_t i_number, uint16_t i_pid);
 
@@ -215,6 +220,7 @@ dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
  *
  * Generate PAT sections based on the dvbpsi_pat_t structure.
  */
+__attribute__((deprecated))
 dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
                                             int i_max_pps);
 

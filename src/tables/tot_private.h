@@ -1,7 +1,7 @@
 /*****************************************************************************
  * tot_private.h: private TDT/TOT structures
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -47,6 +47,7 @@ typedef struct dvbpsi_tot_decoder_s
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_GatherTOTSections(dvbpsi_decoder_t* p_decoder,
                               void * p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
@@ -57,6 +58,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_decoder_t* p_decoder,
  *****************************************************************************
  * Check the CRC_32 if the section has b_syntax_indicator set.
  *****************************************************************************/
+__attribute__((deprecated))
 int dvbpsi_ValidTOTSection(dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
@@ -64,6 +66,7 @@ int dvbpsi_ValidTOTSection(dvbpsi_psi_section_t* p_section);
  *****************************************************************************
  * TDT/TOT decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_DecodeTOTSections(dvbpsi_tot_t* p_tot,
                               dvbpsi_psi_section_t* p_section);
 

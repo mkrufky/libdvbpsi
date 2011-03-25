@@ -1,7 +1,7 @@
 /*****************************************************************************
  * pat_private.h: private PAT structures
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: pat_private.h,v 1.1 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -54,6 +54,7 @@ typedef struct dvbpsi_pat_decoder_s
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
                               dvbpsi_psi_section_t* p_section);
 
@@ -63,6 +64,7 @@ void dvbpsi_GatherPATSections(dvbpsi_decoder_t* p_decoder,
  *****************************************************************************
  * PAT decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_DecodePATSections(dvbpsi_pat_t* p_pat,
                               dvbpsi_psi_section_t* p_section);
 

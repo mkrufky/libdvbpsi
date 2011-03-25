@@ -1,6 +1,6 @@
 /*****************************************************************************
  * tot.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -90,6 +90,7 @@ typedef void (* dvbpsi_tot_callback)(void* p_cb_data, dvbpsi_tot_t* p_new_tot);
  * \param p_cb_data private data given in argument to the callback.
  * \return 0 if everything went ok.
  */
+__attribute__((deprecated))
 int dvbpsi_AttachTOT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
                      uint16_t i_extension,
                      dvbpsi_tot_callback pf_callback, void* p_cb_data);
@@ -106,6 +107,7 @@ int dvbpsi_AttachTOT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  * \param i_extension Table ID extension, unused in the TDT/TOT
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_DetachTOT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
                       uint16_t i_extension);
 
@@ -120,6 +122,7 @@ void dvbpsi_DetachTOT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
  * \param i_utc_time the time in UTC
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time);
 
 /*!
@@ -146,6 +149,7 @@ do {                                                                    \
  * \param p_tot pointer to the TDT/TOT structure
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_EmptyTOT(dvbpsi_tot_t* p_tot);
 
 /*!
@@ -176,6 +180,7 @@ do {                                                                    \
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
+__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);
@@ -192,6 +197,7 @@ dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
  *
  * Generate TDT/TOT sections based on the dvbpsi_tot_t structure.
  */
+__attribute__((deprecated))
 dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_tot_t* p_tot);
 
 

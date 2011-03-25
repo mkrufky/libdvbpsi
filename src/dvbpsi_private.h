@@ -40,6 +40,7 @@ extern uint32_t dvbpsi_crc32_table[];
 #  define DVBPSI_ERROR_ARG(src, str, x...)                              \
         fprintf(stderr, "libdvbpsi error (" src "): " str "\n", x);
 #else
+   __attribute__((deprecated))
    static inline void DVBPSI_ERROR_ARG( char *src, const char *str, ... )
    { va_list ap; va_start( ap, str );
      vfprintf(stderr, str, ap); fprintf(stderr,"\n"); va_end( ap ); }
@@ -52,6 +53,7 @@ extern uint32_t dvbpsi_crc32_table[];
 #     define DVBPSI_DEBUG_ARG(src, str, x...)                           \
           fprintf(stderr, "libdvbpsi debug (" src "): " str "\n", x);
 #  else
+      __attribute__((deprecated))
       static inline void DVBPSI_DEBUG_ARG( char *src, const char *str, ... )
       { va_list ap; va_start( ap, str );
         vfprintf(stderr, str, ap); fprintf(stderr,"\n"); va_end( ap ); }
@@ -61,6 +63,7 @@ extern uint32_t dvbpsi_crc32_table[];
 #  ifdef HAVE_VARIADIC_MACROS
 #     define DVBPSI_DEBUG_ARG(src, str, x...)
 #  else
+      __attribute__((deprecated))
       static inline void DVBPSI_DEBUG_ARG( char *src, const char *str, ... ) {}
 #  endif
 #endif

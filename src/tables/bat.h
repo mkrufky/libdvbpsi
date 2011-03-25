@@ -1,6 +1,6 @@
 /*****************************************************************************
  * bat.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: bat.h  $
  *
  * Authors: Zhu zhenglu <zhuzlu@gmail.com>
@@ -126,6 +126,7 @@ typedef void (* dvbpsi_bat_callback)(void* p_cb_data, dvbpsi_bat_t* p_new_bat);
  * \param p_cb_data private data given in argument to the callback.
  * \return 0 if everything went ok.
  */
+__attribute__((deprecated))
 int dvbpsi_AttachBAT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_bat_callback pf_callback,
                                void* p_cb_data);
@@ -143,6 +144,7 @@ int dvbpsi_AttachBAT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  * \param i_extension Table ID extension, here bouquet ID.
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_DetachBAT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension);
 
@@ -161,6 +163,7 @@ void dvbpsi_DetachBAT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
  * \param i_network_id original network id
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_InitBAT(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_version,
                     int b_current_next);
 
@@ -191,6 +194,7 @@ do {                                                                    \
  * \param p_bat pointer to the BAT structure
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_EmptyBAT(dvbpsi_bat_t *p_bat);
 
 /*!
@@ -208,7 +212,7 @@ do {                                                                    \
 /*****************************************************************************
  * dvbpsi_GenBATSections
  *****************************************************************************
- *!
+/*!
  * \fn dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_bat_t* p_bat)
  * \brief BAT generator
  * \param p_bat BAT structure
@@ -216,6 +220,7 @@ do {                                                                    \
  *
  * Generate BAT sections based on the dvbpsi_bat_t structure.
  *****************************************************************************/
+__attribute__((deprecated))
 dvbpsi_psi_section_t *dvbpsi_GenBATSections(dvbpsi_bat_t * p_bat);
 
 

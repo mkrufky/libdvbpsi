@@ -1,7 +1,7 @@
 /*****************************************************************************
  * nit_private.h: private NIT structures
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -57,6 +57,7 @@ typedef struct dvbpsi_nit_decoder_s
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_GatherNITSections(dvbpsi_decoder_t* p_psi_decoder,
                               void* p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
@@ -67,6 +68,7 @@ void dvbpsi_GatherNITSections(dvbpsi_decoder_t* p_psi_decoder,
  *****************************************************************************
  * NIT decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_DecodeNITSections(dvbpsi_nit_t* p_nit,
                               dvbpsi_psi_section_t* p_section);
 

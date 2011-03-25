@@ -1,7 +1,7 @@
 /*****************************************************************************
  * demux.h
  *
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
@@ -130,6 +130,7 @@ typedef struct dvbpsi_demux_s
  * \param p_new_cb_data Data given to the previous callback.
  * \return a handle to the new demux structure.
  */
+__attribute__((deprecated))
 dvbpsi_handle dvbpsi_AttachDemux(dvbpsi_demux_new_cb_t pf_new_cb,
                                  void *                p_new_cb_data);
 
@@ -141,7 +142,7 @@ dvbpsi_handle dvbpsi_AttachDemux(dvbpsi_demux_new_cb_t pf_new_cb,
  * \brief Destroys a demux structure.
  * \param h_dvbpsi The handle of the demux to be destroyed.
  */
-
+__attribute__((deprecated))
 void dvbpsi_DetachDemux(dvbpsi_handle h_dvbpsi);
 
 /*****************************************************************************
@@ -156,6 +157,7 @@ void dvbpsi_DetachDemux(dvbpsi_handle h_dvbpsi);
  * \return a pointer to the found subdecoder, or NULL.
  *
  */
+__attribute__((deprecated))
 dvbpsi_demux_subdec_t * dvbpsi_demuxGetSubDec(dvbpsi_demux_t * p_demux,
                                               uint8_t          i_table_id,
                                               uint16_t         i_extension);
@@ -169,6 +171,7 @@ dvbpsi_demux_subdec_t * dvbpsi_demuxGetSubDec(dvbpsi_demux_t * p_demux,
  * \param h_dvbpsi PSI decoder handle.
  * \param p_section PSI section.
  */
+__attribute__((deprecated))
 void dvbpsi_Demux(dvbpsi_handle h_dvbpsi,
                   dvbpsi_psi_section_t * p_section);
 

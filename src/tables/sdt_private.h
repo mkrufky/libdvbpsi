@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sdt_private.h: private SDT structures
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: sdt_private.h,v 1.1 2002/12/11 13:04:57 jobi Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
@@ -54,6 +54,7 @@ typedef struct dvbpsi_sdt_decoder_s
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_GatherSDTSections(dvbpsi_decoder_t* p_psi_decoder,
                       void* p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
@@ -64,6 +65,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t* p_psi_decoder,
  *****************************************************************************
  * SDT decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
                               dvbpsi_psi_section_t* p_section);
 

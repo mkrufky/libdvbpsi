@@ -1,6 +1,6 @@
 /*****************************************************************************
  * eit.h
- * Copyright (C) 2004-2010 VideoLAN
+ * Copyright (C) 2004-2011 VideoLAN
  * $Id: eit.h 88 2004-02-24 14:31:18Z sam $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -126,6 +126,7 @@ typedef void (* dvbpsi_eit_callback)(void* p_cb_data, dvbpsi_eit_t* p_new_eit);
  * \param p_cb_data private data given in argument to the callback.
  * \return 0 if everything went ok.
  */
+__attribute__((deprecated))
 int dvbpsi_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_eit_callback pf_callback,
                                void* p_cb_data);
@@ -143,6 +144,7 @@ int dvbpsi_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  * \param i_extension Table ID extension, here service ID.
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension);
 
@@ -166,6 +168,7 @@ void dvbpsi_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
  * \param i_last_table_id i_last_table_id
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
                     int b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
                     uint8_t i_segment_last_section_number,
@@ -198,6 +201,7 @@ do {                                                                    \
  * \param p_eit pointer to the EIT structure
  * \return nothing.
  */
+__attribute__((deprecated))
 void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit);
 
 /*!
@@ -251,6 +255,7 @@ dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
+__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(
                                                dvbpsi_eit_event_t* p_event,
                                                uint8_t i_tag, uint8_t i_length,

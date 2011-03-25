@@ -1,7 +1,7 @@
 /*****************************************************************************
  * eit_private.h: private EIT structures
  *----------------------------------------------------------------------------
- * Copyright (C) 2004-2010 VideoLAN
+ * Copyright (C) 2004-2011 VideoLAN
  * $Id: eit_private.h 88 2004-02-24 14:31:18Z sam $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -55,6 +55,7 @@ typedef struct dvbpsi_eit_decoder_s
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_GatherEITSections(dvbpsi_decoder_t* p_psi_decoder,
                       void* p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
@@ -65,6 +66,7 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t* p_psi_decoder,
  *****************************************************************************
  * EIT decoder.
  *****************************************************************************/
+__attribute__((deprecated))
 void dvbpsi_DecodeEITSections(dvbpsi_eit_t* p_eit,
                               dvbpsi_psi_section_t* p_section);
 
