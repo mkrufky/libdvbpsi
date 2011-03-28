@@ -88,7 +88,7 @@ typedef struct dvbpsi_demux_subdec_s
   uint32_t                        i_id;             /*!< subtable id */
   dvbpsi_demux_subdec_cb_t        pf_callback;      /*!< subdec callback */
   void *                          p_cb_data;        /*!< subdec callback data */
-  struct dvbpsi_demux_subdec_s *  p_next;           /*!< next subdec callback */
+  struct dvbpsi_demux_subdec_s *  p_next;           /*!< next subdec */
 
   void (*pf_detach)(dvbpsi_t *, uint8_t, uint16_t); /*!< detach subdec callback */
 
