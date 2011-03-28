@@ -235,30 +235,36 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
     }
 
     /* Continuity check */
-    i_expected_counter = (p_decoder->i_continuity_counter + 1) & 0xf;
-    p_decoder->i_continuity_counter = p_data[3] & 0xf;
-
-    if (i_expected_counter == ((p_decoder->i_continuity_counter + 1) & 0xf)
-        && !p_decoder->b_discontinuity)
+    bool b_first = (p_decoder->i_continuity_counter == 0xFF);
+    if (b_first)
+        p_decoder->i_continuity_counter = p_data[3] & 0xf;
+    else
     {
-        dvbpsi_error(handle, "PSI decoder",
+        i_expected_counter = (p_decoder->i_continuity_counter + 1) & 0xf;
+        p_decoder->i_continuity_counter = p_data[3] & 0xf;
+
+        if (i_expected_counter == ((p_decoder->i_continuity_counter + 1) & 0xf)
+            && !p_decoder->b_discontinuity)
+        {
+            dvbpsi_error(handle, "PSI decoder",
                      "TS duplicate (received %d, expected %d) for PID %d",
                      p_decoder->i_continuity_counter, i_expected_counter,
                      ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
-        return;
-    }
+            return;
+        }
 
-    if (i_expected_counter != p_decoder->i_continuity_counter)
-    {
-        dvbpsi_error(handle, "PSI decoder",
+        if (i_expected_counter != p_decoder->i_continuity_counter)
+        {
+            dvbpsi_error(handle, "PSI decoder",
                      "TS discontinuity (received %d, expected %d) for PID %d",
                      p_decoder->i_continuity_counter, i_expected_counter,
                      ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
-        p_decoder->b_discontinuity = true;
-        if (p_decoder->p_current_section)
-        {
-            dvbpsi_DeletePSISections(p_decoder->p_current_section);
-            p_decoder->p_current_section = NULL;
+            p_decoder->b_discontinuity = true;
+            if (p_decoder->p_current_section)
+            {
+                dvbpsi_DeletePSISections(p_decoder->p_current_section);
+                p_decoder->p_current_section = NULL;
+            }
         }
     }
 
