@@ -225,7 +225,6 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
 
     dvbpsi_decoder_t *p_decoder = (dvbpsi_decoder_t *)handle->p_private;
     assert(p_decoder);
-    assert(p_decoder->pf_callback);
 
     /* TS start code */
     if (p_data[0] != 0x47)
@@ -297,6 +296,8 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
             p_decoder->p_current_section
                         = p_section
                         = dvbpsi_NewPSISection(p_decoder->i_section_max_size);
+            if (!p_section)
+                return false;
             /* Update the position in the packet */
             p_payload_pos = p_new_pos;
             /* New section is being handled */
@@ -347,6 +348,8 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
                         p_decoder->p_current_section
                                     = p_section
                                     = dvbpsi_NewPSISection(p_decoder->i_section_max_size);
+                        if (!p_section)
+                            return false;
                         p_payload_pos = p_new_pos;
                         p_new_pos = NULL;
                         p_decoder->i_need = 3;
@@ -391,8 +394,8 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
                         p_section->i_last_number = 0;
                         p_section->p_payload_start = p_section->p_data + 3;
                     }
-
-                    p_decoder->pf_callback(handle, p_section);
+                    if (p_decoder->pf_callback)
+                        p_decoder->pf_callback(handle, p_section);
                     p_decoder->p_current_section = NULL;
                 }
                 else
@@ -417,6 +420,8 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
                     p_decoder->p_current_section
                               = p_section
                               = dvbpsi_NewPSISection(p_decoder->i_section_max_size);
+                    if (!p_section)
+                        return false;
                     p_payload_pos = p_new_pos;
                     p_new_pos = NULL;
                     p_decoder->i_need = 3;
