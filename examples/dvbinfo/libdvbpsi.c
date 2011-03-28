@@ -1202,7 +1202,6 @@ ts_stream_t *libdvbpsi_init(int debug)
         return NULL;
 
     /* print PSI tables debug anyway, unless no debug is wanted at all */
-    enum dvbpsi_msg_level level = (debug == 0) ? DVBPSI_MSG_NONE : DVBPSI_MSG_DEBUG;
     switch (debug)
     {
         case 0: stream->level = DVBPSI_MSG_NONE; break;
@@ -1212,7 +1211,7 @@ ts_stream_t *libdvbpsi_init(int debug)
     }
 
     /* PAT */
-    stream->pat.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    stream->pat.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
     if (stream->pat.handle == NULL)
         goto error;
     if (!dvbpsi_AttachPAT(stream->pat.handle, handle_PAT, stream))
@@ -1222,11 +1221,11 @@ ts_stream_t *libdvbpsi_init(int debug)
         goto error;
     }
     /* PMT */
-    stream->pmt.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    stream->pmt.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
     if (stream->pmt.handle == NULL)
         goto error;
     /* CAT */
-    stream->cat.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    stream->cat.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
     if (stream->pat.handle == NULL)
         goto error;
     if (!dvbpsi_AttachCAT(stream->cat.handle, handle_CAT, stream))
@@ -1236,7 +1235,7 @@ ts_stream_t *libdvbpsi_init(int debug)
         goto error;
     }
     /* SDT demuxer */
-    stream->sdt.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    stream->sdt.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
     if (stream->sdt.handle == NULL)
         goto error;
     if (!dvbpsi_AttachDemux(stream->sdt.handle, handle_subtable, stream))
@@ -1246,7 +1245,7 @@ ts_stream_t *libdvbpsi_init(int debug)
         goto error;
     }
     /* EIT demuxer */
-    stream->eit.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    stream->eit.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
     if (stream->eit.handle == NULL)
         goto error;
     if (!dvbpsi_AttachDemux(stream->eit.handle, handle_subtable, stream))
@@ -1256,7 +1255,7 @@ ts_stream_t *libdvbpsi_init(int debug)
         goto error;
     }
     /* TDT demuxer */
-    stream->tdt.handle = dvbpsi_NewHandle(&dvbpsi_message, level);
+    stream->tdt.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
     if (stream->tdt.handle == NULL)
         goto error;
     if (!dvbpsi_AttachDemux(stream->tdt.handle, handle_subtable, stream))
