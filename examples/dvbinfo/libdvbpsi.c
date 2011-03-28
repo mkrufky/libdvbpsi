@@ -1396,9 +1396,9 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length)
             dvbpsi_PushPacket(stream->pat.handle, p_tmp);
         else if (i_pid == 0x01) /* CAT */
             dvbpsi_PushPacket(stream->cat.handle, p_tmp);
-#if 0
         else if (i_pid == 0x02) /* Transport Stream Description Table */
             dvbpsi_PushPacket(stream->tdt.handle, p_tmp);
+#if 0
         else if (i_pid == 0x03) /* IPMP Control Information Table */
             dvbpsi_PushPacket(stream->ipmp.handle, p_tmp);
 #endif
@@ -1410,10 +1410,6 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length)
             dvbpsi_PushPacket(stream->tdt.handle, p_tmp);
         else if (stream->pmt.pid_pmt && i_pid == stream->pmt.pid_pmt->i_pid)
             dvbpsi_PushPacket(stream->pmt.handle, p_tmp);
-#if 0 /* Testing to generate errors */
-        else
-            dvbpsi_PushPacket(stream->handle, p_tmp);
-#endif
 
         /* Remember PID */
         if (!stream->pid[i_pid].b_seen)
