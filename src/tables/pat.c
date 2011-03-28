@@ -56,18 +56,12 @@ bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private == NULL);
 
-    dvbpsi_pat_decoder_t* p_pat_decoder = (dvbpsi_pat_decoder_t*) calloc(1, sizeof(dvbpsi_pat_decoder_t));
+    /* PSI decoder configuration and initial state */
+    dvbpsi_pat_decoder_t *p_pat_decoder;
+    p_pat_decoder = (dvbpsi_pat_decoder_t*) dvbpsi_NewDecoder(&dvbpsi_GatherPATSections,
+                                                1024, true, sizeof(dvbpsi_pat_decoder_t));
     if (p_pat_decoder == NULL)
         return false;
-
-    /* PSI decoder configuration */
-    p_pat_decoder->pf_callback = &dvbpsi_GatherPATSections;
-    p_pat_decoder->i_section_max_size = 1024;
-
-    /* PSI decoder initial state */
-    p_pat_decoder->i_continuity_counter = 31;
-    p_pat_decoder->b_discontinuity = true;
-    p_pat_decoder->p_current_section = NULL;
 
     /* PAT decoder information */
     p_pat_decoder->pf_pat_callback = pf_callback;
@@ -103,9 +97,7 @@ void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi)
             free(p_pat_decoder->ap_sections[i]);
     }
 
-    if (p_pat_decoder->p_current_section)
-        dvbpsi_DeletePSISections(p_pat_decoder->p_current_section);
-    free(p_pat_decoder);
+    dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
     p_dvbpsi->p_private = NULL;
 }
 

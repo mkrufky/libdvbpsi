@@ -169,15 +169,21 @@ void dvbpsi_DeleteHandle(dvbpsi_t *handle)
 /*****************************************************************************
  * dvbpsi_NewDecoder
  *****************************************************************************/
-dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *handle, dvbpsi_callback *callback)
+#define DVBPSI_INVALID_CC (0xFF)
+dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback callback,
+    const int i_section_max_size, const bool b_discontinuity, const size_t psi_size)
 {
-    dvbpsi_decoder_t *p_decoder = calloc(1, sizeof(dvbpsi_decoder_t));
+    dvbpsi_decoder_t *p_decoder = (dvbpsi_decoder_t *) calloc(1, psi_size);
     if (p_decoder == NULL)
         return NULL;
 
-    p_decoder->pf_callback = NULL;
+    p_decoder->pf_callback = callback;
     p_decoder->p_current_section = NULL;
-    p_decoder->i_continuity_counter = 0xFF; /* invalid CC */
+    p_decoder->i_section_max_size = i_section_max_size;
+    p_decoder->b_discontinuity = b_discontinuity;
+    p_decoder->i_continuity_counter = DVBPSI_INVALID_CC;
+    p_decoder->p_current_section = NULL;
+    p_decoder->b_complete_header = false;
 
     return p_decoder;
 }
@@ -185,15 +191,11 @@ dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *handle, dvbpsi_callback *callback)
 /*****************************************************************************
  * dvbpsi_DeleteDecoder
  *****************************************************************************/
-void dvbpsi_DeleteDecoder(dvbpsi_t *handle)
+void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder)
 {
-    assert(handle);
-    assert(handle->p_private);
+    assert(p_decoder);
 
-    dvbpsi_decoder_t *p_decoder = (dvbpsi_decoder_t *) handle->p_private;
-    handle->p_private = NULL;
-
-    assert(p_decoder->p_current_section == NULL);
+    dvbpsi_DeletePSISections(p_decoder->p_current_section);
     free(p_decoder);
 }
 
@@ -235,7 +237,7 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
     }
 
     /* Continuity check */
-    bool b_first = (p_decoder->i_continuity_counter == 0xFF);
+    bool b_first = (p_decoder->i_continuity_counter == DVBPSI_INVALID_CC);
     if (b_first)
         p_decoder->i_continuity_counter = p_data[3] & 0xf;
     else
@@ -447,6 +449,7 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
     }
     return true;
 }
+#undef DVBPSI_INVALID_CC
 
 /*****************************************************************************
  * Message error level:

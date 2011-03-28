@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cat.c: CAT decoder/generator
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -61,18 +61,10 @@ bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
     assert(p_dvbpsi->p_private == NULL);
 
     dvbpsi_cat_decoder_t* p_cat_decoder;
-    p_cat_decoder = (dvbpsi_cat_decoder_t*)calloc(1, sizeof(dvbpsi_cat_decoder_t));
+    p_cat_decoder = (dvbpsi_cat_decoder_t*) dvbpsi_NewDecoder(&dvbpsi_GatherCATSections,
+                                                1024, true, sizeof(dvbpsi_cat_decoder_t));
     if (p_cat_decoder == NULL)
         return false;
-
-    /* PSI decoder configuration */
-    p_cat_decoder->pf_callback = &dvbpsi_GatherCATSections;
-    p_dvbpsi->p_private = p_cat_decoder;
-    p_cat_decoder->i_section_max_size = 1024;
-    /* PSI decoder initial state */
-    p_cat_decoder->i_continuity_counter = 31;
-    p_cat_decoder->b_discontinuity = true;
-    p_cat_decoder->p_current_section = NULL;
 
     /* CAT decoder configuration */
     p_cat_decoder->pf_cat_callback = pf_callback;
@@ -83,6 +75,7 @@ bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
     for (unsigned int i = 0; i <= 255; i++)
         p_cat_decoder->ap_sections[i] = NULL;
 
+    p_dvbpsi->p_private = p_cat_decoder;
     return true;
 }
 
@@ -106,9 +99,7 @@ void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
             free(p_cat_decoder->ap_sections[i]);
     }
 
-    if (p_cat_decoder->p_current_section)
-        dvbpsi_DeletePSISections(p_cat_decoder->p_current_section);
-    free(p_cat_decoder);
+    dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
     p_dvbpsi->p_private = NULL;
 }
 

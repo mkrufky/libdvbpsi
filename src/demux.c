@@ -56,18 +56,11 @@ bool dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private == NULL);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t*)malloc(sizeof(dvbpsi_demux_t));
+    dvbpsi_demux_t *p_demux;
+    p_demux = (dvbpsi_demux_t*) dvbpsi_NewDecoder(&dvbpsi_Demux, 4096, true,
+                                                  sizeof(dvbpsi_demux_t));
     if (p_demux == NULL)
         return false;
-
-    /* PSI decoder configuration */
-    p_demux->pf_callback = &dvbpsi_Demux;
-    p_demux->i_section_max_size = 4096;
-
-    /* PSI decoder initial state */
-    p_demux->i_continuity_counter = 31;
-    p_demux->b_discontinuity = true;
-    p_demux->p_current_section = NULL;
 
     /* Subtables demux configuration */
     p_demux->p_first_subdec = NULL;
@@ -161,9 +154,6 @@ void dvbpsi_DetachDemux(dvbpsi_t *p_dvbpsi)
         else free(p_subdec_temp);
     }
 
-    if (p_demux->p_current_section)
-        dvbpsi_DeletePSISections(p_demux->p_current_section);
-
+    dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
     p_dvbpsi->p_private = NULL;
-    free(p_demux);
 }

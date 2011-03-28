@@ -1,7 +1,7 @@
 /*****************************************************************************
  * pmt.c: PMT decoder/generator
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -59,20 +59,12 @@ bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
     assert(p_dvbpsi->p_private == NULL);
 
     dvbpsi_pmt_decoder_t* p_pmt_decoder;
-    p_pmt_decoder = (dvbpsi_pmt_decoder_t*)malloc(sizeof(dvbpsi_pmt_decoder_t));
+    p_pmt_decoder = (dvbpsi_pmt_decoder_t*) dvbpsi_NewDecoder(&dvbpsi_GatherPMTSections,
+                                            1024, true, sizeof(dvbpsi_pmt_decoder_t));
     if (p_pmt_decoder == NULL)
         return false;
 
     p_dvbpsi->p_private = (void *)p_pmt_decoder;
-
-    /* PSI decoder configuration */
-    p_pmt_decoder->pf_callback = &dvbpsi_GatherPMTSections;
-    p_pmt_decoder->i_section_max_size = 1024;
-
-    /* PSI decoder initial state */
-    p_pmt_decoder->i_continuity_counter = 31;
-    p_pmt_decoder->b_discontinuity = true;
-    p_pmt_decoder->p_current_section = NULL;
 
     /* PMT decoder configuration */
     p_pmt_decoder->i_program_number = i_program_number;
@@ -98,8 +90,8 @@ void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
-    dvbpsi_pmt_decoder_t* p_pmt_decoder
-                        = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_private;
+    dvbpsi_pmt_decoder_t* p_pmt_decoder;
+    p_pmt_decoder = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_private;
     free(p_pmt_decoder->p_building_pmt);
 
     for (unsigned int i = 0; i <= 255; i++)
@@ -108,9 +100,7 @@ void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
             free(p_pmt_decoder->ap_sections[i]);
     }
 
-    if (p_pmt_decoder->p_current_section)
-        dvbpsi_DeletePSISections(p_pmt_decoder->p_current_section);
-    free(p_pmt_decoder);
+    dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
     p_dvbpsi->p_private = NULL;
 }
 

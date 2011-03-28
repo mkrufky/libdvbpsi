@@ -199,30 +199,34 @@ struct dvbpsi_decoder_s
  * dvbpsi_NewDecoder
  *****************************************************************************/
 /*!
- * \fn dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *p_dvbpsi, dvbpsi_callback *callback)
+ * \fn dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *p_dvbpsi, dvbpsi_callback *callback,
+ *     const int i_section_max_size, const bool b_discontinuity, const size_t struct_size);
  * \brief Create a new dvbpsi_decoder_t.
- * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param callback dvbpsi_callback handler
+ * \param i_section_max_size Max size of a section for this decoder
+ * \param b_discontinuity Discontinuity flag
+ * \param psi_size size of new PSI struct, eg: sizeof(dvbpsi_pat_t)
  * \return pointer to dvbpsi_decoder_t&
  *
  * Creates a dvbpsi_decoder_t pointer to struct dvbpsi_decoder_s. It should be
  * delete with dvbpsi_DeleteDecoder() function.
  */
-dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *p_dvbpsi, dvbpsi_callback *callback);
+dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback callback,
+    const int i_section_max_size, const bool b_discontinuity, const size_t psi_size);
 
 /*****************************************************************************
  * dvbpsi_DeleteDecoder
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DeleteDecoder(dvbpsi_t *p_dvbpsi);
- * \brief Deletes attached decoder struct from dvbpsi_t handle and frees its memory
- * \param p_dvbpsi handle to dvbpsi with attached decoder
+ * \fn void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder);
+ * \brief Deletes decoder struct and frees its memory
+ * \param p_decoder pointer to dvbpsi_decoder_t with decoder
  * \return nothing
  *
  * Delets a dvbpsi_t handle by calling free(handle). Make sure to detach any
  * decoder of encoder before deleting the dvbpsi handle.
  */
-void dvbpsi_DeleteDecoder(dvbpsi_t *p_dvbpsi);
+void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder);
 
 /*****************************************************************************
  * dvbpsi_HasDecoder
