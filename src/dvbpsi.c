@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dvbpsi.c: conversion from TS packets to PSI sections
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -177,6 +177,7 @@ dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_t *handle, dvbpsi_callback *callback)
 
     p_decoder->pf_callback = NULL;
     p_decoder->p_current_section = NULL;
+    p_decoder->i_continuity_counter = 0xFF; /* invalid CC */
 
     return p_decoder;
 }
@@ -213,226 +214,225 @@ bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi)
  *****************************************************************************/
 void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
 {
-  uint8_t i_expected_counter;           /* Expected continuity counter */
-  dvbpsi_psi_section_t* p_section;      /* Current section */
-  uint8_t* p_payload_pos;               /* Where in the TS packet */
-  uint8_t* p_new_pos = NULL;            /* Beginning of the new section,
-                                           updated to NULL when the new
-                                           section is handled */
-  int i_available;                      /* Byte count available in the
-                                           packet */
+    uint8_t i_expected_counter;           /* Expected continuity counter */
+    dvbpsi_psi_section_t* p_section;      /* Current section */
+    uint8_t* p_payload_pos;               /* Where in the TS packet */
+    uint8_t* p_new_pos = NULL;            /* Beginning of the new section,
+                                             updated to NULL when the new
+                                             section is handled */
+    int i_available;                      /* Byte count available in the
+                                             packet */
 
-  dvbpsi_decoder_t *p_decoder = (dvbpsi_decoder_t *)handle->p_private;
-  assert(p_decoder);
+    dvbpsi_decoder_t *p_decoder = (dvbpsi_decoder_t *)handle->p_private;
+    assert(p_decoder);
+    assert(p_decoder->pf_callback);
 
-  /* TS start code */
-  if(p_data[0] != 0x47)
-  {
-    dvbpsi_error(handle, "PSI decoder", "not a TS packet");
-    return;
-  }
+    /* TS start code */
+    if (p_data[0] != 0x47)
+    {
+        dvbpsi_error(handle, "PSI decoder", "not a TS packet");
+        return;
+    }
 
-  /* Continuity check */
-  i_expected_counter = (p_decoder->i_continuity_counter + 1) & 0xf;
-  p_decoder->i_continuity_counter = p_data[3] & 0xf;
+    /* Continuity check */
+    i_expected_counter = (p_decoder->i_continuity_counter + 1) & 0xf;
+    p_decoder->i_continuity_counter = p_data[3] & 0xf;
 
-  if(i_expected_counter == ((p_decoder->i_continuity_counter + 1) & 0xf)
-      && !p_decoder->b_discontinuity)
-  {
-    dvbpsi_error(handle, "PSI decoder",
+    if (i_expected_counter == ((p_decoder->i_continuity_counter + 1) & 0xf)
+        && !p_decoder->b_discontinuity)
+    {
+        dvbpsi_error(handle, "PSI decoder",
                      "TS duplicate (received %d, expected %d) for PID %d",
                      p_decoder->i_continuity_counter, i_expected_counter,
                      ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
-    return;
-  }
+        return;
+    }
 
-  if(i_expected_counter != p_decoder->i_continuity_counter)
-  {
-    dvbpsi_error(handle, "PSI decoder",
+    if (i_expected_counter != p_decoder->i_continuity_counter)
+    {
+        dvbpsi_error(handle, "PSI decoder",
                      "TS discontinuity (received %d, expected %d) for PID %d",
                      p_decoder->i_continuity_counter, i_expected_counter,
                      ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
-    p_decoder->b_discontinuity = true;
-    if(p_decoder->p_current_section)
-    {
-      dvbpsi_DeletePSISections(p_decoder->p_current_section);
-      p_decoder->p_current_section = NULL;
-    }
-  }
-
-  /* Return if no payload in the TS packet */
-  if(!(p_data[3] & 0x10))
-  {
-    return;
-  }
-
-  /* Skip the adaptation_field if present */
-  if(p_data[3] & 0x20)
-    p_payload_pos = p_data + 5 + p_data[4];
-  else
-    p_payload_pos = p_data + 4;
-
-  /* Unit start -> skip the pointer_field and a new section begins */
-  if(p_data[1] & 0x40)
-  {
-    p_new_pos = p_payload_pos + *p_payload_pos + 1;
-    p_payload_pos += 1;
-  }
-
-  p_section = p_decoder->p_current_section;
-
-  /* If the psi decoder needs a begginning of section and a new section
-     begins in the packet then initialize the dvbpsi_psi_section_t structure */
-  if(p_section == NULL)
-  {
-    if(p_new_pos)
-    {
-      /* Allocation of the structure */
-      p_decoder->p_current_section
-                        = p_section
-                        = dvbpsi_NewPSISection(p_decoder->i_section_max_size);
-      /* Update the position in the packet */
-      p_payload_pos = p_new_pos;
-      /* New section is being handled */
-      p_new_pos = NULL;
-      /* Just need the header to know how long is the section */
-      p_decoder->i_need = 3;
-      p_decoder->b_complete_header = false;
-    }
-    else
-    {
-      /* No new section => return */
-      return;
-    }
-  }
-
-  /* Remaining bytes in the payload */
-  i_available = 188 + p_data - p_payload_pos;
-
-  while(i_available > 0)
-  {
-    if(i_available >= p_decoder->i_need)
-    {
-      /* There are enough bytes in this packet to complete the
-         header/section */
-      memcpy(p_section->p_payload_end, p_payload_pos, p_decoder->i_need);
-      p_payload_pos += p_decoder->i_need;
-      p_section->p_payload_end += p_decoder->i_need;
-      i_available -= p_decoder->i_need;
-
-      if(!p_decoder->b_complete_header)
-      {
-        /* Header is complete */
-        p_decoder->b_complete_header = true;
-        /* Compute p_section->i_length and update p_decoder->i_need */
-        p_decoder->i_need = p_section->i_length
-                         =   ((uint16_t)(p_section->p_data[1] & 0xf)) << 8
-                           | p_section->p_data[2];
-        /* Check that the section isn't too long */
-        if(p_decoder->i_need > p_decoder->i_section_max_size - 3)
+        p_decoder->b_discontinuity = true;
+        if (p_decoder->p_current_section)
         {
-          dvbpsi_error(handle, "PSI decoder", "PSI section too long");
-          dvbpsi_DeletePSISections(p_section);
-          p_decoder->p_current_section = NULL;
-          /* If there is a new section not being handled then go forward
-             in the packet */
-          if(p_new_pos)
-          {
+            dvbpsi_DeletePSISections(p_decoder->p_current_section);
+            p_decoder->p_current_section = NULL;
+        }
+    }
+
+    /* Return if no payload in the TS packet */
+    if (!(p_data[3] & 0x10))
+        return;
+
+    /* Skip the adaptation_field if present */
+    if (p_data[3] & 0x20)
+        p_payload_pos = p_data + 5 + p_data[4];
+    else
+        p_payload_pos = p_data + 4;
+
+    /* Unit start -> skip the pointer_field and a new section begins */
+    if (p_data[1] & 0x40)
+    {
+        p_new_pos = p_payload_pos + *p_payload_pos + 1;
+        p_payload_pos += 1;
+    }
+
+    p_section = p_decoder->p_current_section;
+
+    /* If the psi decoder needs a begginning of section and a new section
+       begins in the packet then initialize the dvbpsi_psi_section_t structure */
+    if (p_section == NULL)
+    {
+        if (p_new_pos)
+        {
+            /* Allocation of the structure */
             p_decoder->p_current_section
                         = p_section
                         = dvbpsi_NewPSISection(p_decoder->i_section_max_size);
+            /* Update the position in the packet */
             p_payload_pos = p_new_pos;
+            /* New section is being handled */
             p_new_pos = NULL;
+            /* Just need the header to know how long is the section */
             p_decoder->i_need = 3;
             p_decoder->b_complete_header = false;
-            i_available = 188 + p_data - p_payload_pos;
-          }
-          else
-          {
-            i_available = 0;
-          }
-        }
-      }
-      else
-      {
-        /* PSI section is complete */
-        p_section->b_syntax_indicator = p_section->p_data[1] & 0x80;
-        p_section->b_private_indicator = p_section->p_data[1] & 0x40;
-        /* Update the end of the payload if CRC_32 is present */
-        if(p_section->b_syntax_indicator)
-          p_section->p_payload_end -= 4;
-
-        if(p_section->p_data[0] != 0x72 && dvbpsi_ValidPSISection(p_section))
-        {
-          /* PSI section is valid */
-          p_section->i_table_id = p_section->p_data[0];
-          if(p_section->b_syntax_indicator)
-          {
-            p_section->i_extension =   (p_section->p_data[3] << 8)
-                                     | p_section->p_data[4];
-            p_section->i_version = (p_section->p_data[5] & 0x3e) >> 1;
-            p_section->b_current_next = p_section->p_data[5] & 0x1;
-            p_section->i_number = p_section->p_data[6];
-            p_section->i_last_number = p_section->p_data[7];
-            p_section->p_payload_start = p_section->p_data + 8;
-          }
-          else
-          {
-            p_section->i_extension = 0;
-            p_section->i_version = 0;
-            p_section->b_current_next = 1;
-            p_section->i_number = 0;
-            p_section->i_last_number = 0;
-            p_section->p_payload_start = p_section->p_data + 3;
-          }
-
-          p_decoder->pf_callback(handle, p_section);
-          p_decoder->p_current_section = NULL;
         }
         else
         {
-          dvbpsi_error(handle, "misc PSI", "Bad CRC_32 !!!");
-
-          /* PSI section isn't valid => trash it */
-          dvbpsi_DeletePSISections(p_section);
-          p_decoder->p_current_section = NULL;
+            /* No new section => return */
+            return;
         }
-
-        /* A TS packet may contain any number of sections, only the first
-         * new one is flagged by the pointer_field. If the next payload
-         * byte isn't 0xff then a new section starts. */
-        if(p_new_pos == NULL && i_available && *p_payload_pos != 0xff)
-          p_new_pos = p_payload_pos;
-
-        /* If there is a new section not being handled then go forward
-           in the packet */
-        if(p_new_pos)
-        {
-          p_decoder->p_current_section
-                        = p_section
-                        = dvbpsi_NewPSISection(p_decoder->i_section_max_size);
-          p_payload_pos = p_new_pos;
-          p_new_pos = NULL;
-          p_decoder->i_need = 3;
-          p_decoder->b_complete_header = false;
-          i_available = 188 + p_data - p_payload_pos;
-        }
-        else
-        {
-          i_available = 0;
-        }
-      }
     }
-    else
+
+    /* Remaining bytes in the payload */
+    i_available = 188 + p_data - p_payload_pos;
+
+    while (i_available > 0)
     {
-      /* There aren't enough bytes in this packet to complete the
-         header/section */
-      memcpy(p_section->p_payload_end, p_payload_pos, i_available);
-      p_section->p_payload_end += i_available;
-      p_decoder->i_need -= i_available;
-      i_available = 0;
+        if (i_available >= p_decoder->i_need)
+        {
+            /* There are enough bytes in this packet to complete the
+               header/section */
+            memcpy(p_section->p_payload_end, p_payload_pos, p_decoder->i_need);
+            p_payload_pos += p_decoder->i_need;
+            p_section->p_payload_end += p_decoder->i_need;
+            i_available -= p_decoder->i_need;
+
+            if (!p_decoder->b_complete_header)
+            {
+                /* Header is complete */
+                p_decoder->b_complete_header = true;
+                /* Compute p_section->i_length and update p_decoder->i_need */
+                p_decoder->i_need = p_section->i_length
+                                 =   ((uint16_t)(p_section->p_data[1] & 0xf)) << 8
+                                       | p_section->p_data[2];
+                /* Check that the section isn't too long */
+                if (p_decoder->i_need > p_decoder->i_section_max_size - 3)
+                {
+                    dvbpsi_error(handle, "PSI decoder", "PSI section too long");
+                    dvbpsi_DeletePSISections(p_section);
+                    p_decoder->p_current_section = NULL;
+                    /* If there is a new section not being handled then go forward
+                       in the packet */
+                    if (p_new_pos)
+                    {
+                        p_decoder->p_current_section
+                                    = p_section
+                                    = dvbpsi_NewPSISection(p_decoder->i_section_max_size);
+                        p_payload_pos = p_new_pos;
+                        p_new_pos = NULL;
+                        p_decoder->i_need = 3;
+                        p_decoder->b_complete_header = false;
+                        i_available = 188 + p_data - p_payload_pos;
+                    }
+                    else
+                    {
+                        i_available = 0;
+                    }
+                }
+            }
+            else
+            {
+                /* PSI section is complete */
+                p_section->b_syntax_indicator = p_section->p_data[1] & 0x80;
+                p_section->b_private_indicator = p_section->p_data[1] & 0x40;
+                /* Update the end of the payload if CRC_32 is present */
+                if (p_section->b_syntax_indicator)
+                    p_section->p_payload_end -= 4;
+
+                if (p_section->p_data[0] != 0x72 && dvbpsi_ValidPSISection(p_section))
+                {
+                    /* PSI section is valid */
+                    p_section->i_table_id = p_section->p_data[0];
+                    if (p_section->b_syntax_indicator)
+                    {
+                        p_section->i_extension =   (p_section->p_data[3] << 8)
+                                                 | p_section->p_data[4];
+                        p_section->i_version = (p_section->p_data[5] & 0x3e) >> 1;
+                        p_section->b_current_next = p_section->p_data[5] & 0x1;
+                        p_section->i_number = p_section->p_data[6];
+                        p_section->i_last_number = p_section->p_data[7];
+                        p_section->p_payload_start = p_section->p_data + 8;
+                    }
+                    else
+                    {
+                        p_section->i_extension = 0;
+                        p_section->i_version = 0;
+                        p_section->b_current_next = 1;
+                        p_section->i_number = 0;
+                        p_section->i_last_number = 0;
+                        p_section->p_payload_start = p_section->p_data + 3;
+                    }
+
+                    p_decoder->pf_callback(handle, p_section);
+                    p_decoder->p_current_section = NULL;
+                }
+                else
+                {
+                    dvbpsi_error(handle, "misc PSI", "Bad CRC_32 !!!");
+
+                    /* PSI section isn't valid => trash it */
+                    dvbpsi_DeletePSISections(p_section);
+                    p_decoder->p_current_section = NULL;
+                }
+
+                /* A TS packet may contain any number of sections, only the first
+                 * new one is flagged by the pointer_field. If the next payload
+                 * byte isn't 0xff then a new section starts. */
+                if (p_new_pos == NULL && i_available && *p_payload_pos != 0xff)
+                    p_new_pos = p_payload_pos;
+
+                /* If there is a new section not being handled then go forward
+                   in the packet */
+                if (p_new_pos)
+                {
+                    p_decoder->p_current_section
+                              = p_section
+                              = dvbpsi_NewPSISection(p_decoder->i_section_max_size);
+                    p_payload_pos = p_new_pos;
+                    p_new_pos = NULL;
+                    p_decoder->i_need = 3;
+                    p_decoder->b_complete_header = false;
+                    i_available = 188 + p_data - p_payload_pos;
+                }
+                else
+                {
+                    i_available = 0;
+                }
+            }
+        }
+        else
+        {
+            /* There aren't enough bytes in this packet to complete the
+               header/section */
+            memcpy(p_section->p_payload_end, p_payload_pos, i_available);
+            p_section->p_payload_end += i_available;
+            p_decoder->i_need -= i_available;
+            i_available = 0;
+        }
     }
-  }
 }
 
 /*****************************************************************************
