@@ -447,7 +447,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
 #endif
 
 #ifdef HAVE_VARIADIC_MACROS
-void message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...)
+void message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char *fmt, ...)
 {
     if ((dvbpsi->i_msg_level > DVBPSI_MSG_NONE) &&
         (level <= dvbpsi->i_msg_level))
@@ -470,7 +470,7 @@ void message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...)
         va_end(ap);
         if (err > DVBPSI_MSG_NONE) {
             if (dvbpsi->pf_message)
-                dvbpsi->pf_message(dvbpsi, msg);
+                dvbpsi->pf_message(dvbpsi, level, msg);
         }
         free(msg);
     }
@@ -480,7 +480,7 @@ void message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...)
 
 /* Common code for printing messages */
 #   if defined(_GNU_SOURCE)
-#       define DVBPSI_MSG_COMMON                                \
+#       define DVBPSI_MSG_COMMON(level)                         \
     do {                                                        \
         va_list ap;                                             \
         va_start(ap, fmt);                                      \
@@ -497,7 +497,7 @@ void message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...)
         va_end(ap);                                             \
         if (err > 0) {                                          \
             if (dvbpsi->pf_message)                             \
-                dvbpsi->pf_message(dvbpsi, msg);                \
+                dvbpsi->pf_message(dvbpsi, level, msg);         \
         }                                                       \
         free(msg);                                              \
     } while(0);
@@ -515,7 +515,7 @@ void message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...)
         va_end(ap);                                             \
         if (err > 0) {                                          \
             if (dvbpsi->pf_message)                             \
-                dvbpsi->pf_message(dvbpsi, msg);                \
+                dvbpsi->pf_message(dvbpsi, level, msg);         \
         }                                                       \
         free(msg);                                              \
     } while(0);
@@ -526,7 +526,7 @@ void dvbpsi_error(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...)
     if ((dvbpsi->i_msg_level > DVBPSI_MSG_NONE) &&
         (DVBPSI_MSG_ERROR <= dvbpsi->i_msg_level))
     {
-        DVBPSI_MSG_COMMON
+        DVBPSI_MSG_COMMON(DVBPSI_MSG_ERROR)
     }
 }
 
@@ -535,7 +535,7 @@ void dvbpsi_warning(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...)
     if ((dvbpsi->i_msg_level > DVBPSI_MSG_NONE) &&
         (DVBPSI_MSG_WARN <= dvbpsi->i_msg_level))
     {
-        DVBPSI_MSG_COMMON
+        DVBPSI_MSG_COMMON(DVBPSI_MSG_WARN)
     }
 }
 
@@ -544,7 +544,7 @@ void dvbpsi_debug(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...)
     if ((dvbpsi->i_msg_level > DVBPSI_MSG_NONE) &&
         (DVBPSI_MSG_DEBUG <= dvbpsi->i_msg_level))
     {
-        DVBPSI_MSG_COMMON
+        DVBPSI_MSG_COMMON(DVBPSI_MSG_DEBUG)
     }
 }
 #endif

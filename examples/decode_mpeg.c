@@ -293,8 +293,16 @@ static void report_PCRPacketTiming( int i_cc, ts_pid_t *ts_pid,
 #endif
 }
 
-static void message(dvbpsi_t *handle, const char* msg)
+static void message(dvbpsi_t *handle, const dvbpsi_msg_level_t level, const char* msg)
 {
+    switch(level)
+    {
+        case DVBPSI_MSG_ERROR: fprintf(stderr, "Error: "); break;
+        case DVBPSI_MSG_WARN:  fprintf(stderr, "Warning: "); break;
+        case DVBPSI_MSG_DEBUG: fprintf(stderr, "Debug: "); break;
+        default: /* do nothing */
+            return;
+    }
     fprintf(stderr, "%s\n", msg);
 }
 

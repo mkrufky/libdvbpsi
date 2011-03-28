@@ -50,28 +50,30 @@ extern "C" {
  */
 typedef struct dvbpsi_s dvbpsi_t;
 
-/*****************************************************************************
- * dvbpsi_message_cb
- *****************************************************************************/
-/*!
- * \typedef void (* dvbpsi_message_cb)(dvbpsi_handle p_decoder,
- *                                     const char* msg)
- * \brief Callback type definition.
- */
-typedef void (* dvbpsi_message_cb)(dvbpsi_t *handle,
-                                   const char* msg);
-
 /*!
  * \enum dvbpsi_msg_level
  * \brief DVBPSI message level enum
  */
-enum dvbpsi_msg_level
+typedef enum dvbpsi_msg_level
 {
     DVBPSI_MSG_NONE  = -1, /*!< No messages */
     DVBPSI_MSG_ERROR =  0, /*!< Error messages only */
     DVBPSI_MSG_WARN  =  1, /*!< Error and Warning messages */
     DVBPSI_MSG_DEBUG =  2, /*!< Error, warning and debug messages */
-};
+} dvbpsi_msg_level_t;
+
+/*****************************************************************************
+ * dvbpsi_message_cb
+ *****************************************************************************/
+/*!
+ * \typedef void (* dvbpsi_message_cb)(dvbpsi_handle p_decoder,
+ *                                     const dvbpse_msg_level_t level,
+ *                                     const char* msg)
+ * \brief Callback type definition.
+ */
+typedef void (* dvbpsi_message_cb)(dvbpsi_t *handle,
+                                   const dvbpsi_msg_level_t level,
+                                   const char* msg);
 
 /*****************************************************************************
  * dvbpsi_t

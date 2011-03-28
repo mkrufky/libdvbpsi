@@ -95,9 +95,17 @@ static void writePSI(uint8_t* p_packet, dvbpsi_psi_section_t* p_section)
   }
 }
 
-static void message(dvbpsi_t *handle, const char* msg)
+static void message(dvbpsi_t *handle, const dvbpsi_msg_level_t level, const char* msg)
 {
-     fprintf(stderr, "%s\n", msg);
+    switch(level)
+    {
+        case DVBPSI_MSG_ERROR: fprintf(stderr, "Error: "); break;
+        case DVBPSI_MSG_WARN:  fprintf(stderr, "Warning: "); break;
+        case DVBPSI_MSG_DEBUG: fprintf(stderr, "Debug: "); break;
+        default: /* do nothing */
+            return;
+    }
+    fprintf(stderr, "%s\n", msg);
 }
 
 /*****************************************************************************

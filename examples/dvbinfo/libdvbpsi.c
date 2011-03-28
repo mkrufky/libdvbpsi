@@ -266,8 +266,16 @@ mtime_t mdate(void)
 /*****************************************************************************
  * libdvbpsi message callback functions
  *****************************************************************************/
-static void dvbpsi_message(dvbpsi_t *p_dvbpsi, const char* msg)
+static void dvbpsi_message(dvbpsi_t *p_dvbpsi, const dvbpsi_msg_level_t level, const char* msg)
 {
+    switch(level)
+    {
+        case DVBPSI_MSG_ERROR: fprintf(stderr, "Error: "); break;
+        case DVBPSI_MSG_WARN:  fprintf(stderr, "Warning: "); break;
+        case DVBPSI_MSG_DEBUG: fprintf(stderr, "Debug: "); break;
+        default: /* do nothing */
+            return;
+    }
     fprintf(stderr, "%s\n", msg);
 }
 
@@ -1363,7 +1371,7 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length)
         {
             stream->i_lost_bytes += i_lost;
             i += i_lost;
-            fprintf(stderr, "dvbinfo: Lost %ld bytes out of %ld in buffer\n", i_lost, length);
+            fprintf(stderr, "dvbinfo: Lost %"PRId64" bytes out of %"PRId64" in buffer\n", (int64_t) i_lost, (int64_t)length);
             if (i >= length)
                 return true;
         }
