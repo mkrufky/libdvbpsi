@@ -133,15 +133,15 @@ void dvbpsi_DeleteHandle(dvbpsi_t *handle);
  * dvbpsi_PushPacket
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
+ * \fn bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
  * \brief Injection of a TS packet into a PSI decoder.
  * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_data pointer to a 188 bytes playload of a TS packet
- * \return nothing.
+ * \return true when packet has been handled, false on error.
  *
  * Injection of a TS packet into a PSI decoder.
  */
-void dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data);
+bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data);
 
 /*****************************************************************************
  * The following definitions are just here to allow external decoders but

@@ -212,7 +212,7 @@ bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi)
  *****************************************************************************
  * Injection of a TS packet into a PSI decoder.
  *****************************************************************************/
-void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
+bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
 {
     uint8_t i_expected_counter;           /* Expected continuity counter */
     dvbpsi_psi_section_t* p_section;      /* Current section */
@@ -231,7 +231,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
     if (p_data[0] != 0x47)
     {
         dvbpsi_error(handle, "PSI decoder", "not a TS packet");
-        return;
+        return false;
     }
 
     /* Continuity check */
@@ -250,7 +250,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
                      "TS duplicate (received %d, expected %d) for PID %d",
                      p_decoder->i_continuity_counter, i_expected_counter,
                      ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
-            return;
+            return false;
         }
 
         if (i_expected_counter != p_decoder->i_continuity_counter)
@@ -270,7 +270,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
 
     /* Return if no payload in the TS packet */
     if (!(p_data[3] & 0x10))
-        return;
+        return false;
 
     /* Skip the adaptation_field if present */
     if (p_data[3] & 0x20)
@@ -287,7 +287,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
 
     p_section = p_decoder->p_current_section;
 
-    /* If the psi decoder needs a begginning of section and a new section
+    /* If the psi decoder needs a beginning of a section and a new section
        begins in the packet then initialize the dvbpsi_psi_section_t structure */
     if (p_section == NULL)
     {
@@ -308,7 +308,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
         else
         {
             /* No new section => return */
-            return;
+            return false;
         }
     }
 
@@ -439,6 +439,7 @@ void dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
             i_available = 0;
         }
     }
+    return true;
 }
 
 /*****************************************************************************
