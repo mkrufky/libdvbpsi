@@ -193,6 +193,7 @@ void dvbpsi_DeleteDecoder(dvbpsi_t *handle)
     dvbpsi_decoder_t *p_decoder = (dvbpsi_decoder_t *) handle->p_private;
     handle->p_private = NULL;
 
+    assert(p_decoder->p_current_section == NULL);
     free(p_decoder);
 }
 
