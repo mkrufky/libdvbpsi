@@ -1,7 +1,7 @@
 /*****************************************************************************
  * demux.h
  *
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
@@ -134,8 +134,8 @@ struct dvbpsi_demux_s
  * \return true on success, false on failure
  */
 bool dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
-                             dvbpsi_demux_new_cb_t pf_new_cb,
-                             void *                p_new_cb_data);
+                        dvbpsi_demux_new_cb_t pf_new_cb,
+                        void *                p_new_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachDemux
