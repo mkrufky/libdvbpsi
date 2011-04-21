@@ -4,10 +4,10 @@
 
 %define lib_name	%{name}
 
-%define redhat 0
+%define redhat 1
 %if %redhat
 # some mdk macros that do not exist in rh
-%define configure2_5x CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr
+%define configure2_5x CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr --libdir=%{_libdir}
 %define make %__make
 %define makeinstall_std %__make DESTDIR="$RPM_BUILD_ROOT" install
 # adjust define for Redhat.
@@ -50,7 +50,7 @@ the %name package installed.
 %setup -q -n %{lib_name}-%{version}
 
 %build
-%configure2_5x --enable-release
+%configure2_5x --enable-release --enable-debug
 %make 
 
 %install
@@ -78,6 +78,10 @@ rm -rf %buildroot
 %{_includedir}/*
 
 %changelog
+* Thu Apr 21 2011 Jean-Paul Saman <jpsaman@videolan.org>
+- Correctly build rpm package on x86_64
+- Enable debug symbols in build (usefull for %name-debuginfo package)
+
 * Fri Nov 19 2010 Jean-Paul Saman <jpsaman@videolan.org>
 - Relicensed under LGPLv2.1
 
