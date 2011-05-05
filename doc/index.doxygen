@@ -21,7 +21,7 @@ describes how to use it and the "C" API.</p>
 
 <h2>License</h2>
 
-<p>libdvbpsi was originally released under the GPLv2 and later relicensed under the LGPLv2. All versions prior to version 1.0.0 are GPLv2, versions 1.0.0 and later are LGPLv2.<p>
+<p>libdvbpsi was originally released under the GPLv2 and later relicensed under the LGPLv2. All versions prior to version 0.2.0 are GPLv2, versions 0.2.0 and later are LGPLv2.1.<p>
 
 <h2>Tables and Descriptors</h2>
 <p>libdvbpsi supports the following PSI tables and many descriptors regularly found in MPEG/DVB Transport streams</p>
