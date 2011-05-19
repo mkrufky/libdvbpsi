@@ -1,7 +1,7 @@
 /*****************************************************************************
  * tot.c: TDT/TOT decoder/generator
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -200,8 +200,6 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
 
     dvbpsi_tot_decoder_t* p_tot_decoder
                         = (dvbpsi_tot_decoder_t*)p_private_decoder;
-    int b_append = 1;
-    dvbpsi_tot_t* p_building_tot;
 
     dvbpsi_debug(p_dvbpsi, "TDT/TOT decoder", "got a section");
 
@@ -211,49 +209,44 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
         dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
                      "invalid section (table_id == 0x%02x)",
                      p_section->i_table_id);
-        b_append = 0;
+        dvbpsi_DeletePSISections(p_section);
+        return;
     }
 
-    if (b_append && p_section->b_syntax_indicator != false)
+    if (p_section->b_syntax_indicator != false)
     {
         /* Invalid section_syntax_indicator */
         dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
                     "invalid section (section_syntax_indicator != 0)");
-        b_append = 0;
-    }
-
-    /* Now if b_append is true then we have a valid TDT/TOT section */
-    if (b_append)
-    {
-        /* TS discontinuity check */
-        if (p_tot_decoder->b_discontinuity)
-        {
-            /* We don't care about discontinuities with the TDT/TOT as it
-               only consists of one section anyway */
-            p_tot_decoder->b_discontinuity = false;
-        }
-
-        p_building_tot = (dvbpsi_tot_t*)malloc(sizeof(dvbpsi_tot_t));
-        if (p_building_tot)
-            dvbpsi_InitTOT(p_building_tot,   ((uint64_t)p_section->p_payload_start[0] << 32)
-                                   | ((uint64_t)p_section->p_payload_start[1] << 24)
-                                   | ((uint64_t)p_section->p_payload_start[2] << 16)
-                                   | ((uint64_t)p_section->p_payload_start[3] <<  8)
-                                   |  (uint64_t)p_section->p_payload_start[4]);
-        else
-            dvbpsi_error(p_dvbpsi, "TOT decoder", "failed decoding section");
-
-        /* Decode the section */
-        dvbpsi_DecodeTOTSections(p_dvbpsi, p_building_tot, p_section);
-        /* Delete the section */
         dvbpsi_DeletePSISections(p_section);
-        /* signal the new TDT/TOT */
-        p_tot_decoder->pf_tot_callback(p_tot_decoder->p_cb_data, p_building_tot);
+        return;
     }
+
+    /* TS discontinuity check */
+    if (p_tot_decoder->b_discontinuity)
+    {
+        /* We don't care about discontinuities with the TDT/TOT as it
+           only consists of one section anyway */
+        p_tot_decoder->b_discontinuity = false;
+    }
+
+    dvbpsi_tot_t* p_building_tot;
+    p_building_tot = (dvbpsi_tot_t*)malloc(sizeof(dvbpsi_tot_t));
+    if (p_building_tot)
+        dvbpsi_InitTOT(p_building_tot,   ((uint64_t)p_section->p_payload_start[0] << 32)
+                                       | ((uint64_t)p_section->p_payload_start[1] << 24)
+                                       | ((uint64_t)p_section->p_payload_start[2] << 16)
+                                       | ((uint64_t)p_section->p_payload_start[3] <<  8)
+                                       |  (uint64_t)p_section->p_payload_start[4]);
     else
-    {
-        dvbpsi_DeletePSISections(p_section);
-    }
+        dvbpsi_error(p_dvbpsi, "TOT decoder", "failed decoding section");
+
+    /* Decode the section */
+    dvbpsi_DecodeTOTSections(p_dvbpsi, p_building_tot, p_section);
+    /* Delete the section */
+    dvbpsi_DeletePSISections(p_section);
+    /* signal the new TDT/TOT */
+    p_tot_decoder->pf_tot_callback(p_tot_decoder->p_cb_data, p_building_tot);
 }
 
 /*****************************************************************************
