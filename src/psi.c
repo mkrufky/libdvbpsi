@@ -49,20 +49,19 @@ dvbpsi_psi_section_t *dvbpsi_NewPSISection(int i_max_size)
 {
     /* Allocate the dvbpsi_psi_section_t structure */
     dvbpsi_psi_section_t * p_section
-                  = (dvbpsi_psi_section_t*)malloc(sizeof(dvbpsi_psi_section_t));
+                  = (dvbpsi_psi_section_t*)calloc(1, sizeof(dvbpsi_psi_section_t));
     if (p_section == NULL)
         return NULL;
 
     /* Allocate the p_data memory area */
-    p_section->p_data = (uint8_t*)malloc(i_max_size * sizeof(uint8_t));
-
-    if (p_section->p_data != NULL)
-        p_section->p_payload_end = p_section->p_data;
-    else
+    p_section->p_data = (uint8_t*)calloc(1, i_max_size * sizeof(uint8_t));
+    if (p_section->p_data == NULL)
     {
         free(p_section);
         return NULL;
     }
+
+    p_section->p_payload_end = p_section->p_data;
     p_section->p_next = NULL;
 
     return p_section;
