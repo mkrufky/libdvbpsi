@@ -166,7 +166,6 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
     dvbpsi_cat_decoder_t* p_cat_decoder
                           = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_private;
 
-    bool b_append = true;
     bool b_reinit = false;
 
     if (p_section->i_table_id != 0x01)
@@ -179,7 +178,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
         return;
     }
 
-    if (b_append && !p_section->b_syntax_indicator)
+    if (!p_section->b_syntax_indicator)
     {
         /* Invalid section_syntax_indicator */
         dvbpsi_error(p_dvbpsi, "CAT decoder",
@@ -195,49 +194,45 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
                         p_section->i_number, p_section->i_last_number,
                         p_section->b_current_next);
 
-    if (b_append)
+    /* TS discontinuity check */
+    if (p_cat_decoder->b_discontinuity)
     {
-        /* TS discontinuity check */
-        if (p_cat_decoder->b_discontinuity)
+        b_reinit = true;
+        p_cat_decoder->b_discontinuity = false;
+    }
+    else
+    {
+        /* Perform some few sanity checks */
+        if (p_cat_decoder->p_building_cat)
         {
-            b_reinit = true;
-            p_cat_decoder->b_discontinuity = false;
+            if (p_cat_decoder->p_building_cat->i_version != p_section->i_version)
+            {
+                /* version_number */
+                dvbpsi_error(p_dvbpsi, "CAT decoder",
+                                "'version_number' differs"
+                                " whereas no discontinuity has occured");
+                b_reinit = true;
+            }
+            else if (p_cat_decoder->i_last_section_number != p_section->i_last_number)
+            {
+                 /* last_section_number */
+                 dvbpsi_error(p_dvbpsi, "CAT decoder",
+                                "'last_section_number' differs"
+                                " whereas no discontinuity has occured");
+                 b_reinit = true;
+            }
         }
         else
         {
-            /* Perform some few sanity checks */
-            if (p_cat_decoder->p_building_cat)
-            {
-                if (p_cat_decoder->p_building_cat->i_version != p_section->i_version)
-                {
-                    /* version_number */
-                    dvbpsi_error(p_dvbpsi, "CAT decoder",
-                                "'version_number' differs"
-                                " whereas no discontinuity has occured");
-                     b_reinit = true;
-                }
-                else if (p_cat_decoder->i_last_section_number
-                                                    != p_section->i_last_number)
-                {
-                    /* last_section_number */
-                    dvbpsi_error(p_dvbpsi, "CAT decoder",
-                                "'last_section_number' differs"
-                                " whereas no discontinuity has occured");
-                    b_reinit = true;
-                }
-            }
-            else
-            {
-                if (   (p_cat_decoder->b_current_valid)
-                    && (p_cat_decoder->current_cat.i_version == p_section->i_version)
-                    && (p_cat_decoder->current_cat.b_current_next ==
+             if (   (p_cat_decoder->b_current_valid)
+                 && (p_cat_decoder->current_cat.i_version == p_section->i_version)
+                 && (p_cat_decoder->current_cat.b_current_next ==
                                                    p_section->b_current_next))
-                {
-                    /* Don't decode since this version is already decoded */
-                    dvbpsi_DeletePSISections(p_section);
-                    return;
-                }
-            }
+             {
+                 /* Don't decode since this version is already decoded */
+                 dvbpsi_DeletePSISections(p_section);
+                 return;
+             }
         }
     }
 
@@ -263,71 +258,63 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
         }
     }
 
-    /* Append the section to the list if wanted */
-    if (b_append)
+    int b_complete = false;
+
+    /* Initialize the structures if it's the first section received */
+    if (!p_cat_decoder->p_building_cat)
     {
-        int b_complete = false;
-
-        /* Initialize the structures if it's the first section received */
-        if (!p_cat_decoder->p_building_cat)
-        {
-            p_cat_decoder->p_building_cat =
-                                (dvbpsi_cat_t*)malloc(sizeof(dvbpsi_cat_t));
-            if (p_cat_decoder->p_building_cat)
-                    dvbpsi_InitCAT(p_cat_decoder->p_building_cat,
-                                p_section->i_version, p_section->b_current_next);
-            else
-                 dvbpsi_error(p_dvbpsi, "CAT decoder", "failed decoding section");
-            p_cat_decoder->i_last_section_number = p_section->i_last_number;
-        }
-
-        /* Fill the section array */
-        if (p_cat_decoder->ap_sections[p_section->i_number] != NULL)
-        {
-            dvbpsi_debug(p_dvbpsi, "CAT decoder", "overwrite section number %d",
-                            p_section->i_number);
-            dvbpsi_DeletePSISections(p_cat_decoder->ap_sections[p_section->i_number]);
-        }
-        p_cat_decoder->ap_sections[p_section->i_number] = p_section;
-
-        /* Check if we have all the sections */
-        for (unsigned int i = 0; i <= p_cat_decoder->i_last_section_number; i++)
-        {
-            if (!p_cat_decoder->ap_sections[i])
-                break;
-
-            if (i == p_cat_decoder->i_last_section_number)
-                b_complete = true;
-        }
-
-        if (b_complete)
-        {
-            /* Save the current information */
-            p_cat_decoder->current_cat = *p_cat_decoder->p_building_cat;
-            p_cat_decoder->b_current_valid = 1;
-            /* Chain the sections */
-            if (p_cat_decoder->i_last_section_number)
-            {
-                for (int i = 0; i <= p_cat_decoder->i_last_section_number - 1; i++)
-                    p_cat_decoder->ap_sections[i]->p_next = p_cat_decoder->ap_sections[i + 1];
-            }
-            /* Decode the sections */
-            dvbpsi_DecodeCATSections(p_cat_decoder->p_building_cat,
-                                     p_cat_decoder->ap_sections[0]);
-            /* Delete the sections */
-            dvbpsi_DeletePSISections(p_cat_decoder->ap_sections[0]);
-            /* signal the new CAT */
-            p_cat_decoder->pf_cat_callback(p_cat_decoder->p_cb_data,
-                                           p_cat_decoder->p_building_cat);
-            /* Reinitialize the structures */
-            p_cat_decoder->p_building_cat = NULL;
-            for (unsigned int i = 0; i <= p_cat_decoder->i_last_section_number; i++)
-                p_cat_decoder->ap_sections[i] = NULL;
-        }
+        p_cat_decoder->p_building_cat =
+                            (dvbpsi_cat_t*)malloc(sizeof(dvbpsi_cat_t));
+        if (p_cat_decoder->p_building_cat)
+            dvbpsi_InitCAT(p_cat_decoder->p_building_cat,
+                           p_section->i_version, p_section->b_current_next);
+        else
+            dvbpsi_error(p_dvbpsi, "CAT decoder", "failed decoding section");
+        p_cat_decoder->i_last_section_number = p_section->i_last_number;
     }
-    else
+
+    /* Fill the section array */
+    if (p_cat_decoder->ap_sections[p_section->i_number] != NULL)
     {
-        dvbpsi_DeletePSISections(p_section);
+        dvbpsi_debug(p_dvbpsi, "CAT decoder", "overwrite section number %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_cat_decoder->ap_sections[p_section->i_number]);
+    }
+    p_cat_decoder->ap_sections[p_section->i_number] = p_section;
+
+    /* Check if we have all the sections */
+    for (unsigned int i = 0; i <= p_cat_decoder->i_last_section_number; i++)
+    {
+        if (!p_cat_decoder->ap_sections[i])
+            break;
+
+        if (i == p_cat_decoder->i_last_section_number)
+            b_complete = true;
+    }
+
+    if (b_complete)
+    {
+        /* Save the current information */
+        p_cat_decoder->current_cat = *p_cat_decoder->p_building_cat;
+        p_cat_decoder->b_current_valid = true;
+        /* Chain the sections */
+        if (p_cat_decoder->i_last_section_number)
+        {
+            for (int i = 0; i <= p_cat_decoder->i_last_section_number - 1; i++)
+                p_cat_decoder->ap_sections[i]->p_next = p_cat_decoder->ap_sections[i + 1];
+        }
+        /* Decode the sections */
+        dvbpsi_DecodeCATSections(p_cat_decoder->p_building_cat,
+                                 p_cat_decoder->ap_sections[0]);
+        /* Delete the sections */
+        dvbpsi_DeletePSISections(p_cat_decoder->ap_sections[0]);
+        /* signal the new CAT */
+        p_cat_decoder->pf_cat_callback(p_cat_decoder->p_cb_data,
+                                       p_cat_decoder->p_building_cat);
+        /* Reinitialize the structures */
+        p_cat_decoder->p_building_cat = NULL;
+        for (unsigned int i = 0; i <= p_cat_decoder->i_last_section_number; i++)
+            p_cat_decoder->ap_sections[i] = NULL;
     }
 }
 
