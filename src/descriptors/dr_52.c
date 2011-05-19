@@ -81,7 +81,7 @@ dvbpsi_stream_identifier_dr_t * dvbpsi_DecodeStreamIdentifierDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenStreamIdentifierDr(
                                         dvbpsi_stream_identifier_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

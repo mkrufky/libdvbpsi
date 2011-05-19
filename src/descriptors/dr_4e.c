@@ -105,7 +105,7 @@ dvbpsi_extended_event_dr_t * dvbpsi_DecodeExtendedEventDr(dvbpsi_descriptor_t * 
  * dvbpsi_GenExtendedEventDr
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenExtendedEventDr(dvbpsi_extended_event_dr_t * p_decoded,
-                                          int b_duplicate)
+                                                bool b_duplicate)
 {
   int i_len;
   int i_len2;

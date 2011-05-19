@@ -85,7 +85,7 @@ dvbpsi_private_data_dr_t * dvbpsi_DecodePrivateDataDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenPrivateDataDr(
                                         dvbpsi_private_data_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

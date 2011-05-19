@@ -109,7 +109,7 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
                                         dvbpsi_subtitling_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   int i;
 

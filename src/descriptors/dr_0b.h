@@ -56,7 +56,7 @@ extern "C" {
  */
 typedef struct dvbpsi_system_clock_dr_s
 {
-  int       b_external_clock_ref;       /*!< external_clock_reference_indicator
+  bool      b_external_clock_ref;       /*!< external_clock_reference_indicator
                                              */
   uint8_t   i_clock_accuracy_integer;   /*!< clock_accuracy_integer */
   uint8_t   i_clock_accuracy_exponent;  /*!< clock_accuracy_exponent */
@@ -84,17 +84,17 @@ dvbpsi_system_clock_dr_t* dvbpsi_DecodeSystemClockDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenSystemClockDr(
-                        dvbpsi_system_clock_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_system_clock_dr_t * p_decoded, bool b_duplicate)
  * \brief "system clock" descriptor generator.
  * \param p_decoded pointer to a decoded "system clock" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenSystemClockDr(
                                         dvbpsi_system_clock_dr_t * p_decoded,
-                                        int b_duplicate);
+                                        bool b_duplicate);
 
 
 #ifdef __cplusplus

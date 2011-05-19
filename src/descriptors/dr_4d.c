@@ -88,7 +88,7 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
  * dvbpsi_GenShortEventDr
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenShortEventDr(dvbpsi_short_event_dr_t * p_decoded,
-                                          int b_duplicate)
+                                             bool b_duplicate)
 {
   int i_len1 = p_decoded->i_event_name_length;
   int i_len2 = p_decoded->i_text_length;

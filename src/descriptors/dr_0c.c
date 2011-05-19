@@ -69,7 +69,7 @@ dvbpsi_mx_buff_utilization_dr_t * dvbpsi_DecodeMxBuffUtilizationDr(
     return NULL;
   }
 
-  p_decoded->b_mdv_valid = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;
+  p_decoded->b_mdv_valid = (p_descriptor->p_data[0] & 0x80) ? true : false;
   p_decoded->i_mx_delay_variation =
                           ((uint16_t)(p_descriptor->p_data[0] & 0x7f) << 8)
                         | p_descriptor->p_data[1];
@@ -86,7 +86,7 @@ dvbpsi_mx_buff_utilization_dr_t * dvbpsi_DecodeMxBuffUtilizationDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenMxBuffUtilizationDr(
                                 dvbpsi_mx_buff_utilization_dr_t * p_decoded,
-                                int b_duplicate)
+                                bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

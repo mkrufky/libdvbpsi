@@ -98,7 +98,7 @@ dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenTeletextDr(
                                         dvbpsi_teletext_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   int i;
 

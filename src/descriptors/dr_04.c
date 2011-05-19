@@ -83,7 +83,7 @@ dvbpsi_hierarchy_dr_t * dvbpsi_DecodeHierarchyDr(
  * dvbpsi_GenHierarchyDr
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenHierarchyDr(dvbpsi_hierarchy_dr_t * p_decoded,
-                                            int b_duplicate)
+                                            bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x04, 4, NULL);

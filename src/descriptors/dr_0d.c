@@ -91,7 +91,7 @@ dvbpsi_copyright_dr_t * dvbpsi_DecodeCopyrightDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenCopyrightDr(
                                         dvbpsi_copyright_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

@@ -81,7 +81,7 @@ dvbpsi_bouquet_name_dr_t * dvbpsi_DecodeBouquetNameDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenBouquetNameDr(
                                         dvbpsi_bouquet_name_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

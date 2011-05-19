@@ -105,7 +105,7 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenVBIDataDr(
                                         dvbpsi_vbi_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   int i;
 

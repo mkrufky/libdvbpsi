@@ -62,7 +62,7 @@
 /*****************************************************************************
  * ReadPacket
  *****************************************************************************/
-static int ReadPacket(int i_fd, uint8_t* p_dst)
+static bool ReadPacket(int i_fd, uint8_t* p_dst)
 {
   int i = 187;
   int i_rc = 1;
@@ -81,7 +81,7 @@ static int ReadPacket(int i_fd, uint8_t* p_dst)
       i -= i_rc;
   }
 
-  return (i == 0) ? 1 : 0;
+  return (i == 0) ? true : false;
 }
 
 /*****************************************************************************
@@ -260,7 +260,7 @@ int main(int i_argc, char* pa_argv[])
   int i_fd;
   uint8_t data[188];
   dvbpsi_t *p_dvbpsi;
-  int b_ok;
+  bool b_ok;
   uint16_t i_program_number, i_pmt_pid;
 
   if (i_argc != 4)

@@ -88,7 +88,7 @@ dvbpsi_target_bg_grid_dr_t * dvbpsi_DecodeTargetBgGridDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenTargetBgGridDr(
                                         dvbpsi_target_bg_grid_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x07, 4, NULL);

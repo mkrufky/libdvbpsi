@@ -130,7 +130,7 @@ void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi);
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id,
-                           uint8_t i_version, int b_current_next)
+                           uint8_t i_version, bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_pat_t structure.
  * \param p_pat pointer to the PAT structure
  * \param i_ts_id transport stream ID
@@ -139,7 +139,7 @@ void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi);
  * \return nothing.
  */
 void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
-                    int b_current_next);
+                    bool b_current_next);
 
 /*!
  * \def dvbpsi_NewPAT(p_pat, i_ts_id, i_version, b_current_next)

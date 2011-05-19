@@ -141,7 +141,7 @@ void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
     if (p_section->b_syntax_indicator)
     {
         /* 8 MSB of table_id_extension */
-        b_section->p_data[3] = (p_section->i_extension >> 8) & 0xff;
+        p_section->p_data[3] = (p_section->i_extension >> 8) & 0xff;
         /* 8 LSB of table_id_extension */
         p_section->p_data[4] = p_section->i_extension & 0xff;
         /* 5 bits of version_number | current_next_indicator */

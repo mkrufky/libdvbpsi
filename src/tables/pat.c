@@ -107,7 +107,7 @@ void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi)
  * Initialize a pre-allocated dvbpsi_pat_t structure.
  *****************************************************************************/
 void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
-                    int b_current_next)
+                    bool b_current_next)
 {
     p_pat->i_ts_id = i_ts_id;
     p_pat->i_version = i_version;

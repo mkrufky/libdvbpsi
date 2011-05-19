@@ -95,7 +95,7 @@ dvbpsi_parental_rating_dr_t * dvbpsi_DecodeParentalRatingDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenParentalRatingDr(
                                         dvbpsi_parental_rating_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   int i;
 

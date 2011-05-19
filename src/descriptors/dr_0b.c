@@ -69,7 +69,7 @@ dvbpsi_system_clock_dr_t * dvbpsi_DecodeSystemClockDr(
     return NULL;
   }
 
-  p_decoded->b_external_clock_ref = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;
+  p_decoded->b_external_clock_ref = (p_descriptor->p_data[0] & 0x80) ? true : false;
   p_decoded->i_clock_accuracy_integer = p_descriptor->p_data[0] & 0x3f;
   p_decoded->i_clock_accuracy_exponent = (p_descriptor->p_data[1] & 0xe0) >> 5;
 
@@ -84,7 +84,7 @@ dvbpsi_system_clock_dr_t * dvbpsi_DecodeSystemClockDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenSystemClockDr(
                                         dvbpsi_system_clock_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

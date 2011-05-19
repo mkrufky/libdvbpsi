@@ -90,7 +90,7 @@ dvbpsi_terr_deliv_sys_dr_t * dvbpsi_DecodeTerrDelivSysDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenTerrDelivSysDr(
                                         dvbpsi_terr_deliv_sys_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

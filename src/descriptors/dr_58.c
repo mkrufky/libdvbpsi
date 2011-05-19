@@ -99,7 +99,7 @@ dvbpsi_local_time_offset_dr_t * dvbpsi_DecodeLocalTimeOffsetDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenLocalTimeOffsetDr(
                                         dvbpsi_local_time_offset_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   uint8_t i_num;
   dvbpsi_local_time_offset_t * p_current;

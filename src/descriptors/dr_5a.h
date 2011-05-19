@@ -92,17 +92,17 @@ dvbpsi_terr_deliv_sys_dr_t* dvbpsi_DecodeTerrDelivSysDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenTerrDelivSysDr(
-                        dvbpsi_terr_deliv_sys_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_terr_deliv_sys_dr_t * p_decoded, bool b_duplicate)
  * \brief terrestrial delivery system descriptor generator.
  * \param p_decoded pointer to a decoded terrestrial delivery system descriptor
  * descriptor structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenTerrDelivSysDr(
                                         dvbpsi_terr_deliv_sys_dr_t * p_decoded,
-                                        int b_duplicate);
+                                        bool b_duplicate);
 
 
 #ifdef __cplusplus

@@ -591,7 +591,7 @@ int main(int i_argc, char* pa_argv[])
     uint8_t *p_data = NULL;
     ts_stream_t *p_stream = NULL;
     int i_len = 0;
-    int b_verbose = 0;
+    bool b_verbose = false;
 
     /* parser commandline arguments */
     do {
@@ -626,7 +626,7 @@ int main(int i_argc, char* pa_argv[])
                 break;
 #endif
             case 'v':
-                b_verbose = 1;
+                b_verbose = true;
                 break;
             case -1:
                 break;
