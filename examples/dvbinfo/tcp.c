@@ -45,7 +45,7 @@
 #       include <netinet/if_ether.h>
 #   endif
 #   include <netdb.h>
-#   ifndef __FreeBSD__
+#   ifndef BSD
 #       include <netinet/ip.h>
 #   endif
 #   include <netinet/udp.h>
