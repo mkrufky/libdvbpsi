@@ -96,6 +96,17 @@ dvbpsi_descriptor_t * dvbpsi_GenCUEIDr(dvbpsi_cuei_dr_t * p_decoded, bool b_dupl
   {
     /* Encode data */
     p_descriptor->p_data[0] = p_decoded->i_cue_stream_type;
+
+    if(b_duplicate)
+    {
+      /* Duplicate decoded data */
+      dvbpsi_cuei_dr_t *p_dup_decoded =
+                (dvbpsi_cuei_dr_t *)malloc(sizeof(dvbpsi_cuei_dr_t));
+      if(p_dup_decoded)
+        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_cuei_dr_t));
+
+      p_descriptor->p_decoded = (void*)p_dup_decoded;
+    }
   }
 
   return p_descriptor;
