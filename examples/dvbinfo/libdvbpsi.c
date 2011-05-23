@@ -622,10 +622,10 @@ static char const* GetTypeName(uint8_t type)
     case 0x1B: return "AVC video stream as defined in ITU-T Rec. H.264 | ISO/IEC 14496-10 Video";
     case 0x7F: return "IPMP stream";
     default:
-        if ((type >= 0x80) && (type <= 0xFF))
-            return "User Private";
-        else if ((type >= 0x1C) && (type <= 0x7E))
+        if ((type >= 0x1C) && (type <= 0x7E))
             return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 Reserved";
+        else if (type >= 0x80) /* 0x80 - 0xFF */
+            return "User Private";
         else
             return "Unknown";
         break;
@@ -825,9 +825,8 @@ static void DumpCUEIDescriptor(dvbpsi_cuei_dr_t* p_cuei_descriptor)
             if ((p_cuei_descriptor->i_cue_stream_type >= 0x05) &&
                 (p_cuei_descriptor->i_cue_stream_type <= 0x7f))
                 cuei_stream_type = "Reserved";
-            else if ((p_cuei_descriptor->i_cue_stream_type >= 0x80) &&
-                     (p_cuei_descriptor->i_cue_stream_type <= 0xff))
-                cuei_stream_type = "User defined";
+            else if ((p_cuei_descriptor->i_cue_stream_type >= 0x80))
+                cuei_stream_type = "User defined"; /* 0x80 - 0xFF */
             break;
     }
     printf("CUE Identifier stream type: (%0xd) %s\n",
