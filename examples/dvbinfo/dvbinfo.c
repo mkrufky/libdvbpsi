@@ -184,7 +184,7 @@ static void *dvbinfo_capture(void *data)
         if (buffer == NULL) /* out of memory */
             break;
 
-        size_t size = param->pf_read(param->fd_in, buffer->p_data, buffer->i_size);
+        ssize_t size = param->pf_read(param->fd_in, buffer->p_data, buffer->i_size);
         if (size < 0) /* short read ? */
         {
             fifo_push(capture->empty, buffer);
@@ -196,7 +196,7 @@ static void *dvbinfo_capture(void *data)
             b_eof = true;
             continue;
         }
-        assert(size == buffer->i_size);
+
         buffer->i_date = mdate();
 
         /* store buffer */
