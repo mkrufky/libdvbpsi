@@ -64,7 +64,7 @@ void dvbpsi_GatherBATSections(dvbpsi_t* p_dvbpsi,
  *****************************************************************************
  * BAT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeBATSections(dvbpsi_t* p_dvbpsi,dvbpsi_bat_t* p_bat,
+void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
                               dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************

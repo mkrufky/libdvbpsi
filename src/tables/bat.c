@@ -443,7 +443,7 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
                                     p_bat_decoder->ap_sections[j + 1];
         }
         /* Decode the sections */
-        dvbpsi_DecodeBATSections(p_dvbpsi, p_bat_decoder->p_building_bat,
+        dvbpsi_DecodeBATSections(p_bat_decoder->p_building_bat,
                                  p_bat_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[0]);
@@ -465,7 +465,7 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
  * p_section as the input parameter
  * similar to dvbpsi_DecodeNITSection
  *****************************************************************************/
-void dvbpsi_DecodeBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_bat,
+void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
                               dvbpsi_psi_section_t* p_section)
 {
   uint8_t* p_byte, * p_end, * p_end2;

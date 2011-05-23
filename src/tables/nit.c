@@ -432,7 +432,7 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
                                     p_nit_decoder->ap_sections[i + 1];
         }
         /* Decode the sections */
-        dvbpsi_DecodeNITSections(p_dvbpsi, p_nit_decoder->p_building_nit,
+        dvbpsi_DecodeNITSections(p_nit_decoder->p_building_nit,
                                  p_nit_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[0]);
@@ -451,7 +451,7 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
  *****************************************************************************
  * NIT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeNITSections(dvbpsi_t *p_dvbpsi, dvbpsi_nit_t* p_nit,
+void dvbpsi_DecodeNITSections(dvbpsi_nit_t* p_nit,
                               dvbpsi_psi_section_t* p_section)
 {
     uint8_t* p_byte, * p_end, * p_end2;
