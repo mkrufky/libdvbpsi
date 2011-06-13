@@ -460,6 +460,7 @@ void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, void *p_private_decoder,
 
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[0]);
+        p_eit_decoder->ap_sections[0] = NULL;
 
         /* signal the new EIT */
         p_eit_decoder->pf_eit_callback(p_eit_decoder->p_cb_data, p_eit_decoder->p_building_eit);

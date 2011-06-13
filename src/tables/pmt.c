@@ -402,6 +402,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
                                  p_pmt_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_pmt_decoder->ap_sections[0]);
+        p_pmt_decoder->ap_sections[0] = NULL;
         /* signal the new PMT */
         p_pmt_decoder->pf_pmt_callback(p_pmt_decoder->p_cb_data,
                                        p_pmt_decoder->p_building_pmt);

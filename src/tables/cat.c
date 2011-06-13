@@ -308,6 +308,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
                                  p_cat_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_cat_decoder->ap_sections[0]);
+        p_cat_decoder->ap_sections[0] = NULL;
         /* signal the new CAT */
         p_cat_decoder->pf_cat_callback(p_cat_decoder->p_cb_data,
                                        p_cat_decoder->p_building_cat);

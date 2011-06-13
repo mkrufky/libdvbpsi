@@ -339,6 +339,7 @@ void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sectio
                                  p_pat_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_pat_decoder->ap_sections[0]);
+        p_pat_decoder->ap_sections[0] = NULL;
         /* signal the new PAT */
         p_pat_decoder->pf_pat_callback(p_pat_decoder->p_cb_data,
                                        p_pat_decoder->p_building_pat);

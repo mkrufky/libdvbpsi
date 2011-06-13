@@ -137,7 +137,10 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     for (unsigned int i = 0; i <= 255; i++)
     {
         if (p_sdt_decoder->ap_sections[i])
+        {
             dvbpsi_DeletePSISections(p_sdt_decoder->ap_sections[i]);
+            p_sdt_decoder->ap_sections[i] = NULL;
+        }
     }
     free(p_subdec->p_cb_data);
 
@@ -409,6 +412,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
                                  p_sdt_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_sdt_decoder->ap_sections[0]);
+        p_sdt_decoder->ap_sections[0] = NULL;
         /* signal the new SDT */
         p_sdt_decoder->pf_sdt_callback(p_sdt_decoder->p_cb_data,
                                        p_sdt_decoder->p_building_sdt);

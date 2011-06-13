@@ -436,6 +436,7 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
                                  p_nit_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[0]);
+        p_nit_decoder->ap_sections[0] = NULL;
         /* signal the new NIT */
         p_nit_decoder->pf_nit_callback(p_nit_decoder->p_cb_data,
                                        p_nit_decoder->p_building_nit);
