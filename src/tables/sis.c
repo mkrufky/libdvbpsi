@@ -116,7 +116,6 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
     dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_demux_subdec_t** pp_prev_subdec;
-    dvbpsi_sis_decoder_t* p_sis_decoder;
 
     i_extension = 0;
 
@@ -130,8 +129,10 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
         return;
     }
 
+    dvbpsi_sis_decoder_t* p_sis_decoder;
     p_sis_decoder = (dvbpsi_sis_decoder_t*)p_subdec->p_cb_data;
-    free(p_subdec->p_cb_data);
+    free(p_sis_decoder);
+    p_subdec->p_cb_data = NULL;
 
     pp_prev_subdec = &p_demux->p_first_subdec;
     while(*pp_prev_subdec != p_subdec)
