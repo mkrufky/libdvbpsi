@@ -812,6 +812,8 @@ static void DumpCUEIDescriptor(dvbpsi_cuei_dr_t* p_cuei_descriptor)
 {
     const char *cuei_stream_type;
 
+    assert(p_cuei_descriptor);
+
     switch(p_cuei_descriptor->i_cue_stream_type)
     {
         case 0x00:
@@ -827,7 +829,7 @@ static void DumpCUEIDescriptor(dvbpsi_cuei_dr_t* p_cuei_descriptor)
                 cuei_stream_type = "Reserved";
             else if ((p_cuei_descriptor->i_cue_stream_type >= 0x80))
                 cuei_stream_type = "User defined"; /* 0x80 - 0xFF */
-            break;
+            return;
     }
     printf("CUE Identifier stream type: (%0xd) %s\n",
            p_cuei_descriptor->i_cue_stream_type, cuei_stream_type );
