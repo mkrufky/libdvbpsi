@@ -160,11 +160,26 @@ void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
 void dvbpsi_InitBAT(dvbpsi_bat_t* p_bat, uint16_t i_bouquet_id, uint8_t i_version,
                     bool b_current_next)
 {
+    assert(p_bat);
     p_bat->i_bouquet_id = i_bouquet_id;
     p_bat->i_version = i_version;
     p_bat->b_current_next = b_current_next;
     p_bat->p_first_ts = NULL;
     p_bat->p_first_descriptor = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_NewBAT
+ *****************************************************************************
+ * Allocate and initialize a dvbpsi_bat_t structure.
+ *****************************************************************************/
+dvbpsi_bat_t *dvbpsi_NewBAT(uint16_t i_bouquet_id, uint8_t i_version,
+                            bool b_current_next)
+{
+    dvbpsi_bat_t *p_bat = (dvbpsi_bat_t*)malloc(sizeof(dvbpsi_bat_t));
+    if(p_bat != NULL)
+        dvbpsi_InitBAT(p_bat, i_bouquet_id, i_version, b_current_next);
+    return p_bat;
 }
 
 /*****************************************************************************
@@ -187,6 +202,18 @@ void dvbpsi_EmptyBAT(dvbpsi_bat_t* p_bat)
         p_ts = p_tmp;
     }
     p_bat->p_first_ts = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_DeleteBAT
+ *****************************************************************************
+ * Empty and Delere a dvbpsi_bat_t structure.
+ *****************************************************************************/
+void dvbpsi_DeleteBAT(dvbpsi_bat_t *p_bat)
+{
+    if (p_bat)
+        dvbpsi_EmptyBAT(p_bat);
+    free(p_bat);
 }
 
 /*****************************************************************************

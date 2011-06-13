@@ -162,20 +162,16 @@ void dvbpsi_InitBAT(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_versio
                     bool b_current_next);
 
 /*!
- * \def dvbpsi_NewBAT(p_bat, i_bouquet_id, i_version, b_current_next)
+ * \def dvbpsi_bat_t *dvbpsi_NewBAT(uint16_t i_bouquet_id, uint8_t i_version,
+ *                   bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_bat_t structure.
- * \param p_bat pointer to the BAT structure
  * \param i_bouquet_id bouquet ID
  * \param i_version BAT version
  * \param b_current_next current next indicator
- * \return nothing.
+ * \return p_bat pointer to the BAT structure
  */
-#define dvbpsi_NewBAT(p_bat, i_bouquet_id, i_version, b_current_next) \
-do {                                                                    \
-  p_bat = (dvbpsi_bat_t*)malloc(sizeof(dvbpsi_bat_t));                  \
-  if(p_bat != NULL)                                                     \
-    dvbpsi_InitBAT(p_bat, i_bouquet_id, i_version, b_current_next); \
-} while(0);
+dvbpsi_bat_t *dvbpsi_NewBAT(uint16_t i_bouquet_id, uint8_t i_version,
+                            bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_EmptyBAT/dvbpsi_DeleteBAT
@@ -189,16 +185,12 @@ do {                                                                    \
 void dvbpsi_EmptyBAT(dvbpsi_bat_t *p_bat);
 
 /*!
- * \def dvbpsi_DeleteBAT(p_bat)
+ * \def dvbpsi_DeleteBAT(dvbpis_bat_t *p_bat)
  * \brief Clean and free a dvbpsi_bat_t structure.
  * \param p_bat pointer to the BAT structure
  * \return nothing.
  */
-#define dvbpsi_DeleteBAT(p_bat)                                         \
-do {                                                                    \
-  dvbpsi_EmptyBAT(p_bat);                                               \
-  free(p_bat);                                                          \
-} while(0);
+void dvbpsi_DeleteBAT(dvbpsi_bat_t *p_bat);
 
 /*****************************************************************************
  * dvbpsi_GenBATSections
