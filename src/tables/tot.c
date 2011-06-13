@@ -65,7 +65,8 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_tot_decoder_t*  p_tot_decoder;
 
-    if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0))
+    i_extension = 0; /* NOTE: force to 0 when handling TDT/TOT */
+    if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
         dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
                      "Already a decoder for (table_id == 0x%02x,"
@@ -117,7 +118,8 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
     dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_demux_subdec_t** pp_prev_subdec;
 
-    p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0);
+    i_extension = 0; /* NOTE: force to 0 when handling TDT/TOT */
+    p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if (p_demux == NULL)
     {
         dvbpsi_error(p_dvbpsi, "TDT/TOT Decoder",
@@ -254,7 +256,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
  *****************************************************************************
  * Check the CRC_32 if the section has b_syntax_indicator set.
  *****************************************************************************/
-bool dvbpsi_ValidTOTSection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
+static bool dvbpsi_ValidTOTSection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
     if (p_section->i_table_id != 0x73)
     {
