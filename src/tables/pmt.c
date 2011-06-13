@@ -358,7 +358,11 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
                        ((uint16_t)(p_section->p_payload_start[0] & 0x1f) << 8)
                      | p_section->p_payload_start[1]);
         else
-             dvbpsi_debug(p_dvbpsi, "PMT decoder", "failed decoding section");
+        {
+            dvbpsi_debug(p_dvbpsi, "PMT decoder", "failed decoding section");
+            dvbpsi_DeletePSISections(p_section);
+            return;
+        }
         p_pmt_decoder->i_last_section_number = p_section->i_last_number;
     }
 
