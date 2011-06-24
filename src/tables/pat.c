@@ -388,6 +388,12 @@ dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi,
     dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
     int i_count = 0;
 
+    if (p_current == NULL)
+    {
+        dvbpsi_error(p_dvbpsi, "PAT encoder", "failed to allocate new PSI section");
+        return NULL;
+    }
+
     /* A PAT section can carry up to 253 programs */
     if((i_max_pps <= 0) || (i_max_pps > 253))
         i_max_pps = 253;
@@ -411,6 +417,11 @@ dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi,
         {
             p_prev = p_current;
             p_current = dvbpsi_NewPSISection(1024);
+            if (p_current ==  NULL)
+            {
+                dvbpsi_error(p_dvbpsi, "PAT encoder", "failed to allocate new PSI section");
+                goto error;
+            }
             p_prev->p_next = p_current;
             i_count = 1;
 
@@ -449,4 +460,10 @@ dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi,
     }
 
     return p_result;
+
+error:
+    /* Cleanup on error */
+    p_prev = p_result;
+    dvbpsi_DeletePSISections(p_prev);
+    return NULL;
 }
