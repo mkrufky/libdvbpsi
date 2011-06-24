@@ -112,12 +112,29 @@ void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
 void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
                     uint8_t i_version, bool b_current_next, uint16_t i_pcr_pid)
 {
+    assert(p_pmt);
+
     p_pmt->i_program_number = i_program_number;
     p_pmt->i_version = i_version;
     p_pmt->b_current_next = b_current_next;
     p_pmt->i_pcr_pid = i_pcr_pid;
     p_pmt->p_first_descriptor = NULL;
     p_pmt->p_first_es = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_NewPMT
+ *****************************************************************************
+ * Allocate and Initialize a new dvbpsi_pmt_t structure.
+ *****************************************************************************/
+dvbpsi_pmt_t* dvbpsi_NewPMT(uint16_t i_program_number, uint8_t i_version,
+                            bool b_current_next, uint16_t i_pcr_pid)
+{
+    dvbpsi_pmt_t *p_pmt = (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));
+    if(p_pmt != NULL)
+        dvbpsi_InitPMT(p_pmt, i_program_number, i_version,
+                       b_current_next, i_pcr_pid);
+    return p_pmt;
 }
 
 /*****************************************************************************
@@ -141,6 +158,18 @@ void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt)
 
     p_pmt->p_first_descriptor = NULL;
     p_pmt->p_first_es = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_DeletePMT
+ *****************************************************************************
+ * Clean a dvbpsi_pmt_t structure.
+ *****************************************************************************/
+void dvbpsi_DeletePMT(dvbpsi_pmt_t* p_pmt)
+{
+    if (p_pmt)
+        dvbpsi_EmptyPMT(p_pmt);
+    free(p_pmt);
 }
 
 /*****************************************************************************

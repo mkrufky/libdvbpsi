@@ -153,24 +153,18 @@ void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
                     uint8_t i_version, bool b_current_next, uint16_t i_pcr_pid);
 
 /*!
- * \def dvbpsi_NewPMT(p_pmt, i_program_number,
-                      i_version, b_current_next, i_pcr_pid)
+ * \fn dvbpsi_pmt_t* dvbpsi_NewPMT(uint16_t i_program_number,
+                           uint8_t i_version, bool b_current_next,
+                           uint16_t i_pcr_pid)
  * \brief Allocate and initialize a new dvbpsi_pmt_t structure.
- * \param p_pmt pointer to the PMT structure
  * \param i_program_number program number
  * \param i_version PMT version
  * \param b_current_next current next indicator
  * \param i_pcr_pid PCR_PID
- * \return nothing.
+ * \return p_pmt pointer to the PMT structure
  */
-#define dvbpsi_NewPMT(p_pmt, i_program_number,                          \
-                      i_version, b_current_next, i_pcr_pid)             \
-do {                                                                    \
-  p_pmt = (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));                  \
-  if(p_pmt != NULL)                                                     \
-    dvbpsi_InitPMT(p_pmt, i_program_number, i_version, b_current_next,  \
-                   i_pcr_pid);                                          \
-} while(0);
+dvbpsi_pmt_t* dvbpsi_NewPMT(uint16_t i_program_number, uint8_t i_version,
+                            bool b_current_next, uint16_t i_pcr_pid);
 
 /*****************************************************************************
  * dvbpsi_EmptyPMT/dvbpsi_DeletePMT
@@ -184,16 +178,12 @@ do {                                                                    \
 void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt);
 
 /*!
- * \def dvbpsi_DeletePMT(p_pmt)
+ * \fn void dvbpsi_DeletePMT(dvbpsi_pmt_t* p_pmt)
  * \brief Clean and free a dvbpsi_pmt_t structure.
  * \param p_pmt pointer to the PMT structure
  * \return nothing.
  */
-#define dvbpsi_DeletePMT(p_pmt)                                         \
-do {                                                                    \
-  dvbpsi_EmptyPMT(p_pmt);                                               \
-  free(p_pmt);                                                          \
-} while(0);
+void dvbpsi_DeletePMT(dvbpsi_pmt_t* p_pmt);
 
 /*****************************************************************************
  * dvbpsi_PMTAddDescriptor
