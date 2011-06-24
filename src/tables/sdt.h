@@ -156,21 +156,17 @@ void dvbpsi_InitSDT(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next, uint16_t i_network_id);
 
 /*!
- * \def dvbpsi_NewSDT(p_sdt, i_ts_id, i_version, b_current_next, i_network_id)
+ * \fn dvbpsi_sdt_t *dvbpsi_NewSDT(uint16_t i_ts_id, uint8_t i_version,
+                                    bool b_current_next, uint16_t i_network_id)
  * \brief Allocate and initialize a new dvbpsi_sdt_t structure.
- * \param p_sdt pointer to the SDT structure
  * \param i_ts_id transport stream ID
  * \param i_version SDT version
  * \param b_current_next current next indicator
  * \param i_network_id original network id
- * \return nothing.
+ * \return p_sdt pointer to the SDT structure
  */
-#define dvbpsi_NewSDT(p_sdt, i_ts_id, i_version, b_current_next,i_network_id) \
-do {                                                                    \
-  p_sdt = (dvbpsi_sdt_t*)malloc(sizeof(dvbpsi_sdt_t));                  \
-  if(p_sdt != NULL)                                                     \
-    dvbpsi_InitSDT(p_sdt, i_ts_id, i_version, b_current_next, i_network_id); \
-} while(0);
+dvbpsi_sdt_t *dvbpsi_NewSDT(uint16_t i_ts_id, uint8_t i_version,
+                             bool b_current_next, uint16_t i_network_id);
 
 /*****************************************************************************
  * dvbpsi_EmptySDT/dvbpsi_DeleteSDT
@@ -184,16 +180,12 @@ do {                                                                    \
 void dvbpsi_EmptySDT(dvbpsi_sdt_t *p_sdt);
 
 /*!
- * \def dvbpsi_DeleteSDT(p_sdt)
+ * \fn void dvbpsi_DeleteSDT(dvbpsi_sdt_t *p_sdt)
  * \brief Clean and free a dvbpsi_sdt_t structure.
  * \param p_sdt pointer to the SDT structure
  * \return nothing.
  */
-#define dvbpsi_DeleteSDT(p_sdt)                                         \
-do {                                                                    \
-  dvbpsi_EmptySDT(p_sdt);                                               \
-  free(p_sdt);                                                          \
-} while(0);
+void dvbpsi_DeleteSDT(dvbpsi_sdt_t *p_sdt);
 
 /*****************************************************************************
  * dvbpsi_SDTAddService

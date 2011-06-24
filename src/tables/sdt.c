@@ -161,11 +161,27 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
 void dvbpsi_InitSDT(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next, uint16_t i_network_id)
 {
+    assert(p_sdt);
+
     p_sdt->i_ts_id = i_ts_id;
     p_sdt->i_version = i_version;
     p_sdt->b_current_next = b_current_next;
     p_sdt->i_network_id = i_network_id;
     p_sdt->p_first_service = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_NewSDT
+ *****************************************************************************
+ * Allocate and Initialize a new dvbpsi_sdt_t structure.
+ *****************************************************************************/
+dvbpsi_sdt_t *dvbpsi_NewSDT(uint16_t i_ts_id, uint8_t i_version,
+                             bool b_current_next, uint16_t i_network_id)
+{
+    dvbpsi_sdt_t *p_sdt = (dvbpsi_sdt_t*)malloc(sizeof(dvbpsi_sdt_t));
+    if (p_sdt != NULL)
+        dvbpsi_InitSDT(p_sdt, i_ts_id, i_version, b_current_next, i_network_id);
+    return p_sdt;
 }
 
 /*****************************************************************************
@@ -185,6 +201,18 @@ void dvbpsi_EmptySDT(dvbpsi_sdt_t* p_sdt)
         p_service = p_tmp;
     }
     p_sdt->p_first_service = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_DeleteSDT
+ *****************************************************************************
+ * Clean and Delete dvbpsi_sdt_t structure.
+ *****************************************************************************/
+void dvbpsi_DeleteSDT(dvbpsi_sdt_t *p_sdt)
+{
+    if (p_sdt)
+        dvbpsi_EmptySDT(p_sdt);
+    free(p_sdt);
 }
 
 /*****************************************************************************
