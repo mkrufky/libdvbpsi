@@ -109,10 +109,26 @@ void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi)
 void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next)
 {
+    assert(p_pat);
+
     p_pat->i_ts_id = i_ts_id;
     p_pat->i_version = i_version;
     p_pat->b_current_next = b_current_next;
     p_pat->p_first_program = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_NewPAT
+ *****************************************************************************
+ * Allocate and Initialize a newly allocated dvbpsi_pat_t structure.
+ *****************************************************************************/
+dvbpsi_pat_t *dvbpsi_NewPAT(uint16_t i_ts_id, uint8_t i_version,
+                            bool b_current_next)
+{
+    dvbpsi_pat_t *p_pat = (dvbpsi_pat_t*)malloc(sizeof(dvbpsi_pat_t));
+    if (p_pat)
+        dvbpsi_InitPAT(p_pat, i_ts_id, i_version, b_current_next);
+    return p_pat;
 }
 
 /*****************************************************************************
@@ -131,6 +147,18 @@ void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat)
         p_program = p_tmp;
     }
     p_pat->p_first_program = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_DeletePAT
+ *****************************************************************************
+ * Clean and Delete dvbpsi_pat_t structure.
+ *****************************************************************************/
+void dvbpsi_DeletePAT(dvbpsi_pat_t *p_pat)
+{
+    if (p_pat)
+        dvbpsi_EmptyPAT(p_pat);
+    free(p_pat);
 }
 
 /*****************************************************************************

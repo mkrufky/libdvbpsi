@@ -142,20 +142,15 @@ void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next);
 
 /*!
- * \def dvbpsi_NewPAT(p_pat, i_ts_id, i_version, b_current_next)
+ * \def dvbpsi_pat_t *dvbpsi_NewPAT(uint16_t i_ts_id, uint8_t i_version,
+ *                                  bool b_current_next);
  * \brief Allocate and initialize a new dvbpsi_pat_t structure.
- * \param p_pat pointer to the PAT structure
  * \param i_ts_id transport stream ID
  * \param i_version PAT version
  * \param b_current_next current next indicator
- * \return nothing.
+ * \return p_pat pointer to the PAT structure
  */
-#define dvbpsi_NewPAT(p_pat, i_ts_id, i_version, b_current_next)        \
-do {                                                                    \
-  p_pat = (dvbpsi_pat_t*)malloc(sizeof(dvbpsi_pat_t));                  \
-  if(p_pat != NULL)                                                     \
-    dvbpsi_InitPAT(p_pat, i_ts_id, i_version, b_current_next);          \
-} while(0);
+dvbpsi_pat_t *dvbpsi_NewPAT(uint16_t i_ts_id, uint8_t i_version, bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_EmptyPAT/dvbpsi_DeletePAT
@@ -169,16 +164,12 @@ do {                                                                    \
 void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat);
 
 /*!
- * \def dvbpsi_DeletePAT(p_pat)
+ * \def void dvbpsi_DeletePAT(dvbpsi_pat_t (*_pat)
  * \brief Clean and free a dvbpsi_pat_t structure.
  * \param p_pat pointer to the PAT structure
  * \return nothing.
  */
-#define dvbpsi_DeletePAT(p_pat)                                         \
-do {                                                                    \
-  dvbpsi_EmptyPAT(p_pat);                                               \
-  free(p_pat);                                                          \
-} while(0);
+void dvbpsi_DeletePAT(dvbpsi_pat_t *p_pat);
 
 /*****************************************************************************
  * dvbpsi_PATAddProgram
