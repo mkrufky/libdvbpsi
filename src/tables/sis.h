@@ -345,18 +345,12 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
 void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version);
 
 /*!
- * \def dvbpsi_NewSIS(p_sis, i_protocol_version)
+ * \fn dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version)
  * \brief Allocate and initialize a new dvbpsi_sis_t structure.
- * \param p_sis pointer to the SIS structure
  * \param i_protocol_version SIS protocol version (currently 0)
- * \return nothing.
+ * \return p_sis pointer to the SIS structure
  */
-#define dvbpsi_NewSIS(p_sis, i_protocol_version)                        \
-do {                                                                    \
-  p_sis = (dvbpsi_sis_t*)malloc(sizeof(dvbpsi_sis_t));                  \
-  if(p_sis != NULL)                                                     \
-    dvbpsi_InitSIS(p_sis, i_protocol_version);                          \
-} while(0);
+dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version);
 
 /*****************************************************************************
  * dvbpsi_EmptySIS/dvbpsi_DeleteSIS
@@ -370,16 +364,12 @@ do {                                                                    \
 void dvbpsi_EmptySIS(dvbpsi_sis_t *p_sis);
 
 /*!
- * \def dvbpsi_DeleteSIS(p_sis)
+ * \fn void  dvbpsi_DeleteSIS(dvbpsi_sis_t *p_sis)
  * \brief Clean and free a dvbpsi_sis_t structure.
  * \param p_sis pointer to the SIS structure
  * \return nothing.
  */
-#define dvbpsi_DeleteSIS(p_sis)                                         \
-do {                                                                    \
-  dvbpsi_EmptySIS(p_sis);                                               \
-  free(p_sis);                                                          \
-} while(0);
+void dvbpsi_DeleteSIS(dvbpsi_sis_t *p_sis);
 
 /*****************************************************************************
  * dvbpsi_SISAddDescriptor

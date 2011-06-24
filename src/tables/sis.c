@@ -176,6 +176,19 @@ void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version)
 }
 
 /*****************************************************************************
+ * dvbpsi_NewSIS
+ *****************************************************************************
+ * Allocate and Initialize a new dvbpsi_sis_t structure.
+ *****************************************************************************/
+dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version)
+{
+    dvbpsi_sis_t* p_sis = (dvbpsi_sis_t*)malloc(sizeof(dvbpsi_sis_t));
+    if(p_sis != NULL)
+        dvbpsi_InitSIS(p_sis, i_protocol_version);
+    return p_sis;
+}
+
+/*****************************************************************************
  * dvbpsi_EmptySIS
  *****************************************************************************
  * Clean a dvbpsi_sis_t structure.
@@ -188,6 +201,18 @@ void dvbpsi_EmptySIS(dvbpsi_sis_t* p_sis)
     p_sis->p_first_descriptor = NULL;
 
     /* FIXME: free alignment stuffing */
+}
+
+/*****************************************************************************
+ * dvbpsi_DeleteSIS
+ *****************************************************************************
+ * Clean and Delete a dvbpsi_sis_t structure.
+ *****************************************************************************/
+void dvbpsi_DeleteSIS(dvbpsi_sis_t *p_sis)
+{
+    if (p_sis)
+        dvbpsi_EmptySIS(p_sis);
+    free(p_sis);
 }
 
 /*****************************************************************************
