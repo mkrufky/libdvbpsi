@@ -172,6 +172,23 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
 }
 
 /*****************************************************************************
+ * dvbpsi_NewEIT
+ *****************************************************************************
+ * Allocate and Initialize a new dvbpsi_eit_t structure.
+ *****************************************************************************/
+dvbpsi_eit_t* dvbpsi_NewtEIT(uint16_t i_service_id, uint8_t i_version,
+                             bool b_current_next, uint16_t i_ts_id,
+                             uint16_t i_network_id, uint8_t i_segment_last_section_number,
+                             uint8_t i_last_table_id)
+{
+    dvbpsi_eit_t *p_eit = (dvbpsi_eit_t*)malloc(sizeof(dvbpsi_eit_t));
+    if (p_eit != NULL)
+        dvbpsi_InitEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id,
+                       i_network_id, i_segment_last_section_number, i_last_table_id);
+    return p_eit;
+}
+
+/*****************************************************************************
  * dvbpsi_EmptyEIT
  *****************************************************************************
  * Clean a dvbpsi_eit_t structure.
@@ -188,6 +205,18 @@ void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit)
         p_event = p_tmp;
     }
     p_eit->p_first_event = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_DeleteEIT
+ *****************************************************************************
+ * Clean a dvbpsi_eit_t structure.
+ *****************************************************************************/
+void dvbpsi_DeleteEIT(dvbpsi_eit_t* p_eit)
+{
+    if (p_eit)
+        dvbpsi_EmptyEIT(p_eit);
+    free(p_eit);
 }
 
 /*****************************************************************************

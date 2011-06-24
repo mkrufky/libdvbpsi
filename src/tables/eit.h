@@ -165,9 +165,11 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
                     uint8_t i_last_table_id);
 
 /*!
- * \def dvbpsi_NewEIT(p_eit, i_ts_id, i_version, b_current_next, i_network_id)
+ * \fn dvbpsi_eit_t* dvbpsi_NewtEIT(uint16_t i_service_id,
+          uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
+          uint16_t i_network_id, uint8_t i_segment_last_section_number,
+          uint8_t i_last_table_id)
  * \brief Allocate and initialize a new dvbpsi_eit_t structure.
- * \param p_eit pointer to the EIT structure
  * \param i_service_id service ID
  * \param i_version EIT version
  * \param b_current_next current next indicator
@@ -175,14 +177,12 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
  * \param i_network_id original network id
  * \param i_segment_last_section_number segment_last_section_number
  * \param i_last_table_id i_last_table_id
- * \return nothing.
+ * \return p_eit pointer to the EIT structure
  */
-#define dvbpsi_NewEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id) \
-do {                                                                    \
-  p_eit = (dvbpsi_eit_t*)malloc(sizeof(dvbpsi_eit_t));                  \
-  if(p_eit != NULL)                                                     \
-    dvbpsi_InitEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id); \
-} while(0);
+dvbpsi_eit_t* dvbpsi_NewtEIT(uint16_t i_service_id,
+          uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
+          uint16_t i_network_id, uint8_t i_segment_last_section_number,
+          uint8_t i_last_table_id);
 
 /*****************************************************************************
  * dvbpsi_EmptyEIT/dvbpsi_DeleteEIT
@@ -196,16 +196,12 @@ do {                                                                    \
 void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit);
 
 /*!
- * \def dvbpsi_DeleteEIT(p_eit)
+ * \fn void dvbpsi_DeleteEIT(dvbpsi_eit_t *p_eit)
  * \brief Clean and free a dvbpsi_eit_t structure.
  * \param p_eit pointer to the EIT structure
  * \return nothing.
  */
-#define dvbpsi_DeleteEIT(p_eit)                                         \
-do {                                                                    \
-  dvbpsi_EmptyEIT(p_eit);                                               \
-  free(p_eit);                                                          \
-} while(0);
+void dvbpsi_DeleteEIT(dvbpsi_eit_t* p_eit);
 
 /*****************************************************************************
  * dvbpsi_EITAddEvent
