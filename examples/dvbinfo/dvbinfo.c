@@ -80,7 +80,7 @@ typedef struct dvbinfo_capture_s
 static void usage(void)
 {
 #ifdef HAVE_SYS_SOCKET_H
-    printf("Usage: dvbinfo [-h] [-d <debug>] [-f| [[-u|-t] -i <ipaddress:port>]\n");
+    printf("Usage: dvbinfo [-h] [-d <debug>] [-f| [[-u|-t] -i <ipaddress:port>] -o <outputfile>\n");
 #else
     printf("Usage: dvbinfo [-h] [-d <debug>] [-f|\n");
 #endif
@@ -90,6 +90,7 @@ static void usage(void)
     printf(" -i : hostname or ipaddress\n");
     printf(" -u : udp network transport\n");
     printf(" -t : tcp network transport\n");
+    printf(" -o : output to filename\n");
 #endif
     printf(" -h : help information\n");
     exit(EXIT_FAILURE);
@@ -123,9 +124,31 @@ static void params_free(params_t *param)
 }
 
 /* */
+static void dvbinfo_close(params_t *param)
+{
+#ifdef HAVE_SYS_SOCKET_H
+    if (param->input && param->b_udp)
+        udp_close(param->fd_in);
+    else if (param->input && param->b_tcp)
+        tcp_close(param->fd_in);
+    else
+#endif
+    if (param->input)
+        close(param->fd_in);
+    if (param->output)
+        close(param->fd_out);
+}
+
 static void dvbinfo_open(params_t *param)
 {
 #ifdef HAVE_SYS_SOCKET_H
+    if (param->output)
+    {
+        param->fd_out = open(param->output, O_CREAT | O_RDWR | O_NONBLOCK
+                             | O_EXCL | O_CLOEXEC, S_IRWXU);
+        if (param->fd_out < 0)
+            goto error;
+    }
     if (param->input && param->b_udp)
     {
         param->fd_in = udp_open(param->input, param->port);
@@ -149,21 +172,9 @@ static void dvbinfo_open(params_t *param)
     return;
 
 error:
+    dvbinfo_close(param);
     params_free(param);
     exit(EXIT_FAILURE);
-}
-
-static void dvbinfo_close(params_t *param)
-{
-#ifdef HAVE_SYS_SOCKET_H
-    if (param->input && param->b_udp)
-        udp_close(param->fd_in);
-    else if (param->input && param->b_tcp)
-        tcp_close(param->fd_in);
-    else
-#endif
-    if (param->input)
-        close(param->fd_in);
 }
 
 static void *dvbinfo_capture(void *data)
@@ -229,6 +240,21 @@ static void dvbinfo_process(dvbinfo_capture_t *capture)
         if (buffer == NULL)
             break;
 
+        if (param->output)
+        {
+            size_t size = param->pf_write(param->fd_out, buffer->p_data, buffer->i_size);
+            if (size < 0) /* error writing */
+            {
+                fprintf(stderr, "error (%d) writting to %s", errno, param->output);
+                break;
+            }
+            else if (size < buffer->i_size) /* short writting disk full? */
+            {
+                fprintf(stderr, "error writting to %s (disk full?)", param->output);
+                break;
+            }
+        }
+
         if (!libdvbpsi_process(stream, buffer->p_data, buffer->i_size))
             b_error = true;
 
@@ -273,12 +299,13 @@ int main(int argc, char **pp_argv)
         { "ipaddress", required_argument, NULL, 'i' },
         { "tcp",       no_argument,       NULL, 't' },
         { "udp",       no_argument,       NULL, 'u' },
+        { "output",    required_argument, NULL, 'o' },
 #endif
         { "help",      no_argument,       NULL, 'h' },
         { 0, 0, 0, 0 }
     };
 #ifdef HAVE_SYS_SOCKET_H
-    while ((c = getopt_long(argc, pp_argv, "d:f:i:htu", long_options, NULL)) != -1)
+    while ((c = getopt_long(argc, pp_argv, "d:f:i:ho:tu", long_options, NULL)) != -1)
 #else
     while ((c = getopt_long(argc, pp_argv, "d:f:h", long_options, NULL)) != -1)
 #endif
@@ -323,6 +350,19 @@ int main(int argc, char **pp_argv)
                         parm->input = strdup(psz_tmp);
                     }
                     else usage();
+                }
+                break;
+
+            case 'o':
+                if (optarg)
+                {
+                    if (asprintf(&parm->output, "%s", optarg) < 0)
+                    {
+                        fprintf(stderr, "error: out of memory\n");
+                        usage();
+                    }
+                    /* */
+                    parm->pf_write = write;
                 }
                 break;
 
