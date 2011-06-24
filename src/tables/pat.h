@@ -142,8 +142,8 @@ void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next);
 
 /*!
- * \def dvbpsi_pat_t *dvbpsi_NewPAT(uint16_t i_ts_id, uint8_t i_version,
- *                                  bool b_current_next);
+ * \fn dvbpsi_pat_t *dvbpsi_NewPAT(uint16_t i_ts_id, uint8_t i_version,
+ *                                 bool b_current_next);
  * \brief Allocate and initialize a new dvbpsi_pat_t structure.
  * \param i_ts_id transport stream ID
  * \param i_version PAT version
@@ -164,7 +164,7 @@ dvbpsi_pat_t *dvbpsi_NewPAT(uint16_t i_ts_id, uint8_t i_version, bool b_current_
 void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat);
 
 /*!
- * \def void dvbpsi_DeletePAT(dvbpsi_pat_t (*_pat)
+ * \fn void dvbpsi_DeletePAT(dvbpsi_pat_t (*_pat)
  * \brief Clean and free a dvbpsi_pat_t structure.
  * \param p_pat pointer to the PAT structure
  * \return nothing.
