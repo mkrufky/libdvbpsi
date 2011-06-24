@@ -403,7 +403,10 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
                 }
                 else
                 {
-                    dvbpsi_error(handle, "misc PSI", "Bad CRC_32 !!!");
+                    if (!dvbpsi_ValidPSISection(p_section))
+                        dvbpsi_error(handle, "misc PSI", "Bad CRC_32 !!!");
+                    else
+                        dvbpsi_error(handle, "misc PSI", "0x%x", p_section->p_data[0]);
 
                     /* PSI section isn't valid => trash it */
                     dvbpsi_DeletePSISections(p_section);
