@@ -358,21 +358,20 @@ void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sectio
 void dvbpsi_DecodePATSections(dvbpsi_pat_t* p_pat,
                               dvbpsi_psi_section_t* p_section)
 {
-  while(p_section)
-  {
-    for(uint8_t *p_byte = p_section->p_payload_start;
-        p_byte < p_section->p_payload_end;
-        p_byte += 4)
+    while (p_section)
     {
-      uint16_t i_program_number = ((uint16_t)(p_byte[0]) << 8) | p_byte[1];
-      uint16_t i_pid = ((uint16_t)(p_byte[2] & 0x1f) << 8) | p_byte[3];
-      dvbpsi_PATAddProgram(p_pat, i_program_number, i_pid);
+        for (uint8_t *p_byte = p_section->p_payload_start;
+            p_byte < p_section->p_payload_end;
+            p_byte += 4)
+        {
+            uint16_t i_program_number = ((uint16_t)(p_byte[0]) << 8) | p_byte[1];
+            uint16_t i_pid = ((uint16_t)(p_byte[2] & 0x1f) << 8) | p_byte[3];
+            dvbpsi_PATAddProgram(p_pat, i_program_number, i_pid);
+        }
+
+        p_section = p_section->p_next;
     }
-
-    p_section = p_section->p_next;
-  }
 }
-
 
 /*****************************************************************************
  * dvbpsi_GenPATSections
@@ -383,71 +382,71 @@ void dvbpsi_DecodePATSections(dvbpsi_pat_t* p_pat,
 dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi,
                                             dvbpsi_pat_t* p_pat, int i_max_pps)
 {
-  dvbpsi_psi_section_t* p_result = dvbpsi_NewPSISection(1024);
-  dvbpsi_psi_section_t* p_current = p_result;
-  dvbpsi_psi_section_t* p_prev;
-  dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
-  int i_count = 0;
+    dvbpsi_psi_section_t* p_result = dvbpsi_NewPSISection(1024);
+    dvbpsi_psi_section_t* p_current = p_result;
+    dvbpsi_psi_section_t* p_prev;
+    dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
+    int i_count = 0;
 
-  /* A PAT section can carry up to 253 programs */
-  if((i_max_pps <= 0) || (i_max_pps > 253))
-    i_max_pps = 253;
+    /* A PAT section can carry up to 253 programs */
+    if((i_max_pps <= 0) || (i_max_pps > 253))
+        i_max_pps = 253;
 
-  p_current->i_table_id = 0;
-  p_current->b_syntax_indicator = true;
-  p_current->b_private_indicator = false;
-  p_current->i_length = 9;                      /* header + CRC_32 */
-  p_current->i_extension = p_pat->i_ts_id;
-  p_current->i_version = p_pat->i_version;
-  p_current->b_current_next = p_pat->b_current_next;
-  p_current->i_number = 0;
-  p_current->p_payload_end += 8;                /* just after the header */
-  p_current->p_payload_start = p_current->p_payload_end;
+    p_current->i_table_id = 0;
+    p_current->b_syntax_indicator = true;
+    p_current->b_private_indicator = false;
+    p_current->i_length = 9;                      /* header + CRC_32 */
+    p_current->i_extension = p_pat->i_ts_id;
+    p_current->i_version = p_pat->i_version;
+    p_current->b_current_next = p_pat->b_current_next;
+    p_current->i_number = 0;
+    p_current->p_payload_end += 8;                /* just after the header */
+    p_current->p_payload_start = p_current->p_payload_end;
 
-  /* PAT programs */
-  while(p_program != NULL)
-  {
-    /* New section if needed */
-    if(++i_count > i_max_pps)
+    /* PAT programs */
+    while (p_program != NULL)
     {
-      p_prev = p_current;
-      p_current = dvbpsi_NewPSISection(1024);
-      p_prev->p_next = p_current;
-      i_count = 1;
+        /* New section if needed */
+        if (++i_count > i_max_pps)
+        {
+            p_prev = p_current;
+            p_current = dvbpsi_NewPSISection(1024);
+            p_prev->p_next = p_current;
+            i_count = 1;
 
-      p_current->i_table_id = 0;
-      p_current->b_syntax_indicator = true;
-      p_current->b_private_indicator = false;
-      p_current->i_length = 9;                  /* header + CRC_32 */
-      p_current->i_extension = p_pat->i_ts_id;
-      p_current->i_version = p_pat->i_version;
-      p_current->b_current_next = p_pat->b_current_next;
-      p_current->i_number = p_prev->i_number + 1;
-      p_current->p_payload_end += 8;            /* just after the header */
-      p_current->p_payload_start = p_current->p_payload_end;
+            p_current->i_table_id = 0;
+            p_current->b_syntax_indicator = true;
+            p_current->b_private_indicator = false;
+            p_current->i_length = 9;                  /* header + CRC_32 */
+            p_current->i_extension = p_pat->i_ts_id;
+            p_current->i_version = p_pat->i_version;
+            p_current->b_current_next = p_pat->b_current_next;
+            p_current->i_number = p_prev->i_number + 1;
+            p_current->p_payload_end += 8;            /* just after the header */
+            p_current->p_payload_start = p_current->p_payload_end;
+        }
+
+        /* p_payload_end is where the program begins */
+        p_current->p_payload_end[0] = p_program->i_number >> 8;
+        p_current->p_payload_end[1] = p_program->i_number;
+        p_current->p_payload_end[2] = (p_program->i_pid >> 8) | 0xe0;
+        p_current->p_payload_end[3] = p_program->i_pid;
+
+        /* Increase length by 4 */
+        p_current->p_payload_end += 4;
+        p_current->i_length += 4;
+
+        p_program = p_program->p_next;
     }
 
-    /* p_payload_end is where the program begins */
-    p_current->p_payload_end[0] = p_program->i_number >> 8;
-    p_current->p_payload_end[1] = p_program->i_number;
-    p_current->p_payload_end[2] = (p_program->i_pid >> 8) | 0xe0;
-    p_current->p_payload_end[3] = p_program->i_pid;
+    /* Finalization */
+    p_prev = p_result;
+    while (p_prev != NULL)
+    {
+        p_prev->i_last_number = p_current->i_number;
+        dvbpsi_BuildPSISection(p_dvbpsi, p_prev);
+        p_prev = p_prev->p_next;
+    }
 
-    /* Increase length by 4 */
-    p_current->p_payload_end += 4;
-    p_current->i_length += 4;
-
-    p_program = p_program->p_next;
-  }
-
-  /* Finalization */
-  p_prev = p_result;
-  while(p_prev != NULL)
-  {
-    p_prev->i_last_number = p_current->i_number;
-    dvbpsi_BuildPSISection(p_dvbpsi, p_prev);
-    p_prev = p_prev->p_next;
-  }
-
-  return p_result;
+    return p_result;
 }
