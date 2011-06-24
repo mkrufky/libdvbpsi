@@ -565,6 +565,12 @@ dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_
     uint16_t i_bouquet_descriptors_length, i_transport_stream_loop_length;
     uint8_t * p_transport_stream_loop_length;
 
+    if (p_current == NULL)
+    {
+        dvbpsi_error(p_dvbpsi, "BAT encoder", "failed to allocate new PSI section");
+        return NULL;
+    }
+
     p_current->i_table_id = 0x4a;
     p_current->b_syntax_indicator = true;
     p_current->b_private_indicator = true;
@@ -596,6 +602,11 @@ dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_
 
             p_prev = p_current;
             p_current = dvbpsi_NewPSISection(1024);
+            if (p_current ==  NULL)
+            {
+                dvbpsi_error(p_dvbpsi, "BAT encoder", "failed to allocate new PSI section");
+                goto error;
+            }
             p_prev->p_next = p_current;
 
             p_current->i_table_id = 0x4a;
@@ -747,4 +758,10 @@ dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_
         p_prev = p_prev->p_next;
     }
     return p_result;
+
+error:
+    /* Cleanup on error */
+    p_prev = p_result;
+    dvbpsi_DeletePSISections(p_prev);
+    return NULL;
 }
