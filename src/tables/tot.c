@@ -147,6 +147,7 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************/
 void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time)
 {
+    p_tot->i_crc = 0;
     p_tot->i_utc_time = i_utc_time;
     p_tot->p_first_descriptor = NULL;
 }
@@ -241,7 +242,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
                                        | ((uint64_t)p_section->p_payload_start[3] <<  8)
                                        |  (uint64_t)p_section->p_payload_start[4]);
     else
-        dvbpsi_error(p_dvbpsi, "TOT decoder", "failed decoding section");
+        dvbpsi_error(p_dvbpsi, "TOT/TDT decoder", "failed decoding section");
 
     /* Decode the section */
     dvbpsi_DecodeTOTSections(p_dvbpsi, p_building_tot, p_section);
@@ -258,9 +259,9 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
  *****************************************************************************/
 static bool dvbpsi_ValidTOTSection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
-    if (p_section->i_table_id != 0x73)
+    if (p_section->i_table_id == 0x70)
     {
-        /* A TDT always has a length of 5 bytes (which is only the UTC time) */
+        /* A TDT (table_id 0x70) always has a length of 5 bytes (which is only the UTC time) */
         if (p_section->i_length != 5)
         {
             dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
