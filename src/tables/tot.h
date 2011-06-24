@@ -29,8 +29,9 @@
  * \author Johann Hanne
  * \brief Application interface for the TDT/TOT decoder and the TDT/TOT generator.
  *
- * Application interface for the TDT/TOT decoder and the TDT/TOT generator.
- * New decoded TDT/TOT tables are sent by callback to the application.
+ * Application interface for the TDT (Time and Date Table)/TOT (Time Offset Table)
+ * decoder and the TDT/TOT generator. New decoded TDT/TOT tables are sent by
+ * callback to the application.
  */
 
 #ifndef _DVBPSI_TOT_H_
