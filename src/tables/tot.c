@@ -153,6 +153,19 @@ void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time)
 }
 
 /*****************************************************************************
+ * dvbpsi_NewTOT
+ *****************************************************************************
+ * Allocate and Initialize a new dvbpsi_tot_t structure.
+ *****************************************************************************/
+dvbpsi_tot_t *dvbpsi_NewTOT(uint64_t i_utc_time)
+{
+  dvbpsi_tot_t *p_tot = (dvbpsi_tot_t*)malloc(sizeof(dvbpsi_tot_t));
+  if (p_tot != NULL)
+        dvbpsi_InitTOT(p_tot, i_utc_time);
+  return p_tot;
+}
+
+/*****************************************************************************
  * dvbpsi_EmptyTOT
  *****************************************************************************
  * Clean a dvbpsi_tot_t structure.
@@ -161,6 +174,18 @@ void dvbpsi_EmptyTOT(dvbpsi_tot_t* p_tot)
 {
     dvbpsi_DeleteDescriptors(p_tot->p_first_descriptor);
     p_tot->p_first_descriptor = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_NewTOT
+ *****************************************************************************
+ * Clean and Delete dvbpsi_tot_t structure.
+ *****************************************************************************/
+void dvbpsi_DeleteTOT(dvbpsi_tot_t* p_tot)
+{
+    if (p_tot)
+        dvbpsi_EmptyTOT(p_tot);
+    free(p_tot);
 }
 
 /*****************************************************************************

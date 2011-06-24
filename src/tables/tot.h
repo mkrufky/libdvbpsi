@@ -1,6 +1,6 @@
 /*****************************************************************************
  * tot.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -119,18 +119,12 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
 void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time);
 
 /*!
- * \def dvbpsi_NewTOT(p_tot, i_utc_time)
+ * \fn dvbpsi_tot_t *dvbpsi_NewTOT(uint64_t i_utc_time)
  * \brief Allocate and initialize a new dvbpsi_tot_t structure.
- * \param p_tot pointer to the TDT/TOT structure
  * \param i_utc_time the time in UTC
- * \return nothing.
+ * \return p_tot pointer to the TDT/TOT structure
  */
-#define dvbpsi_NewTOT(p_tot, i_utc_time)                                \
-do {                                                                    \
-  p_tot = (dvbpsi_tot_t*)malloc(sizeof(dvbpsi_tot_t));                  \
-  if(p_tot != NULL)                                                     \
-    dvbpsi_InitTOT(p_tot, i_utc_time);                                  \
-} while(0);
+dvbpsi_tot_t *dvbpsi_NewTOT(uint64_t i_utc_time);
 
 /*****************************************************************************
  * dvbpsi_EmptyTOT/dvbpsi_DeleteTOT
@@ -144,16 +138,12 @@ do {                                                                    \
 void dvbpsi_EmptyTOT(dvbpsi_tot_t* p_tot);
 
 /*!
- * \def dvbpsi_DeleteTOT(p_tot)
+ * \fn dvbpsi_DeleteTOT(dvbpsi_tot_t* p_tot)
  * \brief Clean and free a dvbpsi_tot_t structure.
  * \param p_tot pointer to the TDT/TOT structure
  * \return nothing.
  */
-#define dvbpsi_DeleteTOT(p_tot)                                         \
-do {                                                                    \
-  dvbpsi_EmptyTOT(p_tot);                                               \
-  free(p_tot);                                                          \
-} while(0);
+void dvbpsi_DeleteTOT(dvbpsi_tot_t* p_tot);
 
 /*****************************************************************************
  * dvbpsi_TOTAddDescriptor
