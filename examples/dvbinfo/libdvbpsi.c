@@ -1077,9 +1077,15 @@ static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot)
     //ts_stream_t* p_stream = (ts_stream_t*) p_data;
 
     printf("\n");
-    printf("  TDT/TOT: TDT/TOT Table\n");
+    uint8_t table_id = (p_tot->p_first_descriptor != NULL) ? 0x73 : 0x70;
+    if (table_id == 0x70) /* TDT */
+        printf("  TDT: Time and Date Table\n");
+    else if (table_id == 0x73) /* TOT */
+        printf("  TOT: Time Offset Table\n");
+
     printf("\tUTC time       : %"PRId64"\n", p_tot->i_utc_time);
-    printf("\tCRC 32         : %d\n", p_tot->i_crc);
+    if (table_id == 0x73) /* TOT */
+        printf("\tCRC 32         : %d\n", p_tot->i_crc);
     DumpDescriptors("\t  |  ]", p_tot->p_first_descriptor);
     dvbpsi_DeleteTOT(p_tot);
 }
