@@ -116,6 +116,19 @@ void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat, uint8_t i_version, bool b_current_next)
 }
 
 /*****************************************************************************
+ * dvbpsi_NewCAT
+ *****************************************************************************
+ * Allocate and Initialize a dvbpsi_cat_t structure.
+ *****************************************************************************/
+dvbpsi_cat_t *dvbpsi_NewCAT(uint8_t i_version, bool b_current_next)
+{
+    dvbpsi_cat_t *p_cat = (dvbpsi_cat_t*)malloc(sizeof(dvbpsi_cat_t));
+    if (p_cat != NULL)
+        dvbpsi_InitCAT(p_cat, i_version, b_current_next);
+    return p_cat;
+}
+
+/*****************************************************************************
  * dvbpsi_EmptyCAT
  *****************************************************************************
  * Clean a dvbpsi_cat_t structure.
@@ -124,6 +137,18 @@ void dvbpsi_EmptyCAT(dvbpsi_cat_t* p_cat)
 {
     dvbpsi_DeleteDescriptors(p_cat->p_first_descriptor);
     p_cat->p_first_descriptor = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_DeleteCAT
+ *****************************************************************************
+ * Clean a dvbpsi_cat_t structure.
+ *****************************************************************************/
+void dvbpsi_DeleteCAT(dvbpsi_cat_t *p_cat)
+{
+    if (p_cat)
+        dvbpsi_EmptyCAT(p_cat);
+    free(p_cat);
 }
 
 /*****************************************************************************

@@ -1,6 +1,6 @@
 /*****************************************************************************
  * cat.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -118,21 +118,14 @@ void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat,
                     uint8_t i_version, bool b_current_next);
 
 /*!
- * \def dvbpsi_NewCAT(p_cat,
-                      i_version, b_current_next)
+ * \fn dvbpsi_cat_t *dvbpsi_NewCAT(uint8_t i_version,
+ *                                  bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_cat_t structure.
- * \param p_cat pointer to the CAT structure
  * \param i_version CAT version
  * \param b_current_next current next indicator
- * \return nothing.
+ * \return p_cat pointer to the CAT structure
  */
-#define dvbpsi_NewCAT(p_cat,                                            \
-                      i_version, b_current_next)                        \
-do {                                                                    \
-  p_cat = (dvbpsi_cat_t*)malloc(sizeof(dvbpsi_cat_t));                  \
-  if(p_cat != NULL)                                                     \
-    dvbpsi_InitCAT(p_cat, i_version, b_current_next);                   \
-} while(0);
+dvbpsi_cat_t *dvbpsi_NewCAT(uint8_t i_version, bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_EmptyCAT/dvbpsi_DeleteCAT
@@ -146,16 +139,12 @@ do {                                                                    \
 void dvbpsi_EmptyCAT(dvbpsi_cat_t* p_cat);
 
 /*!
- * \def dvbpsi_DeleteCAT(p_cat)
+ * \fn void dvbpsi_DeleteCAT(dvbpsi_cat_t *p_cat)
  * \brief Clean and free a dvbpsi_cat_t structure.
  * \param p_cat pointer to the CAT structure
  * \return nothing.
  */
-#define dvbpsi_DeleteCAT(p_cat)                                         \
-do {                                                                    \
-  dvbpsi_EmptyCAT(p_cat);                                               \
-  free(p_cat);                                                          \
-} while(0);
+void dvbpsi_DeleteCAT(dvbpsi_cat_t *p_cat);
 
 /*****************************************************************************
  * dvbpsi_CATAddDescriptor
