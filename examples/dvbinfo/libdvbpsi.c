@@ -1364,7 +1364,7 @@ static ssize_t check_sync_word(uint8_t *buf, ssize_t length)
     return i_lost;
 }
 
-bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length)
+bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_t date)
 {
     mtime_t  i_prev_pcr = 0;  /* 33 bits */
     int      i_old_cc = -1;
@@ -1377,7 +1377,8 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length)
         {
             stream->i_lost_bytes += i_lost;
             i += i_lost;
-            fprintf(stderr, "dvbinfo: Lost %"PRId64" bytes out of %"PRId64" in buffer\n", (int64_t) i_lost, (int64_t)length);
+            fprintf(stderr, "%"PRId64": lost %"PRId64" bytes out of %"PRId64" in buffer\n",
+                    date, (int64_t) i_lost, (int64_t)length);
             if (i >= length)
                 return true;
         }
@@ -1396,7 +1397,11 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length)
 
         /* received times */
         stream->pid[i_pid].i_prev_received = stream->pid[i_pid].i_received;
-        stream->pid[i_pid].i_received = mdate();
+        stream->pid[i_pid].i_received = date;
+
+        if (stream->level < DVBPSI_MSG_DEBUG)
+            fprintf(stderr, "%"PRId64" packet %"PRId64" pid %d (0x%x) cc %d\n",
+                            date, stream->i_packets, i_pid, i_pid, i_cc);
 
         if (i_pid == 0x0) /* PAT */
             dvbpsi_PushPacket(stream->pat.handle, p_tmp);

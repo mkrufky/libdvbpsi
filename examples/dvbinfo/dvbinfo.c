@@ -255,7 +255,7 @@ static void dvbinfo_process(dvbinfo_capture_t *capture)
             }
         }
 
-        if (!libdvbpsi_process(stream, buffer->p_data, buffer->i_size))
+        if (!libdvbpsi_process(stream, buffer->p_data, buffer->i_size, buffer->i_date))
             b_error = true;
 
         /* reuse buffer */

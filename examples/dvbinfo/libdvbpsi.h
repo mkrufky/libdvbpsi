@@ -31,7 +31,7 @@ typedef struct ts_stream_t ts_stream_t;
 
 /* */
 ts_stream_t *libdvbpsi_init(int debug);
-bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length);
+bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_t date);
 void libdvbpsi_summary(ts_stream_t *stream);
 void libdvbpsi_exit(ts_stream_t *stream);
 
