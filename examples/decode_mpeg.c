@@ -652,6 +652,7 @@ int main(int i_argc, char* pa_argv[])
             vlc_bool_t b_adaptation = (p_tmp[3] & 0x20); /* adaptation field */
             vlc_bool_t b_discontinuity_seen = VLC_FALSE;
 
+#ifdef HAVE_SYS_SOCKET_H
             if( i_report == REPORT_UDP && !b_first )
             {
 #ifdef HAVE_GETTIMEOFDAY
@@ -661,7 +662,7 @@ int main(int i_argc, char* pa_argv[])
 #endif
                 b_first = VLC_TRUE;
             }
-
+#endif
             if( i_pid == 0x0 )
                 dvbpsi_PushPacket(p_stream->pat.handle, p_tmp);
             else if( p_stream->pmt.pid_pmt && i_pid == p_stream->pmt.pid_pmt->i_pid )
@@ -713,6 +714,7 @@ int main(int i_argc, char* pa_argv[])
                     i_prev_pcr = p_stream->pid[i_pid].i_pcr;
                     p_stream->pid[i_pid].i_pcr = i_pcr;
 
+#ifdef HAVE_SYS_SOCKET_H
                     if( i_report == REPORT_PCR )
                     {
 #ifdef HAVE_GETTIMEOFDAY
@@ -721,6 +723,7 @@ int main(int i_argc, char* pa_argv[])
                         report_PCRPacketTiming( i_cc, &(p_stream->pid[i_pid]), i_prev_pcr, i_bytes );
 #endif
                     }
+#endif
                     i_bytes = 0; /* reset byte counter */
 
                     if( b_discontinuity_seen )
@@ -742,9 +745,10 @@ int main(int i_argc, char* pa_argv[])
             }
         }
 
+#ifdef HAVE_SYS_SOCKET_H
         if( i_report == REPORT_UDP )
             i_bytes = 0; /* reset byte counter */
-
+#endif
         /* Read next packet */
         if( filename )
             i_len = ReadPacket( i_fd, p_data );
