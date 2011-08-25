@@ -172,6 +172,8 @@ int main( int i_argc, char **pp_argv )
     p_pat_dvbpsi_fd = dvbpsi_AttachPAT( PATCallback, NULL );
 
     p_buffer = malloc( TS_SIZE * READ_ONCE );
+    if ( p_buffer == NULL )
+        goto out;
 
     for ( ; ; )
     {
@@ -195,7 +197,9 @@ int main( int i_argc, char **pp_argv )
             i_ts_read++;
         }
     }
+    free( p_buffer );
 
+out:
     close( i_fd );
     fprintf( stderr, "no PAT/PMT found\n" );
 
