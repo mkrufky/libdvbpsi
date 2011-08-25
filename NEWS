@@ -1,5 +1,12 @@
 $Id$
 
+Changes between 0.2.0 and 0.2.1:
+--------------------------------
+
+  * ignore initial discontinuity
+  * Build fixes for BSD builds
+  * Build fixes for MSYS builds
+
 Changes between 0.1.7 and 0.2.0:
 --------------------------------
 
