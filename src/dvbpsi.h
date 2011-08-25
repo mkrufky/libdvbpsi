@@ -48,7 +48,7 @@ extern "C" {
  * \typedef struct dvbpsi_decoder_s * dvbpsi_handle
  * \brief Decoder abstration.
  */
-typedef struct dvbpsi_decoder_s * dvbpsi_handle __attribute__((depreceated));
+typedef struct dvbpsi_decoder_s * dvbpsi_handle __attribute__((deprecated));
 
 
 /*****************************************************************************
