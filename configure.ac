@@ -21,11 +21,15 @@ CFLAGS="${CFLAGS} -Wall -DDVBPSI_DIST --std=gnu99"
 CFLAGS="${CFLAGS} -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-prototypes -Wshadow -Waggregate-return -Wmissing-prototypes -Wnested-externs -Wsign-compare"
 
 dnl check the operating system
-case x"${target_os}" in
-  xdarwin*)
+case "${target_os}" in
+  darwin*)
     CFLAGS="${CFLAGS} -no-cpp-precomp"
     ;;
+  *mingw32* | *cygwin* | *wince* | *mingwce*)
+    have_win32="yes"
+    ;;
 esac
+AM_CONDITIONAL(HAVE_WIN32, test "${have_win32}" = "yes")
 
 dnl --enable-debug
 AC_ARG_ENABLE(debug,
