@@ -242,6 +242,8 @@ int main( int i_argc, char **pp_argv )
     }
     result = EXIT_SUCCESS;
 
+    free( p_buffer );
+
 out:
     if (p_pat_dvbpsi_fd)
     {
