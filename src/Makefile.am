@@ -16,7 +16,11 @@ libdvbpsi_la_LDFLAGS = -version-info 7:0:0
 if HAVE_WIN32
 libdvbpsi_la_LDFLAGS += -no-undefined
 else
+if HAVE_DARWIN
+libdvbpsi_la_LDFLAGS += -no-undefined
+else
 libdvbpsi_la_LDFLAGS += -Wl,--no-undefined
+endif
 endif
 
 pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
