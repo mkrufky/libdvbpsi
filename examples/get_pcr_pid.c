@@ -202,7 +202,7 @@ int main( int i_argc, char **pp_argv )
     free( p_buffer );
 
 out:
-    if ( p_dvbpsi_fd ) dvbpsi_DetachPAT( p_dvbpsi_fd );
+    if ( p_pat_dvbpsi_fd ) dvbpsi_DetachPAT( p_pat_dvbpsi_fd );
     close( i_fd );
     fprintf( stderr, "no PAT/PMT found\n" );
 
