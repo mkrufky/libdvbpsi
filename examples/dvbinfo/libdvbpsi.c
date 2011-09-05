@@ -1232,7 +1232,7 @@ ts_stream_t *libdvbpsi_init(int debug)
         goto error;
     /* CAT */
     stream->cat.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
-    if (stream->pat.handle == NULL)
+    if (stream->cat.handle == NULL)
         goto error;
     if (!dvbpsi_AttachCAT(stream->cat.handle, handle_CAT, stream))
     {
