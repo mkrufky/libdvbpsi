@@ -89,14 +89,14 @@ typedef struct dvbpsi_bat_ts_s
  */
 typedef struct dvbpsi_bat_s
 {
-  uint16_t                  i_bouquet_id;            /*!< bouquet_id */
+  uint16_t                  i_bouquet_id;       /*!< bouquet_id */
   uint8_t                   i_version;          /*!< version_number */
   bool                      b_current_next;     /*!< current_next_indicator */
 
   dvbpsi_descriptor_t *     p_first_descriptor; /*!< descriptor list */
 
-  dvbpsi_bat_ts_t *         p_first_ts;    /*!< transport stream description
-                                                     list */
+  dvbpsi_bat_ts_t *         p_first_ts;         /*!< transport stream
+                                                     description list */
 
 } dvbpsi_bat_t;
 
