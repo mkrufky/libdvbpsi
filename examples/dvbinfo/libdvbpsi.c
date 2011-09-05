@@ -780,8 +780,7 @@ static void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descript
  *****************************************************************************/
 static void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_descriptor)
 {
-    printf("Component tag: %d\n",
-    p_si_descriptor->i_component_tag);
+    printf("Component tag: %d\n", p_si_descriptor->i_component_tag);
 }
 
 /*****************************************************************************
