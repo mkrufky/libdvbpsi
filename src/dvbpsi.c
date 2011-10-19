@@ -174,18 +174,13 @@ void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
     return;
   }
 
-  if(!h_dvbpsi->b_discontinuity
-      && (i_expected_counter != h_dvbpsi->i_continuity_counter))
+  if(i_expected_counter != h_dvbpsi->i_continuity_counter)
   {
     DVBPSI_ERROR_ARG("PSI decoder",
                      "TS discontinuity (received %d, expected %d) for PID %d",
                      h_dvbpsi->i_continuity_counter, i_expected_counter,
                      ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
     h_dvbpsi->b_discontinuity = 1;
-  }
-
-  if(h_dvbpsi->b_discontinuity)
-  {
     if(h_dvbpsi->p_current_section)
     {
       dvbpsi_DeletePSISections(h_dvbpsi->p_current_section);
