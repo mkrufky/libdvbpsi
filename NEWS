@@ -1,5 +1,10 @@
 $Id$
 
+Changes between 0.2.1 and 0.2.2:
+--------------------------------
+
+  * revert regression introduced by "ignore initial discontinuity" commit (commit-id: d565a849ad0191ed14db018546c71eb52d47a741).
+
 Changes between 0.2.0 and 0.2.1:
 --------------------------------
 
