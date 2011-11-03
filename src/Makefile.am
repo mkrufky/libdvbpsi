@@ -19,7 +19,11 @@ else
 if HAVE_DARWIN
 libdvbpsi_la_LDFLAGS += -no-undefined
 else
+if HAVE_BSD
+libdvbpsi_la_LDFLAGS +=
+else
 libdvbpsi_la_LDFLAGS += -Wl,--no-undefined
+endif
 endif
 endif
 
