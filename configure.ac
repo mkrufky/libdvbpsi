@@ -24,18 +24,8 @@ dnl check the operating system
 case "${target_os}" in
   darwin*)
     CFLAGS="${CFLAGS} -no-cpp-precomp"
-    have_darwin="yes"
-    ;;
-  *mingw32* | *cygwin* | *wince* | *mingwce*)
-    have_win32="yes"
-    ;;
-  *bsd*)
-    have_bsd="yes"
     ;;
 esac
-AM_CONDITIONAL(HAVE_DARWIN, test "${have_darwin}" = "yes")
-AM_CONDITIONAL(HAVE_WIN32, test "${have_win32}" = "yes")
-AM_CONDITIONAL(HAVE_BSD, test "${have_bsd}" = "yes")
 
 dnl --enable-debug
 AC_ARG_ENABLE(debug,
