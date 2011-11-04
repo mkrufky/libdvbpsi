@@ -112,9 +112,9 @@ dvbpsi_descriptor_t * dvbpsi_GenShortEventDr(dvbpsi_short_event_dr_t * p_decoded
     p_descriptor->p_data[3] = i_len1;
     if( i_len1 )
         memcpy( &p_descriptor->p_data[4], p_decoded->i_event_name, i_len1 );
-    p_descriptor->p_data[3+i_len1] = i_len2;
+    p_descriptor->p_data[3+1+i_len1] = i_len2;
     if( i_len2 )
-        memcpy( &p_descriptor->p_data[3+i_len1+1], p_decoded->i_text, i_len2 );
+        memcpy( &p_descriptor->p_data[3+1+i_len1+1], p_decoded->i_text, i_len2 );
 
     if(b_duplicate)
     {
