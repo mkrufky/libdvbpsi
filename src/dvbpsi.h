@@ -33,8 +33,8 @@
 #ifndef _DVBPSI_DVBPSI_H_
 #define _DVBPSI_DVBPSI_H_
 
-#define DVBPSI_VERSION      0.2.0
-#define DVBPSI_VERSION_INT  ((0<<16)+(2<<8)+0)
+#define DVBPSI_VERSION      0.2.2
+#define DVBPSI_VERSION_INT  ((0<<16)+(2<<8)+2)
 
 #ifdef __cplusplus
 extern "C" {

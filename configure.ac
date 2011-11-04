@@ -1,4 +1,4 @@
-AC_INIT(libdvbpsi, 0.2.1)
+AC_INIT(libdvbpsi, 0.2.2)
 
 AC_PREREQ(2.50)
 AC_CONFIG_AUX_DIR(.auto)
@@ -29,9 +29,13 @@ case "${target_os}" in
   *mingw32* | *cygwin* | *wince* | *mingwce*)
     have_win32="yes"
     ;;
+  *bsd*)
+    have_bsd="yes"
+    ;;
 esac
 AM_CONDITIONAL(HAVE_DARWIN, test "${have_darwin}" = "yes")
 AM_CONDITIONAL(HAVE_WIN32, test "${have_win32}" = "yes")
+AM_CONDITIONAL(HAVE_BSD, test "${have_bsd}" = "yes")
 
 dnl --enable-debug
 AC_ARG_ENABLE(debug,
