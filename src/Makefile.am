@@ -11,21 +11,7 @@ libdvbpsi_la_SOURCES = dvbpsi.c dvbpsi_private.h \
                        $(tables_src) \
                        $(descriptors_src)
 
-libdvbpsi_la_LDFLAGS = -version-info 7:0:0
-
-if HAVE_WIN32
-libdvbpsi_la_LDFLAGS += -no-undefined
-else
-if HAVE_DARWIN
-libdvbpsi_la_LDFLAGS += -no-undefined
-else
-if HAVE_BSD
-libdvbpsi_la_LDFLAGS +=
-else
-libdvbpsi_la_LDFLAGS += -Wl,--no-undefined
-endif
-endif
-endif
+libdvbpsi_la_LDFLAGS = -version-info 7:0:0 -no-undefined
 
 pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      tables/pat.h tables/pmt.h tables/sdt.h tables/eit.h \
