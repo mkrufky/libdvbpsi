@@ -151,7 +151,7 @@ void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
     p_subdec = NULL;
 }
 
-/*****************************************************************************
+/****************************************************************************
  * dvbpsi_InitNIT
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_nit_t structure.
@@ -164,6 +164,20 @@ void dvbpsi_InitNIT(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
     p_nit->b_current_next = b_current_next;
     p_nit->p_first_descriptor = NULL;
     p_nit->p_first_ts = NULL;
+}
+
+/****************************************************************************
+ * dvbpsi_NewNIT
+ *****************************************************************************
+ * Allocate and initialize a dvbpsi_nit_t structure.
+ *****************************************************************************/
+dvbpsi_nit_t *dvbpsi_NewNIT(uint16_t i_network_id, uint8_t i_version,
+                            bool b_current_next)
+{
+    dvbpsi_nit_t*p_nit = (dvbpsi_nit_t*)malloc(sizeof(dvbpsi_nit_t));
+    if (p_nit != NULL)
+       dvbpsi_InitNIT(p_nit, i_network_id, i_version, b_current_next);
+    return p_nit;
 }
 
 /*****************************************************************************
@@ -187,6 +201,18 @@ void dvbpsi_EmptyNIT(dvbpsi_nit_t* p_nit)
 
     p_nit->p_first_descriptor = NULL;
     p_nit->p_first_ts = NULL;
+}
+
+/****************************************************************************
+ * dvbpsi_DeleteNIT
+ *****************************************************************************
+ * Clean and delete a dvbpsi_nit_t structure.
+ *****************************************************************************/
+void dvbpsi_DeleteNIT(dvbpsi_nit_t *p_nit)
+{
+    if (p_nit)
+        dvbpsi_EmptyNIT(p_nit);
+    free(p_nit);
 }
 
 /*****************************************************************************
