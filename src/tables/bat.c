@@ -390,7 +390,7 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
             {   /* Signal a new BAT if the previous one wasn't active */
                 dvbpsi_bat_t *p_bat = NULL;
                 p_bat_decoder->current_bat.b_current_next = true;
-                *p_bat = p_bat_decoder->current_bat;
+                p_bat = &p_bat_decoder->current_bat;
                 p_bat_decoder->pf_bat_callback(p_bat_decoder->p_cb_data, p_bat);
             }
             dvbpsi_DeletePSISections(p_section);
