@@ -1568,8 +1568,8 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
 
         if (b_discontinuity_seen)
         {
-            fprintf(stderr, "dvbinfo: Continuity counter discontinuity (pid %d found %d expected %d)\n",
-                   i_pid, stream->pid[i_pid].i_cc, i_old_cc+1 );
+            fprintf(stderr, "dvbinfo: Continuity counter discontinuity (pid %d 0x%x found %d expected %d)\n",
+                   i_pid, i_pid, stream->pid[i_pid].i_cc, i_old_cc+1 );
 
             /* Discontinuity has been handled */
             b_discontinuity_seen = false;
