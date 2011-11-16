@@ -1190,7 +1190,7 @@ static void handle_CAT(void *p_data, dvbpsi_cat_t *p_cat)
     p_stream->cat.i_version = p_cat->i_version;
 
     printf("\n" );
-    printf("  CAT: Conditional Association Table\n" );
+    printf("  CAT: Conditional Access Table\n" );
     printf("\tVersion number : %d\n", p_cat->i_version );
     printf("\tCurrent next   : %s\n", p_cat->b_current_next ? "yes" : "no");
     DumpDescriptors("\t   ]", p_cat->p_first_descriptor);
