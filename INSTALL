@@ -83,7 +83,7 @@ Building packages
 =================
 
 Once configure, run 'make dist', this will generate a libdvbpsi-${VERSION}.tar.gz
-and libdvbpsi-${VERSION}.tar.bz2. If you intend to build a package for RPM based 
+and libdvbpsi-${VERSION}.tar.bz2. If you intend to build a package for RPM based
 linux distributions, then you can run 'rpmbuild -ta libdvbpsi-${VERSION}.tar.gz'
 or 'rpmbuild -ta libdvbpsi-${VERSION}.tar.bz2'.
 
