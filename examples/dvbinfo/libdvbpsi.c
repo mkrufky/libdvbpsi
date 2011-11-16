@@ -1140,7 +1140,7 @@ static void handle_BAT(void* p_data, dvbpsi_bat_t* p_bat)
     //ts_stream_t* p_stream = (ts_stream_t*) p_data;
 
     printf("\n");
-    printf("  BAT: Bouque Association Table\n");
+    printf("  BAT: Bouquet Association Table\n");
     printf("\tVersion number : %d\n", p_bat->i_version);
     printf("\tBouquet id     : %d\n", p_bat->i_bouquet_id);
     printf("\tCurrent next   : %s\n", p_bat->b_current_next ? "yes" : "no");
