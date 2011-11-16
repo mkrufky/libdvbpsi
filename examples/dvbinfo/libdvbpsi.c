@@ -1412,11 +1412,11 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
         else if (i_pid == 0x03) /* IPMP Control Information Table */
             dvbpsi_PushPacket(stream->ipmp.handle, p_tmp);
 #endif
-        else if (i_pid == 0x11) /* SDT */
+        else if (i_pid == 0x11) /* SDT/BAT/NIT */
             dvbpsi_PushPacket(stream->sdt.handle, p_tmp);
         else if (i_pid == 0x12) /* EIT */
             dvbpsi_PushPacket(stream->eit.handle, p_tmp);
-        else if (i_pid == 0x14) /* TDT */
+        else if (i_pid == 0x14) /* TDT/TOT */
             dvbpsi_PushPacket(stream->tdt.handle, p_tmp);
         else if (stream->pmt.pid_pmt && i_pid == stream->pmt.pid_pmt->i_pid)
             dvbpsi_PushPacket(stream->pmt.handle, p_tmp);
@@ -1445,7 +1445,8 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
         if (i_pid == 0x1FFF)
         {
             stream->i_null_packets++;
-            continue;  /* NULL packet - skip it */
+            /* NULL packet - skip it */
+            goto dump_packet;
         }
 
         /* */
@@ -1575,6 +1576,7 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
             b_discontinuity_seen = false;
         }
 
+dump_packet:
         if (stream->level >= DVBPSI_MSG_DEBUG)
         {
             printf("\n\t---------------------------------------------------------\n");
