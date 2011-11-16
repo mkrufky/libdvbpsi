@@ -233,12 +233,21 @@ static void dvbinfo_process(dvbinfo_capture_t *capture)
         exit(EXIT_FAILURE);
     }
 
-    while (!b_error && capture->b_alive)
+    while (!b_error)
     {
+        /* Wait till fifo has emptied */
+        if (!capture->b_alive && (fifo_count(capture->fifo) == 0))
+            break;
+
         /* Wait for data to arrive */
         buffer = fifo_pop(capture->fifo);
         if (buffer == NULL)
-            break;
+        {
+            if (capture->b_alive)
+                continue;
+            else
+                break;
+        }
 
         if (param->output)
         {
