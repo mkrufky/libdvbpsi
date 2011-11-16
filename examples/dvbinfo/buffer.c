@@ -137,6 +137,7 @@ void fifo_push(fifo_t *fifo, buffer_t *buffer)
     if (buffer == NULL)
         return;
 
+    pthread_mutex_lock(&fifo->lock);
     for (p_last = buffer; ; p_last = p_last->p_next)
     {
          i_depth ++;
@@ -144,7 +145,6 @@ void fifo_push(fifo_t *fifo, buffer_t *buffer)
              break;
     }
 
-    pthread_mutex_lock(&fifo->lock);
     *fifo->pp_last = buffer;
     fifo->pp_last = &p_last->p_next;
     fifo->i_count += i_depth;
