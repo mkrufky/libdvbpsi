@@ -74,11 +74,11 @@ bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
         return false;
     }
 
-    p_subdec = (dvbpsi_demux_subdec_t*)malloc(sizeof(dvbpsi_demux_subdec_t));
+    p_subdec = (dvbpsi_demux_subdec_t*)calloc(1, sizeof(dvbpsi_demux_subdec_t));
     if (p_subdec == NULL)
         return false;
 
-    p_bat_decoder = (dvbpsi_bat_decoder_t*)malloc(sizeof(dvbpsi_bat_decoder_t));
+    p_bat_decoder = (dvbpsi_bat_decoder_t*)calloc(1, sizeof(dvbpsi_bat_decoder_t));
     if (p_bat_decoder == NULL)
     {
         free(p_subdec);
@@ -387,11 +387,17 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
             }
             else if (  (!p_bat_decoder->current_bat.b_current_next)
                      && (p_section->b_current_next))
-            {   /* Signal a new BAT if the previous one wasn't active */
-                dvbpsi_bat_t *p_bat = NULL;
-                p_bat_decoder->current_bat.b_current_next = true;
-                p_bat = &p_bat_decoder->current_bat;
-                p_bat_decoder->pf_bat_callback(p_bat_decoder->p_cb_data, p_bat);
+            {
+                /* Signal a new BAT if the previous one wasn't active */
+                dvbpsi_bat_t *p_bat = (dvbpsi_bat_t*)malloc(sizeof(dvbpsi_bat_t));
+                if (p_bat)
+                {
+                    p_bat_decoder->current_bat.b_current_next = true;
+                    memcpy(p_bat, &p_bat_decoder->current_bat, sizeof(dvbpsi_bat_t));
+                    p_bat_decoder->pf_bat_callback(p_bat_decoder->p_cb_data, p_bat);
+                }
+                else
+                    dvbpsi_error(p_dvbpsi, "BAT decoder", "Could not signal new BAT.");
             }
             dvbpsi_DeletePSISections(p_section);
             return;
