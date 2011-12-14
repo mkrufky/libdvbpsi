@@ -557,7 +557,7 @@ static dvbpsi_psi_section_t* NewEITSection(dvbpsi_eit_t* p_eit, int i_table_id,
   p_result->i_extension = p_eit->i_service_id;
   p_result->i_version = p_eit->i_version;
   p_result->b_current_next = p_eit->b_current_next;
-  p_result->i_number = 0;
+  p_result->i_number = i_section_number;
 
   p_result->p_payload_end += 14;
   p_result->p_payload_start = p_result->p_data + 8;
