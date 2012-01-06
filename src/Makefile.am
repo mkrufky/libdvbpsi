@@ -19,6 +19,7 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
 		     tables/bat.h \
 		     tables/atsc_vct.h tables/atsc_stt.h \
 		     tables/atsc_eit.h tables/atsc_mgt.h \
+		     tables/atsc_ett.h \
                      descriptors/dr_02.h \
                      descriptors/dr_03.h \
                      descriptors/dr_04.h \
@@ -108,5 +109,6 @@ tables_src = tables/pat.c tables/pat_private.h \
 	     tables/atsc_vct.c tables/atsc_vct.h \
 	     tables/atsc_stt.c tables/atsc_stt.h \
 	     tables/atsc_eit.c tables/atsc_eit.h \
+	     tables/atsc_ett.c tables/atsc_ett.h \
 	     tables/atsc_mgt.c tables/atsc_mgt.h
 
