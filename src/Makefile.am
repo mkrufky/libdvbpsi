@@ -17,6 +17,8 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      tables/pat.h tables/pmt.h tables/sdt.h tables/eit.h \
                      tables/cat.h tables/nit.h tables/tot.h tables/sis.h \
 		     tables/bat.h \
+		     tables/atsc_vct.h tables/atsc_stt.h \
+		     tables/atsc_eit.h \
                      descriptors/dr_02.h \
                      descriptors/dr_03.h \
                      descriptors/dr_04.h \
@@ -31,6 +33,8 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      descriptors/dr_0d.h \
                      descriptors/dr_0e.h \
                      descriptors/dr_0f.h \
+                     descriptors/dr_13.h \
+                     descriptors/dr_14.h \
                      descriptors/dr_42.h \
                      descriptors/dr_43.h \
                      descriptors/dr_44.h \
@@ -45,7 +49,12 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      descriptors/dr_58.h \
                      descriptors/dr_59.h \
                      descriptors/dr_5a.h \
+                     descriptors/dr_62.h \
+                     descriptors/dr_66.h \
                      descriptors/dr_69.h \
+                     descriptors/dr_73.h \
+                     descriptors/dr_76.h \
+		     descriptors/dr_83.h \
 		     descriptors/dr_8a.h \
                      descriptors/dr.h
 
@@ -63,6 +72,8 @@ descriptors_src = descriptors/dr_02.c \
                   descriptors/dr_0d.c \
                   descriptors/dr_0e.c \
                   descriptors/dr_0f.c \
+                  descriptors/dr_13.c \
+                  descriptors/dr_14.c \
                   descriptors/dr_42.c \
                   descriptors/dr_43.c \
                   descriptors/dr_44.c \
@@ -77,7 +88,12 @@ descriptors_src = descriptors/dr_02.c \
                   descriptors/dr_58.c \
                   descriptors/dr_59.c \
                   descriptors/dr_5a.c \
+                  descriptors/dr_62.c \
+                  descriptors/dr_66.c \
                   descriptors/dr_69.c \
+                  descriptors/dr_73.c \
+                  descriptors/dr_76.c \
+                  descriptors/dr_83.c \
 		  descriptors/dr_8a.c
 
 tables_src = tables/pat.c tables/pat_private.h \
@@ -88,5 +104,8 @@ tables_src = tables/pat.c tables/pat_private.h \
              tables/nit.c tables/nit_private.h \
              tables/tot.c tables/tot_private.h \
              tables/sis.c tables/sis_private.h \
-	     tables/bat.c tables/bat_private.h
+	     tables/bat.c tables/bat_private.h \
+	     tables/atsc_vct.c tables/atsc_vct.h \
+	     tables/atsc_stt.c tables/atsc_stt.h \
+	     tables/atsc_eit.c tables/atsc_eit.h
 
