@@ -1,4 +1,5 @@
 /*
+Copyright (C) 2006  Adam Charrett
 Copyright (C) 2011  Michael Krufky
 
 This library is free software; you can redistribute it and/or
