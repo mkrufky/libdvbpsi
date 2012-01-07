@@ -23,6 +23,9 @@ Decode PSIP Extended Text Table.
 #ifndef _ATSC_ETT_H
 #define _ATSC_ETT_H 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*****************************************************************************
  * dvbpsi_atsc_ett_t
@@ -68,11 +71,13 @@ typedef void (* dvbpsi_atsc_ett_callback)(void* p_cb_data, dvbpsi_atsc_ett_t* p_
             dvbpsi_atsc_ett_callback pf_callback, void* p_cb_data)
  *
  * \brief Creation and initialization of a ETT decoder.
+ * \param i_extension Table ID extension, normally 0x0000.
  * \param pf_callback function to call back on new ETT.
  * \param p_cb_data private data given in argument to the callback.
  * \return 0 if everything went ok.
  */
-dvbpsi_handle dvbpsi_atsc_AttachETT(dvbpsi_atsc_ett_callback pf_callback, void* p_cb_data);
+int dvbpsi_atsc_AttachETT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+          uint16_t i_extension, dvbpsi_atsc_ett_callback pf_callback, void* p_cb_data);
 
 
 /*****************************************************************************
@@ -84,11 +89,11 @@ dvbpsi_handle dvbpsi_atsc_AttachETT(dvbpsi_atsc_ett_callback pf_callback, void* 
  * \brief Destroy a ETT decoder.
  * \param p_demux Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0xCD.
- * \param i_extension Table extension, ignored as this should always be 0.
- *                    (Required to match prototype for demux)
+ * \param i_extension Table ID extension, normally 0x0000.
  * \return nothing.
  */
-void dvbpsi_atsc_DetachETT(dvbpsi_handle h_dvbpsi);
+void dvbpsi_atsc_DetachETT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+          uint16_t i_extension);
 
 
 /*****************************************************************************
@@ -147,5 +152,9 @@ void dvbpsi_atsc_EmptyETT(dvbpsi_atsc_ett_t *p_ett);
     dvbpsi_atsc_EmptyETT(p_ett);					\
     free(p_ett);							\
   } while(0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif
