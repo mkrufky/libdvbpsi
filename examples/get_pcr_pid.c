@@ -1,7 +1,7 @@
 /*****************************************************************************
  * get_pcr_pid.c: stdout the PID of the PCR of a given program
  *****************************************************************************
- * Copyright (C) 2009-2010 VideoLAN
+ * Copyright (C) 2009-2011 VideoLAN
  * $Id: pcread.c 15 2006-06-15 22:17:58Z cmassiot $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
@@ -63,11 +64,27 @@
 
 static int i_fd = -1;
 static int i_ts_read = 0;
-static dvbpsi_handle p_pat_dvbpsi_fd;
+static dvbpsi_t *p_pat_dvbpsi_fd;
 static int i_nb_programs = 0;
 static uint16_t i_program = 0;
 static uint16_t pi_pmt_pids[MAX_PROGRAMS];
-static dvbpsi_handle p_pmt_dvbpsi_fds[MAX_PROGRAMS];
+static dvbpsi_t *p_pmt_dvbpsi_fds[MAX_PROGRAMS];
+
+/*****************************************************************************
+ * DVBPSI messaging callback
+ *****************************************************************************/
+static void message(dvbpsi_t *handle, const dvbpsi_msg_level_t level, const char* msg)
+{
+    switch(level)
+    {
+        case DVBPSI_MSG_ERROR: fprintf(stderr, "Error: "); break;
+        case DVBPSI_MSG_WARN:  fprintf(stderr, "Warning: "); break;
+        case DVBPSI_MSG_DEBUG: fprintf(stderr, "Debug: "); break;
+        default: /* do nothing */
+            return;
+    }
+    fprintf(stderr, "%s\n", msg);
+}
 
 /*****************************************************************************
  * PMTCallback
@@ -92,6 +109,13 @@ static void PATCallback( void *_unused, dvbpsi_pat_t *p_pat )
 {
     dvbpsi_pat_program_t *p_program;
 
+    if (i_nb_programs >= MAX_PROGRAMS)
+    {
+        fprintf(stderr, "Too many PMT programs\n");
+        dvbpsi_DeletePAT( p_pat );
+        return;
+    }
+
     for( p_program = p_pat->p_first_program; p_program != NULL;
          p_program = p_program->p_next )
     {
@@ -99,10 +123,13 @@ static void PATCallback( void *_unused, dvbpsi_pat_t *p_pat )
              && (!i_program || i_program == p_program->i_number) )
         {
             pi_pmt_pids[i_nb_programs] = p_program->i_pid;
-            p_pmt_dvbpsi_fds[i_nb_programs] =
-                        dvbpsi_AttachPMT( p_program->i_number, PMTCallback,
-                                          NULL );
-            i_nb_programs++;
+            p_pmt_dvbpsi_fds[i_nb_programs] = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+            if (p_pmt_dvbpsi_fds[i_nb_programs])
+            {
+                if (dvbpsi_AttachPMT(p_pmt_dvbpsi_fds[i_nb_programs],
+                                      p_program->i_number, PMTCallback, NULL))
+                    i_nb_programs++;
+            }
         }
     }
 
@@ -152,6 +179,7 @@ static void TSHandle( uint8_t *p_ts )
 int main( int i_argc, char **pp_argv )
 {
     uint8_t *p_buffer;
+    int result = EXIT_FAILURE;
 
     if ( i_argc < 2 || i_argc > 3 || !strcmp( pp_argv[1], "-" ) )
     {
@@ -169,12 +197,15 @@ int main( int i_argc, char **pp_argv )
     if ( i_argc == 3 )
         i_program = strtol( pp_argv[2], NULL, 0 );
 
-    p_pat_dvbpsi_fd = dvbpsi_AttachPAT( PATCallback, NULL );
-    if ( p_pat_dvbpsi_fd == NULL )
+    p_pat_dvbpsi_fd = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+    if (p_pat_dvbpsi_fd == NULL)
+        goto out;
+
+    if (!dvbpsi_AttachPAT(p_pat_dvbpsi_fd, PATCallback, NULL ))
         goto out;
 
     p_buffer = malloc( TS_SIZE * READ_ONCE );
-    if ( p_buffer == NULL )
+    if (p_buffer == NULL)
         goto out;
 
     for ( ; ; )
@@ -201,11 +232,24 @@ int main( int i_argc, char **pp_argv )
     }
     free( p_buffer );
 
+    for( int i = 0; i < MAX_PROGRAMS; i++)
+    {
+        if (p_pmt_dvbpsi_fds[i])
+        {
+            dvbpsi_DetachPMT(p_pmt_dvbpsi_fds[i]);
+            dvbpsi_DeleteHandle(p_pmt_dvbpsi_fds[i]);
+        }
+        p_pmt_dvbpsi_fds[i] = NULL;
+    }
+    result = EXIT_SUCCESS;
+
 out:
-    if ( p_pat_dvbpsi_fd ) dvbpsi_DetachPAT( p_pat_dvbpsi_fd );
+    if (p_pat_dvbpsi_fd)
+    {
+      dvbpsi_DetachPAT(p_pat_dvbpsi_fd);
+      dvbpsi_DeleteHandle(p_pat_dvbpsi_fd);
+    }
     close( i_fd );
-    fprintf( stderr, "no PAT/PMT found\n" );
 
-    return EXIT_FAILURE;
+    return result;
 }
-

@@ -1,5 +1,34 @@
 INSTALL file for "libdvbpsi".
 
+ * Developers
+ * Configuring "libdvbpsi"
+ * Building "libdvbpsi"
+ * Installing and using "libdvbpsi"
+ * Building documentation
+ * Building packages
+
+Developers
+==========
+
+Before starting to enhance libdvbpsi as you downloaded it from the git repository
+at git.videolan.org make sure you have autotools (autoconf, automake, m4, libtool)
+installed.
+
+Clone the repository:
+
+  git clone git://git.videolan.org/libdvbpsi.git
+
+In contrast to other autotools enabled programs libdvbpsi uses a script named
+'bootstrap' to generate the configure script. Others use a program 'autogen.sh'
+for that. For libdvbpsi you need to run:
+
+  ./bootstrap
+
+Run the configure script for development:
+
+  ./configure --prefix=/usr --enable-debug --disable-release
+
+Now you can start enhancing libdvbpsi.
 
 Configuring "libdvbpsi"
 =======================
@@ -25,7 +54,6 @@ Building "libdvbpsi"
 
 Once configured, run 'make' to build the library and the programs
 located in the 'examples' and 'misc' directories.
-
 
 Installing and using "libdvbpsi"
 ================================
@@ -54,5 +82,10 @@ doxygen tool (http://www.doxygen.org/) and the graphviz tool
 Building packages
 =================
 
-Further writing.
+Once configure, run 'make dist', this will generate a libdvbpsi-${VERSION}.tar.gz
+and libdvbpsi-${VERSION}.tar.bz2. If you intend to build a package for RPM based
+linux distributions, then you can run 'rpmbuild -ta libdvbpsi-${VERSION}.tar.gz'
+or 'rpmbuild -ta libdvbpsi-${VERSION}.tar.bz2'.
 
+For distributions that use another package management system look at their documentation
+on howto create a installable package for it.

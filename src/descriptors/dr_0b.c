@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_0b.c
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: dr_0b.c,v 1.3 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -51,10 +51,7 @@ dvbpsi_system_clock_dr_t * dvbpsi_DecodeSystemClockDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x0b)
-  {
-    DVBPSI_ERROR_ARG("dr_0b decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -63,22 +60,16 @@ dvbpsi_system_clock_dr_t * dvbpsi_DecodeSystemClockDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_system_clock_dr_t*)malloc(sizeof(dvbpsi_system_clock_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_0b decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length != 2)
   {
-    DVBPSI_ERROR_ARG("dr_0b decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }
 
-  p_decoded->b_external_clock_ref = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;
+  p_decoded->b_external_clock_ref = (p_descriptor->p_data[0] & 0x80) ? true : false;
   p_decoded->i_clock_accuracy_integer = p_descriptor->p_data[0] & 0x3f;
   p_decoded->i_clock_accuracy_exponent = (p_descriptor->p_data[1] & 0xe0) >> 5;
 
@@ -93,7 +84,7 @@ dvbpsi_system_clock_dr_t * dvbpsi_DecodeSystemClockDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenSystemClockDr(
                                         dvbpsi_system_clock_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

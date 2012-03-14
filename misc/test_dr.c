@@ -5,6 +5,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
@@ -25,14 +26,14 @@
 
 #include "test_dr.h"
 
-
+  
 /* video stream (b_mpeg2 = false) */
 static int main_vstream_1(void)
 {
   BOZO_VARS(vstream);
   BOZO_START(video stream (b_mpeg2 = false));
 
-
+  
   /* check b_multiple_frame_rate */
   BOZO_init_boolean(b_multiple_frame_rate, 0);
   BOZO_init_integer(i_frame_rate_code, 0);
@@ -93,7 +94,7 @@ static int main_vstream_2(void)
   BOZO_VARS(vstream);
   BOZO_START(video stream (b_mpeg2 = true));
 
-
+  
   /* check b_multiple_frame_rate */
   BOZO_init_boolean(b_multiple_frame_rate, 0);
   BOZO_init_integer(i_frame_rate_code, 0);
@@ -211,7 +212,7 @@ static int main_astream_(void)
   BOZO_VARS(astream);
   BOZO_START(audio stream);
 
-
+  
   /* check b_free_format */
   BOZO_init_boolean(b_free_format, 0);
   BOZO_init_integer(i_id, 0);
@@ -254,7 +255,7 @@ static int main_hierarchy_(void)
   BOZO_VARS(hierarchy);
   BOZO_START(hierarchy);
 
-
+  
   /* check i_h_type */
   BOZO_init_integer(i_h_type, 0);
   BOZO_init_integer(i_h_layer_index, 0);
@@ -311,7 +312,7 @@ static int main_registration_(void)
   BOZO_VARS(registration);
   BOZO_START(registration);
 
-
+  
   /* check i_format_identifier */
   s_decoded.i_additional_length = 0;
   BOZO_init_integer(i_format_identifier, 0);
@@ -333,7 +334,7 @@ static int main_ds_alignment_(void)
   BOZO_VARS(ds_alignment);
   BOZO_START(data stream alignment);
 
-
+  
   /* check i_alignment_type */
   BOZO_init_integer(i_alignment_type, 0);
   BOZO_begin_integer(i_alignment_type, 8)
@@ -354,7 +355,7 @@ static int main_target_bg_grid_(void)
   BOZO_VARS(target_bg_grid);
   BOZO_START(target background grid);
 
-
+  
   /* check i_horizontal_size */
   BOZO_init_integer(i_horizontal_size, 0);
   BOZO_init_integer(i_vertical_size, 0);
@@ -397,7 +398,7 @@ static int main_vwindow_(void)
   BOZO_VARS(vwindow);
   BOZO_START(video window);
 
-
+  
   /* check i_horizontal_offset */
   BOZO_init_integer(i_horizontal_offset, 0);
   BOZO_init_integer(i_vertical_offset, 0);
@@ -440,7 +441,7 @@ static int main_ca_(void)
   BOZO_VARS(ca);
   BOZO_START(conditional access);
 
-
+  
   /* check i_ca_system_id */
   s_decoded.i_private_length = 0;
   BOZO_init_integer(i_ca_system_id, 0);
@@ -473,7 +474,7 @@ static int main_system_clock_(void)
   BOZO_VARS(system_clock);
   BOZO_START(system clock);
 
-
+  
   /* check b_external_clock_ref */
   BOZO_init_boolean(b_external_clock_ref, 0);
   BOZO_init_integer(i_clock_accuracy_integer, 0);
@@ -516,7 +517,7 @@ static int main_mx_buff_utilization_(void)
   BOZO_VARS(mx_buff_utilization);
   BOZO_START(multiplex buffer utilization);
 
-
+  
   /* check b_mdv_valid */
   BOZO_init_boolean(b_mdv_valid, 0);
   BOZO_init_integer(i_mx_delay_variation, 0);
@@ -559,7 +560,7 @@ static int main_copyright_(void)
   BOZO_VARS(copyright);
   BOZO_START(copyright);
 
-
+  
   /* check i_copyright_identifier */
   s_decoded.i_additional_length = 0;
   BOZO_init_integer(i_copyright_identifier, 0);
@@ -581,7 +582,7 @@ static int main_max_bitrate_(void)
   BOZO_VARS(max_bitrate);
   BOZO_START(maximum bitrate);
 
-
+  
   /* check i_max_bitrate */
   BOZO_init_integer(i_max_bitrate, 0);
   BOZO_begin_integer(i_max_bitrate, 22)
@@ -602,7 +603,7 @@ static int main_private_data_(void)
   BOZO_VARS(private_data);
   BOZO_START(private data indicator);
 
-
+  
   /* check i_private_data */
   BOZO_init_integer(i_private_data, 0);
   BOZO_begin_integer(i_private_data, 32)
@@ -623,7 +624,7 @@ static int main_service_(void)
   BOZO_VARS(service);
   BOZO_START(service);
 
-
+  
   /* check i_service_type */
   s_decoded.i_service_provider_name_length = 0;
   s_decoded.i_service_name_length = 0;
@@ -645,7 +646,7 @@ static int main_service_(void)
 int main(void)
 {
   int i_err = 0;
-
+  
   i_err |= main_vstream_1();
   i_err |= main_vstream_2();
   i_err |= main_astream_();

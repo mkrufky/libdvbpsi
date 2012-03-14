@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_8a.c
- * Copyright (c) 2010 VideoLAN
+ * Copyright (c) 2010-2011 VideoLAN
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -48,10 +49,7 @@ dvbpsi_cuei_dr_t * dvbpsi_DecodeCUEIDr(dvbpsi_descriptor_t * p_descriptor)
 
   /* Check the tag */
   if (p_descriptor->i_tag != 0x8a)
-  {
-    DVBPSI_ERROR_ARG("dr_8a decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if (p_descriptor->p_decoded)
@@ -59,17 +57,11 @@ dvbpsi_cuei_dr_t * dvbpsi_DecodeCUEIDr(dvbpsi_descriptor_t * p_descriptor)
 
   /* Allocate memory */
   p_decoded = (dvbpsi_cuei_dr_t*)malloc(sizeof(dvbpsi_cuei_dr_t));
-  if (!p_decoded)
-  {
-    DVBPSI_ERROR("dr_8a decoder", "out of memory");
-    return NULL;
-  }
+  if (!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if (p_descriptor->i_length == 0x01)
   {
-    DVBPSI_ERROR_ARG("dr_8a decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }
@@ -94,7 +86,7 @@ dvbpsi_cuei_dr_t * dvbpsi_DecodeCUEIDr(dvbpsi_descriptor_t * p_descriptor)
 /*****************************************************************************
  * dvbpsi_GenCUEIDr
  *****************************************************************************/
-dvbpsi_descriptor_t * dvbpsi_GenCUEIDr(dvbpsi_cuei_dr_t * p_decoded)
+dvbpsi_descriptor_t * dvbpsi_GenCUEIDr(dvbpsi_cuei_dr_t * p_decoded, bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =
@@ -104,6 +96,17 @@ dvbpsi_descriptor_t * dvbpsi_GenCUEIDr(dvbpsi_cuei_dr_t * p_decoded)
   {
     /* Encode data */
     p_descriptor->p_data[0] = p_decoded->i_cue_stream_type;
+
+    if(b_duplicate)
+    {
+      /* Duplicate decoded data */
+      dvbpsi_cuei_dr_t *p_dup_decoded =
+                (dvbpsi_cuei_dr_t *)malloc(sizeof(dvbpsi_cuei_dr_t));
+      if(p_dup_decoded)
+        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_cuei_dr_t));
+
+      p_descriptor->p_decoded = (void*)p_dup_decoded;
+    }
   }
 
   return p_descriptor;

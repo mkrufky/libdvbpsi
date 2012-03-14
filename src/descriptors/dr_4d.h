@@ -55,11 +55,11 @@ extern "C" {
  */
 typedef struct dvbpsi_short_event_dr_s
 {
-  uint8_t i_iso_639_code[3];
-  int     i_event_name_length;
-  uint8_t i_event_name[256];
-  int     i_text_length;
-  uint8_t i_text[256];
+  uint8_t i_iso_639_code[3];    /*!< ISO 639 language code */
+  int     i_event_name_length;  /*!< length of event name */
+  uint8_t i_event_name[256];    /*!< "short event" name */
+  int     i_text_length;        /*!< text length */
+  uint8_t i_text[256];          /*!< "short event" text */
 
 } dvbpsi_short_event_dr_t;
 
@@ -83,15 +83,15 @@ dvbpsi_short_event_dr_t* dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_descr
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenShortEventDr(
-                        dvbpsi_short_event_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_short_event_dr_t * p_decoded, bool b_duplicate)
  * \brief "short event" descriptor generator.
  * \param p_decoded pointer to a decoded "video stream" descriptor structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenShortEventDr(dvbpsi_short_event_dr_t * p_decoded,
-                                             int b_duplicate);
+                                             bool b_duplicate);
 
 
 #ifdef __cplusplus

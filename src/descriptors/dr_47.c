@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_47.c
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: dr_47.c,v 1.1 2002/12/11 13:14:42 jobi Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -22,11 +22,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -52,10 +52,7 @@ dvbpsi_bouquet_name_dr_t * dvbpsi_DecodeBouquetNameDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x47)
-  {
-    DVBPSI_ERROR_ARG("dr_47 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -64,11 +61,7 @@ dvbpsi_bouquet_name_dr_t * dvbpsi_DecodeBouquetNameDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_bouquet_name_dr_t*)malloc(sizeof(dvbpsi_bouquet_name_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_47 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data */
   p_decoded->i_name_length = p_descriptor->i_length;
@@ -88,7 +81,7 @@ dvbpsi_bouquet_name_dr_t * dvbpsi_DecodeBouquetNameDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenBouquetNameDr(
                                         dvbpsi_bouquet_name_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

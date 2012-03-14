@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 EXTRA_DIST=index.doxygen structure.doxygen usage.doxygen newdec.doxygen \
+	   howto-new-api.doxygen \
            decoder.dot doxygen.cfg
 
 MOSTLYCLEANFILES=decoder.png

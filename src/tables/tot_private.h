@@ -7,6 +7,7 @@
  * Authors: Johann Hanne
  *          heavily based on pmt.c which was written by
  *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,8 +37,10 @@
  *****************************************************************************/
 typedef struct dvbpsi_tot_decoder_s
 {
-  dvbpsi_tot_callback           pf_callback;
-  void *                        p_cb_data;
+    DVBPSI_DECODER_COMMON
+
+    dvbpsi_tot_callback           pf_tot_callback;
+    void *                        p_cb_data;
 
 } dvbpsi_tot_decoder_t;
 
@@ -47,29 +50,24 @@ typedef struct dvbpsi_tot_decoder_s
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_GatherTOTSections(dvbpsi_decoder_t* p_decoder,
+void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
                               void * p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
-
 
 /*****************************************************************************
  * dvbpsi_ValidTOTSection
  *****************************************************************************
  * Check the CRC_32 if the section has b_syntax_indicator set.
  *****************************************************************************/
-__attribute__((deprecated))
-int dvbpsi_ValidTOTSection(dvbpsi_psi_section_t* p_section);
+static bool dvbpsi_ValidTOTSection(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
  * dvbpsi_DecodeTOTSections
  *****************************************************************************
  * TDT/TOT decoder.
  *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_DecodeTOTSections(dvbpsi_tot_t* p_tot,
+void dvbpsi_DecodeTOTSections(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot,
                               dvbpsi_psi_section_t* p_section);
-
 
 #else
 #error "Multiple inclusions of tot_private.h"

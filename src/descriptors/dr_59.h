@@ -54,10 +54,10 @@ extern "C" {
  */
 typedef struct dvbpsi_subtitle_s
 {
-  uint8_t      i_iso6392_language_code[3];
-  uint8_t      i_subtitling_type;
-  uint16_t      i_composition_page_id;
-  uint16_t      i_ancillary_page_id;
+  uint8_t      i_iso6392_language_code[3];  /*!< ISO 6392 language code */
+  uint8_t      i_subtitling_type;           /*!< subtitling type */
+  uint16_t     i_composition_page_id;       /*!< composition page id */
+  uint16_t     i_ancillary_page_id;         /*!< ancillayr page id */
 
 } dvbpsi_subtitle_t;
 
@@ -78,8 +78,8 @@ typedef struct dvbpsi_subtitle_s
  */
 typedef struct dvbpsi_subtitling_dr_s
 {
-  uint8_t      i_subtitles_number;
-  dvbpsi_subtitle_t p_subtitle[20];
+  uint8_t      i_subtitles_number;  /*!< subtiles number */
+  dvbpsi_subtitle_t p_subtitle[20]; /*!< subtitles */
 
 } dvbpsi_subtitling_dr_t;
 
@@ -104,17 +104,17 @@ dvbpsi_subtitling_dr_t* dvbpsi_DecodeSubtitlingDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
-                        dvbpsi_subtitling_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_subtitling_dr_t * p_decoded, bool b_duplicate)
  * \brief "subtitling" descriptor generator.
  * \param p_decoded pointer to a decoded "subtitling" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if bool then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
                                         dvbpsi_subtitling_dr_t * p_decoded,
-                                        int b_duplicate);
+                                        bool b_duplicate);
 
 
 #ifdef __cplusplus

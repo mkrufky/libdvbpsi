@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_55.c
- * Copyright (C) 2004-2010 VideoLAN
+ * Copyright (C) 2004-2011 VideoLAN
  * $Id: dr_55.c 89 2004-06-28 19:17:23Z gbazin $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -52,10 +52,7 @@ dvbpsi_parental_rating_dr_t * dvbpsi_DecodeParentalRatingDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x55)
-  {
-    DVBPSI_ERROR_ARG("dr_55 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -64,17 +61,11 @@ dvbpsi_parental_rating_dr_t * dvbpsi_DecodeParentalRatingDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_parental_rating_dr_t*)malloc(sizeof(dvbpsi_parental_rating_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_55 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length % 4)
   {
-    DVBPSI_ERROR_ARG("dr_55 decoder", "length not multiple of 4 (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }
@@ -104,7 +95,7 @@ dvbpsi_parental_rating_dr_t * dvbpsi_DecodeParentalRatingDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenParentalRatingDr(
                                         dvbpsi_parental_rating_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   int i;
 

@@ -6,6 +6,7 @@
  * Authors: Zhu zhenglu <zhuzlu@gmail.com>
  *          heavily based on nit.h which was written by
  *          Johann Hanne
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,8 +32,8 @@
  *
  * Application interface for the BAT decoder. New
  * decoded BAT are sent by callback to the application. If a table
- * wasn't active (b_current_next == 0) and the next is the same but active
- * (b_current_next == 1) then the service description list is empty and should
+ * wasn't active (b_current_next == false) and the next is the same but active
+ * (b_current_next == true) then the service description list is empty and should
  * be caught from the previous structure.
  * This is a simulation to sdt.h
  */
@@ -88,14 +89,14 @@ typedef struct dvbpsi_bat_ts_s
  */
 typedef struct dvbpsi_bat_s
 {
-  uint16_t                  i_bouquet_id;            /*!< bouquet_id */
+  uint16_t                  i_bouquet_id;       /*!< bouquet_id */
   uint8_t                   i_version;          /*!< version_number */
-  int                       b_current_next;     /*!< current_next_indicator */
+  bool                      b_current_next;     /*!< current_next_indicator */
 
   dvbpsi_descriptor_t *     p_first_descriptor; /*!< descriptor list */
 
-  dvbpsi_bat_ts_t *         p_first_ts;    /*!< transport stream description
-                                                     list */
+  dvbpsi_bat_ts_t *         p_first_ts;         /*!< transport stream
+                                                     description list */
 
 } dvbpsi_bat_t;
 
@@ -110,80 +111,68 @@ typedef struct dvbpsi_bat_s
  */
 typedef void (* dvbpsi_bat_callback)(void* p_cb_data, dvbpsi_bat_t* p_new_bat);
 
-
 /*****************************************************************************
  * dvbpsi_AttachBAT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_AttachBAT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_bat_callback pf_callback,
                                void* p_cb_data)
- * \brief Creation and initialization of a BAT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \brief Creation and initialization of a BAT decoder. It will be attached to p_dvbpsi.
+ * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0x4a.
  * \param i_extension Table ID extension, here bouquet ID.
  * \param pf_callback function to call back on new BAT.
  * \param p_cb_data private data given in argument to the callback.
- * \return 0 if everything went ok.
+ * \return true on success, false on failure
  */
-__attribute__((deprecated))
-int dvbpsi_AttachBAT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_bat_callback pf_callback,
                                void* p_cb_data);
-
 
 /*****************************************************************************
  * dvbpsi_DetachBAT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachBAT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension)
  * \brief Destroy a BAT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0x4a.
  * \param i_extension Table ID extension, here bouquet ID.
  * \return nothing.
  */
-__attribute__((deprecated))
-void dvbpsi_DetachBAT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension);
-
 
 /*****************************************************************************
  * dvbpsi_InitBAT/dvbpsi_NewBAT
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_InitBAT(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_version,
-                    int b_current_next)
+                    bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_bat_t structure.
  * \param p_bat pointer to the BAT structure
  * \param i_bouquet_id bouquet ID
  * \param i_version BAT version
  * \param b_current_next current next indicator
- * \param i_network_id original network id
  * \return nothing.
  */
 __attribute__((deprecated))
 void dvbpsi_InitBAT(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_version,
-                    int b_current_next);
+                    bool b_current_next);
 
 /*!
- * \def dvbpsi_NewBAT(p_bat, i_bouquet_id, i_version, b_current_next)
+ * \fn dvbpsi_bat_t *dvbpsi_NewBAT(uint16_t i_bouquet_id, uint8_t i_version,
+ *                                 bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_bat_t structure.
- * \param p_bat pointer to the BAT structure
  * \param i_bouquet_id bouquet ID
  * \param i_version BAT version
  * \param b_current_next current next indicator
- * \param i_network_id original network id
- * \return nothing.
+ * \return p_bat pointer to the BAT structure
  */
-#define dvbpsi_NewBAT(p_bat, i_bouquet_id, i_version, b_current_next) \
-do {                                                                    \
-  p_bat = (dvbpsi_bat_t*)malloc(sizeof(dvbpsi_bat_t));                  \
-  if(p_bat != NULL)                                                     \
-    dvbpsi_InitBAT(p_bat, i_bouquet_id, i_version, b_current_next); \
-} while(0);
-
+dvbpsi_bat_t *dvbpsi_NewBAT(uint16_t i_bouquet_id, uint8_t i_version,
+                            bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_EmptyBAT/dvbpsi_DeleteBAT
@@ -198,31 +187,26 @@ __attribute__((deprecated))
 void dvbpsi_EmptyBAT(dvbpsi_bat_t *p_bat);
 
 /*!
- * \def dvbpsi_DeleteBAT(p_bat)
+ * \fn dvbpsi_DeleteBAT(dvbpis_bat_t *p_bat)
  * \brief Clean and free a dvbpsi_bat_t structure.
  * \param p_bat pointer to the BAT structure
  * \return nothing.
  */
-#define dvbpsi_DeleteBAT(p_bat)                                         \
-do {                                                                    \
-  dvbpsi_EmptyBAT(p_bat);                                               \
-  free(p_bat);                                                          \
-} while(0);
+void dvbpsi_DeleteBAT(dvbpsi_bat_t *p_bat);
 
 /*****************************************************************************
  * dvbpsi_GenBATSections
- *****************************************************************************
+ *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_bat_t* p_bat)
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_bat)
  * \brief BAT generator
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_bat BAT structure
  * \return a pointer to the list of generated PSI sections.
  *
  * Generate BAT sections based on the dvbpsi_bat_t structure.
  *****************************************************************************/
-__attribute__((deprecated))
-dvbpsi_psi_section_t *dvbpsi_GenBATSections(dvbpsi_bat_t * p_bat);
-
+dvbpsi_psi_section_t *dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t * p_bat);
 
 #ifdef __cplusplus
 };
@@ -231,4 +215,3 @@ dvbpsi_psi_section_t *dvbpsi_GenBATSections(dvbpsi_bat_t * p_bat);
 #else
 #error "Multiple inclusions of bat.h"
 #endif
-

@@ -58,7 +58,7 @@ typedef struct dvbpsi_sis_s
                                                          shall be 0 */
 
   /* encryption */
-  int                       b_encrypted_packet;     /*!< 1 when packet is
+  bool                      b_encrypted_packet;     /*!< 1 when packet is
                                                          encrypted */
   uint8_t                   i_encryption_algorithm; /*!< Encryption algorithm
                                                          used */
@@ -70,7 +70,7 @@ typedef struct dvbpsi_sis_s
   uint16_t                  i_splice_command_length;/*!< Length of splice command */
   uint8_t                   i_splice_command_type;  /*!< Splice command type */
 
-  /* FIXME: splice_info_section comes here
+  /* Splice Command:
    * splice_command_type     splice_info_section
    *    0x00                    splice_null()
    *    0x01                    reserved
@@ -82,18 +82,213 @@ typedef struct dvbpsi_sis_s
    *    0x07                    bandwidth_reservation()
    *    0x08 - 0xff             reserved
    */
+  void                      *p_splice_command;      /*!< Pointer to splice command
+                                                         structure */
 
   /* descriptors */
   uint16_t                  i_descriptors_length;   /*!< Descriptors loop
                                                          length */
-  dvbpsi_descriptor_t *     p_first_descriptor;     /*!< First of the following
-                                                         DVB descriptors */
+  dvbpsi_descriptor_t       *p_first_descriptor;     /*!< First of the following
+                                                          SIS descriptors */
 
   /* FIXME: alignment stuffing */
-
   uint32_t i_ecrc; /*!< CRC 32 of decrypted splice_info_section */
 
 } dvbpsi_sis_t;
+
+/*****************************************************************************
+ * Splice Commands
+ *****************************************************************************/
+/*!
+ * \brief The Splice Info Section (SIS) defines some Splice Commands, which
+ * are described below:
+ */
+/*!
+ * \typedef struct dvbpsi_sis_cmd_splice_null_s dvbpsi_sis_cmd_splice_null_t
+ * \brief splice_null() splice command definition
+ */
+typedef struct dvbpsi_sis_cmd_splice_null_s
+{
+    /* nothing */
+} dvbpsi_sis_cmd_splice_null_t;
+
+/*!
+ * \typedef struct dvbpsi_sis_break_duration_s dvbpsi_sis_break_duration_t
+ * \brief splice event definition
+ */
+typedef struct dvbpsi_sis_break_duration_s
+{
+    bool        b_auto_return;  /*!< when true it denotes that the duration
+                                     shall be used by the splicing device to
+                                     know when the return to the network feed
+                                     (end of break) is to take place */
+    uint64_t    i_duration;     /*!< indicates elapsed time in terms of ticks
+                                     of the program’s 90 kHz clock indicates
+                                     elapsed time in terms of ticks of the
+                                     program’s 90 kHz clock */
+} dvbpsi_sis_break_duration_t;
+
+/*!
+ * \typedef struct dvbpsi_sis_component_utc_splice_time_s dvbpsi_sis_component_utc_splice_time_t
+ * \brief combined component tag and UTC splice time definition
+ */
+typedef struct dvbpsi_sis_component_utc_splice_time_s dvbpsi_sis_component_utc_splice_time_s;
+struct dvbpsi_sis_component_utc_splice_time_s
+{
+    uint8_t     component_tag;      /*!< identifies the elementary PID stream containing
+                                         the Splice Point specified by the value of
+                                         splice_time() that follows. */
+    uint32_t    i_utc_splice_time;  /*!< time of the signaled splice event as
+                                         the number of seconds since 00 hours UTC,
+                                         January 6th, 1980.
+                                         Maybe converted to UTC without use of
+                                         GPS_UTC_offset value from System Time table. */
+
+    dvbpsi_sis_component_utc_splice_time_s *p_next; /*!< next component, utc splice time structure */
+};
+
+/*!
+ * \typedef struct dvbpsi_sis_splice_event_s dvbpsi_sis_splice_event_t
+ * \brief splice event definition
+ */
+typedef struct dvbpsi_sis_splice_event_s dvbpsi_sis_splice_event_t;
+struct dvbpsi_sis_splice_event_s
+{
+    uint32_t        i_splice_event_id;               /*!< splice event identifier */
+    bool            b_splice_event_cancel_indicator; /*!< cancels splice event when true */
+
+    /* if (!b_splice_event_cancel_indicator) */
+    bool            b_out_of_network_indicator; /*!< signals an out of network feed event */
+    bool            b_program_splice_flag;      /*!< signals a Program Splice Point */
+    bool            b_duration_flag;            /*!< signals existing break_duration() field */
+    /*      if (b_program_splice_flag) */
+    uint32_t        i_utc_splice_time;          /*!< time of the signaled splice event as
+                                                     the number of seconds since 00 hours UTC,
+                                                     January 6th, 1980.
+                                                     Maybe converted to UTC without use of
+                                                     GPS_UTC_offset value from System Time table.*/
+    /*      if (!b_program_splice_flag) */
+    uint8_t         i_component_count;          /*!< number of stream PID in the following
+                                                     loop. A component is equivalent to
+                                                     elementary stream PIDs.*/
+    dvbpsi_sis_component_utc_splice_time_s  *p_data;
+                                                /*!< identifies the elementary PID stream containing
+                                                     the Splice Point specified by the value of
+                                                     splice_time() that follows. */
+    /*      if (b_duration_flag) */
+    dvbpsi_sis_break_duration_t *p_break_duration;     /*!< break duration is present when
+                                                     b_duration_flag is set */
+    /* */
+
+    uint16_t        i_unique_program_id; /*!< provide a unique identification for
+                                              a viewing event */
+    uint8_t         i_avail_num;         /*!< identification for a specific
+                                              avail within one unique_program_id. */
+    uint8_t         i_avails_expected;   /*!< count of the expected number of individual
+                                              avails within the current viewing event */
+    /* end */
+
+    dvbpsi_sis_splice_event_t *p_next;   /*!< next splice event structure */
+};
+
+/*!
+ * \typedef struct dvbpsi_sis_cmd_splice_schedule_s dvbpsi_sis_cmd_splice_schedule_t
+ * \brief splice_schedule() splice command definition
+ */
+typedef struct dvbpsi_sis_cmd_splice_schedule_s
+{
+    uint8_t                     i_splice_count; /*!< Count of splice events */
+    dvbpsi_sis_splice_event_t  *p_splice_event; /*!< List splice of events */
+} dvbpsi_sis_cmd_splice_schedule_t;
+
+/*!
+ * \typedef struct dvbpsi_sis_splice_time_s dvbpsi_sis_splice_time_t
+ * \brief splice_time() splice definition
+ */
+typedef struct dvbpsi_sis_splice_time_s dvbpsi_sis_splice_time_t;
+struct dvbpsi_sis_splice_time_s
+{
+    bool        b_time_specified_flag; /*!< signals presence of PTS time field */
+    /* if (b_time_specified_flag) */
+    uint64_t    i_pts_time;        /*!< time in terms of ticks of the program’s 90 kHz
+                                        clock. This field, when modified by pts_adjustment,
+                                        represents the time of the intended splice point.*/
+    /* else reserved */
+    /* end */
+
+    dvbpsi_sis_splice_time_t *p_next; /*!< next splice_time() entry */
+};
+
+/*!
+ * \typedef struct dvbpsi_sis_splice_time_s dvbpsi_sis_splice_time_t
+ * \brief component_tag, splice_time definition
+ */
+typedef struct dvbpsi_sis_component_splice_time_s dvbpsi_sis_component_splice_time_t;
+struct dvbpsi_sis_component_splice_time_s
+{
+    uint8_t     i_component_tag;    /*!< identifies the elementary PID stream containing
+                                         the Splice Point specified by the value of
+                                         splice_time() that follows. */
+    /* if (splice_immediate_flag) */
+    dvbpsi_sis_splice_time_t *p_splice_time; /*!< splice time defintions */
+    /* */
+
+    dvbpsi_sis_component_splice_time_t *p_next; /*!< next in list */
+};
+
+/*!
+ * \typedef struct dvbpsi_sis_cmd_splice_insert_s dvbpsi_sis_cmd_splice_insert_t
+ * \brief splice_insert() splice command definition
+ */
+typedef struct dvbpsi_sis_cmd_splice_insert_s
+{
+    uint32_t        i_splice_event_id;               /*!< splice event identifier */
+    bool            b_splice_event_cancel_indicator; /*!< cancels splice event when true */
+
+    /* if (!b_splice_event_cancel_indicator) */
+    bool            b_out_of_network_indicator; /*!< signals an out of network feed event */
+    bool            b_program_splice_flag;      /*!< signals a Program Splice Point */
+    bool            b_duration_flag;            /*!< signals existing break_duration() field */
+    bool            b_splice_immediate_flag;    /*!< signals immediate splice insertion */
+
+    /*      if (b_program_splice_flag) && (!b_splice_immediate_flag) */
+    dvbpsi_sis_splice_time_t *p_splice_time;           /*!< splice time */
+
+    /*      if (!b_program_splice_flag) */
+    uint8_t         i_component_count;           /*!< number of stream PID in the following loop.
+                                                      A component is equivalent to elementary stream PIDs.*/
+    dvbpsi_sis_component_splice_time_t  *p_data; /*!< identifies the elementary PID stream containing
+                                                      the Splice Point specified by the value of
+                                                      splice_time() that follows. */
+    /*      if (b_duration_flag) */
+    dvbpsi_sis_break_duration_t *p_break_duration; /*!< break duration is present when b_duration_flag is set */
+
+    /* */
+    uint16_t        i_unique_program_id;      /*!< provide a unique identification for a viewing event */
+    uint8_t         i_avail_num;              /*!< identification for a specific avail within
+                                                   one unique_program_id. */
+    uint8_t         i_avails_expected;        /*!< count of the expected number of individual avails
+                                                   within the current viewing event */
+    /* end */
+} dvbpsi_sis_cmd_splice_insert_t;
+
+/*!
+ * \typedef struct dvbpsi_sis_cmd_time_signal_s dvbpsi_sis_cmd_time_signal_t
+ * \brief time_signal() splice command definition
+ */
+typedef struct dvbpsi_sis_cmd_time_signal_s
+{
+    dvbpsi_sis_splice_time_t *p_splice_time;       /*!< splice time command */
+} dvbpsi_sis_cmd_time_signal_t;
+
+/*!
+ * \typedef struct dvbpsi_sis_cmd_bandwidth_reservation_s dvbpsi_sis_cmd_bandwidth_reservation_t
+ * \brief bandwidth_reservation() splice command definition
+ */
+typedef struct dvbpsi_sis_cmd_bandwidth_reservation_s
+{
+    /* nothing */
+} dvbpsi_sis_cmd_bandwidth_reservation_t;
 
 /*****************************************************************************
  * dvbpsi_sis_callback
@@ -105,51 +300,43 @@ typedef struct dvbpsi_sis_s
  */
 typedef void (* dvbpsi_sis_callback)(void* p_cb_data, dvbpsi_sis_t* p_new_sis);
 
-
 /*****************************************************************************
  * dvbpsi_AttachSIS
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_AttachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sis_callback pf_callback,
                                void* p_cb_data)
- * \brief Creation and initialization of a SIS decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \brief Creation and initialization of a SIS decoder. It is attached to p_dvbpsi.
+ * \param p_dvbpsi pointer to dvbpsi to hold decoder/demuxer structure
  * \param i_table_id Table ID, 0xFC.
  * \param i_extension Table ID extension, here TS ID.
  * \param pf_callback function to call back on new SIS.
  * \param p_cb_data private data given in argument to the callback.
- * \return 0 if everything went ok.
+ * \return true on success, false on failure
  */
-__attribute__((deprecated))
-int dvbpsi_AttachSIS(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_sis_callback pf_callback,
-                               void* p_cb_data);
-
+bool dvbpsi_AttachSIS(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                      dvbpsi_sis_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachSIS
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-          uint16_t i_extension)
+ * \fn void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+                             uint16_t i_extension)
  * \brief Destroy a SIS decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi pointer to dvbpsi to hold decoder/demuxer structure
  * \param i_table_id Table ID, 0xFC.
  * \param i_extension Table ID extension, here TS ID.
  * \return nothing.
  */
-__attribute__((deprecated))
-void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-          uint16_t i_extension);
-
+void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
 
 /*****************************************************************************
  * dvbpsi_InitSIS/dvbpsi_NewSIS
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_InitSIS(dvbpsi_sis_t* p_sis, uint16_t i_ts_id,
-          uint8_t i_version, int b_current_next, uint16_t i_network_id)
+ * \fn void dvbpsi_InitSIS(dvbpsi_sis_t* p_sis, uint8_t i_protocol_version)
  * \brief Initialize a user-allocated dvbpsi_sis_t structure.
  * \param p_sis pointer to the SIS structure
  * \param i_protocol_version SIS protocol version (currently 0)
@@ -159,18 +346,12 @@ __attribute__((deprecated))
 void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version);
 
 /*!
- * \def dvbpsi_NewSIS(p_sis, i_protocol_version)
+ * \fn dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version)
  * \brief Allocate and initialize a new dvbpsi_sis_t structure.
- * \param p_sis pointer to the SIS structure
  * \param i_protocol_version SIS protocol version (currently 0)
- * \return nothing.
+ * \return p_sis pointer to the SIS structure
  */
-#define dvbpsi_NewSIS(p_sis, i_protocol_version)                        \
-do {                                                                    \
-  p_sis = (dvbpsi_sis_t*)malloc(sizeof(dvbpsi_sis_t));                  \
-  if(p_sis != NULL)                                                     \
-    dvbpsi_InitSIS(p_sis, i_protocol_version);                          \
-} while(0);
+dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version);
 
 /*****************************************************************************
  * dvbpsi_EmptySIS/dvbpsi_DeleteSIS
@@ -185,16 +366,12 @@ __attribute__((deprecated))
 void dvbpsi_EmptySIS(dvbpsi_sis_t *p_sis);
 
 /*!
- * \def dvbpsi_DeleteSIS(p_sis)
+ * \fn void  dvbpsi_DeleteSIS(dvbpsi_sis_t *p_sis)
  * \brief Clean and free a dvbpsi_sis_t structure.
- * \param p_sIt pointer to the SIS structure
+ * \param p_sis pointer to the SIS structure
  * \return nothing.
  */
-#define dvbpsi_DeleteSIS(p_sis)                                         \
-do {                                                                    \
-  dvbpsi_EmptySIS(p_sis);                                               \
-  free(p_sis);                                                          \
-} while(0);
+void dvbpsi_DeleteSIS(dvbpsi_sis_t *p_sis);
 
 /*****************************************************************************
  * dvbpsi_SISAddDescriptor
@@ -210,18 +387,25 @@ do {                                                                    \
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-__attribute__((deprecated))
-dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor( dvbpsi_sis_t *p_sis,
-                                              uint8_t i_tag, uint8_t i_length,
-                                              uint8_t *p_data);
+dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor(dvbpsi_sis_t *p_sis,
+                                             uint8_t i_tag, uint8_t i_length,
+                                             uint8_t *p_data);
 
 /*****************************************************************************
  * dvbpsi_GenSISSections
  *****************************************************************************
  * Generate SIS sections based on the dvbpsi_sis_t structure.
  *****************************************************************************/
-__attribute__((deprecated))
-dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_sis_t * p_sis);
+/*!
+ * \fn dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t * p_sis);
+ * \brief SIS generator
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
+ * \param p_sis SIS structure
+ * \return a pointer to the list of generated PSI sections.
+ *
+ * Generate SIS sections based on the dvbpsi_sis_t structure.
+ */
+dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t * p_sis);
 
 #ifdef __cplusplus
 };

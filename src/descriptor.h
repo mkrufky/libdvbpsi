@@ -27,6 +27,9 @@
  * \brief Common descriptor tools.
  *
  * Descriptor structure and its Manipulation tools.
+ *
+ * NOTE: Descriptor generators and decoder functions return a pointer on success
+ * and NULL on error. They do not use a dvbpsi_t handle as first argument.
  */
 
 #ifndef _DVBPSI_DESCRIPTOR_H_

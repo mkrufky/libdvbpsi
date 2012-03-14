@@ -5,6 +5,7 @@
  * $Id: sdt_private.h,v 1.1 2002/12/11 13:04:57 jobi Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,7 +28,6 @@
 #ifndef _DVBPSI_SDT_PRIVATE_H_
 #define _DVBPSI_SDT_PRIVATE_H_
 
-
 /*****************************************************************************
  * dvbpsi_sdt_decoder_t
  *****************************************************************************
@@ -35,30 +35,29 @@
  *****************************************************************************/
 typedef struct dvbpsi_sdt_decoder_s
 {
-  dvbpsi_sdt_callback           pf_callback;
-  void *                        p_cb_data;
+    DVBPSI_DECODER_COMMON
 
-  dvbpsi_sdt_t                  current_sdt;
-  dvbpsi_sdt_t *                p_building_sdt;
+    dvbpsi_sdt_callback           pf_sdt_callback;
+    void *                        p_cb_data;
 
-  int                           b_current_valid;
+    dvbpsi_sdt_t                  current_sdt;
+    dvbpsi_sdt_t *                p_building_sdt;
 
-  uint8_t                       i_last_section_number;
-  dvbpsi_psi_section_t *        ap_sections [256];
+    bool                          b_current_valid;
+
+    uint8_t                       i_last_section_number;
+    dvbpsi_psi_section_t *        ap_sections [256];
 
 } dvbpsi_sdt_decoder_t;
-
 
 /*****************************************************************************
  * dvbpsi_GatherSDTSections
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_GatherSDTSections(dvbpsi_decoder_t* p_psi_decoder,
-                      void* p_private_decoder,
+void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
+                              void* p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
-
 
 /*****************************************************************************
  * dvbpsi_DecodeSDTSection
@@ -68,7 +67,6 @@ void dvbpsi_GatherSDTSections(dvbpsi_decoder_t* p_psi_decoder,
 __attribute__((deprecated))
 void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
                               dvbpsi_psi_section_t* p_section);
-
 
 #else
 #error "Multiple inclusions of sdt_private.h"

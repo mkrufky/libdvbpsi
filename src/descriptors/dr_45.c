@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_45.c
- * Copyright (C) 2004-2010 VideoLAN
+ * Copyright (C) 2004-2011 VideoLAN
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -50,10 +51,7 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
 
   /* Check the tag */
   if( p_descriptor->i_tag != 0x45 )
-  {
-    DVBPSI_ERROR_ARG("dr_45 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -61,29 +59,17 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
 
   /* Decode data and check the length */
   if(p_descriptor->i_length < 3)
-  {
-    DVBPSI_ERROR_ARG("dr_45 decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     return NULL;
-  }
 
   if(p_descriptor->i_length % 2)
-  {
-    DVBPSI_ERROR_ARG("dr_45 decoder", "length not multiple of 3(%d)",
-                     p_descriptor->i_length);
     return NULL;
-  }
 
   i_services_number = p_descriptor->i_length / 2;
 
   /* Allocate memory */
   p_decoded =
         (dvbpsi_vbi_dr_t*)malloc(sizeof(dvbpsi_vbi_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_45 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   p_decoded->i_services_number = i_services_number;
 
@@ -119,7 +105,7 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenVBIDataDr(
                                         dvbpsi_vbi_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   int i;
 

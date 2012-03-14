@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_0c.c
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: dr_0c.c,v 1.3 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -51,10 +51,7 @@ dvbpsi_mx_buff_utilization_dr_t * dvbpsi_DecodeMxBuffUtilizationDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x0c)
-  {
-    DVBPSI_ERROR_ARG("dr_0c decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -63,22 +60,16 @@ dvbpsi_mx_buff_utilization_dr_t * dvbpsi_DecodeMxBuffUtilizationDr(
   /* Allocate memory */
   p_decoded = (dvbpsi_mx_buff_utilization_dr_t*)
                         malloc(sizeof(dvbpsi_mx_buff_utilization_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_0c decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length != 3)
   {
-    DVBPSI_ERROR_ARG("dr_0c decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }
 
-  p_decoded->b_mdv_valid = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;
+  p_decoded->b_mdv_valid = (p_descriptor->p_data[0] & 0x80) ? true : false;
   p_decoded->i_mx_delay_variation =
                           ((uint16_t)(p_descriptor->p_data[0] & 0x7f) << 8)
                         | p_descriptor->p_data[1];
@@ -95,7 +86,7 @@ dvbpsi_mx_buff_utilization_dr_t * dvbpsi_DecodeMxBuffUtilizationDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenMxBuffUtilizationDr(
                                 dvbpsi_mx_buff_utilization_dr_t * p_decoded,
-                                int b_duplicate)
+                                bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

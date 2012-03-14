@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sis.c: SIS decoder/generator
  *----------------------------------------------------------------------------
- * Copyright (C) 2010 VideoLAN
+ * Copyright (C) 2010-2011 VideoLAN
  * $Id:$
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -52,11 +53,13 @@
  *****************************************************************************
  * Initialize a SIS subtable decoder.
  *****************************************************************************/
-int dvbpsi_AttachSIS(dvbpsi_decoder_t *p_psi_decoder, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_sis_callback pf_callback,
-                               void* p_cb_data)
+bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                      dvbpsi_sis_callback pf_callback, void* p_cb_data)
 {
-    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_psi_decoder->p_private_decoder;
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
+    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
     dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_sis_decoder_t*  p_sis_decoder;
 
@@ -64,25 +67,22 @@ int dvbpsi_AttachSIS(dvbpsi_decoder_t *p_psi_decoder, uint8_t i_table_id,
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
-        DVBPSI_ERROR_ARG("SIS decoder",
+        dvbpsi_error(p_dvbpsi, "SIS decoder",
                          "Already a decoder for (table_id == 0x%02x,"
                          "extension == 0x%02x)",
                          i_table_id, i_extension);
-
-        return 1;
+        return false;
     }
 
     p_subdec = (dvbpsi_demux_subdec_t*)malloc(sizeof(dvbpsi_demux_subdec_t));
     if (p_subdec == NULL)
-    {
-        return 1;
-    }
+        return false;
 
     p_sis_decoder = (dvbpsi_sis_decoder_t*)malloc(sizeof(dvbpsi_sis_decoder_t));
     if (p_sis_decoder == NULL)
     {
         free(p_subdec);
-        return 1;
+        return false;
     }
 
     /* subtable decoder configuration */
@@ -96,10 +96,10 @@ int dvbpsi_AttachSIS(dvbpsi_decoder_t *p_psi_decoder, uint8_t i_table_id,
     p_demux->p_first_subdec = p_subdec;
 
     /* SIS decoder information */
-    p_sis_decoder->pf_callback = pf_callback;
+    p_sis_decoder->pf_sis_callback = pf_callback;
     p_sis_decoder->p_cb_data = p_cb_data;
 
-    return 0;
+    return true;
 }
 
 /*****************************************************************************
@@ -107,28 +107,32 @@ int dvbpsi_AttachSIS(dvbpsi_decoder_t *p_psi_decoder, uint8_t i_table_id,
  *****************************************************************************
  * Close a SIS decoder.
  *****************************************************************************/
-void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
     dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_demux_subdec_t** pp_prev_subdec;
-    dvbpsi_sis_decoder_t* p_sis_decoder;
 
     i_extension = 0;
 
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if (p_demux == NULL)
     {
-        DVBPSI_ERROR_ARG("SIS Decoder",
+        dvbpsi_error(p_dvbpsi, "SIS Decoder",
                          "No such SIS decoder (table_id == 0x%02x,"
                          "extension == 0x%02x)",
                          i_table_id, i_extension);
         return;
     }
 
+    dvbpsi_sis_decoder_t* p_sis_decoder;
     p_sis_decoder = (dvbpsi_sis_decoder_t*)p_subdec->p_cb_data;
-
-    free(p_subdec->p_cb_data);
+    free(p_sis_decoder);
+    p_subdec->p_cb_data = NULL;
 
     pp_prev_subdec = &p_demux->p_first_subdec;
     while(*pp_prev_subdec != p_subdec)
@@ -136,6 +140,7 @@ void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
 
     *pp_prev_subdec = p_subdec->p_next;
     free(p_subdec);
+    p_subdec = NULL;
 }
 
 /*****************************************************************************
@@ -149,7 +154,7 @@ void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version)
     p_sis->i_protocol_version = 0; /* must be 0 */
 
     /* encryption */
-    p_sis->b_encrypted_packet = 0;
+    p_sis->b_encrypted_packet = false;
     p_sis->i_encryption_algorithm = 0;
 
     p_sis->i_pts_adjustment = (uint64_t)0;
@@ -171,6 +176,19 @@ void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version)
 }
 
 /*****************************************************************************
+ * dvbpsi_NewSIS
+ *****************************************************************************
+ * Allocate and Initialize a new dvbpsi_sis_t structure.
+ *****************************************************************************/
+dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version)
+{
+    dvbpsi_sis_t* p_sis = (dvbpsi_sis_t*)malloc(sizeof(dvbpsi_sis_t));
+    if(p_sis != NULL)
+        dvbpsi_InitSIS(p_sis, i_protocol_version);
+    return p_sis;
+}
+
+/*****************************************************************************
  * dvbpsi_EmptySIS
  *****************************************************************************
  * Clean a dvbpsi_sis_t structure.
@@ -186,32 +204,40 @@ void dvbpsi_EmptySIS(dvbpsi_sis_t* p_sis)
 }
 
 /*****************************************************************************
+ * dvbpsi_DeleteSIS
+ *****************************************************************************
+ * Clean and Delete a dvbpsi_sis_t structure.
+ *****************************************************************************/
+void dvbpsi_DeleteSIS(dvbpsi_sis_t *p_sis)
+{
+    if (p_sis)
+        dvbpsi_EmptySIS(p_sis);
+    free(p_sis);
+}
+
+/*****************************************************************************
  * dvbpsi_SISAddDescriptor
  *****************************************************************************
  * Add a descriptor in the SIS service description.
  *****************************************************************************/
-dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor( dvbpsi_sis_t *p_sis,
-                                              uint8_t i_tag, uint8_t i_length,
-                                              uint8_t *p_data)
+dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor(dvbpsi_sis_t *p_sis,
+                                             uint8_t i_tag, uint8_t i_length,
+                                             uint8_t *p_data)
 {
     dvbpsi_descriptor_t * p_descriptor;
-
     p_descriptor = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
-    if (p_descriptor)
-    {
-        if (p_sis->p_first_descriptor == NULL)
-        {
-            p_sis->p_first_descriptor = p_descriptor;
-        }
-        else
-        {
-            dvbpsi_descriptor_t * p_last_descriptor = p_sis->p_first_descriptor;
-            while (p_last_descriptor->p_next != NULL)
-                p_last_descriptor = p_last_descriptor->p_next;
-            p_last_descriptor->p_next = p_descriptor;
-        }
-    }
+    if (p_descriptor == NULL)
+        return NULL;
 
+    if (p_sis->p_first_descriptor == NULL)
+        p_sis->p_first_descriptor = p_descriptor;
+    else
+    {
+        dvbpsi_descriptor_t *p_last_descriptor = p_sis->p_first_descriptor;
+        while (p_last_descriptor->p_next != NULL)
+            p_last_descriptor = p_last_descriptor->p_next;
+        p_last_descriptor->p_next = p_descriptor;
+    }
     return p_descriptor;
 }
 
@@ -220,16 +246,18 @@ dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor( dvbpsi_sis_t *p_sis,
  *****************************************************************************
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
-void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
+void dvbpsi_GatherSISSections(dvbpsi_t *p_dvbpsi,
                               void * p_private_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
     dvbpsi_sis_decoder_t * p_sis_decoder
                         = (dvbpsi_sis_decoder_t*)p_private_decoder;
-    int b_append = 1;
-    int b_reinit = 0;
 
-    DVBPSI_DEBUG_ARG("SIS decoder",
+    dvbpsi_debug(p_dvbpsi, "SIS decoder",
                      "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
                      "section %3d up to %3d, " "current %1d",
                      p_section->i_version, p_section->i_table_id,
@@ -240,57 +268,59 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
     if (p_section->i_table_id != 0xFC)
     {
         /* Invalid table_id value */
-        DVBPSI_ERROR_ARG("SIS decoder",
+        dvbpsi_error(p_dvbpsi, "SIS decoder",
                          "invalid section (table_id == 0x%02x)",
                           p_section->i_table_id);
-        b_append = 0;
+         dvbpsi_DeletePSISections(p_section);
+         return;
     }
 
-    if (p_section->b_syntax_indicator != 0)
+    if (p_section->b_syntax_indicator)
     {
         /* Invalid section_syntax_indicator */
-        DVBPSI_ERROR("SIS decoder",
-                     "invalid section (section_syntax_indicator != 0)");
-        b_append = 0;
+        dvbpsi_error(p_dvbpsi, "SIS decoder",
+                     "invalid section (section_syntax_indicator != false)");
+        dvbpsi_DeletePSISections(p_section);
+        return;
     }
 
-    if (p_section->b_private_indicator != 0)
+    if (p_section->b_private_indicator)
     {
         /* Invalid private_syntax_indicator */
-        DVBPSI_ERROR("SIS decoder",
-                     "invalid private section (private_syntax_indicator != 0)");
-        b_append = 0;
+        dvbpsi_error(p_dvbpsi, "SIS decoder",
+                     "invalid private section (private_syntax_indicator != false)");
+        dvbpsi_DeletePSISections(p_section);
+        return;
     }
 
-    /* Now if b_append is true then we have a valid SIS section */
-    if (b_append)
+    bool b_reinit = false;
+
+    /* TS discontinuity check */
+    if (p_demux->b_discontinuity)
     {
-        /* TS discontinuity check */
-        if (p_psi_decoder->b_discontinuity)
+        b_reinit = true;
+        p_demux->b_discontinuity = false;
+    }
+    else
+    {
+        /* Perform a few sanity checks */
+        if (p_sis_decoder->p_building_sis)
         {
-            b_reinit = 1;
-            p_psi_decoder->b_discontinuity = 0;
+            if (p_sis_decoder->p_building_sis->i_protocol_version != 0)
+            {
+                /* transport_stream_id */
+                dvbpsi_error(p_dvbpsi, "SIS decoder",
+                             "'protocol_version' differs");
+                b_reinit = true;
+            }
         }
         else
         {
-            /* Perform a few sanity checks */
-            if (p_sis_decoder->p_building_sis)
+            if (p_sis_decoder->b_current_valid)
             {
-                if (p_sis_decoder->p_building_sis->i_protocol_version != 0)
-                {
-                    /* transport_stream_id */
-                    DVBPSI_ERROR("SIS decoder",
-                                 "'protocol_version' differs");\
-                    b_reinit = 1;
-                }
-            }
-            else
-            {
-                if (p_sis_decoder->b_current_valid)
-                {
-                    /* Don't decode since this version is already decoded */
-                    b_append = 0;
-                }
+                /* Don't decode since this version is already decoded */
+                dvbpsi_DeletePSISections(p_section);
+                return;
             }
         }
     }
@@ -299,7 +329,7 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
     if (b_reinit)
     {
         /* Force redecoding */
-        p_sis_decoder->b_current_valid = 0;
+        p_sis_decoder->b_current_valid = false;
 
         /* Free structures */
         if (p_sis_decoder->p_building_sis)
@@ -309,21 +339,14 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
         }
     }
 
-    /* Append the section to the list if wanted */
-    if (b_append)
+    /* Initialize the structures if it's the first section received */
+    if (!p_sis_decoder->p_building_sis)
     {
-        /* Initialize the structures if it's the first section received */
-        if (!p_sis_decoder->p_building_sis)
-        {
-            p_sis_decoder->p_building_sis =
-                                (dvbpsi_sis_t*)malloc(sizeof(dvbpsi_sis_t));
-            // FIXME: potiential crash on OUT OF MEMORY
+        p_sis_decoder->p_building_sis = (dvbpsi_sis_t*)malloc(sizeof(dvbpsi_sis_t));
+        if (p_sis_decoder->p_building_sis)
             dvbpsi_InitSIS(p_sis_decoder->p_building_sis, 0);
-        }
-    }
-    else
-    {
-        dvbpsi_DeletePSISections(p_section);
+        else
+            dvbpsi_error(p_dvbpsi, "SIS decoder", "failed decoding section");
     }
 }
 
@@ -332,7 +355,7 @@ void dvbpsi_GatherSISSections(dvbpsi_decoder_t * p_psi_decoder,
  *****************************************************************************
  * SIS decoder.
  *****************************************************************************/
-void dvbpsi_DecodeSISSections(dvbpsi_sis_t* p_sis,
+void dvbpsi_DecodeSISSections(dvbpsi_t* p_dvbpsi, dvbpsi_sis_t* p_sis,
                               dvbpsi_psi_section_t* p_section)
 {
     uint8_t *p_byte, *p_end;
@@ -345,7 +368,7 @@ void dvbpsi_DecodeSISSections(dvbpsi_sis_t* p_sis,
             p_sis->i_protocol_version = p_byte[3];
             p_sis->b_encrypted_packet = ((p_byte[4] & 0x80)>>8);
             /* NOTE: cannot handle encrypted packet */
-            assert(p_sis->b_encrypted_packet == 1);
+            assert(p_sis->b_encrypted_packet);
             p_sis->i_encryption_algorithm = ((p_byte[4] & 0x7E) >> 1);
             p_sis->i_pts_adjustment = ((((uint64_t)p_byte[4] & 0x01) << 32) |
                                         ((uint64_t)p_byte[5] << 24) |
@@ -362,7 +385,20 @@ void dvbpsi_DecodeSISSections(dvbpsi_sis_t* p_sis,
                 /* FIXME: size 0xfff of splice_command_section is undefined */
                 assert(p_sis->i_splice_command_length != 0xfff);
             }
+
             /* FIXME: handle splice_command_sections */
+            switch(p_sis->i_splice_command_type)
+            {
+                case 0x00: /* splice_null */
+                case 0x04: /* splice_schedule */
+                case 0x05: /* splice_insert */
+                case 0x06: /* time_signal */
+                case 0x07: /* bandwidth_reservation */
+                    break;
+                default:
+                    dvbpsi_error(p_dvbpsi, "SIS decoder", "invalid SIS Command found");
+                    break;
+            }
 
             /* Service descriptors */
             uint8_t *p_desc = p_byte + 13 + i_splice_command_length;
@@ -382,7 +418,7 @@ void dvbpsi_DecodeSISSections(dvbpsi_sis_t* p_sis,
                 p_desc += 2 + i_length;
             }
 
-            if (p_sis->b_encrypted_packet == 1)
+            if (p_sis->b_encrypted_packet)
             {
                 /* FIXME: Currently ignored */
                 /* Calculate crc32 over decoded
@@ -406,13 +442,13 @@ void dvbpsi_DecodeSISSections(dvbpsi_sis_t* p_sis,
  *****************************************************************************
  * Generate SIS sections based on the dvbpsi_sis_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_sis_t* p_sis)
+dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t* p_sis)
 {
     dvbpsi_psi_section_t * p_current = dvbpsi_NewPSISection(1024);
 
     p_current->i_table_id = 0xFC;
-    p_current->b_syntax_indicator = 0;
-    p_current->b_private_indicator = 0;
+    p_current->b_syntax_indicator = false;
+    p_current->b_private_indicator = false;
     p_current->i_length = 3;                     /* header + CRC_32 */
 
     /* FIXME: looks weird */
@@ -422,7 +458,7 @@ dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_sis_t* p_sis)
     p_current->p_data[3] = p_sis->i_protocol_version;
     p_current->p_data[4] = p_sis->b_encrypted_packet ? 0x80 : 0x0;
     /* NOTE: cannot handle encrypted packet */
-    assert(p_sis->b_encrypted_packet == 1);
+    assert(p_sis->b_encrypted_packet);
     p_current->p_data[4] |= ((p_sis->i_encryption_algorithm << 1) & 0x7E);
 
     p_current->p_data[4] |= ((p_sis->i_pts_adjustment & 0x00800) >> 32);
@@ -473,7 +509,6 @@ dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_sis_t* p_sis)
     assert( i_desc_length == p_sis->i_descriptors_length);
 
     /* Finalization */
-    dvbpsi_BuildPSISection(p_current);
+    dvbpsi_BuildPSISection(p_dvbpsi, p_current);
     return p_current;
 }
-

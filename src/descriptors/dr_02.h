@@ -56,16 +56,16 @@ extern "C" {
  */
 typedef struct dvbpsi_vstream_dr_s
 {
-  int       b_multiple_frame_rate;      /*!< multiple_frame_rate_flag */
+  bool      b_multiple_frame_rate;      /*!< multiple_frame_rate_flag */
   uint8_t   i_frame_rate_code;          /*!< frame_rate_code */
-  int       b_mpeg2;                    /*!< MPEG_2_flag */
-  int       b_constrained_parameter;    /*!< constrained_parameter_flag */
-  int       b_still_picture;            /*!< still_picture_flag */
+  bool      b_mpeg2;                    /*!< MPEG_2_flag */
+  bool      b_constrained_parameter;    /*!< constrained_parameter_flag */
+  bool      b_still_picture;            /*!< still_picture_flag */
 
   /* used if b_mpeg2 is true */
   uint8_t   i_profile_level_indication; /*!< profile_and_level_indication */
   uint8_t   i_chroma_format;            /*!< chroma_format */
-  int       b_frame_rate_extension;     /*!< frame_rate_extension_flag */
+  bool      b_frame_rate_extension;     /*!< frame_rate_extension_flag */
 
 } dvbpsi_vstream_dr_t;
 
@@ -89,15 +89,15 @@ dvbpsi_vstream_dr_t* dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor);
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(
-                        dvbpsi_vstream_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_vstream_dr_t * p_decoded, bool b_duplicate)
  * \brief "video stream" descriptor generator.
  * \param p_decoded pointer to a decoded "video stream" descriptor structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(dvbpsi_vstream_dr_t * p_decoded,
-                                          int b_duplicate);
+                                          bool b_duplicate);
 
 
 #ifdef __cplusplus

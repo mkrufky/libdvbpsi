@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_4d.c
- * Copyright (C) 2005-2010 VideoLAN
+ * Copyright (C) 2005-2011 VideoLAN
  * $Id: dr_4d.c,v 1.7 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -52,18 +52,14 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
   /* Check the tag */
   if(p_descriptor->i_tag != 0x4d ||
      p_descriptor->i_length < 5 )
-  {
-    DVBPSI_ERROR_ARG("dr_4d decoder", "bad tag or corrupted(0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
+
   /* Check length */
   i_len1 = p_descriptor->p_data[3];
   i_len2 = p_descriptor->p_data[4+i_len1];
+
   if( p_descriptor->i_length < 5 + i_len1 + i_len2 )
-  {
-    DVBPSI_ERROR_ARG("dr_4d decoder", "invalid length/content (tag=0x%x)", p_descriptor->i_tag );
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -71,11 +67,7 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
 
   /* Allocate memory */
   p_decoded = malloc(sizeof(dvbpsi_short_event_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_4d decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   memcpy( p_decoded->i_iso_639_code, &p_descriptor->p_data[0], 3 );
@@ -96,7 +88,7 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
  * dvbpsi_GenShortEventDr
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenShortEventDr(dvbpsi_short_event_dr_t * p_decoded,
-                                          int b_duplicate)
+                                             bool b_duplicate)
 {
   int i_len1 = p_decoded->i_event_name_length;
   int i_len2 = p_decoded->i_text_length;

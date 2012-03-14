@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_4e.c
- * Copyright (C) 2005-2010 VideoLAN
+ * Copyright (C) 2005-2011 VideoLAN
  * $Id: dr_4d.c,v 1.7 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -53,10 +53,7 @@ dvbpsi_extended_event_dr_t * dvbpsi_DecodeExtendedEventDr(dvbpsi_descriptor_t * 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x4e ||
      p_descriptor->i_length < 6 )
-  {
-    DVBPSI_ERROR_ARG("dr_4e decoder", "bad tag or corrupted(0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -64,11 +61,7 @@ dvbpsi_extended_event_dr_t * dvbpsi_DecodeExtendedEventDr(dvbpsi_descriptor_t * 
 
   /* Allocate memory */
   p_decoded = malloc(sizeof(dvbpsi_extended_event_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_4e decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode */
   p_decoded->i_descriptor_number = (p_descriptor->p_data[0] >> 4)&0xf;
@@ -112,7 +105,7 @@ dvbpsi_extended_event_dr_t * dvbpsi_DecodeExtendedEventDr(dvbpsi_descriptor_t * 
  * dvbpsi_GenExtendedEventDr
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenExtendedEventDr(dvbpsi_extended_event_dr_t * p_decoded,
-                                          int b_duplicate)
+                                                bool b_duplicate)
 {
   int i_len;
   int i_len2;

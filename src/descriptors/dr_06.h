@@ -81,17 +81,17 @@ dvbpsi_ds_alignment_dr_t* dvbpsi_DecodeDSAlignmentDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenDSAlignmentDr(
-                        dvbpsi_ds_alignment_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_ds_alignment_dr_t * p_decoded, bool b_duplicate)
  * \brief "data stream alignment" descriptor generator.
  * \param p_decoded pointer to a decoded "data stream alignment" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenDSAlignmentDr(
                                         dvbpsi_ds_alignment_dr_t * p_decoded,
-                                        int b_duplicate);
+                                        bool b_duplicate);
 
 
 #ifdef __cplusplus

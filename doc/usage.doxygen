@@ -1,9 +1,16 @@
 /*! \page usage API usage
 
-<p>When the application needs a new decoder it just has to call the
+<p>Each application requires a handle to the dvbpsi library. The function
+dvbpsi_NewHandle(&message_cb, DVBPSI_MSG_DEBUG) will return a handle. All
+error, warning or debug messages will trigger the <em>message_cb</em> function.
+Unless DVBPSI_MSG_NONE is passed to dvbpsi_NewHandle(). For each <em>
+dvbpsi_AttachXXX()</em> function a unique dvbpsi handle must be used.</p>
+
+<p>A dvbpsi handle must be passed to an <em>dvbpsi_AttachXXX()</em> function
+which attaches a decoder to the (dvbpsi_t*)->p_private pointer. The 
 <em>dvbpsi_AttachXXX()</em> function where XXX is the name of the table
-(ex: dvbpsi_AttachPAT()). The function returns a handle on the new
-decoder.</p>
+(ex: dvbpsi_AttachPAT()). The function returns the dvbpsi handle with the
+new decoder attached decoder.</p>
 
 <p>Then the application has to send the TS packets needed by the decoder
 by calling the dvbpsi_PushPacket() function. If a new table is complete
@@ -12,10 +19,9 @@ called <em>dvbpsi_AttachXXX()</em>.</p>
 
 <p>When the application don't need the decoder anymore it just has to
 call the <em>dvbpsi_DetachXXX()</em> function (ex:
-dvbpsi_DetachPAT()).</p>
-
-<p>In this version of <em>libdvbpsi</em> the descriptors aren't decoded.
-These decoders will come in the next release.</p>
+dvbpsi_DetachPAT()). The dvbpsi handle must be released by calling
+dvbpsi_DeleteHandle(). At the time of calling the decoder must already
+have been detached.</p>
 
 <p>For specific tools, the best to do is to have a look at the include
 file:</p>
@@ -34,5 +40,7 @@ file:</p>
 </ul>
 
 \ref structure
+
+\ref howto-new-api
 
 */

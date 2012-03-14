@@ -50,7 +50,7 @@ the %name package installed.
 %setup -q -n %{lib_name}-%{version}
 
 %build
-%configure2_5x --enable-release 
+%configure2_5x --enable-release
 %make 
 
 %install

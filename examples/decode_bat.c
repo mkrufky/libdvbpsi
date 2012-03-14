@@ -1,7 +1,7 @@
 /*****************************************************************************
  * decode_bat.c: BAT decoder example
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: decode_bat.c 01 2010-04-01 17:55:18 zhuzlu $
  *
  * Authors: Zhu zhenglu <zhuzlu@gmail.com>
@@ -24,11 +24,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -56,7 +56,7 @@
 /*****************************************************************************
  * ReadPacket
  *****************************************************************************/
-static int ReadPacket(int i_fd, uint8_t* p_dst)
+static bool ReadPacket(int i_fd, uint8_t* p_dst)
 {
   int i = 187;
   int i_rc = 1;
@@ -75,7 +75,7 @@ static int ReadPacket(int i_fd, uint8_t* p_dst)
       i -= i_rc;
   }
 
-  return (i == 0) ? 1 : 0;
+  return (i == 0) ? true : false;
 }
 
 
@@ -198,15 +198,28 @@ static void DumpBAT(void* p_zero, dvbpsi_bat_t* p_bat)
 /*****************************************************************************
  * NewSubtable
  *****************************************************************************/
-static void NewSubtableBAT(void * p_zero, dvbpsi_handle h_dvbpsi,
+static void NewSubtableBAT(void * p_zero, dvbpsi_t *p_dvbpsi,
                  uint8_t i_table_id, uint16_t i_extension)
 {
   if(i_table_id == 0x4a)
   {
-    dvbpsi_AttachBAT(h_dvbpsi, i_table_id, i_extension, DumpBAT, NULL);
+    if (!dvbpsi_AttachBAT(p_dvbpsi, i_table_id, i_extension, DumpBAT, NULL))
+        fprintf(stderr, "failed to attach BAT subdecoder\n");
   }
 }
 
+static void message(dvbpsi_t *handle, const dvbpsi_msg_level_t level, const char* msg)
+{
+    switch(level)
+    {
+        case DVBPSI_MSG_ERROR: fprintf(stderr, "Error: "); break;
+        case DVBPSI_MSG_WARN:  fprintf(stderr, "Warning: "); break;
+        case DVBPSI_MSG_DEBUG: fprintf(stderr, "Debug: "); break;
+        default: /* do nothing */
+            return;
+    }
+    fprintf(stderr, "%s\n", msg);
+}
 
 /*****************************************************************************
  * main
@@ -215,15 +228,21 @@ int main(int i_argc, char* pa_argv[])
 {
   int i_fd;
   uint8_t data[188];
-  dvbpsi_handle h_dvbpsi;
-  int b_ok;
+  dvbpsi_t *p_dvbpsi;
+  bool b_ok;
 
   if(i_argc != 2)
     return 1;
 
   i_fd = open(pa_argv[1], 0);
+  if (i_fd < 0)
+      return 1;
 
-  h_dvbpsi = dvbpsi_AttachDemux(NewSubtableBAT, NULL);
+  p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  if (p_dvbpsi == NULL)
+      goto out;
+  if (!dvbpsi_AttachDemux(p_dvbpsi, NewSubtableBAT, NULL))
+      goto out;
 
   b_ok = ReadPacket(i_fd, data);
 
@@ -231,11 +250,16 @@ int main(int i_argc, char* pa_argv[])
   {
     uint16_t i_pid = ((uint16_t)(data[1] & 0x1f) << 8) + data[2];
     if(i_pid == 0x11)
-      dvbpsi_PushPacket(h_dvbpsi, data);
+      dvbpsi_PushPacket(p_dvbpsi, data);
     b_ok = ReadPacket(i_fd, data);
   }
 
-  dvbpsi_DetachDemux(h_dvbpsi);
-
+out:
+  if (p_dvbpsi)
+  {
+    dvbpsi_DetachDemux(p_dvbpsi);
+    dvbpsi_DeleteHandle(p_dvbpsi);
+  }
+  close(i_fd);
   return 0;
 }

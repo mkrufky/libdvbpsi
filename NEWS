@@ -1,4 +1,12 @@
-$Id$
+Changes between 0.2.2 and 1.0.0:
+--------------------------------
+
+ * new example application dvbinfo
+ * updated documentation (new api howto)
+ * add log callback (remove fprintf's)
+ * make API more consistent
+   - introduces dvbpsi_t typedef
+   - removed dvbpis_handle
 
 Changes between 0.2.1 and 0.2.2:
 --------------------------------

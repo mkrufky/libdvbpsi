@@ -44,10 +44,10 @@ extern "C" {
  * dvbpsi_extended_event_dr_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_short_event_dr_s
- * \brief "short event" descriptor structure.
+ * \struct dvbpsi_extended_event_dr_s
+ * \brief "extended event" descriptor structure.
  *
- * This structure is used to store a decoded "short event" descriptor.
+ * This structure is used to store a decoded "extended event" descriptor.
  */
 /*!
  * \typedef struct dvbpsi_short_event_dr_s dvbpsi_extended_event_dr_t
@@ -55,21 +55,21 @@ extern "C" {
  */
 typedef struct dvbpsi_extended_event_dr_s
 {
-  uint8_t i_descriptor_number;
-  uint8_t i_last_descriptor_number;
+  uint8_t i_descriptor_number;              /*!< descriptor number */
+  uint8_t i_last_descriptor_number;         /*!< last descriptor number */
 
-  uint8_t i_iso_639_code[3];
+  uint8_t i_iso_639_code[3];                /*!< 3 letter ISO 639 language code */
 
-  int     i_entry_count;
-  uint8_t i_item_description_length[126];
-  uint8_t *i_item_description[126];
-  uint8_t i_item_length[126];
-  uint8_t *i_item[126];
+  int     i_entry_count;                    /*!< entry count */
+  uint8_t i_item_description_length[126];   /*!< length of item_description */
+  uint8_t *i_item_description[126];         /*!< item description */
+  uint8_t i_item_length[126];               /*!< length of item */
+  uint8_t *i_item[126];                     /*!< items */
 
-  int     i_text_length;
-  uint8_t *i_text;
+  int     i_text_length;                    /*!< text length */
+  uint8_t *i_text;                          /*!< text */
 
-  uint8_t i_buffer[256];    /* do not use */
+  uint8_t i_buffer[256];                    /*!< do not used*/
 } dvbpsi_extended_event_dr_t;
 
 
@@ -92,15 +92,15 @@ dvbpsi_extended_event_dr_t* dvbpsi_DecodeExtendedEventDr(dvbpsi_descriptor_t * p
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenExtendedEventDr(
-                        dvbpsi_extended_event_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_extended_event_dr_t * p_decoded, bool b_duplicate)
  * \brief "short event" descriptor generator.
  * \param p_decoded pointer to a decoded "video stream" descriptor structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenExtendedEventDr(dvbpsi_extended_event_dr_t * p_decoded,
-                                             int b_duplicate);
+                                                bool b_duplicate);
 
 
 #ifdef __cplusplus

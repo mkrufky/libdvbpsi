@@ -5,6 +5,7 @@
  * $Id: pmt_private.h,v 1.1 2002/01/22 20:30:16 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,31 +35,30 @@
  *****************************************************************************/
 typedef struct dvbpsi_pmt_decoder_s
 {
-  uint16_t                      i_program_number;
+    DVBPSI_DECODER_COMMON
 
-  dvbpsi_pmt_callback           pf_callback;
-  void *                        p_cb_data;
+    uint16_t                      i_program_number;
 
-  dvbpsi_pmt_t                  current_pmt;
-  dvbpsi_pmt_t *                p_building_pmt;
+    dvbpsi_pmt_callback           pf_pmt_callback;
+    void *                        p_cb_data;
 
-  int                           b_current_valid;
+    dvbpsi_pmt_t                  current_pmt;
+    dvbpsi_pmt_t *                p_building_pmt;
 
-  uint8_t                       i_last_section_number;
-  dvbpsi_psi_section_t *        ap_sections [256];
+    bool                          b_current_valid;
+
+    uint8_t                       i_last_section_number;
+    dvbpsi_psi_section_t *        ap_sections [256];
 
 } dvbpsi_pmt_decoder_t;
-
 
 /*****************************************************************************
  * dvbpsi_GatherPMTSections
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
+void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi,
                               dvbpsi_psi_section_t* p_section);
-
 
 /*****************************************************************************
  * dvbpsi_DecodePMTSections
@@ -68,7 +68,6 @@ void dvbpsi_GatherPMTSections(dvbpsi_decoder_t* p_decoder,
 __attribute__((deprecated))
 void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
                               dvbpsi_psi_section_t* p_section);
-
 
 #else
 #error "Multiple inclusions of pmt_private.h"

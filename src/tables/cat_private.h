@@ -7,6 +7,7 @@
  * Authors: Johann Hanne
  *          heavily based on pmt_private.h which was written by
  *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,29 +37,27 @@
  *****************************************************************************/
 typedef struct dvbpsi_cat_decoder_s
 {
-  dvbpsi_cat_callback           pf_callback;
-  void *                        p_cb_data;
+    DVBPSI_DECODER_COMMON
 
-  dvbpsi_cat_t                  current_cat;
-  dvbpsi_cat_t *                p_building_cat;
+    dvbpsi_cat_callback           pf_cat_callback;
+    void *                        p_cb_data;
 
-  int                           b_current_valid;
+    dvbpsi_cat_t                  current_cat;
+    dvbpsi_cat_t *                p_building_cat;
 
-  uint8_t                       i_last_section_number;
-  dvbpsi_psi_section_t *        ap_sections [256];
+    bool                          b_current_valid;
+
+    uint8_t                       i_last_section_number;
+    dvbpsi_psi_section_t *        ap_sections [256];
 
 } dvbpsi_cat_decoder_t;
-
 
 /*****************************************************************************
  * dvbpsi_GatherCATSections
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_GatherCATSections(dvbpsi_decoder_t* p_decoder,
-                              dvbpsi_psi_section_t* p_section);
-
+void dvbpsi_GatherCATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
  * dvbpsi_DecodeCATSections
@@ -68,7 +67,6 @@ void dvbpsi_GatherCATSections(dvbpsi_decoder_t* p_decoder,
 __attribute__((deprecated))
 void dvbpsi_DecodeCATSections(dvbpsi_cat_t* p_cat,
                               dvbpsi_psi_section_t* p_section);
-
 
 #else
 #error "Multiple inclusions of cat_private.h"

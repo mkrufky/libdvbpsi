@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_52.c
- * Copyright (C) 2005-2010 Andrew John Hughes
+ * Copyright (C) 2005-2011 Andrew John Hughes
  *
  * Authors: Andrew John Hughes <gnu_andrew@member.fsf.org>
  *
@@ -20,11 +20,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -50,10 +50,7 @@ dvbpsi_stream_identifier_dr_t * dvbpsi_DecodeStreamIdentifierDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x52)
-  {
-    DVBPSI_ERROR_ARG("dr_52 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -62,17 +59,11 @@ dvbpsi_stream_identifier_dr_t * dvbpsi_DecodeStreamIdentifierDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_stream_identifier_dr_t*)malloc(sizeof(dvbpsi_stream_identifier_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_52 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length < 1)
   {
-    DVBPSI_ERROR_ARG("dr_52 decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }
@@ -90,7 +81,7 @@ dvbpsi_stream_identifier_dr_t * dvbpsi_DecodeStreamIdentifierDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenStreamIdentifierDr(
                                         dvbpsi_stream_identifier_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

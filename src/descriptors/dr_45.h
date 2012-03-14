@@ -23,7 +23,7 @@
 
 /*!
  * \file <dr_45.h>
- * \author Jean-Paul Saman <jpsaman at videolan dot org>
+ * \author Jean-Paul Saman <jpsaman@videolan.org>
  * \brief VBI data descriptor parsing.
  *
  * DVB VBI data descriptor parsing, according to ETSI EN 300 468
@@ -43,7 +43,7 @@ extern "C" {
  * dvbpsi_vbidata_line_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_vbidata_line_t
+ * \struct dvbpsi_vbidata_line_s
  * \brief  one VBI Data line structure.
  *
  * This structure is used since vbidata_t structure will contain several
@@ -55,8 +55,8 @@ extern "C" {
  */
 typedef struct dvbpsi_vbidata_line_s
 {
-  uint8_t   i_parity;      /* 1 bits */
-  uint8_t   i_line_offset; /* 5 bits */
+  uint8_t   i_parity;      /*!< parity bit (1 bits) */
+  uint8_t   i_line_offset; /*!< line offset (5 bits) */
 
 } dvbpsi_vbidata_line_t;
 
@@ -64,7 +64,7 @@ typedef struct dvbpsi_vbidata_line_s
  * dvbpsi_vbidata_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_vbidata_t
+ * \struct dvbpsi_vbidata_s
  * \brief  one VBI data structure.
  *
  * This structure is used since vbi_descriptor will contain several
@@ -76,9 +76,9 @@ typedef struct dvbpsi_vbidata_line_s
  */
 typedef struct dvbpsi_vbidata_s
 {
-  uint8_t               i_data_service_id;  /* 8 bits */
-  uint8_t               i_lines;
-  dvbpsi_vbidata_line_t p_lines[255];
+  uint8_t               i_data_service_id;  /*!< data service id (8 bits) */
+  uint8_t               i_lines;            /*!< number of lines */
+  dvbpsi_vbidata_line_t p_lines[255];       /*!< VBI lines data */
 
 } dvbpsi_vbidata_t;
 
@@ -98,8 +98,8 @@ typedef struct dvbpsi_vbidata_s
  */
 typedef struct dvbpsi_vbi_dr_s
 {
-  uint8_t          i_services_number;
-  dvbpsi_vbidata_t p_services[85];
+  uint8_t          i_services_number;   /*!< service number */
+  dvbpsi_vbidata_t p_services[85];      /*!< services table */
 
 } dvbpsi_vbi_dr_t;
 
@@ -124,17 +124,17 @@ dvbpsi_vbi_dr_t* dvbpsi_DecodeVBIDataDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenVBIDataDr(
-                        dvbpsi_vbi_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_vbi_dr_t * p_decoded, bool b_duplicate)
  * \brief "VBI data" descriptor generator.
  * \param p_decoded pointer to a decoded "VBI data" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenVBIDataDr(
                                         dvbpsi_vbi_dr_t * p_decoded,
-                                        int b_duplicate);
+                                        bool b_duplicate);
 
 #ifdef __cplusplus
 };

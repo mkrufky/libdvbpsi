@@ -39,8 +39,8 @@
 extern "C" {
 #endif
 
-#define DR_0A_API_VER 2
-typedef uint8_t iso_639_language_code_t[3];
+#define DR_0A_API_VER 2                     /*!< descriptor 0a API version */
+typedef uint8_t iso_639_language_code_t[3]; /*!< ISO639 three letter language codes */
 
 /*****************************************************************************
  * dvbpsi_iso639_dr_t
@@ -61,9 +61,9 @@ typedef struct dvbpsi_iso639_dr_s
   uint8_t       i_code_count;           /*!< length of the i_iso_639_code
                                              array */
   struct {
-    iso_639_language_code_t  iso_639_code;    /*!< ISO_639_language_code */
-    uint8_t                  i_audio_type;    /*!< audio_type */
-  } code[64];
+    iso_639_language_code_t  iso_639_code; /*!< ISO_639_language_code */
+    uint8_t                  i_audio_type; /*!< audio_type */
+  } code[64];                              /*!< list of ISO 639 codes */
 
 } dvbpsi_iso639_dr_t;
 
@@ -87,16 +87,16 @@ dvbpsi_iso639_dr_t* dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor);
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenISO639Dr(
-                        dvbpsi_iso639_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_iso639_dr_t * p_decoded, bool b_duplicate)
  * \brief "ISO 639 language" descriptor generator.
  * \param p_decoded pointer to a decoded "ISO 639 language" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenISO639Dr(dvbpsi_iso639_dr_t * p_decoded,
-                                         int b_duplicate);
+                                         bool b_duplicate);
 
 
 #ifdef __cplusplus

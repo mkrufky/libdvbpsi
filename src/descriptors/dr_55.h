@@ -53,8 +53,8 @@ extern "C" {
  */
 typedef struct dvbpsi_parental_rating_s
 {
-  uint32_t      i_country_code;
-  uint8_t       i_rating;
+  uint32_t      i_country_code; /*!< country code of parental rating */
+  uint8_t       i_rating;       /*!< parental rating */
 
 } dvbpsi_parental_rating_t;
 
@@ -75,8 +75,8 @@ typedef struct dvbpsi_parental_rating_s
  */
 typedef struct dvbpsi_parental_rating_dr_s
 {
-  uint8_t       i_ratings_number;
-  dvbpsi_parental_rating_t p_parental_rating[64];
+  uint8_t       i_ratings_number;                   /*!< number of rating */
+  dvbpsi_parental_rating_t p_parental_rating[64];   /*!< parental rating table */
 
 } dvbpsi_parental_rating_dr_t;
 
@@ -101,17 +101,17 @@ dvbpsi_parental_rating_dr_t* dvbpsi_DecodeParentalRatingDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenParentalRatingDr(
-                        dvbpsi_parental_rating_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_parental_rating_dr_t * p_decoded, bool b_duplicate)
  * \brief "parental_rating" descriptor generator.
  * \param p_decoded pointer to a decoded "parental_rating" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenParentalRatingDr(
                                         dvbpsi_parental_rating_dr_t * p_decoded,
-                                        int b_duplicate);
+                                        bool b_duplicate);
 
 
 #ifdef __cplusplus

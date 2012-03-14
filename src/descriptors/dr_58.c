@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_58.c
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -53,10 +53,7 @@ dvbpsi_local_time_offset_dr_t * dvbpsi_DecodeLocalTimeOffsetDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x58)
-  {
-    DVBPSI_ERROR_ARG("dr_58 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -65,11 +62,7 @@ dvbpsi_local_time_offset_dr_t * dvbpsi_DecodeLocalTimeOffsetDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_local_time_offset_dr_t*)malloc(sizeof(dvbpsi_local_time_offset_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_58 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data */
   p_decoded->i_local_time_offsets_number = 0;
@@ -106,7 +99,7 @@ dvbpsi_local_time_offset_dr_t * dvbpsi_DecodeLocalTimeOffsetDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenLocalTimeOffsetDr(
                                         dvbpsi_local_time_offset_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   uint8_t i_num;
   dvbpsi_local_time_offset_t * p_current;

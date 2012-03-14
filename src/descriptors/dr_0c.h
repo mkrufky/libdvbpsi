@@ -56,7 +56,7 @@ extern "C" {
  */
 typedef struct dvbpsi_mx_buff_utilization_dr_s
 {
-  int           b_mdv_valid;            /*!< mdv_valid_flag */
+  bool          b_mdv_valid;            /*!< mdv_valid_flag */
   uint16_t      i_mx_delay_variation;   /*!< multiplex_delay_variation */
   uint8_t       i_mx_strategy;          /*!< multiplex_strategy */
 
@@ -83,17 +83,17 @@ dvbpsi_mx_buff_utilization_dr_t* dvbpsi_DecodeMxBuffUtilizationDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenMxBuffUtilizationDr(
-                dvbpsi_mx_buff_utilization_dr_t * p_decoded, int b_duplicate)
+                dvbpsi_mx_buff_utilization_dr_t * p_decoded, bool b_duplicate)
  * \brief "multiplex buffer utilization" descriptor generator.
  * \param p_decoded pointer to a decoded "system clock" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenMxBuffUtilizationDr(
                                 dvbpsi_mx_buff_utilization_dr_t * p_decoded,
-                                int b_duplicate);
+                                bool b_duplicate);
 
 
 #ifdef __cplusplus

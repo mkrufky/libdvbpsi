@@ -81,7 +81,7 @@ typedef struct dvbpsi_pat_s
 {
   uint16_t                  i_ts_id;            /*!< transport_stream_id */
   uint8_t                   i_version;          /*!< version_number */
-  int                       b_current_next;     /*!< current_next_indicator */
+  bool                      b_current_next;     /*!< current_next_indicator */
 
   dvbpsi_pat_program_t *    p_first_program;    /*!< program list */
 
@@ -98,44 +98,39 @@ typedef struct dvbpsi_pat_s
  */
 typedef void (* dvbpsi_pat_callback)(void* p_cb_data, dvbpsi_pat_t* p_new_pat);
 
-
 /*****************************************************************************
  * dvbpsi_AttachPAT
  *****************************************************************************/
 /*!
- * \fn dvbpsi_handle dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback,
-                                      void* p_cb_data)
- * \brief Creation and initialization of a PAT decoder.
+ * \fn bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback, void* p_cb_data)
+ * \brief Creation and initialization of a PAT decoder. The decoder will be attached to 'p_dvbpsi' argument.
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param pf_callback function to call back on new PAT
  * \param p_cb_data private data given in argument to the callback
- * \return a pointer to the decoder for future calls.
+ * \return true on success, false on failure
  */
-__attribute__((deprecated))
-dvbpsi_handle dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback,
-                               void* p_cb_data);
-
+bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
+                      void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachPAT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi)
+ * \fn void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi)
  * \brief Destroy a PAT decoder.
- * \param h_dvbpsi handle to the decoder
+ * \param p_dvbpsi pointer to dvbpsi_t handle
  * \return nothing.
  *
  * The handle isn't valid any more.
  */
-__attribute__((deprecated))
-void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi);
-
+void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi);
 
 /*****************************************************************************
  * dvbpsi_InitPAT/dvbpsi_NewPAT
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id,
-                           uint8_t i_version, int b_current_next)
+                           uint8_t i_version, bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_pat_t structure.
  * \param p_pat pointer to the PAT structure
  * \param i_ts_id transport stream ID
@@ -145,24 +140,18 @@ void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi);
  */
 __attribute__((deprecated))
 void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
-                    int b_current_next);
+                    bool b_current_next);
 
 /*!
- * \def dvbpsi_NewPAT(p_pat, i_ts_id, i_version, b_current_next)
+ * \fn dvbpsi_pat_t *dvbpsi_NewPAT(uint16_t i_ts_id, uint8_t i_version,
+ *                                 bool b_current_next);
  * \brief Allocate and initialize a new dvbpsi_pat_t structure.
- * \param p_pat pointer to the PAT structure
  * \param i_ts_id transport stream ID
  * \param i_version PAT version
  * \param b_current_next current next indicator
- * \return nothing.
+ * \return p_pat pointer to the PAT structure
  */
-#define dvbpsi_NewPAT(p_pat, i_ts_id, i_version, b_current_next)        \
-do {                                                                    \
-  p_pat = (dvbpsi_pat_t*)malloc(sizeof(dvbpsi_pat_t));                  \
-  if(p_pat != NULL)                                                     \
-    dvbpsi_InitPAT(p_pat, i_ts_id, i_version, b_current_next);          \
-} while(0);
-
+dvbpsi_pat_t *dvbpsi_NewPAT(uint16_t i_ts_id, uint8_t i_version, bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_EmptyPAT/dvbpsi_DeletePAT
@@ -177,17 +166,12 @@ __attribute__((deprecated))
 void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat);
 
 /*!
- * \def dvbpsi_DeletePAT(p_pat)
+ * \fn void dvbpsi_DeletePAT(dvbpsi_pat_t (*_pat)
  * \brief Clean and free a dvbpsi_pat_t structure.
  * \param p_pat pointer to the PAT structure
  * \return nothing.
  */
-#define dvbpsi_DeletePAT(p_pat)                                         \
-do {                                                                    \
-  dvbpsi_EmptyPAT(p_pat);                                               \
-  free(p_pat);                                                          \
-} while(0);
-
+void dvbpsi_DeletePAT(dvbpsi_pat_t *p_pat);
 
 /*****************************************************************************
  * dvbpsi_PATAddProgram
@@ -210,9 +194,10 @@ dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
  * dvbpsi_GenPATSections
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
+ * \fn dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi, dvbpsi_pat_t* p_pat,
                                                    int i_max_pps);
  * \brief PAT generator.
+ * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_pat pointer to the PAT structure
  * \param i_max_pps limitation of the number of program in each section
  * (max: 253).
@@ -220,10 +205,8 @@ dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
  *
  * Generate PAT sections based on the dvbpsi_pat_t structure.
  */
-__attribute__((deprecated))
-dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat,
-                                            int i_max_pps);
-
+dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_t *p_dvbpsi,
+                                            dvbpsi_pat_t* p_pat, int i_max_pps);
 
 #ifdef __cplusplus
 };

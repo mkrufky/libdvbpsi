@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_0e.c
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: dr_0e.c,v 1.3 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -51,10 +51,7 @@ dvbpsi_max_bitrate_dr_t * dvbpsi_DecodeMaxBitrateDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x0e)
-  {
-    DVBPSI_ERROR_ARG("dr_0e decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -62,17 +59,11 @@ dvbpsi_max_bitrate_dr_t * dvbpsi_DecodeMaxBitrateDr(
 
   /* Allocate memory */
   p_decoded = (dvbpsi_max_bitrate_dr_t*)malloc(sizeof(dvbpsi_max_bitrate_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_0e decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length != 3)
   {
-    DVBPSI_ERROR_ARG("dr_0e decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }
@@ -93,7 +84,7 @@ dvbpsi_max_bitrate_dr_t * dvbpsi_DecodeMaxBitrateDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenMaxBitrateDr(
                                         dvbpsi_max_bitrate_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor =

@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_59.c
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -22,11 +22,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -53,10 +53,7 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x59)
-  {
-    DVBPSI_ERROR_ARG("dr_59 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -65,25 +62,17 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_subtitling_dr_t*)malloc(sizeof(dvbpsi_subtitling_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_59 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length < 3)
   {
-    DVBPSI_ERROR_ARG("dr_59 decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }
 
   if(p_descriptor->i_length % 8)
   {
-    DVBPSI_ERROR_ARG("dr_59 decoder", "length not multiple of 8 (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }
@@ -120,7 +109,7 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
                                         dvbpsi_subtitling_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   int i;
 
@@ -165,4 +154,3 @@ dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
 
   return p_descriptor;
 }
-

@@ -23,7 +23,7 @@
 
 /*!
  * \file <dr_56.h>
- * \author Derk-Jan Hartman <hartman at videolan dot org>
+ * \author Derk-Jan Hartman <hartman@videolan.org>
  * \brief EBU Teletext descriptor parsing.
  *
  * DVB EBU Teletext descriptor parsing, according to ETSI EN 300 468
@@ -43,7 +43,7 @@ extern "C" {
  * dvbpsi_teletext_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_teletextpage_t
+ * \struct dvbpsi_teletextpage_s
  * \brief  one teletext page structure.
  *
  * This structure is used since teletext_descriptor will contain several
@@ -55,10 +55,10 @@ extern "C" {
  */
 typedef struct dvbpsi_teletextpage_s
 {
-  uint8_t      i_iso6392_language_code[3];  /* 24 bits */
-  uint8_t      i_teletext_type;             /*  5 bits */
-  uint8_t      i_teletext_magazine_number;  /*  3 bits */
-  uint8_t      i_teletext_page_number;      /*  8 bits */
+  uint8_t      i_iso6392_language_code[3];  /*!< ISO 6392 Language codes (24 bits) */
+  uint8_t      i_teletext_type;             /*!< teletext type (5 bits) */
+  uint8_t      i_teletext_magazine_number;  /*!< teletext magazine number (3 bits) */
+  uint8_t      i_teletext_page_number;      /*!< teletext page number (8 bits) */
 
 } dvbpsi_teletextpage_t;
 
@@ -79,8 +79,8 @@ typedef struct dvbpsi_teletextpage_s
  */
 typedef struct dvbpsi_teletext_dr_s
 {
-  uint8_t      i_pages_number;
-  dvbpsi_teletextpage_t p_pages[64];
+  uint8_t      i_pages_number;          /*!< number of pages */
+  dvbpsi_teletextpage_t p_pages[64];    /*!< teletext pages */
 
 } dvbpsi_teletext_dr_t;
 
@@ -89,7 +89,7 @@ typedef struct dvbpsi_teletext_dr_s
  * dvbpsi_DecodeTeletextDataDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDataDr(
+ * \fn dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
                                         dvbpsi_descriptor_t * p_descriptor)
  * \brief "teletext" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
@@ -105,17 +105,17 @@ dvbpsi_teletext_dr_t* dvbpsi_DecodeTeletextDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenTeletextDr(
-                        dvbpsi_teletext_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_teletext_dr_t * p_decoded, bool b_duplicate)
  * \brief "teletext" descriptor generator.
  * \param p_decoded pointer to a decoded "teletext" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenTeletextDr(
                                         dvbpsi_teletext_dr_t * p_decoded,
-                                        int b_duplicate);
+                                        bool b_duplicate);
 
 
 #ifdef __cplusplus

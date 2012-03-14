@@ -5,6 +5,7 @@
  * $Id: eit_private.h 88 2004-02-24 14:31:18Z sam $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,7 +28,6 @@
 #ifndef _DVBPSI_EIT_PRIVATE_H_
 #define _DVBPSI_EIT_PRIVATE_H_
 
-
 /*****************************************************************************
  * dvbpsi_eit_decoder_t
  *****************************************************************************
@@ -35,31 +35,30 @@
  *****************************************************************************/
 typedef struct dvbpsi_eit_decoder_s
 {
-  dvbpsi_eit_callback           pf_callback;
-  void *                        p_cb_data;
+    DVBPSI_DECODER_COMMON
 
-  dvbpsi_eit_t                  current_eit;
-  dvbpsi_eit_t *                p_building_eit;
+    dvbpsi_eit_callback           pf_eit_callback;
+    void *                        p_cb_data;
 
-  int                           b_current_valid;
+    dvbpsi_eit_t                  current_eit;
+    dvbpsi_eit_t *                p_building_eit;
 
-  uint8_t                       i_last_section_number;
-  uint8_t                       i_first_received_section_number;
-  dvbpsi_psi_section_t *        ap_sections [256];
+    bool                          b_current_valid;
+
+    uint8_t                       i_last_section_number;
+    uint8_t                       i_first_received_section_number;
+    dvbpsi_psi_section_t *        ap_sections [256];
 
 } dvbpsi_eit_decoder_t;
-
 
 /*****************************************************************************
  * dvbpsi_GatherEITSections
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_GatherEITSections(dvbpsi_decoder_t* p_psi_decoder,
-                      void* p_private_decoder,
+void dvbpsi_GatherEITSections(dvbpsi_t* p_dvbpsi,
+                              void* p_private_decoder,
                               dvbpsi_psi_section_t* p_section);
-
 
 /*****************************************************************************
  * dvbpsi_DecodeEITSection
@@ -69,7 +68,6 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t* p_psi_decoder,
 __attribute__((deprecated))
 void dvbpsi_DecodeEITSections(dvbpsi_eit_t* p_eit,
                               dvbpsi_psi_section_t* p_section);
-
 
 #else
 #error "Multiple inclusions of eit_private.h"

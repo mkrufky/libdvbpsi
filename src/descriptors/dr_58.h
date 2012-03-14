@@ -82,8 +82,8 @@ typedef struct dvbpsi_local_time_offset_s
  */
 typedef struct dvbpsi_local_time_offset_dr_s
 {
-  uint8_t      i_local_time_offsets_number;
-  dvbpsi_local_time_offset_t p_local_time_offset[19];
+  uint8_t      i_local_time_offsets_number;             /*!< local time offset number */
+  dvbpsi_local_time_offset_t p_local_time_offset[19];   /*!< local time offset */
 
 } dvbpsi_local_time_offset_dr_t;
 
@@ -108,17 +108,17 @@ dvbpsi_local_time_offset_dr_t* dvbpsi_DecodeLocalTimeOffsetDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenLocalTimeOffsetDr(
-                        dvbpsi_local_time_offset_data_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_local_time_offset_dr_t * p_decoded, bool b_duplicate)
  * \brief "local time offset" descriptor generator.
  * \param p_decoded pointer to a decoded "local time offset" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenLocalTimeOffsetDr(
                                         dvbpsi_local_time_offset_dr_t * p_decoded,
-                                        int b_duplicate);
+                                        bool b_duplicate);
 
 
 #ifdef __cplusplus

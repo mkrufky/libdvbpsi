@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_07.c
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: dr_07.c,v 1.4 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -51,10 +51,7 @@ dvbpsi_target_bg_grid_dr_t * dvbpsi_DecodeTargetBgGridDr(
 
   /* Check the tag */
   if(p_descriptor->i_tag != 0x07)
-  {
-    DVBPSI_ERROR_ARG("dr_07 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -63,17 +60,11 @@ dvbpsi_target_bg_grid_dr_t * dvbpsi_DecodeTargetBgGridDr(
   /* Allocate memory */
   p_decoded = (dvbpsi_target_bg_grid_dr_t*)
                                 malloc(sizeof(dvbpsi_target_bg_grid_dr_t));
-  if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_07 decoder", "out of memory");
-    return NULL;
-  }
+  if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length != 4)
   {
-    DVBPSI_ERROR_ARG("dr_07 decoder", "bad length (%d)",
-                     p_descriptor->i_length);
     free(p_decoded);
     return NULL;
   }
@@ -97,7 +88,7 @@ dvbpsi_target_bg_grid_dr_t * dvbpsi_DecodeTargetBgGridDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenTargetBgGridDr(
                                         dvbpsi_target_bg_grid_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
   /* Create the descriptor */
   dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x07, 4, NULL);

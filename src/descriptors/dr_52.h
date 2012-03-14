@@ -40,17 +40,17 @@ extern "C" {
 
 
 /*****************************************************************************
- * dvbpsi_service_dr_t
+ * dvbpsi_stream_identifier_dr_s
  *****************************************************************************/
 /*!
- * \struct dvbpsi_service_dr_s
+ * \struct dvbpsi_stream_identifier_dr_s
  * \brief "stream identifier" descriptor structure.
  *
  * This structure is used to store a decoded "stream identifier"
  * descriptor. (ETSI EN 300 468 section 6.2.37).
  */
 /*!
- * \typedef struct dvbpsi_service_dr_s dvbpsi_stream_identifier_dr_t
+ * \typedef struct dvbpsi_stream_identifier_dr_s dvbpsi_stream_identifier_dr_t
  * \brief dvbpsi_stream_identifier_dr_t type definition.
  */
 typedef struct dvbpsi_stream_identifier_dr_s
@@ -79,17 +79,17 @@ dvbpsi_stream_identifier_dr_t* dvbpsi_DecodeStreamIdentifierDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenStreamIdentifierDr(
-                        dvbpsi_service_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_stream_identifier_dr_t *p_decoded, bool b_duplicate)
  * \brief "stream identifier" descriptor generator.
  * \param p_decoded pointer to a decoded "stream identifier" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
 dvbpsi_descriptor_t * dvbpsi_GenStreamIdentifierDr(
                                         dvbpsi_stream_identifier_dr_t * p_decoded,
-                                        int b_duplicate);
+                                        bool b_duplicate);
 
 
 #ifdef __cplusplus

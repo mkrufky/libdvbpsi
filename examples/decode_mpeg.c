@@ -1,7 +1,7 @@
 /*****************************************************************************
  * decode_mpeg.c: MPEG decoder example
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2011 VideoLAN
  * $Id: decode_mpeg.c 104 2005-03-21 13:38:56Z massiot $
  *
  * Authors: Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
@@ -29,10 +29,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
+#ifdef HAVE_SYS_TIME_H
+#define HAVE_GETTIMEOFDAY 1
 #include <sys/time.h>
+#endif
 #include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -100,7 +104,7 @@ typedef int64_t mtime_t;
 
 typedef struct
 {
-    dvbpsi_handle handle;
+    dvbpsi_t * handle;
 
     int i_pat_version;
     int i_ts_id;
@@ -119,7 +123,7 @@ typedef struct ts_pid_s
 
 typedef struct ts_pmt_s
 {
-    dvbpsi_handle handle;
+    dvbpsi_t * handle;
 
     int         i_number; /* i_number = 0 is actually a NIT */
     int         i_pmt_version;
@@ -183,6 +187,10 @@ static int ReadPacketFromSocket( int i_socket, uint8_t* p_dst, size_t i_size)
  *****************************************************************************/
 static void report_Header( int i_report )
 {
+#ifndef HAVE_GETTIMEOFDAY
+    printf("*** WARNING: !!! no gettimeofday support found !!! timing information will not be given !!! ***\n");
+#endif
+
     switch(i_report)
     {
         case REPORT_PCR:
@@ -200,11 +208,7 @@ static void report_Header( int i_report )
  *****************************************************************************/
 #ifdef HAVE_GETTIMEOFDAY
 static mtime_t report_UDPPacketTiming( int32_t i_seqno, int32_t bytes, mtime_t time_prev, mtime_t *time_base )
-#else
-static void report_UDPPacketTiming( int32_t i_seqno, int32_t bytes )
-#endif
 {
-#ifdef HAVE_GETTIMEOFDAY
     mtime_t time_current;
     mtime_t tv_delta;
     struct timeval tv;
@@ -226,10 +230,14 @@ static void report_UDPPacketTiming( int32_t i_seqno, int32_t bytes )
     time_prev = time_current;
     printf( "%d\n", bytes );
     return time_prev;
-#else
-    printf( "\n" );
-#endif
 }
+#else
+static void report_UDPPacketTiming( int32_t i_seqno, int32_t bytes )
+{
+    printf( "%.2d %"PRId64" %"PRId64" ", i_seqno, 0UL, 0UL );
+    printf( "%d\n", bytes );
+}
+#endif
 
 #ifdef HAVE_GETTIMEOFDAY
 static mtime_t report_PCRPacketTiming( int i_cc, ts_pid_t *ts_pid,
@@ -285,6 +293,19 @@ static void report_PCRPacketTiming( int i_cc, ts_pid_t *ts_pid,
 #endif
 }
 
+static void message(dvbpsi_t *handle, const dvbpsi_msg_level_t level, const char* msg)
+{
+    switch(level)
+    {
+        case DVBPSI_MSG_ERROR: fprintf(stderr, "Error: "); break;
+        case DVBPSI_MSG_WARN:  fprintf(stderr, "Warning: "); break;
+        case DVBPSI_MSG_DEBUG: fprintf(stderr, "Debug: "); break;
+        default: /* do nothing */
+            return;
+    }
+    fprintf(stderr, "%s\n", msg);
+}
+
 /*****************************************************************************
  * DumpPAT
  *****************************************************************************/
@@ -292,6 +313,14 @@ static void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
 {
     dvbpsi_pat_program_t* p_program = p_pat->p_first_program;
     ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    if (p_stream->pmt.handle)
+    {
+        fprintf(stderr, "freeing old PMT\n");
+        dvbpsi_DetachPMT(p_stream->pmt.handle);
+        dvbpsi_DeleteHandle(p_stream->pmt.handle);
+        p_stream->pmt.handle = NULL;
+    }
 
     p_stream->pat.i_pat_version = p_pat->i_version;
     p_stream->pat.i_ts_id = p_pat->i_ts_id;
@@ -303,12 +332,28 @@ static void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
     fprintf( stderr, "    | program_number @ [NIT|PMT]_PID\n");
     while( p_program )
     {
+            if (p_stream->pmt.handle)
+            {
+                dvbpsi_DetachPMT(p_stream->pmt.handle);
+                dvbpsi_DeleteHandle(p_stream->pmt.handle);
+                p_stream->pmt.handle = NULL;
+            }
             p_stream->i_pmt++;
             p_stream->pmt.i_number = p_program->i_number;
             p_stream->pmt.pid_pmt = &p_stream->pid[p_program->i_pid];
             p_stream->pmt.pid_pmt->i_pid = p_program->i_pid;
-            p_stream->pmt.handle = dvbpsi_AttachPMT( p_program->i_number, DumpPMT, p_stream );
-
+            p_stream->pmt.handle  = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+            if (p_stream->pmt.handle == NULL)
+            {
+                fprintf(stderr, "could not allocate new dvbpsi_t handle\n");
+                break;
+            }
+            if (!dvbpsi_AttachPMT(p_stream->pmt.handle, p_program->i_number, DumpPMT, p_stream ))
+            {
+                dvbpsi_DeleteHandle(p_stream->pmt.handle);
+                fprintf(stderr, "could not attach PMT\n");
+                break;
+            }
             fprintf( stderr, "    | %14d @ 0x%x (%d)\n",
                 p_program->i_number, p_program->i_pid, p_program->i_pid);
             p_program = p_program->p_next;
@@ -546,7 +591,7 @@ int main(int i_argc, char* pa_argv[])
     uint8_t *p_data = NULL;
     ts_stream_t *p_stream = NULL;
     int i_len = 0;
-    int b_verbose = 0;
+    bool b_verbose = false;
 
     /* parser commandline arguments */
     do {
@@ -581,7 +626,7 @@ int main(int i_argc, char* pa_argv[])
                 break;
 #endif
             case 'v':
-                b_verbose = 1;
+                b_verbose = true;
                 break;
             case -1:
                 break;
@@ -636,8 +681,13 @@ int main(int i_argc, char* pa_argv[])
     report_Header( i_report );
 #endif
 
+    p_stream->pat.handle = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+    if (p_stream->pat.handle == NULL)
+        goto dvbpsi_out;
+    if (!dvbpsi_AttachPAT(p_stream->pat.handle, DumpPAT, p_stream))
+        goto dvbpsi_out;
+
     /* Enter infinite loop */
-    p_stream->pat.handle = dvbpsi_AttachPAT( DumpPAT, p_stream );
     while( i_len > 0 )
     {
         int i = 0;
@@ -663,6 +713,15 @@ int main(int i_argc, char* pa_argv[])
                 b_first = VLC_TRUE;
             }
 #endif
+            if (p_data[i] != 0x47) /* no sync skip this packet */
+            {
+                fprintf( stderr, "Missing TS sync word, skipping 188 bytes\n" );
+                break;
+            }
+
+            if (i_pid == 0x1FFF) /* null packet - TS content undefined */
+                continue;
+
             if( i_pid == 0x0 )
                 dvbpsi_PushPacket(p_stream->pat.handle, p_tmp);
             else if( p_stream->pmt.pid_pmt && i_pid == p_stream->pmt.pid_pmt->i_pid )
@@ -726,7 +785,7 @@ int main(int i_argc, char* pa_argv[])
 #endif
                     i_bytes = 0; /* reset byte counter */
 
-                    if( b_discontinuity_seen )
+                    if( b_discontinuity_indicator )
                     {
                         /* cc discontinuity is expected */
                         fprintf( stderr, "Server signalled the continuity counter discontinuity\n" );
@@ -758,9 +817,15 @@ int main(int i_argc, char* pa_argv[])
 #endif
     }
     if( p_stream->pmt.handle )
+    {
         dvbpsi_DetachPMT( p_stream->pmt.handle );
+        dvbpsi_DeleteHandle( p_stream->pmt.handle );
+    }
     if( p_stream->pat.handle )
-    dvbpsi_DetachPAT( p_stream->pat.handle );
+    {
+        dvbpsi_DetachPAT( p_stream->pat.handle );
+        dvbpsi_DeleteHandle( p_stream->pat.handle );
+    }
 
     /* clean up */
     if( filename )
@@ -782,6 +847,13 @@ int main(int i_argc, char* pa_argv[])
 
 out_of_memory:
     fprintf( stderr, "Out of memory\n" );
+
+dvbpsi_out:
+    if( p_stream->pat.handle )
+    {
+        dvbpsi_DetachPAT( p_stream->pat.handle );
+        dvbpsi_DeleteHandle( p_stream->pat.handle );
+    }
 
 error:
     if( p_data )    free( p_data );

@@ -14,6 +14,7 @@
 #include "config.h"
 
 #include &lt;stdio.h&gt;
+#include &lt;stdbool.h&gt;
 
 #if defined(HAVE_INTTYPES_H)
 #include &lt;inttypes.h&gt;
@@ -37,7 +38,7 @@
   <xsl:apply-templates mode="code" />
 
 /* main function */
-int main()
+int main(void)
 {
   int i_err = 0;
   <xsl:apply-templates mode="main" />
@@ -60,7 +61,7 @@ int main()
 
 <xsl:template match="descriptor" mode="code">
 /* <xsl:value-of select="@name" /> */
-int main_<xsl:value-of select="@sname" />_<xsl:value-of select="@msuffix" />()
+static int main_<xsl:value-of select="@sname" />_<xsl:value-of select="@msuffix" />(void)
 {
   BOZO_VARS(<xsl:value-of select="@sname" />);
   BOZO_START(<xsl:value-of select="@name" />);
