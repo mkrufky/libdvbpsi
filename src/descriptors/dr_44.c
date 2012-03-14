@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_44.c
- * Copyright (C) 2011 VideoLAN
+ * Copyright (C) 2011-2012 VideoLAN
  * $Id$
  *
  * Authors: Ilkka Ollakka
@@ -21,11 +21,11 @@
  *
  *****************************************************************************/
 
-
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #if defined(HAVE_INTTYPES_H)
@@ -50,11 +50,8 @@ dvbpsi_cable_deliv_sys_dr_t * dvbpsi_DecodeCableDelivSysDr(
   dvbpsi_cable_deliv_sys_dr_t * p_decoded;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x44)
-  {
-    DVBPSI_ERROR_ARG("dr_44 decoder", "bad tag (0x%x)", p_descriptor->i_tag);
+  if (p_descriptor->i_tag != 0x44)
     return NULL;
-  }
 
   /* Don't decode twice */
   if(p_descriptor->p_decoded)
@@ -64,10 +61,7 @@ dvbpsi_cable_deliv_sys_dr_t * dvbpsi_DecodeCableDelivSysDr(
   p_decoded =
         (dvbpsi_cable_deliv_sys_dr_t*)malloc(sizeof(dvbpsi_cable_deliv_sys_dr_t));
   if(!p_decoded)
-  {
-    DVBPSI_ERROR("dr_44 decoder", "out of memory");
     return NULL;
-  }
 
   /* Decode data */
   p_decoded->i_frequency         =   (uint32_t)(p_descriptor->p_data[0] << 24)
@@ -86,7 +80,6 @@ dvbpsi_cable_deliv_sys_dr_t * dvbpsi_DecodeCableDelivSysDr(
 
   return p_decoded;
 }
-
 
 /*****************************************************************************
  * dvbpsi_GenCableDelivSysDr
