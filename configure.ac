@@ -16,14 +16,17 @@ AC_C_INLINE
 AC_LIBTOOL_WIN32_DLL
 AM_PROG_LIBTOOL
 
-dnl default CFLAGS
-CFLAGS="${CFLAGS} -Wall -Werror --std=gnu99 -D_GNU_SOURCE"
-CFLAGS="${CFLAGS} -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-prototypes -Wshadow -Waggregate-return -Wmissing-prototypes -Wnested-externs -Wsign-compare"
+dnl store CFLAGS from user
+CFLAGS_save="${CFLAGS}"
+
+dnl add features to CFLAGS
+CFLAGS_dist="-Wall -Werror --std=gnu99 -D_GNU_SOURCE"
+CFLAGS_dist="${CFLAGS_dist} -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-prototypes -Wshadow -Waggregate-return -Wmissing-prototypes -Wnested-externs -Wsign-compare"
 
 dnl check the operating system
 case "${target_os}" in
   darwin*)
-    CFLAGS="${CFLAGS} -no-cpp-precomp"
+    CFLAGS_dist="${CFLAGS_dist} -no-cpp-precomp"
     ;;
 esac
 
@@ -37,9 +40,8 @@ AC_ARG_ENABLE(debug,
 esac],[debug=false])
 if test "$debug" = "true"
 then
-  CFLAGS="${CFLAGS} -g -ggdb3"
+  CFLAGS_dist="${CFLAGS_dist} -g -ggdb3"
 fi
-
 
 dnl --enable-release
 AC_ARG_ENABLE(release,
@@ -49,12 +51,12 @@ AC_ARG_ENABLE(release,
   no)  release=false ;;
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-release) ;;
 esac],[release=false])
-if test "$release" = "true"
-then
-  CFLAGS="${CFLAGS} -O6"
-else
-  CFLAGS="${CFLAGS} -O2 -DDVBPSI_DIST"
+if test "$release" != "true"; then
+  CFLAGS_dist="${CFLAGS_dist} -DDVBPSI_DIST"
 fi
+
+dnl compile feature tests
+CFLAGS="${CFLAGS_save} ${CFLAGS_dist}"
 
 dnl Check for headers
 AC_CHECK_HEADERS(stdbool.h stdint.h inttypes.h getopt.h strings.h sys/time.h)
@@ -76,6 +78,9 @@ if test "${ac_cv_cpp_variadic_macros}" != "no"; then
     AC_DEFINE(HAVE_VARIADIC_MACROS, 1, Support for variadic macros)
 fi
 
+dnl
+dnl Generate Makefiles and other output files
+dnl
 AC_OUTPUT([Makefile
            src/Makefile
            examples/Makefile
@@ -92,5 +97,5 @@ libdvbpsi configuration
 libdvbpsi version     : ${VERSION}
 debug                 : ${debug}
 release               : ${release}
+compile flags         : ${CFLAGS}
 "
-
