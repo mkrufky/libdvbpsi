@@ -42,7 +42,7 @@ extern "C" {
 #endif
 
 /*****************************************************************************
- * dvbpsi_handle
+ * dvbpsi_t
  *****************************************************************************/
 /*!
  * \typedef struct dvbpsi_s dvbpsi_t
@@ -66,7 +66,7 @@ typedef enum dvbpsi_msg_level
  * dvbpsi_message_cb
  *****************************************************************************/
 /*!
- * \typedef void (* dvbpsi_message_cb)(dvbpsi_handle p_decoder,
+ * \typedef void (* dvbpsi_message_cb)(dvbpsi_t *p_decoder,
  *                                     const dvbpse_msg_level_t level,
  *                                     const char* msg)
  * \brief Callback type definition.

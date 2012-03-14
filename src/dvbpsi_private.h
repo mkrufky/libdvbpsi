@@ -40,14 +40,14 @@ extern uint32_t dvbpsi_crc32_table[];
  *****************************************************************************/
 
 #ifdef HAVE_VARIADIC_MACROS
-void message(dvbpsi_handle dvbpsi, const int level, const char *fmt, ...);
+void message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...);
 
 #  define dvbpsi_error(hnd, src, str, x...)                             \
-        message(hnd, DVBPSI_MSG_ERROR, "libdvbpsi error ("src"): " str, x)
-#  define dvbpsi_warning(hnd, str, x...)                                \
-        message(hnd, DVBPSI_MSG_WARNING, "libdvbpsi warning ("src"): " str, x)
-#  define dvbpsi_debug(hnd, str, x...)                                  \
-        message(hnd, DVBPSI_MSG_DEBUG, "libdvbpsi debug ("src"): " str, x)
+        message(hnd, DVBPSI_MSG_ERROR, "libdvbpsi error ("src"): " str, ##x)
+#  define dvbpsi_warning(hnd, src, str, x...)                                \
+        message(hnd, DVBPSI_MSG_WARNING, "libdvbpsi warning ("src"): " str, ##x)
+#  define dvbpsi_debug(hnd, src, str, x...)                                  \
+        message(hnd, DVBPSI_MSG_DEBUG, "libdvbpsi debug ("src"): " str, ##x)
 #else
 void dvbpsi_error(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...);
 void dvbpsi_warning(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...);
