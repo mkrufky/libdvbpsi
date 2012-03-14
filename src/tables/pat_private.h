@@ -63,7 +63,6 @@ void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sectio
  *****************************************************************************
  * PAT decoder.
  *****************************************************************************/
-__attribute__((deprecated))
 void dvbpsi_DecodePATSections(dvbpsi_pat_t* p_pat,
                               dvbpsi_psi_section_t* p_section);
 

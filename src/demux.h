@@ -160,7 +160,6 @@ void dvbpsi_DetachDemux(dvbpsi_t *p_dvbpsi);
  * \return a pointer to the found subdecoder, or NULL.
  *
  */
-__attribute__((deprecated))
 dvbpsi_demux_subdec_t * dvbpsi_demuxGetSubDec(dvbpsi_demux_t * p_demux,
                                               uint8_t          i_table_id,
                                               uint16_t         i_extension);

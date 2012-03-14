@@ -152,7 +152,6 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \param i_network_id original network id
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_InitSDT(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next, uint16_t i_network_id);
 
@@ -178,7 +177,6 @@ dvbpsi_sdt_t *dvbpsi_NewSDT(uint16_t i_ts_id, uint8_t i_version,
  * \param p_sdt pointer to the SDT structure
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_EmptySDT(dvbpsi_sdt_t *p_sdt);
 
 /*!
@@ -208,7 +206,6 @@ void dvbpsi_DeleteSDT(dvbpsi_sdt_t *p_sdt);
  * \param b_free_ca Free CA flag
  * \return a pointer to the added service description.
  */
-__attribute__((deprecated))
 dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
     uint16_t i_service_id, bool b_eit_schedule, bool b_eit_present,
     uint8_t i_running_status, bool b_free_ca);
@@ -228,7 +225,6 @@ dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-__attribute__((deprecated))
 dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
                                                dvbpsi_sdt_service_t *p_service,
                                                uint8_t i_tag, uint8_t i_length,

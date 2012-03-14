@@ -64,7 +64,6 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
  *****************************************************************************
  * SDT decoder.
  *****************************************************************************/
-__attribute__((deprecated))
 void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
                               dvbpsi_psi_section_t* p_section);
 

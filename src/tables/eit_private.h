@@ -65,7 +65,6 @@ void dvbpsi_GatherEITSections(dvbpsi_t* p_dvbpsi,
  *****************************************************************************
  * EIT decoder.
  *****************************************************************************/
-__attribute__((deprecated))
 void dvbpsi_DecodeEITSections(dvbpsi_eit_t* p_eit,
                               dvbpsi_psi_section_t* p_section);
 

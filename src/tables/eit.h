@@ -159,7 +159,6 @@ void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \param i_last_table_id i_last_table_id
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
                     bool b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
                     uint8_t i_segment_last_section_number,
@@ -194,7 +193,6 @@ dvbpsi_eit_t* dvbpsi_NewtEIT(uint16_t i_service_id,
  * \param p_eit pointer to the EIT structure
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit);
 
 /*!
@@ -243,7 +241,6 @@ dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(
                                                dvbpsi_eit_event_t* p_event,
                                                uint8_t i_tag, uint8_t i_length,

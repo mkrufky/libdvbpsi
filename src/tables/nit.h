@@ -149,7 +149,6 @@ void dvbpsi_DetachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * \param b_current_next current next indicator
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_InitNIT(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
                     uint8_t i_version, bool b_current_next);
 
@@ -174,7 +173,6 @@ dvbpsi_nit_t *dvbpsi_NewNIT(uint16_t i_network_id, uint8_t i_version,
  * \param p_nit pointer to the NIT structure
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_EmptyNIT(dvbpsi_nit_t* p_nit);
 
 /*!
@@ -216,7 +214,6 @@ dvbpsi_descriptor_t* dvbpsi_NITAddDescriptor(dvbpsi_nit_t *p_nit,
  * \param i_orig_network_id PID of the TS
  * \return a pointer to the added TS.
  */
-__attribute__((deprecated))
 dvbpsi_nit_ts_t* dvbpsi_NITAddTS(dvbpsi_nit_t* p_nit,
                                  uint16_t i_ts_id, uint16_t i_orig_network_id);
 
@@ -235,7 +232,6 @@ dvbpsi_nit_ts_t* dvbpsi_NITAddTS(dvbpsi_nit_t* p_nit,
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_NITTSAddDescriptor(dvbpsi_nit_ts_t* p_ts,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data);

@@ -68,7 +68,6 @@ void dvbpsi_GatherNITSections(dvbpsi_t* p_dvbpsi,
  *****************************************************************************
  * NIT decoder.
  *****************************************************************************/
-__attribute__((deprecated))
 void dvbpsi_DecodeNITSections(dvbpsi_nit_t* p_nit,
                               dvbpsi_psi_section_t* p_section);
 

@@ -65,7 +65,6 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi,
  *****************************************************************************
  * PMT decoder.
  *****************************************************************************/
-__attribute__((deprecated))
 void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
                               dvbpsi_psi_section_t* p_section);
 

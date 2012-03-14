@@ -149,7 +149,6 @@ void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi);
  * \param i_pcr_pid PCR_PID
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
                     uint8_t i_version, bool b_current_next, uint16_t i_pcr_pid);
 
@@ -176,7 +175,6 @@ dvbpsi_pmt_t* dvbpsi_NewPMT(uint16_t i_program_number, uint8_t i_version,
  * \param p_pmt pointer to the PMT structure
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt);
 
 /*!
@@ -202,7 +200,6 @@ void dvbpsi_DeletePMT(dvbpsi_pmt_t* p_pmt);
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);
@@ -219,7 +216,6 @@ dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
  * \param i_pid PID of the ES
  * \return a pointer to the added ES.
  */
-__attribute__((deprecated))
 dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
                                  uint8_t i_type, uint16_t i_pid);
 
@@ -238,7 +234,6 @@ dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data);

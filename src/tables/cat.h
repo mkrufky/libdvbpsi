@@ -114,7 +114,6 @@ void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi);
  * \param b_current_next current next indicator
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat,
                     uint8_t i_version, bool b_current_next);
 
@@ -137,7 +136,6 @@ dvbpsi_cat_t *dvbpsi_NewCAT(uint8_t i_version, bool b_current_next);
  * \param p_cat pointer to the CAT structure
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_EmptyCAT(dvbpsi_cat_t* p_cat);
 
 /*!
@@ -163,7 +161,6 @@ void dvbpsi_DeleteCAT(dvbpsi_cat_t *p_cat);
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);

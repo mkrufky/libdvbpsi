@@ -342,7 +342,6 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \param i_protocol_version SIS protocol version (currently 0)
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version);
 
 /*!
@@ -362,7 +361,6 @@ dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version);
  * \param p_sis pointer to the SIS structure
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_EmptySIS(dvbpsi_sis_t *p_sis);
 
 /*!

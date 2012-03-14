@@ -138,7 +138,6 @@ void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi);
  * \param b_current_next current next indicator
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next);
 
@@ -162,7 +161,6 @@ dvbpsi_pat_t *dvbpsi_NewPAT(uint16_t i_ts_id, uint8_t i_version, bool b_current_
  * \param p_pat pointer to the PAT structure
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat);
 
 /*!
@@ -186,7 +184,6 @@ void dvbpsi_DeletePAT(dvbpsi_pat_t *p_pat);
  * \param i_pid PID of the NIT/PMT
  * \return a pointer to the added program.
  */
-__attribute__((deprecated))
 dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
                                            uint16_t i_number, uint16_t i_pid);
 

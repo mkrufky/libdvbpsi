@@ -116,7 +116,6 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * \param i_utc_time the time in UTC
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time);
 
 /*!
@@ -136,7 +135,6 @@ dvbpsi_tot_t *dvbpsi_NewTOT(uint64_t i_utc_time);
  * \param p_tot pointer to the TDT/TOT structure
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_EmptyTOT(dvbpsi_tot_t* p_tot);
 
 /*!
@@ -162,7 +160,6 @@ void dvbpsi_DeleteTOT(dvbpsi_tot_t* p_tot);
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-__attribute__((deprecated))
 dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);

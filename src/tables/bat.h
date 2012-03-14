@@ -158,7 +158,6 @@ void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * \param b_current_next current next indicator
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_InitBAT(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_version,
                     bool b_current_next);
 
@@ -183,7 +182,6 @@ dvbpsi_bat_t *dvbpsi_NewBAT(uint16_t i_bouquet_id, uint8_t i_version,
  * \param p_bat pointer to the BAT structure
  * \return nothing.
  */
-__attribute__((deprecated))
 void dvbpsi_EmptyBAT(dvbpsi_bat_t *p_bat);
 
 /*!
