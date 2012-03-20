@@ -45,34 +45,39 @@ dvbpsi_association_tag_dr_t *dvbpsi_DecodeAssociationTagDr(dvbpsi_descriptor_t *
 
     /* Check the tag */
     if (p_descriptor->i_tag != 0x14)
-    {
         return NULL;
-    }
 
     /* Don't decode twice */
     if (p_descriptor->p_decoded)
-    {
         return p_descriptor->p_decoded;
-    }
 
     /* Check length */
     if (p_descriptor->i_length < 5)
-    {
         return NULL;
-    }
 
     selector_len = p_descriptor->p_data[4];
 
     /* Invalid selector length */
     if (selector_len + 5 > p_descriptor->i_length)
+        return NULL;
+
+    private_data_len= p_descriptor->i_length - (5 + selector_len);
+    p_decoded = (dvbpsi_association_tag_dr_t*)malloc(sizeof(dvbpsi_association_tag_dr_t));
+    if (!p_decoded)
+        return NULL;
+
+    p_decoded->p_selector = malloc(selector_len);
+    if (!p_decoded->p_selector)
     {
+        free(p_decoder);
         return NULL;
     }
 
-    private_data_len= p_descriptor->i_length - (5 + selector_len);
-    p_decoded = (dvbpsi_association_tag_dr_t*)malloc(sizeof(dvbpsi_association_tag_dr_t) + selector_len + private_data_len);
-    if (!p_decoded)
+    p_decoded->p_private_data = malloc(private_data_len);
+    if (!p_decoded->p_private_data)
     {
+        free(p_decoded->p_selector);
+        free(p_decoder);
         return NULL;
     }
 
@@ -82,12 +87,10 @@ dvbpsi_association_tag_dr_t *dvbpsi_DecodeAssociationTagDr(dvbpsi_descriptor_t *
     p_decoded->i_private_data_len= private_data_len;
     p_decoded->p_selector = ((void*)p_decoded) + sizeof(dvbpsi_association_tag_dr_t);
     p_decoded->p_private_data = p_decoded->p_selector + selector_len;
-    memcpy(p_decoded->p_selector, &p_descriptor->p_data[5 ], selector_len);
+    memcpy(p_decoded->p_selector, &p_descriptor->p_data[5], selector_len);
     memcpy(p_decoded->p_private_data, &p_descriptor->p_data[5 + selector_len], private_data_len);
     p_descriptor->p_decoded = (void*)p_decoded;
 
     return p_decoded;
 }
-
-
 

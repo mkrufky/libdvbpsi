@@ -39,8 +39,8 @@ Decode Carousel id Descriptor.
 typedef struct dvbpsi_carousel_id_dr_s
 {
     uint32_t i_carousel_id;
-    uint8_t i_private_data_len;
-    uint8_t s_private_data[0];
+    uint8_t  i_private_data_len;
+    uint8_t *p_private_data;    /*< allocated memory must be released */
 }dvbpsi_carousel_id_dr_t;
 
 /*****************************************************************************

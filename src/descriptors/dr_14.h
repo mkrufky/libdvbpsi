@@ -40,12 +40,11 @@ typedef struct dvbpsi_association_tag_dr_s
 {
     uint16_t i_tag;
     uint16_t i_use;
-    uint8_t i_selector_len;
+    uint8_t  i_selector_len;
     uint8_t *p_selector;
-    uint8_t i_private_data_len;
-    uint8_t *p_private_data;
-
-}dvbpsi_association_tag_dr_t;
+    uint8_t  i_private_data_len;
+    uint8_t *p_private_data;        /*< release allocated memory */
+} dvbpsi_association_tag_dr_t;
 
 /*****************************************************************************
  * dvbpsi_DecodeAssociationTagDr

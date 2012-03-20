@@ -43,29 +43,23 @@ dvbpsi_frequency_list_dr_t *dvbpsi_DecodeFrequencyListDr(dvbpsi_descriptor_t *p_
     int i;
     /* Check the tag */
     if (p_descriptor->i_tag != 0x62)
-    {
         return NULL;
-    }
 
     /* Don't decode twice */
     if (p_descriptor->p_decoded)
-    {
         return p_descriptor->p_decoded;
-    }
 
     /* Check length */
     if ((p_descriptor->i_length - 1) % 4)
-    {
         return NULL;
-    }
 
     p_decoded = (dvbpsi_frequency_list_dr_t*)malloc(sizeof(dvbpsi_frequency_list_dr_t));
     if (!p_decoded)
-    {
         return NULL;
-    }
 
     p_decoded->i_number_of_frequencies = (p_descriptor->i_length - 1) / 4;
+    if (p_decoded->i_number_of_frequencies > ARRAY_SIZE(p_decoded->p_center_frequencies))
+        p_decoded->i_number_of_frequencies = ARRAY_SIZE(p_decoded->p_center_frequencies);
 
     p_decoded->i_coding_type = p_descriptor->p_data[0] & 0x3;
 

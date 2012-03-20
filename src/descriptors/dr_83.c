@@ -40,31 +40,26 @@ dvbpsi_lcn_dr_t *dvbpsi_DecodeLCNDr(dvbpsi_descriptor_t *p_descriptor)
 {
     dvbpsi_lcn_dr_t *p_decoded;
     int i;
+
     /* Check the tag */
     if (p_descriptor->i_tag != 0x83)
-    {
         return NULL;
-    }
 
     /* Don't decode twice */
     if (p_descriptor->p_decoded)
-    {
         return p_descriptor->p_decoded;
-    }
 
     /* Check length */
     if (p_descriptor->i_length % 4)
-    {
         return NULL;
-    }
 
     p_decoded = (dvbpsi_lcn_dr_t*)malloc(sizeof(dvbpsi_lcn_dr_t));
     if (!p_decoded)
-    {
         return NULL;
-    }
 
     p_decoded->i_number_of_entries = p_descriptor->i_length / 4;
+    if (p_decoded->i_number_of_entries > ARRAY_SIZE(p_decoded->p_entries))
+        p_decoded->i_number_of_entries = ARRAY_SIZE(p_decoded->p_entries);
 
     for (i = 0; i < p_decoded->i_number_of_entries; i ++)
     {

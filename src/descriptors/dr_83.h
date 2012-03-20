@@ -65,7 +65,7 @@ typedef struct dvbpsi_lcn_dr_s
 {
     uint8_t i_number_of_entries;     /*!< Number of LCN entries present. */
     dvbpsi_lcn_entry_t p_entries[64];/*!< Array of LCN entries. */
-}dvbpsi_lcn_dr_t;
+} dvbpsi_lcn_dr_t;
 
 /*****************************************************************************
  * dvbpsi_DecodeLCNDr

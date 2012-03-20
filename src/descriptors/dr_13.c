@@ -43,35 +43,33 @@ dvbpsi_carousel_id_dr_t *dvbpsi_DecodeCarouselIdDr(dvbpsi_descriptor_t *p_descri
 
     /* Check the tag */
     if (p_descriptor->i_tag != 0x13)
-    {
         return NULL;
-    }
 
     /* Don't decode twice */
     if (p_descriptor->p_decoded)
-    {
         return p_descriptor->p_decoded;
-    }
 
     /* Check length */
     if (p_descriptor->i_length < 4)
-    {
         return NULL;
-    }
 
-    p_decoded = (dvbpsi_carousel_id_dr_t*)malloc(sizeof(dvbpsi_carousel_id_dr_t) + p_descriptor->i_length - 4);
+    p_decoded = (dvbpsi_carousel_id_dr_t*)malloc(sizeof(dvbpsi_carousel_id_dr_t));
     if (!p_decoded)
+        return NULL;
+
+    p_decoded->p_private_data = malloc(p_descriptor->i_length - 4);
+    if (!p_decoded->s_private_data)
     {
+        free(p_decoded);
         return NULL;
     }
+    p_decoded->i_private_data_len = p_descriptor->i_length - 4;
 
-    p_decoded->i_carousel_id= ((p_descriptor->p_data[0] & 0xff) << 24) | ((p_descriptor->p_data[1] & 0xff) << 16)|
-                              ((p_descriptor->p_data[2] & 0xff) <<  8) |  (p_descriptor->p_data[3] & 0xff);
-    p_decoded->i_private_data_len= p_descriptor->i_length - 4;
-    memcpy(p_decoded->s_private_data, &p_descriptor->p_data[4], p_decoded->i_private_data_len);
+    p_decoded->i_carousel_id = ((p_descriptor->p_data[0] & 0xff) << 24) | ((p_descriptor->p_data[1] & 0xff) << 16)|
+                               ((p_descriptor->p_data[2] & 0xff) <<  8) |  (p_descriptor->p_data[3] & 0xff);
+
+    memcpy(p_decoded->p_private_data, &p_descriptor->p_data[4], p_decoded->i_private_data_len);
     p_descriptor->p_decoded = (void*)p_decoded;
 
     return p_decoded;
 }
-
-

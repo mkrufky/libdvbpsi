@@ -42,21 +42,19 @@ dvbpsi_default_authority_dr_t *dvbpsi_DecodeDefaultAuthorityDr(dvbpsi_descriptor
 
     /* Check the tag */
     if (p_descriptor->i_tag != 0x73)
-    {
         return NULL;
-    }
 
     /* Don't decode twice */
     if (p_descriptor->p_decoded)
-    {
         return p_descriptor->p_decoded;
-    }
     
     p_decoded = (dvbpsi_default_authority_dr_t*)malloc(sizeof(dvbpsi_default_authority_dr_t));
     if (!p_decoded)
-    {
         return NULL;
-    }
+
+    if (p_descriptor->i_length > 255)
+        p_descriptor->i_length = 255;
+
     memcpy(&p_decoded->authority, p_descriptor->p_data, p_descriptor->i_length);
     p_decoded->authority[p_descriptor->i_length] = 0;
 
@@ -64,5 +62,3 @@ dvbpsi_default_authority_dr_t *dvbpsi_DecodeDefaultAuthorityDr(dvbpsi_descriptor
 
     return p_decoded;
 }
-
-

@@ -40,23 +40,22 @@ dvbpsi_content_id_dr_t *dvbpsi_DecodeContentIdDr(dvbpsi_descriptor_t *p_descript
 {
     dvbpsi_content_id_dr_t *p_decoded;
     int byte;
+
     /* Check the tag */
     if (p_descriptor->i_tag != 0x76)
-    {
         return NULL;
-    }
 
     /* Don't decode twice */
     if (p_descriptor->p_decoded)
-    {
         return p_descriptor->p_decoded;
-    }
     
+    /* Check boundaries */
+    if (p_descriptor->i_length > ARRAY_SIZE(p_decoded->p_entries))
+        p_descriptor->i_length = ARRAY_SIZE(p_decoded->p_entries);
+
     p_decoded = (dvbpsi_content_id_dr_t*)malloc(sizeof(dvbpsi_content_id_dr_t));
     if (!p_decoded)
-    {
         return NULL;
-    }
 
     p_decoded->i_number_of_entries = 0;
     for (byte = 0; byte < p_descriptor->i_length; p_decoded->i_number_of_entries ++)
@@ -70,6 +69,9 @@ dvbpsi_content_id_dr_t *dvbpsi_DecodeContentIdDr(dvbpsi_descriptor_t *p_descript
         if (entry->i_location == CRID_LOCATION_DESCRIPTOR)
         {
             uint8_t len = p_descriptor->p_data[byte];
+            if (len > 253)
+                len = 253;
+
             unsigned int i;
             byte ++;
             for (i = 0; i < len; i ++)
@@ -91,11 +93,9 @@ dvbpsi_content_id_dr_t *dvbpsi_DecodeContentIdDr(dvbpsi_descriptor_t *p_descript
             free(p_decoded);
             return NULL;
         }
-
     }
 
     p_descriptor->p_decoded = (void*)p_decoded;
 
     return p_decoded;
 }
-

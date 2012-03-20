@@ -39,8 +39,8 @@ Decode Data Broadcast id Descriptor.
 typedef struct dvbpsi_data_broadcast_id_dr_s
 {
     uint16_t i_data_broadcast_id;
-    uint8_t i_id_selector_len;
-    uint8_t s_id_selector[0];
+    uint8_t  i_id_selector_len;
+    uint8_t  *p_id_selector; /*< release allocated memory */
 }dvbpsi_data_broadcast_id_dr_t;
 
 /*****************************************************************************
