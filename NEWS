@@ -8,6 +8,7 @@ Changes between 0.2.2 and 1.0.0:
    - introduces dvbpsi_t typedef
    - removed dvbpis_handle
  * EIT table generation
+ * new descriptor 0x40
 
 Changes between 0.2.1 and 0.2.2:
 --------------------------------
