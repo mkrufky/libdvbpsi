@@ -621,13 +621,16 @@ static inline void EncodeEventHeaders(dvbpsi_eit_event_t *p_event, uint8_t *buf)
  *****************************************************************************
  * Generate EIT sections based on the dvbpsi_eit_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t* dvbpsi_GenEITSections(dvbpsi_eit_t *p_eit,
+dvbpsi_psi_section_t* dvbpsi_GenEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_eit_t *p_eit,
                                             uint8_t i_table_id)
 {
-  dvbpsi_psi_section_t *p_result = NewEITSection (p_eit, i_table_id, 0),
-                       *p_current = p_result;
+  dvbpsi_psi_section_t *p_result = NewEITSection (p_eit, i_table_id, 0);
+  dvbpsi_psi_section_t *p_current = p_result;
   uint8_t i_last_section_number = 0;
   dvbpsi_eit_event_t *p_event;
+
+  if (!p_current)
+      return NULL;
 
   /* Encode events */
   for (p_event = p_eit->p_first_event; p_event; p_event = p_event->p_next)
@@ -669,8 +672,8 @@ dvbpsi_psi_section_t* dvbpsi_GenEITSections(dvbpsi_eit_t *p_eit,
       if ((p_current->p_payload_end - p_current->p_data) +
           p_descriptor->i_length > 4090)
       {
-        DVBPSI_ERROR("EIT generator", "too many descriptors in event, "
-                                      "unable to carry all the descriptors");
+        dvbpsi_error(p_dvbpsi, "EIT generator", "too many descriptors in event, "
+                               "unable to carry all the descriptors");
         break;
       }
 
@@ -697,7 +700,7 @@ dvbpsi_psi_section_t* dvbpsi_GenEITSections(dvbpsi_eit_t *p_eit,
     p_current->p_data[12] = i_last_section_number;
     p_current->i_last_number = i_last_section_number;
 
-    dvbpsi_BuildPSISection(p_current);
+    dvbpsi_BuildPSISection(p_dvbpsi, p_current);
   }
 
   return p_result;

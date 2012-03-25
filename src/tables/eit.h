@@ -251,7 +251,16 @@ dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(
  *****************************************************************************
  * Generate EIT sections based on the dvbpsi_eit_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t *dvbpsi_GenEITSections(dvbpsi_eit_t *p_eit,
+/*!
+ * \fn dvbpsi_psi_section_t *dvbpsi_GenEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_eit_t *p_eit,
+ *                                                 uint8_t i_table_id);
+ * \brief Generate a EIT section based on the information provided in p_eit.
+ * \param p_dvbpsi pointer to Subtable demultiplexor to which the EIT decoder is attached.
+ * \param p_eit pointer to EIT information to include in the PSI secion
+ * \param i_table_id the EIT table id to use
+ * \return a pointer to a new PSI section
+ */
+dvbpsi_psi_section_t *dvbpsi_GenEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_eit_t *p_eit,
                                             uint8_t i_table_id);
 
 #ifdef __cplusplus
