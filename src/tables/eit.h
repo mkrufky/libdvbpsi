@@ -246,6 +246,14 @@ dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data);
 
+/*****************************************************************************
+ * dvbpsi_GenEITSections
+ *****************************************************************************
+ * Generate EIT sections based on the dvbpsi_eit_t structure.
+ *****************************************************************************/
+dvbpsi_psi_section_t *dvbpsi_GenEITSections(dvbpsi_eit_t *p_eit,
+                                            uint8_t i_table_id);
+
 #ifdef __cplusplus
 };
 #endif

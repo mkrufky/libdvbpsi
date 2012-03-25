@@ -544,3 +544,161 @@ void dvbpsi_DecodeEITSections(dvbpsi_eit_t* p_eit,
         p_section = p_section->p_next;
     }
 }
+
+/*****************************************************************************
+ * NewEITSection
+ *****************************************************************************
+ * Helper function which allocates a initializes a new PSI section suitable
+ * for carrying EIT data.
+ *****************************************************************************/
+static dvbpsi_psi_section_t* NewEITSection(dvbpsi_eit_t* p_eit, int i_table_id,
+                                           int i_section_number)
+{
+  dvbpsi_psi_section_t *p_result = dvbpsi_NewPSISection(4094);
+
+  p_result->i_table_id = i_table_id;
+  p_result->b_syntax_indicator = 1;
+  p_result->b_private_indicator = 1;
+  p_result->i_length = 15;                     /* header: 11B + CRC32 */
+
+  p_result->i_extension = p_eit->i_service_id;
+  p_result->i_version = p_eit->i_version;
+  p_result->b_current_next = p_eit->b_current_next;
+  p_result->i_number = i_section_number;
+
+  p_result->p_payload_end += 14;
+  p_result->p_payload_start = p_result->p_data + 8;
+
+  /* Transport Stream ID */
+  p_result->p_data[8] = p_eit->i_ts_id >> 8;
+  p_result->p_data[9] = p_eit->i_ts_id;
+
+  /* Original Network ID */
+  p_result->p_data[10] = p_eit->i_network_id >> 8;
+  p_result->p_data[11] = p_eit->i_network_id;
+
+  /* Segment last section number will be filled once we know how many
+   * sections we are going to need. */
+
+  /* Last Table ID */
+  p_result->p_data[13] = p_eit->i_last_table_id;
+
+  return p_result;
+}
+
+/*****************************************************************************
+ * EncodeEventHeaders
+ *****************************************************************************
+ * Helper function which encodes an EIT event header in a byte buffer.
+ *****************************************************************************/
+static inline void EncodeEventHeaders(dvbpsi_eit_event_t *p_event, uint8_t *buf)
+{
+  /* event_id */
+  buf[0] = p_event->i_event_id >> 8;
+  buf[1] = p_event->i_event_id;
+
+  /* start_time */
+  buf[2] = p_event->i_start_time >> 32;
+  buf[3] = p_event->i_start_time >> 24;
+  buf[4] = p_event->i_start_time >> 16;
+  buf[5] = p_event->i_start_time >>  8;
+  buf[6] = p_event->i_start_time;
+
+  /* duration */
+  buf[7] = p_event->i_duration >> 16;
+  buf[8] = p_event->i_duration >>  8;
+  buf[9] = p_event->i_duration;
+
+  /* running_status, free_CA_mode */
+  buf[10] = ((p_event->i_running_status & 0x7) << 5) |
+            ((p_event->b_free_ca        & 0x1) << 4);
+
+  /* descriptors_loop_length is encoded later */
+}
+
+/*****************************************************************************
+ * dvbpsi_GenEITSections
+ *****************************************************************************
+ * Generate EIT sections based on the dvbpsi_eit_t structure.
+ *****************************************************************************/
+dvbpsi_psi_section_t* dvbpsi_GenEITSections(dvbpsi_eit_t *p_eit,
+                                            uint8_t i_table_id)
+{
+  dvbpsi_psi_section_t *p_result = NewEITSection (p_eit, i_table_id, 0),
+                       *p_current = p_result;
+  uint8_t i_last_section_number = 0;
+  dvbpsi_eit_event_t *p_event;
+
+  /* Encode events */
+  for (p_event = p_eit->p_first_event; p_event; p_event = p_event->p_next)
+  {
+    uint8_t *p_event_start = p_current->p_payload_end;
+    uint16_t i_event_length = 12;
+    dvbpsi_descriptor_t *p_descriptor;
+
+    /* Calculate the size of this event and allocate a new PSI section
+     * to contain it if necessary. */
+    for (p_descriptor = p_event->p_first_descriptor;
+         p_descriptor; p_descriptor = p_descriptor->p_next)
+    {
+      i_event_length += p_descriptor->i_length + 2;
+
+      if (p_event_start - p_current->p_data + i_event_length > 4090)
+      {
+        dvbpsi_psi_section_t *p_prev = p_current;
+
+        p_current = NewEITSection (p_eit, i_table_id, ++i_last_section_number);
+        p_event_start = p_current->p_payload_end;
+        p_prev->p_next = p_current;
+
+        break;
+      }
+    }
+
+    EncodeEventHeaders (p_event, p_event_start);
+
+    /* adjust section to indicate the header */
+    p_current->p_payload_end += 12;
+    p_current->i_length += 12;
+
+    /* encode event descriptors */
+    for (p_descriptor = p_event->p_first_descriptor; p_descriptor;
+         p_descriptor = p_descriptor->p_next)
+    {
+      /* check for overflows */
+      if ((p_current->p_payload_end - p_current->p_data) +
+          p_descriptor->i_length > 4090)
+      {
+        DVBPSI_ERROR("EIT generator", "too many descriptors in event, "
+                                      "unable to carry all the descriptors");
+        break;
+      }
+
+      /* encode the descriptor */
+      p_current->p_payload_end[0] = p_descriptor->i_tag;
+      p_current->p_payload_end[1] = p_descriptor->i_length;
+      memcpy(p_current->p_payload_end + 2, p_descriptor->p_data, p_descriptor->i_length);
+
+      /* adjust section to reflect new encoded descriptor */
+      p_current->p_payload_end += p_descriptor->i_length + 2;
+      p_current->i_length += p_descriptor->i_length + 2;
+    }
+
+    /* now adjust the descriptors_loop_length */
+    i_event_length = p_current->p_payload_end - p_event_start - 12;
+    p_event_start[10] |= ((i_event_length  >> 8) & 0x0f);
+    p_event_start[11] = i_event_length;
+  }
+
+  /* Finalization */
+  for (p_current = p_result; p_current; p_current = p_current->p_next)
+  {
+    /* Segment last section number */
+    p_current->p_data[12] = i_last_section_number;
+    p_current->i_last_number = i_last_section_number;
+
+    dvbpsi_BuildPSISection(p_current);
+  }
+
+  return p_result;
+}
