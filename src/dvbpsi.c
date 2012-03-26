@@ -467,6 +467,8 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
 #   define DVBPSI_MSG_SIZE 1024
 #endif
 
+#define DVBPSI_MSG_FORMAT "libdvbpsi (%s): %s"
+
 #ifdef HAVE_VARIADIC_MACROS
 void message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char *fmt, ...)
 {
@@ -482,7 +484,7 @@ void message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char *fmt, 
         msg = malloc(DVBPSI_MSG_SIZE);
         if (msg == NULL)
             return;
-        if (snprintf(&msg, DVBPSI_MSG_SIZE, DVBPSI_MSG_FORMAT, src) < 0) {
+        if (snprintf(&msg, DVBPSI_MSG_SIZE, DVBPSI_MSG_FORMAT, ap) < 0) {
             free(msg);
             return;
         }
@@ -497,7 +499,6 @@ void message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char *fmt, 
     }
 }
 #else
-#   define DVBPSI_MSG_FORMAT "libdvbpsi (%s): %s"
 
 /* Common code for printing messages */
 #   if defined(_GNU_SOURCE)
