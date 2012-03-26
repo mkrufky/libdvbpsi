@@ -97,6 +97,12 @@ struct dvbpsi_s
     /* Messages callback */
     dvbpsi_message_cb             pf_message;           /*!< Log message callback */
     enum dvbpsi_msg_level         i_msg_level;          /*!< Log level */
+
+    /* private data pointer for use by caller, not by libdvbpsi itself ! */
+    void                         *p_sys;                /*!< pointer to private data
+                                                          from caller. Do not use
+                                                          from inside libdvbpsi. It
+                                                          will crash any application. */
 };
 
 /*****************************************************************************

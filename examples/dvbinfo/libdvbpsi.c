@@ -227,6 +227,10 @@ struct ts_stream_t
     uint64_t    i_packets;
     uint64_t    i_null_packets;
     uint64_t    i_lost_bytes;
+
+    /* logging */
+    ts_stream_log_cb pf_log;
+    void *cb_data;
 };
 
 /*****************************************************************************
@@ -255,6 +259,7 @@ mtime_t mdate(void)
     if (gettimeofday(&tv, NULL) < 0)
     {
         fprintf(stderr, "gettimeofday() error: %s\n", strerror(errno));
+        abort();
     }
 
     return (tv.tv_sec * (mtime_t)1000) + (tv.tv_usec / (mtime_t)1000);
@@ -268,142 +273,103 @@ mtime_t mdate(void)
  *****************************************************************************/
 static void dvbpsi_message(dvbpsi_t *p_dvbpsi, const dvbpsi_msg_level_t level, const char* msg)
 {
+    /* See dvbinfo.h for the definition of these log levels.*/
+    int code = 0;
+    const char *psz_level;
+
     switch(level)
     {
-        case DVBPSI_MSG_ERROR: fprintf(stderr, "Error: "); break;
-        case DVBPSI_MSG_WARN:  fprintf(stderr, "Warning: "); break;
-        case DVBPSI_MSG_DEBUG: fprintf(stderr, "Debug: "); break;
+        case DVBPSI_MSG_ERROR: code = 0; psz_level = "Error: "; break;
+        case DVBPSI_MSG_WARN:  code = 1; psz_level = "Warning: "; break;
+        case DVBPSI_MSG_DEBUG: code = 3; psz_level = "Debug: "; break;
         default: /* do nothing */
             return;
     }
-    fprintf(stderr, "%s\n", msg);
+
+    ts_stream_t *stream = (ts_stream_t *)p_dvbpsi->p_sys;
+    if (stream && stream->pf_log)
+    {
+        stream->pf_log(stream->cb_data, code, msg);
+    }
+    else
+    {
+        char *reply = NULL;
+        if (asprintf(&reply,"%s%s\n", psz_level, msg) > 0)
+        {
+            fprintf(stderr, "%s", reply);
+            free(reply);
+        }
+    }
 }
 
 /*****************************************************************************
  * Dump TS packet as hex
  *****************************************************************************/
-static void ts_hexdump(const uint8_t * const data, const uint32_t length)
+static void ts_hexdump(FILE *fd, const uint8_t * const data, const uint32_t length)
 {
     uint32_t i;
-    printf("\t");
+    fprintf(fd, "\t");
     for (i=0; i < length; i++)
     {
-        if ((i%8) == 0) printf(" ");
-        if ((i%16) == 0) printf("\n\t %.4x: ", i);
-            printf("%.2x ", data[i]);
+        if ((i%8) == 0) fprintf(fd, " ");
+        if ((i%16) == 0) fprintf(fd, "\n\t %.4x: ", i);
+            fprintf(fd, "%.2x ", data[i]);
     }
 }
 
-static void summary(ts_stream_t *stream)
+static void ts_header_dump(FILE *fd, ts_pid_t *ts)
 {
-    uint64_t i_packets = 0;
-    mtime_t i_first_pcr = 0, i_last_pcr = 0;
-    mtime_t start = 0, end = 0;
-
-    printf("\n\t---------------------------------------------------------\n");
-
-    /* Find PCR PID and get pcr timestamps */
-    for (int i_pid = 0; i_pid < 8192; i_pid++)
-    {
-        if (stream->pid[i_pid].b_pcr)
-        {
-            start = stream->pid[i_pid].i_first_pcr;
-            end = stream->pid[i_pid].i_last_pcr;
-            if (stream->pid[i_pid].b_discontinuity_indicator)
-            {
-                printf("\tPCR discontinuity was signalled for PID: %4d (0x%4x)\n",
-                       i_pid, i_pid);
-            }
-        }
-    }
-
-    for (int i_pid = 0; i_pid < 8192; i_pid++)
-    {
-        if (stream->pid[i_pid].b_seen)
-        {
-            printf("\tFound PID: %4d (0x%4x), DRM: %s,", i_pid, i_pid,
-                   (stream->pid[i_pid].i_transport_scrambling_control != 0x00) ? "yes" : " no" );
-
-            double bitrate = 0;
-            if ((end - start) > 0)
-            {
-                bitrate = (double) (stream->pid[i_pid].i_packets * 188 * 8) /
-                                    ((double)(end - start)/1000.0);
-            }
-            printf(" bitrate %0.4f kbit/s,", bitrate);
-            printf(" seen %"PRId64" packets",
-                   stream->pid[i_pid].i_packets);
-            printf("\n");
-
-            i_packets += stream->pid[i_pid].i_packets;
-            if (i_first_pcr == 0)
-                i_first_pcr = start;
-            else
-                i_first_pcr = (i_first_pcr < start) ? i_first_pcr : start;
-            i_last_pcr = (i_last_pcr > end) ? i_last_pcr : end;
-        }
-    }
-    printf("\n\tNumber of packets: %"PRId64", stuffing %"PRId64" packets, lost %"PRId64" bytes, bitrate: %0.4f kbit/s\n",
-            i_packets, stream->i_null_packets, stream->i_lost_bytes,
-            (double)(((i_packets*188) + stream->i_lost_bytes) * 8)/((double)(i_last_pcr - i_first_pcr)/1000.0));
-    printf("\tPCR first: %"PRId64", last: %"PRId64", duration: %"PRId64"\n",
-            i_first_pcr, i_last_pcr, (mtime_t)(i_last_pcr - i_first_pcr));
-    printf("\n\t---------------------------------------------------------\n");
-}
-
-static void ts_header_dump(ts_pid_t *ts)
-{
-    printf("\tPID 0x%x seen %s\n",
+    fprintf(fd, "\n\tPID 0x%x seen %s\n",
            ts->i_pid, ts->b_seen ? "yes" : "no");
-    printf("\tContinuity counter: %d\n", ts->i_cc);
-    printf("\tTransport Error indicator: %s\n",
+    fprintf(fd, "\tContinuity counter: %d\n", ts->i_cc);
+    fprintf(fd, "\tTransport Error indicator: %s\n",
            ts->b_transport_error_indicator ? "yes" : "no");
-    printf("\tPayload unit start indicator: %s\n",
+    fprintf(fd, "\tPayload unit start indicator: %s\n",
            ts->b_payload_unit_start_indicator ? "yes" : "no");
-    printf("\tScrambling control: %s\n",
+    fprintf(fd, "\tScrambling control: %s\n",
            (ts->i_transport_scrambling_control != 0x0) ? "yes" : "no");
     if (ts->i_transport_scrambling_control > 0x0)
-        printf("\tScrambling control word: 0x%x\n", ts->i_transport_scrambling_control);
-    printf("\tAdaptation field control: %s\n",
+        fprintf(fd, "\tScrambling control word: 0x%x\n", ts->i_transport_scrambling_control);
+    fprintf(fd, "\tAdaptation field control: %s\n",
            ts->b_adaptation_field ? "yes" : "no");
     if (ts->b_adaptation_field)
     {
-        printf("\tDiscontinuity indicator: %s\n",
+        fprintf(fd, "\tDiscontinuity indicator: %s\n",
            ts->b_discontinuity_indicator ? "yes" : "no");
-        printf("\tRandom access indicator: %s\n",
+        fprintf(fd, "\tRandom access indicator: %s\n",
            ts->b_random_access_indicator ? "yes" : "no");
-        printf("\tElementary stream priority indicator: %s\n",
+        fprintf(fd, "\tElementary stream priority indicator: %s\n",
            ts->b_elementary_stream_priority_indicator ? "yes" : "no");
-        printf("\tTransport private data: %s\n",
+        fprintf(fd, "\tTransport private data: %s\n",
            ts->b_transport_private_data ? "yes" : "no");
         if (ts->b_transport_private_data )
-            printf("\tTransport private data length: %d\n",
+            fprintf(fd, "\tTransport private data length: %d\n",
                 ts->i_transport_private_data_length);
-        printf("\tSplicing point: %s\n",
+        fprintf(fd, "\tSplicing point: %s\n",
            ts->b_splicing_point ? "yes" : "no");
         if (ts->b_splicing_point)
-            printf("\tSplice countdown: %d (0x%x)\n",
+            fprintf(fd, "\tSplice countdown: %d (0x%x)\n",
                 ts->i_splice_countdown, ts->i_splice_countdown);
 
-        printf("\tOriginal PCR: %s\n", ts->b_opcr ? "yes" : "no");
-        printf("\tPCR PID: %s\n", ts->b_pcr ? "yes" : "no");
+        fprintf(fd, "\tOriginal PCR: %s\n", ts->b_opcr ? "yes" : "no");
+        fprintf(fd, "\tPCR PID: %s\n", ts->b_pcr ? "yes" : "no");
         if (ts->b_pcr)
-            printf("\tPCR: %"PRId64"\n", ts->i_pcr);
+            fprintf(fd, "\tPCR: %"PRId64"\n", ts->i_pcr);
 
         /* adaptation field extension */
         if (ts->b_adaptation_field_extension &&
             ts->i_adaptation_field_extension_length > 0)
         {
-            printf("\tadaptation field extension, length: %d\n",
+            fprintf(fd, "\tadaptation field extension, length: %d\n",
                ts->i_adaptation_field_extension_length);
-            printf("\tlegal time window (ltw): %s\n", ts->b_ltw ? "yes" : "no");
-            printf("\tltw valid: %s\n", ts->b_ltw_valid ? "yes" : "no");
+            fprintf(fd, "\tlegal time window (ltw): %s\n", ts->b_ltw ? "yes" : "no");
+            fprintf(fd, "\tltw valid: %s\n", ts->b_ltw_valid ? "yes" : "no");
             if (ts->b_ltw)
-                printf("\tlegal time window offset: %d\n", ts->i_ltw_offset);
-            printf("\tpiecewise rate: %s\n", ts->b_piecewise_rate ? "yes" : "no");
+                fprintf(fd, "\tlegal time window offset: %d\n", ts->i_ltw_offset);
+            fprintf(fd, "\tpiecewise rate: %s\n", ts->b_piecewise_rate ? "yes" : "no");
             if (ts->b_piecewise_rate)
-                printf("\tpiecewise rate: %d\n", ts->i_piecewise_rate);
-            printf("\tseamless splice: %s\n",
+                fprintf(fd, "\tpiecewise rate: %d\n", ts->i_piecewise_rate);
+            fprintf(fd, "\tseamless splice: %s\n",
                ts->b_seamless_splice ? "yes" : "no");
             if (ts->b_seamless_splice)
             {
@@ -432,10 +398,128 @@ static void ts_header_dump(ts_pid_t *ts)
                     descr = "Reserved/User-defined";
                     break;
                 }
-                printf("\tsplice type 0x%x (%s)\n", ts->i_splice_type, descr);
+                fprintf(fd, "\tsplice type 0x%x (%s)\n", ts->i_splice_type, descr);
             }
         }
     }
+}
+
+static void ts_dump_packet_details(FILE *fd, ts_stream_t *stream, const uint8_t *data, const uint16_t i_pid)
+{
+    fprintf(fd, "\n\t---------------------------------------------------------\n");
+    fprintf(fd, "\tTS Packet number %"PRId64", ES number %"PRId64", pid %d (0x%x)\n",
+       stream->i_packets, stream->pid[i_pid].i_packets, i_pid, i_pid);
+#if defined(HAVE_SYS_TIME_H)
+    fprintf(fd, "\tReceived time: %"PRId64" ms\n", stream->pid[i_pid].i_received);
+#endif
+    ts_header_dump(fd, &stream->pid[i_pid]);
+    ts_hexdump(fd, data, 188);
+    fprintf(fd, "\n\t---------------------------------------------------------\n");
+}
+
+/*****************************************************************************
+ * Summary: Bandwidth, Packet, Table
+ *****************************************************************************/
+static void summary(FILE *fd, ts_stream_t *stream)
+{
+    uint64_t i_packets = 0;
+    mtime_t i_first_pcr = 0, i_last_pcr = 0;
+    mtime_t start = 0, end = 0;
+
+    fprintf(fd, "\n---------------------------------------------------------\n");
+    fprintf(fd, "\nSummary: Bandwidth\n");
+
+    /* Find PCR PID and get pcr timestamps */
+    for (int i_pid = 0; i_pid < 8192; i_pid++)
+    {
+        if (stream->pid[i_pid].b_pcr)
+        {
+            start = stream->pid[i_pid].i_first_pcr;
+            end = stream->pid[i_pid].i_last_pcr;
+            if (stream->pid[i_pid].b_discontinuity_indicator)
+            {
+                fprintf(fd, "PCR discontinuity was signalled for PID: %4d (0x%4x)\n",
+                       i_pid, i_pid);
+            }
+        }
+    }
+
+    for (int i_pid = 0; i_pid < 8192; i_pid++)
+    {
+        if (stream->pid[i_pid].b_seen)
+        {
+            fprintf(fd, "Found PID: %4d (0x%4x), DRM: %s,", i_pid, i_pid,
+                   (stream->pid[i_pid].i_transport_scrambling_control != 0x00) ? "yes" : " no" );
+
+            double bitrate = 0;
+            if ((end - start) > 0)
+            {
+                bitrate = (double) (stream->pid[i_pid].i_packets * 188 * 8) /
+                                    ((double)(end - start)/1000.0);
+            }
+            fprintf(fd, " bitrate %0.4f kbit/s,", bitrate);
+            fprintf(fd, " seen %"PRId64" packets",
+                   stream->pid[i_pid].i_packets);
+            fprintf(fd, "\n");
+
+            i_packets += stream->pid[i_pid].i_packets;
+            if (i_first_pcr == 0)
+                i_first_pcr = start;
+            else
+                i_first_pcr = (i_first_pcr < start) ? i_first_pcr : start;
+            i_last_pcr = (i_last_pcr > end) ? i_last_pcr : end;
+        }
+    }
+    double total_bitrate = (double)(((i_packets*188) + stream->i_lost_bytes) * 8)/((double)(i_last_pcr - i_first_pcr)/1000.0);
+    fprintf(fd, "\nTotal bitrate %0.4f kbits/s\n", total_bitrate);
+
+    fprintf(fd, "Number of packets: %"PRId64", stuffing %"PRId64" packets, lost %"PRId64" bytes\n",
+            i_packets, stream->i_null_packets, stream->i_lost_bytes);
+    fprintf(fd, "PCR first: %"PRId64", last: %"PRId64", duration: %"PRId64"\n",
+            i_first_pcr, i_last_pcr, (mtime_t)(i_last_pcr - i_first_pcr));
+    fprintf(fd, "\n---------------------------------------------------------\n");
+}
+
+static void summary_table(FILE *fd, ts_stream_t *stream)
+{
+    fprintf(fd, "\n---------------------------------------------------------\n");
+    fprintf(fd, "\nSummary: Table\n");
+
+    fprintf(fd, "\nTable: PAT\n");
+    if (stream->pat.handle)
+        ts_header_dump(fd, stream->pat.pid);
+    fprintf(fd, "\nTable: PMT\n");
+    if (stream->pmt.handle)
+        ts_header_dump(fd, stream->pmt.pid_pmt);
+    fprintf(fd, "\nTable: CAT\n");
+    if (stream->cat.handle)
+        ts_header_dump(fd, stream->cat.pid );
+    fprintf(fd, "\nTable: SDT\n");
+    if (stream->sdt.handle)
+        ts_header_dump(fd, stream->sdt.pid);
+    fprintf(fd, "\nTable: EIT\n");
+    if (stream->eit.handle)
+        ts_header_dump(fd, stream->eit.pid);
+    fprintf(fd, "\nTable: TDT\n");
+    if (stream->tdt.handle)
+        ts_header_dump(fd, stream->tdt.pid);
+
+    fprintf(fd, "\n---------------------------------------------------------\n");
+}
+
+static void summary_packet(FILE *fd, ts_stream_t *stream)
+{
+    fprintf(fd, "\n---------------------------------------------------------\n");
+    fprintf(fd, "\nSummary: Packet\n");
+
+    /* Find PCR PID and get pcr timestamps */
+    for (int i_pid = 0; i_pid < 8192; i_pid++)
+    {
+        ts_pid_t *ts = &stream->pid[i_pid];
+        ts_header_dump(fd, ts);
+    }
+
+    fprintf(fd, "\n---------------------------------------------------------\n");
 }
 
 /*****************************************************************************
@@ -1201,11 +1285,17 @@ static void handle_CAT(void *p_data, dvbpsi_cat_t *p_cat)
 /*****************************************************************************
  * Public API
  *****************************************************************************/
-ts_stream_t *libdvbpsi_init(int debug)
+ts_stream_t *libdvbpsi_init(int debug, ts_stream_log_cb pf_log, void *cb_data)
 {
     ts_stream_t *stream = (ts_stream_t *)calloc(1, sizeof(ts_stream_t));
     if (stream == NULL)
         return NULL;
+
+    if (pf_log)
+    {
+        stream->pf_log = pf_log;
+        stream->cb_data = cb_data;
+    }
 
     /* print PSI tables debug anyway, unless no debug is wanted at all */
     switch (debug)
@@ -1314,8 +1404,7 @@ error:
 
 void libdvbpsi_exit(ts_stream_t *stream)
 {
-   printf("\nSummary:\n");
-   summary(stream);
+   summary(stdout, stream);
 
    if (dvbpsi_HasDecoder(stream->pat.handle))
        dvbpsi_DetachPAT(stream->pat.handle);
@@ -1376,8 +1465,9 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
         {
             stream->i_lost_bytes += i_lost;
             i += i_lost;
-            fprintf(stderr, "%"PRId64": lost %"PRId64" bytes out of %"PRId64" in buffer\n",
-                    date, (int64_t) i_lost, (int64_t)length);
+            stream->pf_log(stream->cb_data, 0,
+                           "dvbinfo: %"PRId64": lost %"PRId64" bytes out of %"PRId64" in buffer\n",
+                           date, (int64_t) i_lost, (int64_t)length);
             if (i >= length)
                 return true;
         }
@@ -1399,8 +1489,9 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
         stream->pid[i_pid].i_received = date;
 
         if (stream->level < DVBPSI_MSG_DEBUG)
-            fprintf(stderr, "%"PRId64" packet %"PRId64" pid %d (0x%x) cc %d\n",
-                            date, stream->i_packets, i_pid, i_pid, i_cc);
+            stream->pf_log(stream->cb_data, 0,
+                           "dvbinfo: %"PRId64" packet %"PRId64" pid %d (0x%x) cc %d\n",
+                           date, stream->i_packets, i_pid, i_pid, i_cc);
 
         if (i_pid == 0x0) /* PAT */
             dvbpsi_PushPacket(stream->pat.handle, p_tmp);
@@ -1492,10 +1583,12 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
                     stream->pid[i_pid].i_first_pcr = i_pcr;
                 if (i_pcr < stream->pid[i_pid].i_last_pcr)
                 {
-                    fprintf(stderr, "dvbinfo: Warning wrapping PCR");
                     if (b_discontinuity_seen)
-                        fprintf(stderr, " on discontinuity");
-                    fprintf(stderr, "\n");
+                        stream->pf_log(stream->cb_data, 2,
+                                       "dvbinfo: Warning wrapping PCR on discontinuity\n");
+                    else
+                        stream->pf_log(stream->cb_data, 2,
+                                       "dvbinfo: Warning wrapping PCR\n");
                 }
                 stream->pid[i_pid].i_prev_pcr = i_prev_pcr;
                 stream->pid[i_pid].i_last_pcr = i_pcr;
@@ -1503,7 +1596,8 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
                 if (stream->pid[i_pid].b_discontinuity_indicator)
                 {
                     /* cc discontinuity is expected */
-                    fprintf(stderr, "dvbinfo: Server signalled the continuity counter discontinuity\n");
+                    stream->pf_log(stream->cb_data, 2,
+                                   "dvbinfo: Server signalled the continuity counter discontinuity\n");
 
                     /* Discontinuity has been handled */
                     b_discontinuity_seen = false;
@@ -1569,8 +1663,9 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
 
         if (b_discontinuity_seen)
         {
-            fprintf(stderr, "dvbinfo: Continuity counter discontinuity (pid %d 0x%x found %d expected %d)\n",
-                   i_pid, i_pid, stream->pid[i_pid].i_cc, i_old_cc+1 );
+            stream->pf_log(stream->cb_data, 2,
+                           "dvbinfo: Continuity counter discontinuity (pid %d 0x%x found %d expected %d)\n",
+                           i_pid, i_pid, stream->pid[i_pid].i_cc, i_old_cc+1);
 
             /* Discontinuity has been handled */
             b_discontinuity_seen = false;
@@ -1579,22 +1674,31 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
 dump_packet:
         if (stream->level >= DVBPSI_MSG_DEBUG)
         {
-            printf("\n\t---------------------------------------------------------\n");
-            printf("\tTS Packet number %"PRId64", ES number %"PRId64", pid %d (0x%x)\n",
-                   stream->i_packets, stream->pid[i_pid].i_packets, i_pid, i_pid);
-#if defined(HAVE_SYS_TIME_H)
-            printf("\tReceived time: %"PRId64" ms\n", stream->pid[i_pid].i_received);
-#endif
-            ts_header_dump(&stream->pid[i_pid]);
-            ts_hexdump(&buf[i],188);
-            printf("\n\t---------------------------------------------------------\n");
+            ts_dump_packet_details(stdout, stream, &buf[i], i_pid);
         }
     }
 
     return true;
 }
 
-void libdvbpsi_summary(ts_stream_t *stream)
+void libdvbpsi_summary(FILE *fd, ts_stream_t *stream, const int summary_mode)
 {
-    summary(stream);
+    switch(summary_mode)
+    {
+        case SUM_TABLE:
+            summary_table(fd, stream);
+            break;
+        case SUM_PACKET:
+            summary_packet(fd, stream);
+            break;
+#if 0
+        case SUM_WIRE:
+            summary_wire(fd, stream);
+            break;
+#endif
+        case SUM_BANDWIDTH:
+        default:
+            summary(fd, stream);
+            break;
+    }
 }

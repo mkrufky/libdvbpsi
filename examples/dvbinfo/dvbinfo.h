@@ -23,6 +23,15 @@
 #ifndef DVBINFO_H_
 #define DVBINFO_H_
 
+/* defined loglevels for use within dvbinfo are as follows,
+ * they match to this order of syslog priority levels.
+ * { LOG_ERR, LOG_WARNING, LOG_INFO, LOG_DEBUG };
+ */
+#define DVBINFO_LOG_ERROR 0
+#define DVBINFO_LOG_WARN  1
+#define DVBINFO_LOG_INFO  2
+#define DVBINFO_LOG_DEBUG 3
+
 typedef struct params_s
 {
     /* parameters */
@@ -39,10 +48,21 @@ typedef struct params_s
     int  debug;
     bool b_verbose;
 
+    /* statistics */
+    bool b_summary; /* write summary */
+    struct summary_s {
+        int mode;       /* one of: i_summary_mode */
+        int64_t period; /* summary period in ms */
+        char *file;     /* summary file name    */
+        FILE *fd;       /* summary file descriptor */
+    } summary;
+
     /* read data from file of socket */
     ssize_t (*pf_read)(int fd, void *buf, size_t count);
     ssize_t (*pf_write)(int fd, const void *buf, size_t count);
+
+    /* logging function */
+    void (*pf_log)(const int level, const char *format, ...);
 } params_t;
 
 #endif
-

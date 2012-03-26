@@ -23,16 +23,24 @@
 #ifndef DVBINFO_DVBPSI_H_
 #define DVBINFO_DVBPSI_H_
 
+/* Date and time */
 typedef int64_t mtime_t;
 mtime_t mdate(void);
 
+/* Summary */
+#define SUM_BANDWIDTH 0
+#define SUM_TABLE     1
+#define SUM_PACKET    2
+#define SUM_WIRE      3
+
 /* MPEG-TS PSI decoders */
 typedef struct ts_stream_t ts_stream_t;
+typedef void (* ts_stream_log_cb)(void *data, const int level, const char *msg, ...);
 
 /* */
-ts_stream_t *libdvbpsi_init(int debug);
+ts_stream_t *libdvbpsi_init(int debug, ts_stream_log_cb pf_log, void *cb_data);
 bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_t date);
-void libdvbpsi_summary(ts_stream_t *stream);
+void libdvbpsi_summary(FILE *fd, ts_stream_t *stream, const int summary_mode);
 void libdvbpsi_exit(ts_stream_t *stream);
 
 #endif

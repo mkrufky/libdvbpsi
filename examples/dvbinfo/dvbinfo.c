@@ -25,7 +25,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #include <string.h>
+#include <limits.h>
 
 #if defined(HAVE_INTTYPES_H)
 #   include <inttypes.h>
@@ -38,6 +40,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+#include <syslog.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -60,6 +64,11 @@
 #   include "tcp.h"
 #endif
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+
+static const int   i_summary_mode[] = { SUM_BANDWIDTH, SUM_TABLE, SUM_PACKET, SUM_WIRE };
+static const char *psz_summary_mode[] = { "bandwidth", "table", "packet", "wire" };
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -70,8 +79,8 @@ typedef struct dvbinfo_capture_s
 
     size_t   size;  /* prefered capture size */
 
-    const params_t *params;
-    bool            b_alive;
+    params_t *params;
+    bool      b_alive;
 } dvbinfo_capture_t;
 
 /*****************************************************************************
@@ -80,40 +89,106 @@ typedef struct dvbinfo_capture_s
 static void usage(void)
 {
 #ifdef HAVE_SYS_SOCKET_H
-    printf("Usage: dvbinfo [-h] [-d <debug>] [-f| [[-u|-t] -i <ipaddress:port>] -o <outputfile>\n");
+    printf("Usage: dvbinfo [-h] [-d <debug>] [-f|-m| [[-u|-t] -i <ipaddress:port>] -o <outputfile>\n");
+    printf("               [-s [bandwidth|table|packet] --summary-file <file> --summary-period <ms>]\n");
 #else
     printf("Usage: dvbinfo [-h] [-d <debug>] [-f|\n");
 #endif
-    printf(" -d : debug level (default:none, error, warn, debug)\n");
-    printf(" -f : filename\n");
+    printf("\n");
+    printf(" -d | --debug          : debug level (default:none, error, warn, debug)\n");
+    printf(" -h | --help           : help information\n");
+    printf("\nInputs: \n");
+    printf(" -f | --file           : filename\n");
 #ifdef HAVE_SYS_SOCKET_H
-    printf(" -i : hostname or ipaddress\n");
-    printf(" -u : udp network transport\n");
-    printf(" -t : tcp network transport\n");
-    printf(" -o : output to filename\n");
+    printf(" -i | --ipadddress     : hostname or ipaddress\n");
+    printf(" -t | --tcp            : tcp network transport\n");
+    printf(" -u | --udp            : udp network transport\n");
+    printf("\nOutputs: \n");
+    printf(" -o | --output         : output incoming data to filename\n");
+    printf("\nStatistics: \n");
+    printf(" -m | --monitor        : monitor mode (run as unix daemon)\n");
+    printf(" -s | --summary=[<type>]:write summary for one of the modes (default: bandwidth):\n");
+    printf("                         bandwidth = bandwidth per elementary stream\n");
+    printf("                         table  = tables and descriptors\n");
+    printf("                         packet = decode packets and print structs\n");
+//    printf("                         wire = print arrival time per packet (wireshark like)\n");
+    printf("      --summary-file   : file to write summary information to (default: stdout)\n");
+    printf("      --summary-period : refresh summary file every n milliseconds (default: 1000ms)\n");
 #endif
-    printf(" -h : help information\n");
     exit(EXIT_FAILURE);
 }
 
-/* */
+/* Logging */
+static int log_level[] = { LOG_ERR, LOG_WARNING, LOG_INFO, LOG_DEBUG };
+static void log_remote(const int level, const char *format, ...)
+{
+    va_list ap;
+    char *msg = NULL;
+    va_start(ap, format);
+    int err = vasprintf(&msg, format, ap);
+    va_end(ap);
+    if (err != 1)
+    {
+        syslog(log_level[level], "%s", msg);
+        free(msg);
+    }
+}
+
+static const char *psz_level[] = { "ERROR", "WARNING", "INFO", "DEBUG" };
+static void log_local(const int level, const char *format, ...)
+{
+    va_list ap;
+    int err = 0;
+    char *msg = NULL;
+    va_start(ap, format);
+#if defined(_GNU_SOURCE)
+    err = vasprintf(&msg, format, ap);
+#else
+    msg = calloc(1, 1024);
+    if (msg)
+        err = vsnprintf(msg, 1024, format, ap);
+#endif
+    va_end(ap);
+    if (err != 1)
+    {
+        fprintf(stderr, "%s: %s", psz_level[level], msg);
+        free(msg);
+    }
+}
+
+static void libdvbpsi_log(void *data, const int level, const char *format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+    params_t *param = (params_t *)data;
+    if (param)
+        param->pf_log(level, format, ap);
+    va_end(ap);
+}
+
+/* Parameters */
 static params_t *params_init(void)
 {
     params_t *param;
     param = (params_t *) calloc(1, sizeof(params_t));
     if (param == NULL)
-    {
-        fprintf(stderr, "out of memory\n");
         exit(EXIT_FAILURE);
-    }
 
     param->fd_in = param->fd_out = -1;
     param->input = NULL;
     param->output = NULL;
-    param->debug = 0;
+
+    /* statistics */
+    param->b_summary = false;
+    param->summary.mode = SUM_BANDWIDTH;
+    param->summary.file = NULL;
+    param->summary.fd = stdout;
+    param->summary.period = 1000;
+
+    /* functions */
     param->pf_read = NULL;
     param->pf_write = NULL;
-
+    param->pf_log = log_local;
     return param;
 }
 
@@ -121,6 +196,7 @@ static void params_free(params_t *param)
 {
     free(param->input);
     free(param->output);
+    free(param->summary.file);
 }
 
 /* */
@@ -220,18 +296,29 @@ static void *dvbinfo_capture(void *data)
     return NULL;
 }
 
-static void dvbinfo_process(dvbinfo_capture_t *capture)
+static int dvbinfo_process(dvbinfo_capture_t *capture)
 {
+    int err = -1;
     bool b_error = false;
-    const params_t *param = capture->params;
+    params_t *param = capture->params;
     buffer_t *buffer = NULL;
 
-    ts_stream_t *stream = libdvbpsi_init(param->debug);
-    if (!stream)
+    char *psz_temp = NULL;
+    mtime_t deadline = 0;
+    if (param->b_summary)
     {
-        fprintf(stderr, "error: out of memory\n");
-        exit(EXIT_FAILURE);
+        if (asprintf(&psz_temp, "%s.part", param->summary.file) < 0)
+        {
+            param->pf_log(DVBINFO_LOG_ERROR, "Could not create temporary summary file %s\n",
+                          param->summary.file);
+            return err;
+        }
+        deadline = mdate() + param->summary.period;
     }
+
+    ts_stream_t *stream = libdvbpsi_init(param->debug, &libdvbpsi_log, (void *)param);
+    if (!stream)
+        goto out;
 
     while (!b_error)
     {
@@ -254,12 +341,12 @@ static void dvbinfo_process(dvbinfo_capture_t *capture)
             size_t size = param->pf_write(param->fd_out, buffer->p_data, buffer->i_size);
             if (size < 0) /* error writing */
             {
-                fprintf(stderr, "error (%d) writting to %s", errno, param->output);
+                param->pf_log(DVBINFO_LOG_ERROR, "error (%d) writting to %s", errno, param->output);
                 break;
             }
             else if (size < buffer->i_size) /* short writting disk full? */
             {
-                fprintf(stderr, "error writting to %s (disk full?)", param->output);
+                param->pf_log(DVBINFO_LOG_ERROR, "error writting to %s (disk full?)", param->output);
                 break;
             }
         }
@@ -267,17 +354,44 @@ static void dvbinfo_process(dvbinfo_capture_t *capture)
         if (!libdvbpsi_process(stream, buffer->p_data, buffer->i_size, buffer->i_date))
             b_error = true;
 
+        /* summary statistics */
+        if (param->b_summary)
+        {
+            if (mdate() >= deadline)
+            {
+                FILE *fd = fopen(psz_temp, "w+");
+                if (fd)
+                {
+                    libdvbpsi_summary(fd, stream, param->summary.mode);
+                    fflush(fd);
+                    fclose(fd);
+                    unlink(param->summary.file);
+                    rename(psz_temp, param->summary.file);
+                }
+                else
+                {
+                    param->pf_log(DVBINFO_LOG_ERROR, "failed opening summary file (disabling summary logging)\n");
+                    param->b_summary = false;
+                }
+                deadline = mdate() + param->summary.period;
+            }
+        }
+
         /* reuse buffer */
         fifo_push(capture->empty, buffer);
         buffer = NULL;
     }
 
     libdvbpsi_exit(stream);
+    err = 0;
 
+out:
     if (b_error)
-        fprintf(stderr, "error while processing\n" );
+        param->pf_log(DVBINFO_LOG_ERROR, "error while processing\n" );
 
-    buffer_free(buffer);
+    if (buffer) buffer_free(buffer);
+    free(psz_temp);
+    return err;
 }
 
 /*
@@ -286,35 +400,44 @@ static void dvbinfo_process(dvbinfo_capture_t *capture)
 int main(int argc, char **pp_argv)
 {
     dvbinfo_capture_t capture;
-    params_t *parm = NULL;
+    params_t *param = NULL;
+    bool b_monitor = false;
     char c;
 
-    printf("dvbinfo: Copyright (C) 2011 M2X BV\n");
+    printf("dvbinfo: Copyright (C) 2011-2012 M2X BV\n");
     printf("License: LGPL v2.1\n");
 
     if (argc == 1)
         usage();
 
-    parm = params_init();
-    capture.params = parm;
+    param = params_init();
+    capture.params = param;
     capture.fifo = fifo_new();
     capture.empty = fifo_new();
 
     static const struct option long_options[] =
     {
         { "debug",     required_argument, NULL, 'd' },
+        { "help",      no_argument,       NULL, 'h' },
+        /* - inputs - */
         { "file",      required_argument, NULL, 'f' },
 #ifdef HAVE_SYS_SOCKET_H
         { "ipaddress", required_argument, NULL, 'i' },
         { "tcp",       no_argument,       NULL, 't' },
         { "udp",       no_argument,       NULL, 'u' },
+        /* - outputs - */
         { "output",    required_argument, NULL, 'o' },
+        /* - daemon - */
+        { "monitor",   no_argument,       NULL, 'm' },
+        /* - statistics - */
+        { "summary",        required_argument, NULL, 's' },
+        { "summary-file",   required_argument, NULL, 'j' },
+        { "summary-period", required_argument, NULL, 'p' },
 #endif
-        { "help",      no_argument,       NULL, 'h' },
-        { 0, 0, 0, 0 }
+        { NULL, 0, NULL, 0 }
     };
 #ifdef HAVE_SYS_SOCKET_H
-    while ((c = getopt_long(argc, pp_argv, "d:f:i:ho:tu", long_options, NULL)) != -1)
+    while ((c = getopt_long(argc, pp_argv, "d:f:i:ho:ms:tu", long_options, NULL)) != -1)
 #else
     while ((c = getopt_long(argc, pp_argv, "d:f:h", long_options, NULL)) != -1)
 #endif
@@ -324,26 +447,27 @@ int main(int argc, char **pp_argv)
             case 'd':
                 if (optarg)
                 {
-                    parm->debug = 0;
+                    param->debug = 0;
                     if (strncmp(optarg, "error", 5) == 0)
-                        parm->debug = 1;
+                        param->debug = 1;
                     else if (strncmp(optarg, "warn", 4) == 0)
-                        parm->debug = 2;
+                        param->debug = 2;
                     else if (strncmp(optarg, "debug", 5) == 0)
-                        parm->debug = 3;
+                        param->debug = 3;
                 }
                 break;
 
             case 'f':
                 if (optarg)
                 {
-                    if (asprintf(&parm->input, "%s", optarg) < 0)
+                    if (asprintf(&param->input, "%s", optarg) < 0)
                     {
                         fprintf(stderr, "error: out of memory\n");
+                        params_free(param);
                         usage();
                     }
                     /* */
-                    parm->pf_read = read;
+                    param->pf_read = read;
                 }
                 break;
 
@@ -355,87 +479,173 @@ int main(int argc, char **pp_argv)
                     if (psz_tmp)
                     {
                         size_t len = strlen(psz_tmp);
-                        parm->port = strtol(&optarg[len+1], NULL, 0);
-                        parm->input = strdup(psz_tmp);
+                        param->port = strtol(&optarg[len+1], NULL, 0);
+                        param->input = strdup(psz_tmp);
                     }
-                    else usage();
+                    else
+                    {
+                        params_free(param);
+                        usage();
+                    }
                 }
+                break;
+
+            case 'm':
+                b_monitor = true;
+                param->pf_log = log_remote;
                 break;
 
             case 'o':
                 if (optarg)
                 {
-                    if (asprintf(&parm->output, "%s", optarg) < 0)
+                    if (asprintf(&param->output, "%s", optarg) < 0)
                     {
                         fprintf(stderr, "error: out of memory\n");
+                        params_free(param);
                         usage();
                     }
                     /* */
-                    parm->pf_write = write;
+                    param->pf_write = write;
                 }
                 break;
 
             case 't':
-                parm->b_tcp = true;
-                parm->pf_read = tcp_read;
+                param->b_tcp = true;
+                param->pf_read = tcp_read;
                 break;
 
             case 'u':
-                parm->b_udp = true;
-                parm->pf_read = udp_read;
+                param->b_udp = true;
+                param->pf_read = udp_read;
+                break;
+
+            /* - Statistics */
+            case 's':
+            {
+                param->b_summary = true;
+                ssize_t size = ARRAY_SIZE(psz_summary_mode);
+                for (unsigned int i = 0; i < size; i++)
+                {
+                    printf("summary mode %s\n", psz_summary_mode[i]);
+                    if (strncmp(optarg, psz_summary_mode[i], strlen(psz_summary_mode[i])) == 0)
+                    {
+                        param->summary.mode = i_summary_mode[i];
+                        break;
+                    }
+                }
+                break;
+            }
+            case 'j':
+                if (optarg)
+                {
+                    if (asprintf(&param->summary.file, "%s", optarg) < 0)
+                    {
+                        params_free(param);
+                        usage();
+                    }
+                }
+                break;
+
+            case 'p':
+                {
+                    char *end = NULL;
+                    param->summary.period = strtoll(optarg, &end, 10);
+                    if (((errno == ERANGE) &&
+                            ((param->summary.period == LLONG_MIN) ||
+                             (param->summary.period == LLONG_MAX))) ||
+                        ((errno != 0) && (param->summary.period == 0)))
+                    {
+                        fprintf(stderr, "Option --summary-period has invalid content %s\n", optarg);
+                        params_free(param);
+                        usage();
+                    }
+                }
                 break;
 #endif
+            case ':':
+                fprintf(stderr, "Option %c is missing arguments\n", c);
+                params_free(param);
+                exit(EXIT_FAILURE);
+                break;
 
             case '?':
                fprintf(stderr, "Unknown option %c found\n", c);
+               params_free(param);
                exit(EXIT_FAILURE);
                break;
 
             case 'h':
             default:
+                params_free(param);
                 usage();
                 break;
         }
     };
 
-    if (parm->input == NULL)
+#ifdef HAVE_SYS_SOCKET_H
+    if (b_monitor)
     {
-        fprintf(stderr, "No source given\n");
-        params_free(parm);
+        openlog("dvbinfo", LOG_PID, LOG_DAEMON);
+        if (daemon(1,0) < 0)
+        {
+            param->pf_log(DVBINFO_LOG_ERROR, "Failed to start in background\n");
+            params_free(param);
+            closelog();
+            usage(); /* exits application */
+        }
+        param->pf_log(DVBINFO_LOG_INFO, "dvbinfo: Copyright (C) 2011-2012 M2X BV\n");
+        param->pf_log(DVBINFO_LOG_ERROR, "License: LGPL v2.1\n");
+    }
+#endif
+
+    if (param->input == NULL)
+    {
+        param->pf_log(DVBINFO_LOG_ERROR, "No source given\n");
+        params_free(param);
+#ifdef HAVE_SYS_SOCKET_H
+        if (b_monitor)
+            closelog();
+#endif
+        params_free(param);
         usage(); /* exits application */
     }
 
 #ifdef HAVE_SYS_SOCKET_H
-    if (parm->b_udp || parm->b_tcp)
+    if (param->b_udp || param->b_tcp)
     {
         capture.size = 7*188;
-        printf("Listen: host=%s port=%d\n", parm->input, parm->port);
+        param->pf_log(DVBINFO_LOG_INFO, "Listen: host=%s port=%d\n", param->input, param->port);
     }
     else
 #endif
     {
         capture.size = 188;
-        printf("Examining: %s\n", parm->input);
+        param->pf_log(DVBINFO_LOG_INFO, "Examining: %s\n", param->input);
     }
 
-    /* */
-    dvbinfo_open(parm);
+    /* Capture thread */
+    dvbinfo_open(param);
     pthread_t handle;
     capture.b_alive = true;
     if (pthread_create(&handle, NULL, dvbinfo_capture, (void *)&capture) < 0)
     {
-        fprintf(stderr, "failed creating thread\n");
-        dvbinfo_close(parm);
+        param->pf_log(DVBINFO_LOG_ERROR, "failed creating thread\n");
+        dvbinfo_close(param);
+#ifdef HAVE_SYS_SOCKET_H
+        if (b_monitor)
+            closelog();
+#endif
+        params_free(param);
         exit(EXIT_FAILURE);
     }
-    dvbinfo_process(&capture);
+    int err = dvbinfo_process(&capture);
     capture.b_alive = false;     /* stop thread */
     if (pthread_join(handle, NULL) < 0)
-        fprintf(stderr, "error joining capture thread\n");
-    dvbinfo_close(parm);
+        param->pf_log(DVBINFO_LOG_ERROR, "error joining capture thread\n");
+    dvbinfo_close(param);
 
     /* cleanup */
-    params_free(parm);
+    params_free(param);
 
     fifo_wake((&capture)->fifo);
     fifo_wake((&capture)->empty);
@@ -443,5 +653,12 @@ int main(int argc, char **pp_argv)
     fifo_free((&capture)->fifo);
     fifo_free((&capture)->empty);
 
-    exit(EXIT_SUCCESS);
+#ifdef HAVE_SYS_SOCKET_H
+    if (b_monitor)
+        closelog();
+#endif
+    if (err < 0)
+        exit(EXIT_FAILURE);
+    else
+        exit(EXIT_SUCCESS);
 }
