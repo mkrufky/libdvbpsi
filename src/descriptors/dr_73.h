@@ -43,8 +43,8 @@ extern "C" {
  */
 typedef struct dvbpsi_default_authority_dr_s
 {
-    uint8_t authority[255];
-}dvbpsi_default_authority_dr_t;
+    uint8_t authority[255]; /*< default authorizty descriptor */
+} dvbpsi_default_authority_dr_t;
 
 /*****************************************************************************
  * dvbpsi_DecodeLCNDr
@@ -63,6 +63,3 @@ dvbpsi_default_authority_dr_t *dvbpsi_DecodeDefaultAuthorityDr(dvbpsi_descriptor
 #endif
 
 #endif
-
-
-

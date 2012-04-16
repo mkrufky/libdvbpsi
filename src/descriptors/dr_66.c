@@ -33,6 +33,22 @@ Decode Data Broadcast Id Descriptor.
 
 #include "dr_66.h"
 
+static dvbpsi_data_broadcast_id_dr_t *NewDataBroadcastDr(const size_t i_private)
+{
+    dvbpsi_data_broadcast_id_dr_t *p_bcast;
+
+    if (i_private <= 0)
+        return NULL;
+
+    p_bcast = (dvbpsi_data_broadcast_id_dr_t *)
+                calloc(1, sizeof(dvbpsi_data_broadcast_id_dr_t) + i_private);
+    if (p_bcast)
+    {
+        p_bcast->p_id_selector = p_bcast + sizeof(dvbpsi_data_broadcast_id_dr_t);
+        p_bcast->i_id_selector_len = i_private;
+    }
+    return p_bcast;
+}
 
 /*****************************************************************************
  * dvbpsi_DecodeDataBroadcastIdDr
@@ -53,18 +69,11 @@ dvbpsi_data_broadcast_id_dr_t *dvbpsi_DecodeDataBroadcastIdDr(dvbpsi_descriptor_
     if (p_descriptor->i_length < 2)
         return NULL;
     
-    p_decoded = (dvbpsi_data_broadcast_id_dr_t*)malloc(sizeof(dvbpsi_data_broadcast_id_dr_t));
+    p_decoded = NewDataBroadcastDr(p_descriptor->i_length - 2);
     if (!p_decoded)
         return NULL;
 
-    p_decoded->p_id_selector = malloc(p_descriptor->i_length - 2);
-    if (!p_decoded->p_id_selector)
-    {
-        free(p_decoded);
-        return NULL;
-    }
     p_decoded->i_data_broadcast_id = ((p_descriptor->p_data[0] & 0xff) << 8) | (p_descriptor->p_data[1] & 0xff);
-    p_decoded->i_id_selector_len = p_descriptor->i_length - 2;
     memcpy(p_decoded->p_id_selector, &p_descriptor->p_data[2], p_decoded->i_id_selector_len);
     p_descriptor->p_decoded = (void*)p_decoded;
 

@@ -38,10 +38,12 @@ Decode Data Broadcast id Descriptor.
  */
 typedef struct dvbpsi_data_broadcast_id_dr_s
 {
-    uint16_t i_data_broadcast_id;
-    uint8_t  i_id_selector_len;
-    uint8_t  *p_id_selector; /*< release allocated memory */
-}dvbpsi_data_broadcast_id_dr_t;
+    uint16_t i_data_broadcast_id; /*< broadcast identifier */
+    uint8_t  i_id_selector_len;   /*< length of selector data in bytes */
+    uint8_t  *p_id_selector;      /*< pointer to selector data. Memory is allocated
+                                      right after sizeof struct, when freeing this
+                                      struct the private data is freed at the same time. */
+} dvbpsi_data_broadcast_id_dr_t;
 
 /*****************************************************************************
  * dvbpsi_DecodeDataBroadcastIdDr

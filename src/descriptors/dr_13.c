@@ -33,6 +33,20 @@ Decode Carousel Id Descriptor.
 
 #include "dr_13.h"
 
+static dvbpsi_carousel_id_dr_t *NewCarouselDr(const size_t i_private)
+{
+    dvbpsi_carousel_id_dr_t *p_carousel;
+    if (i_private <= 0)
+        return NULL;
+    p_carousel = (dvbpsi_carousel_id_dr_t *)
+                    calloc(1, sizeof(dvbpsi_carousel_id_dr_t) + i_private);
+    if (p_carousel)
+    {
+        p_carousel->p_private_data = p_carousel + sizeof(dvbpsi_carousel_id_dr_t);
+        p_carousel->i_private_data_len = i_private;
+    }
+    return p_carousel;
+}
 
 /*****************************************************************************
  * dvbpsi_DecodeCarouselIdDr
@@ -53,17 +67,9 @@ dvbpsi_carousel_id_dr_t *dvbpsi_DecodeCarouselIdDr(dvbpsi_descriptor_t *p_descri
     if (p_descriptor->i_length < 4)
         return NULL;
 
-    p_decoded = (dvbpsi_carousel_id_dr_t*)malloc(sizeof(dvbpsi_carousel_id_dr_t));
+    p_decoded = NewCarouselDr(p_descriptor->i_length - 4);
     if (!p_decoded)
         return NULL;
-
-    p_decoded->p_private_data = malloc(p_descriptor->i_length - 4);
-    if (!p_decoded->s_private_data)
-    {
-        free(p_decoded);
-        return NULL;
-    }
-    p_decoded->i_private_data_len = p_descriptor->i_length - 4;
 
     p_decoded->i_carousel_id = ((p_descriptor->p_data[0] & 0xff) << 24) | ((p_descriptor->p_data[1] & 0xff) << 16)|
                                ((p_descriptor->p_data[2] & 0xff) <<  8) |  (p_descriptor->p_data[3] & 0xff);

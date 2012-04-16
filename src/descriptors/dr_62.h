@@ -77,5 +77,3 @@ uint32_t dvbpsi_Bcd8ToUint32(uint32_t bcd);
 #endif
 
 #endif
-
-

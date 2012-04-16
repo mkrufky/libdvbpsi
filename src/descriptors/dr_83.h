@@ -45,8 +45,8 @@ typedef struct dvbpsi_lcn_entry_s
 {
     uint16_t i_service_id;             /*!< Service ID this logical channel number refers to */
     int      b_visible_service_flag;   /*!< Whether this LCN should be visible to the user. */
-    uint16_t i_logical_channel_number; /*!<The logical channel number for this service. */
-}dvbpsi_lcn_entry_t;
+    uint16_t i_logical_channel_number; /*!< The logical channel number for this service. */
+} dvbpsi_lcn_entry_t;
 
 /*****************************************************************************
  * dvbpsi_lcn_dr_s

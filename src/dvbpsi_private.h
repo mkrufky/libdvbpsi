@@ -30,6 +30,8 @@
 
 #include <stdarg.h>
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+
 extern uint32_t dvbpsi_crc32_table[];
 
 /*****************************************************************************

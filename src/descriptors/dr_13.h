@@ -38,10 +38,12 @@ Decode Carousel id Descriptor.
  */
 typedef struct dvbpsi_carousel_id_dr_s
 {
-    uint32_t i_carousel_id;
-    uint8_t  i_private_data_len;
-    uint8_t *p_private_data;    /*< allocated memory must be released */
-}dvbpsi_carousel_id_dr_t;
+    uint32_t i_carousel_id;      /*< carousel identifier */
+    uint8_t  i_private_data_len; /*< length of private data pointer in bytes */
+    uint8_t *p_private_data;     /*< memory is allocated right after sizeof struct,
+                                     when freeing this struct the private data is
+                                     freed at the same time. */
+} dvbpsi_carousel_id_dr_t;
 
 /*****************************************************************************
  * dvbpsi_DecodeCarouselIdDr
@@ -57,7 +59,3 @@ typedef struct dvbpsi_carousel_id_dr_s
 dvbpsi_carousel_id_dr_t *dvbpsi_DecodeCarouselIdDr(dvbpsi_descriptor_t *p_descriptor);
 
 #endif
-
-
-
-

@@ -33,6 +33,25 @@ Decode Assocation Tag Descriptor.
 
 #include "dr_14.h"
 
+static dvbpsi_association_tag_dr_t *NewAssociationTagDr(const size_t i_selector, const size_t i_private)
+{
+    dvbpsi_association_tag_dr_t *p_tag;
+
+    if ((i_selector <= 0) || (i_private <= 0))
+        return NULL;
+
+    size_t i_size = sizeof(dvbpsi_association_tag_dr_t) + i_selector + i_private;
+    p_tag = (dvbpsi_association_tag_dr_t*) calloc(1, i_size);
+    if (p_tag)
+    {
+        p_tag->p_selector = p_tag + sizeof(dvbpsi_association_tag_dr_t);
+        p_tag->i_selector_len = i_selector;
+
+        p_tag->p_private_data = p_tag->p_selector + i_selector;
+        p_tag->i_private_data_len = i_private;
+    }
+    return p_tag;
+}
 
 /*****************************************************************************
  * dvbpsi_DecodeAssociationTagDr
@@ -56,41 +75,23 @@ dvbpsi_association_tag_dr_t *dvbpsi_DecodeAssociationTagDr(dvbpsi_descriptor_t *
         return NULL;
 
     selector_len = p_descriptor->p_data[4];
+    private_data_len = p_descriptor->i_length - (5 + selector_len);
 
     /* Invalid selector length */
     if (selector_len + 5 > p_descriptor->i_length)
         return NULL;
 
-    private_data_len= p_descriptor->i_length - (5 + selector_len);
-    p_decoded = (dvbpsi_association_tag_dr_t*)malloc(sizeof(dvbpsi_association_tag_dr_t));
+    p_decoded = NewAssociationTagDr(selector_len, private_data_len);
     if (!p_decoded)
         return NULL;
 
-    p_decoded->p_selector = malloc(selector_len);
-    if (!p_decoded->p_selector)
-    {
-        free(p_decoder);
-        return NULL;
-    }
-
-    p_decoded->p_private_data = malloc(private_data_len);
-    if (!p_decoded->p_private_data)
-    {
-        free(p_decoded->p_selector);
-        free(p_decoder);
-        return NULL;
-    }
-
     p_decoded->i_tag = ((p_descriptor->p_data[0] & 0xff) << 8) | (p_descriptor->p_data[1] & 0xff);
     p_decoded->i_use = ((p_descriptor->p_data[2] & 0xff) << 8) | (p_descriptor->p_data[3] & 0xff);
-    p_decoded->i_selector_len = selector_len;
-    p_decoded->i_private_data_len= private_data_len;
-    p_decoded->p_selector = ((void*)p_decoded) + sizeof(dvbpsi_association_tag_dr_t);
-    p_decoded->p_private_data = p_decoded->p_selector + selector_len;
+
     memcpy(p_decoded->p_selector, &p_descriptor->p_data[5], selector_len);
     memcpy(p_decoded->p_private_data, &p_descriptor->p_data[5 + selector_len], private_data_len);
+
     p_descriptor->p_decoded = (void*)p_decoded;
 
     return p_decoded;
 }
-
