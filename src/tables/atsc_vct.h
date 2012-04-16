@@ -66,7 +66,6 @@ typedef struct dvbpsi_atsc_vct_channel_s
     struct dvbpsi_atsc_vct_channel_s *p_next;         /*!< next element of the list */
 } dvbpsi_atsc_vct_channel_t;
 
-
 /*****************************************************************************
  * dvbpsi_atsc_vct_t
  *****************************************************************************/
@@ -93,7 +92,6 @@ typedef struct dvbpsi_atsc_vct_s
     dvbpsi_descriptor_t    *p_first_descriptor; /*!< First descriptor. */
 } dvbpsi_atsc_vct_t;
 
-
 /*****************************************************************************
  * dvbpsi_vct_callback
  *****************************************************************************/
@@ -103,7 +101,6 @@ typedef struct dvbpsi_atsc_vct_s
  * \brief Callback type definition.
  */
 typedef void (* dvbpsi_atsc_vct_callback)(void* p_cb_data, dvbpsi_atsc_vct_t* p_new_vct);
-
 
 /*****************************************************************************
  * dvbpsi_atsc_AttachVCT
@@ -123,7 +120,6 @@ typedef void (* dvbpsi_atsc_vct_callback)(void* p_cb_data, dvbpsi_atsc_vct_t* p_
 int dvbpsi_atsc_AttachVCT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_atsc_vct_callback pf_callback, void* p_cb_data);
 
-
 /*****************************************************************************
  * dvbpsi_DetachVCT
  *****************************************************************************/
@@ -138,7 +134,6 @@ int dvbpsi_atsc_AttachVCT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  */
 void dvbpsi_atsc_DetachVCT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension);
-
 
 /*****************************************************************************
  * dvbpsi_atsc_InitVCT/dvbpsi_atsc_NewVCT
@@ -178,7 +173,6 @@ do {                                                                     \
         i_ts_id, b_cable_vct);                                           \
 } while(0);
 
-
 /*****************************************************************************
  * dvbpsi_atsc_EmptyVCT/dvbpsi_atsc_DeleteVCT
  *****************************************************************************/
@@ -207,4 +201,3 @@ do {                                                                     \
 #endif
 
 #endif
-

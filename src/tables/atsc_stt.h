@@ -51,7 +51,6 @@ typedef struct dvbpsi_atsc_stt_s
     dvbpsi_descriptor_t    *p_first_descriptor; /*!< First descriptor. */
 } dvbpsi_atsc_stt_t;
 
-
 /*****************************************************************************
  * dvbpsi_atsc_stt_callback
  *****************************************************************************/
@@ -61,7 +60,6 @@ typedef struct dvbpsi_atsc_stt_s
  * \brief Callback type definition.
  */
 typedef void (* dvbpsi_atsc_stt_callback)(void* p_cb_data, dvbpsi_atsc_stt_t* p_new_stt);
-
 
 /*****************************************************************************
  * dvbpsi_atsc_AttachSTT
@@ -80,7 +78,6 @@ typedef void (* dvbpsi_atsc_stt_callback)(void* p_cb_data, dvbpsi_atsc_stt_t* p_
 int dvbpsi_atsc_AttachSTT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
           dvbpsi_atsc_stt_callback pf_callback, void* p_cb_data);
 
-
 /*****************************************************************************
  * dvbpsi_atsc_DetachSTT
  *****************************************************************************/
@@ -95,7 +92,6 @@ int dvbpsi_atsc_AttachSTT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  * \return nothing.
  */
 void dvbpsi_atsc_DetachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_t i_externsion);
-
 
 /*****************************************************************************
  * dvbpsi_atsc_InitSTT/dvbpsi_atsc_NewSTT
@@ -123,7 +119,6 @@ do {                                                                     \
   if(p_stt != NULL)                                                      \
     dvbpsi_atsc_InitSTT(p_stt, i_protocol);                              \
 } while(0);
-
 
 /*****************************************************************************
  * dvbpsi_atsc_EmptySTT
@@ -153,4 +148,3 @@ do {                                                                     \
 #endif
 
 #endif
-

@@ -53,7 +53,6 @@ typedef struct dvbpsi_atsc_mgt_table_s
     struct dvbpsi_atsc_mgt_table_s *p_next;         /*!< next element of the list */
 } dvbpsi_atsc_mgt_table_t;
 
-
 /*****************************************************************************
  * dvbpsi_atsc_mgt_t
  *****************************************************************************/
@@ -79,7 +78,6 @@ typedef struct dvbpsi_atsc_mgt_s
     dvbpsi_descriptor_t    *p_first_descriptor; /*!< First descriptor. */
 } dvbpsi_atsc_mgt_t;
 
-
 /*****************************************************************************
  * dvbpsi_mgt_callback
  *****************************************************************************/
@@ -89,7 +87,6 @@ typedef struct dvbpsi_atsc_mgt_s
  * \brief Callback type definition.
  */
 typedef void (* dvbpsi_atsc_mgt_callback)(void* p_cb_data, dvbpsi_atsc_mgt_t* p_new_mgt);
-
 
 /*****************************************************************************
  * dvbpsi_atsc_AttachMGT
@@ -109,7 +106,6 @@ typedef void (* dvbpsi_atsc_mgt_callback)(void* p_cb_data, dvbpsi_atsc_mgt_t* p_
 int dvbpsi_atsc_AttachMGT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_atsc_mgt_callback pf_callback, void* p_cb_data);
 
-
 /*****************************************************************************
  * dvbpsi_DetachMGT
  *****************************************************************************/
@@ -124,7 +120,6 @@ int dvbpsi_atsc_AttachMGT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  */
 void dvbpsi_atsc_DetachMGT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension);
-
 
 /*****************************************************************************
  * dvbpsi_atsc_InitMGT/dvbpsi_atsc_NewMGT
@@ -161,7 +156,6 @@ do {                                                                     \
     dvbpsi_atsc_InitMGT(p_mgt, i_version, b_current_next, i_protocol,    \
         i_table_id_extension);                                           \
 } while(0);
-
 
 /*****************************************************************************
  * dvbpsi_atsc_EmptyMGT/dvbpsi_atsc_DeleteMGT

@@ -79,7 +79,6 @@ typedef struct dvbpsi_atsc_eit_s
 
 } dvbpsi_atsc_eit_t;
 
-
 /*****************************************************************************
  * dvbpsi_eit_callback
  *****************************************************************************/
@@ -89,7 +88,6 @@ typedef struct dvbpsi_atsc_eit_s
  * \brief Callback type definition.
  */
 typedef void (* dvbpsi_atsc_eit_callback)(void* p_cb_data, dvbpsi_atsc_eit_t* p_new_eit);
-
 
 /*****************************************************************************
  * dvbpsi_atsc_AttachEIT
@@ -109,7 +107,6 @@ typedef void (* dvbpsi_atsc_eit_callback)(void* p_cb_data, dvbpsi_atsc_eit_t* p_
 int dvbpsi_atsc_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_atsc_eit_callback pf_callback, void* p_cb_data);
 
-
 /*****************************************************************************
  * dvbpsi_DetachEIT
  *****************************************************************************/
@@ -124,7 +121,6 @@ int dvbpsi_atsc_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  */
 void dvbpsi_atsc_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
           uint16_t i_extension);
-
 
 /*****************************************************************************
  * dvbpsi_atsc_InitEIT/dvbpsi_atsc_NewEIT
@@ -193,4 +189,3 @@ do {                                                                     \
 #endif
 
 #endif
-
