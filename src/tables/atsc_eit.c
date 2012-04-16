@@ -88,7 +88,6 @@ int dvbpsi_atsc_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id, 
     DVBPSI_ERROR_ARG("EIT decoder",
                      "Already a decoder for (table_id == 0x%02x extension == 0x%04x)",
                      i_table_id, i_extension);
-
     return 1;
   }
 
@@ -99,7 +98,6 @@ int dvbpsi_atsc_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id, 
   }
 
   p_eit_decoder = (dvbpsi_atsc_eit_decoder_t*)malloc(sizeof(dvbpsi_atsc_eit_decoder_t));
-
   if(p_eit_decoder == NULL)
   {
     free(p_subdec);
@@ -128,7 +126,6 @@ int dvbpsi_atsc_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id, 
   return 0;
 }
 
-
 /*****************************************************************************
  * dvbpsi_atsc_DetachEIT
  *****************************************************************************
@@ -140,11 +137,8 @@ void dvbpsi_atsc_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   dvbpsi_demux_subdec_t** pp_prev_subdec;
   dvbpsi_atsc_eit_decoder_t* p_eit_decoder;
 
-  unsigned int i;
-
   p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
-
-  if(p_demux == NULL)
+  if(p_subdec == NULL)
   {
     DVBPSI_ERROR_ARG("EIT Decoder",
                      "No such EIT decoder (table_id == 0x%02x,"
@@ -154,12 +148,13 @@ void dvbpsi_atsc_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   }
 
   p_eit_decoder = (dvbpsi_atsc_eit_decoder_t*)p_subdec->p_cb_data;
-  if (p_eit_decoder->p_building_eit)
-  {
-    free(p_eit_decoder->p_building_eit);
-  }
+  if (!p_eit_decoder)
+      return;
 
-  for(i = 0; i <= 255; i++)
+  if (p_eit_decoder->p_building_eit)
+     free(p_eit_decoder->p_building_eit);
+
+  for(unsigned int i = 0; i <= 255; i++)
   {
     if(p_eit_decoder->ap_sections[i])
       dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[i]);
@@ -175,14 +170,13 @@ void dvbpsi_atsc_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   free(p_subdec);
 }
 
-
 /*****************************************************************************
  * dvbpsi_atsc_InitEIT
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_atsc_eit_t structure.
  *****************************************************************************/
 void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit,uint8_t i_version, int b_current_next,
-                       uint8_t i_protocol, uint16_t i_source_id)
+                         uint8_t i_protocol, uint16_t i_source_id)
 {
   p_eit->i_version = i_version;
   p_eit->b_current_next = b_current_next;
@@ -190,7 +184,6 @@ void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit,uint8_t i_version, int b_curre
   p_eit->i_source_id = i_source_id;
   p_eit->p_first_event = NULL;
 }
-
 
 /*****************************************************************************
  * dvbpsi_atsc_EmptyEIT
@@ -226,7 +219,6 @@ dvbpsi_atsc_eit_event_t *dvbpsi_atsc_EITAddEvent(dvbpsi_atsc_eit_t* p_eit,
 {
   dvbpsi_atsc_eit_event_t * p_event
                 = (dvbpsi_atsc_eit_event_t*)malloc(sizeof(dvbpsi_atsc_eit_event_t));
-
   if(p_event)
   {
     p_event->i_event_id = i_event_id;
@@ -255,7 +247,6 @@ dvbpsi_atsc_eit_event_t *dvbpsi_atsc_EITAddEvent(dvbpsi_atsc_eit_t* p_eit,
 
   return p_event;
 }
-
 
 /*****************************************************************************
  * dvbpsi_EITTableAddDescriptor
@@ -287,7 +278,6 @@ dvbpsi_descriptor_t *dvbpsi_atsc_EITChannelAddDescriptor(
 
   return p_descriptor;
 }
-
 
 /*****************************************************************************
  * dvbpsi_atsc_GatherEITSections
@@ -531,5 +521,3 @@ void dvbpsi_atsc_DecodeEITSections(dvbpsi_atsc_eit_t* p_eit,
     p_section = p_section->p_next;
   }
 }
-
-

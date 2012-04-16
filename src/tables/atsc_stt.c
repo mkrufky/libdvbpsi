@@ -81,7 +81,6 @@ int dvbpsi_atsc_AttachSTT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
   }
 
   p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)malloc(sizeof(dvbpsi_atsc_stt_decoder_t));
-
   if(p_stt_decoder == NULL)
   {
     free(p_subdec);
@@ -105,7 +104,6 @@ int dvbpsi_atsc_AttachSTT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
   return 0;
 }
 
-
 /*****************************************************************************
  * dvbpsi_atsc_DetachSTT
  *****************************************************************************
@@ -118,8 +116,7 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   dvbpsi_atsc_stt_decoder_t* p_stt_decoder;
 
   p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0);
-
-  if(p_demux == NULL)
+  if(p_subdec == NULL)
   {
     DVBPSI_ERROR_ARG("STT Decoder",
                      "No such STT decoder (table_id == 0x%02x,"
@@ -129,6 +126,8 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   }
 
   p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)p_subdec->p_cb_data;
+  if(!p_stt_decoder)
+      return;
 
   free(p_subdec->p_cb_data);
 
@@ -140,7 +139,6 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   free(p_subdec);
 }
 
-
 /*****************************************************************************
  * dvbpsi_atsc_InitSTT
  *****************************************************************************
@@ -151,7 +149,6 @@ void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_protocol)
   p_stt->i_protocol = i_protocol;
   p_stt->p_first_descriptor = NULL;
 }
-
 
 /*****************************************************************************
  * dvbpsi_atsc_EmptySTT
@@ -176,7 +173,6 @@ dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor(
 {
   dvbpsi_descriptor_t * p_descriptor
                         = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
-
   if(p_descriptor)
   {
     if(p_stt->p_first_descriptor == NULL)
@@ -207,6 +203,9 @@ void dvbpsi_atsc_GatherSTTSections(dvbpsi_decoder_t * p_psi_decoder,
   dvbpsi_atsc_stt_decoder_t * p_stt_decoder
                         = (dvbpsi_atsc_stt_decoder_t*)p_private_decoder;
 
+  if(!p_stt_decoder)
+      return;
+
   dvbpsi_atsc_stt_t *p_stt;
 
   if(!p_section->b_syntax_indicator)
@@ -214,7 +213,6 @@ void dvbpsi_atsc_GatherSTTSections(dvbpsi_decoder_t * p_psi_decoder,
     /* Invalid section_syntax_indicator */
     DVBPSI_ERROR("STT decoder",
                  "invalid section (section_syntax_indicator == 0)");
-
   }
   else
   {
@@ -222,19 +220,15 @@ void dvbpsi_atsc_GatherSTTSections(dvbpsi_decoder_t * p_psi_decoder,
       if (p_stt)
       {
           /* Decode the sections */
-          dvbpsi_atsc_DecodeSTTSections(p_stt,
-                                  p_section);
+          dvbpsi_atsc_DecodeSTTSections(p_stt, p_section);
           /* Delete the sections */
           dvbpsi_DeletePSISections(p_section);
           /* signal the new STT */
           p_stt_decoder->pf_callback(p_stt_decoder->p_cb_data,
                                      p_stt);
       }
-
   }
-
 }
-
 
 /*****************************************************************************
  * dvbpsi_DecodeSTTSection
@@ -268,6 +262,4 @@ void dvbpsi_atsc_DecodeSTTSections(dvbpsi_atsc_stt_t* p_stt,
           dvbpsi_atsc_STTAddDescriptor(p_stt, i_tag, i_length, p_byte + 2);
         p_byte += 2 + i_length;
     }
-
 }
-

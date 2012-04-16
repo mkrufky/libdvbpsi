@@ -37,7 +37,6 @@ Decode PSIP Extended Text Table.
  *****************************************************************************
  * ETM Version information.
  *****************************************************************************/
-
 typedef struct dvbpsi_atsc_ett_etm_version_s
 {
     uint32_t i_etm_id;
@@ -90,7 +89,6 @@ int dvbpsi_atsc_AttachETT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id, 
     DVBPSI_ERROR_ARG("ETT decoder",
                      "Already a decoder for (table_id == 0x%02x extension == 0x%04x)",
                      i_table_id, i_extension);
-
     return 1;
   }
 
@@ -101,7 +99,6 @@ int dvbpsi_atsc_AttachETT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id, 
   }
 
   p_ett_decoder = (dvbpsi_atsc_ett_decoder_t*)malloc(sizeof(dvbpsi_atsc_ett_decoder_t));
-
   if(p_ett_decoder == NULL)
   {
     free(p_subdec);
@@ -126,7 +123,6 @@ int dvbpsi_atsc_AttachETT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id, 
   return 0;
 }
 
-
 /*****************************************************************************
  * dvbpsi_atsc_DetachETT
  *****************************************************************************
@@ -137,9 +133,9 @@ void dvbpsi_atsc_DetachETT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   dvbpsi_demux_subdec_t* p_subdec;
   dvbpsi_demux_subdec_t** pp_prev_subdec;
   dvbpsi_atsc_ett_decoder_t* p_ett_decoder;
-  p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
 
-  if(p_demux == NULL)
+  p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
+  if(p_subdec == NULL)
   {
     DVBPSI_ERROR_ARG("ETT Decoder",
                      "No such ETT decoder (table_id == 0x%02x,"
@@ -149,6 +145,9 @@ void dvbpsi_atsc_DetachETT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   }
 
   p_ett_decoder = (dvbpsi_atsc_ett_decoder_t*)p_subdec->p_cb_data;
+  if(!p_ett_decoder)
+      return;
+
   dvbpsi_atsc_ett_etm_version_t *p_etm_version, *p_next;
   for (p_etm_version = p_ett_decoder->p_etm_versions; p_etm_version; p_etm_version = p_next)
   {
@@ -165,7 +164,6 @@ void dvbpsi_atsc_DetachETT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   *pp_prev_subdec = p_subdec->p_next;
   free(p_subdec);
 }
-
 
 /*****************************************************************************
  * dvbpsi_atsc_InitETT
@@ -219,6 +217,8 @@ void dvbpsi_atsc_GatherETTSections(dvbpsi_decoder_t* p_psi_decoder,
 {
   dvbpsi_atsc_ett_decoder_t* p_ett_decoder
                         = (dvbpsi_atsc_ett_decoder_t*)p_private_decoder;
+  if(!p_ett_decoder)
+      return;
 
   if(p_section->i_table_id == 0xCC)
   {
@@ -261,7 +261,6 @@ void dvbpsi_atsc_GatherETTSections(dvbpsi_decoder_t* p_psi_decoder,
 
   dvbpsi_DeletePSISections(p_section);
 }
-
 
 /*****************************************************************************
  * dvbpsi_atsc_DecodeETTSection

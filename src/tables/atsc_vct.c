@@ -112,7 +112,6 @@ int dvbpsi_atsc_AttachVCT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id, 
   }
 
   p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)malloc(sizeof(dvbpsi_atsc_vct_decoder_t));
-
   if(p_vct_decoder == NULL)
   {
     free(p_subdec);
@@ -156,8 +155,7 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   unsigned int i;
 
   p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
-
-  if(p_demux == NULL)
+  if(p_subdec == NULL)
   {
     DVBPSI_ERROR_ARG("VCT Decoder",
                      "No such VCT decoder (table_id == 0x%02x,"
@@ -167,6 +165,9 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   }
 
   p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)p_subdec->p_cb_data;
+  if(!p_vct_decoder)
+      return;
+
   if (p_vct_decoder->p_building_vct)
   {
     free(p_vct_decoder->p_building_vct);
@@ -187,7 +188,6 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
   *pp_prev_subdec = p_subdec->p_next;
   free(p_subdec);
 }
-
 
 /*****************************************************************************
  * dvbpsi_atsc_InitVCT
@@ -240,7 +240,6 @@ dvbpsi_descriptor_t *dvbpsi_atsc_VCTAddDescriptor(
 {
   dvbpsi_descriptor_t * p_descriptor
                         = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
-
   if(p_descriptor)
   {
     if(p_vct->p_first_descriptor == NULL)
@@ -282,7 +281,6 @@ dvbpsi_atsc_vct_channel_t *dvbpsi_atsc_VCTAddChannel(dvbpsi_atsc_vct_t* p_vct,
 {
   dvbpsi_atsc_vct_channel_t * p_channel
                 = (dvbpsi_atsc_vct_channel_t*)malloc(sizeof(dvbpsi_atsc_vct_channel_t));
-
   if(p_channel)
   {
     memcpy(p_channel->i_short_name, p_short_name, sizeof(uint16_t) * 7);
@@ -320,7 +318,6 @@ dvbpsi_atsc_vct_channel_t *dvbpsi_atsc_VCTAddChannel(dvbpsi_atsc_vct_t* p_vct,
   return p_channel;
 }
 
-
 /*****************************************************************************
  * dvbpsi_VCTTableAddDescriptor
  *****************************************************************************
@@ -333,7 +330,6 @@ dvbpsi_descriptor_t *dvbpsi_atsc_VCTChannelAddDescriptor(
 {
   dvbpsi_descriptor_t * p_descriptor
                         = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
-
   if(p_descriptor)
   {
     if(p_channel->p_first_descriptor == NULL)
@@ -351,7 +347,6 @@ dvbpsi_descriptor_t *dvbpsi_atsc_VCTChannelAddDescriptor(
 
   return p_descriptor;
 }
-
 
 /*****************************************************************************
  * dvbpsi_atsc_GatherVCTSections
@@ -541,7 +536,6 @@ void dvbpsi_atsc_GatherVCTSections(dvbpsi_decoder_t * p_psi_decoder,
   }
 }
 
-
 /*****************************************************************************
  * dvbpsi_DecodeVCTSection
  *****************************************************************************
@@ -621,4 +615,3 @@ void dvbpsi_atsc_DecodeVCTSections(dvbpsi_atsc_vct_t* p_vct,
     p_section = p_section->p_next;
   }
 }
-
