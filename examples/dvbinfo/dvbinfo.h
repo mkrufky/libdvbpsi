@@ -47,6 +47,7 @@ typedef struct params_s
 
     int  debug;
     bool b_verbose;
+    bool b_monitor; /* run in daemon mode */
 
     /* statistics */
     bool b_summary; /* write summary */
@@ -60,9 +61,6 @@ typedef struct params_s
     /* read data from file of socket */
     ssize_t (*pf_read)(int fd, void *buf, size_t count);
     ssize_t (*pf_write)(int fd, const void *buf, size_t count);
-
-    /* logging function */
-    void (*pf_log)(const int level, const char *format, ...);
 } params_t;
 
 #endif

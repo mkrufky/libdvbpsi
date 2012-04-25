@@ -120,50 +120,39 @@ static void usage(void)
 
 /* Logging */
 static int log_level[] = { LOG_ERR, LOG_WARNING, LOG_INFO, LOG_DEBUG };
-static void log_remote(const int level, const char *format, ...)
-{
-    va_list ap;
-    char *msg = NULL;
-    va_start(ap, format);
-    int err = vasprintf(&msg, format, ap);
-    va_end(ap);
-    if (err != 1)
-    {
-        syslog(log_level[level], "%s", msg);
-        free(msg);
-    }
-}
-
 static const char *psz_level[] = { "ERROR", "WARNING", "INFO", "DEBUG" };
-static void log_local(const int level, const char *format, ...)
+
+static void libdvbpsi_log(void *data, const int level, const char *format, ...)
 {
-    va_list ap;
     int err = 0;
     char *msg = NULL;
+    va_list ap;
+
+    /* Get arguments and construct final message */
     va_start(ap, format);
 #if defined(_GNU_SOURCE)
     err = vasprintf(&msg, format, ap);
 #else
-    msg = calloc(1, 1024);
+    msg = calloc(1, strlen(format) + 1024);
     if (msg)
         err = vsnprintf(msg, 1024, format, ap);
 #endif
     va_end(ap);
-    if (err != 1)
-    {
-        fprintf(stderr, "%s: %s", psz_level[level], msg);
-        free(msg);
-    }
-}
+    if (err < 0)
+        return;
 
-static void libdvbpsi_log(void *data, const int level, const char *format, ...)
-{
-    va_list ap;
-    va_start(ap, format);
+    /* Print message */
     params_t *param = (params_t *)data;
-    if (param)
-        param->pf_log(level, format, ap);
-    va_end(ap);
+    if (!param)
+    {
+        free(msg);
+        return;
+    }
+    if (param->b_monitor)
+        syslog(log_level[level], "%s", msg);
+    else
+        fprintf(stderr, "%s: %s", psz_level[level], msg);
+    free(msg);
 }
 
 /* Parameters */
@@ -178,6 +167,9 @@ static params_t *params_init(void)
     param->input = NULL;
     param->output = NULL;
 
+    param->b_verbose = false;
+    param->b_monitor = false;
+
     /* statistics */
     param->b_summary = false;
     param->summary.mode = SUM_BANDWIDTH;
@@ -188,7 +180,6 @@ static params_t *params_init(void)
     /* functions */
     param->pf_read = NULL;
     param->pf_write = NULL;
-    param->pf_log = log_local;
     return param;
 }
 
@@ -309,7 +300,7 @@ static int dvbinfo_process(dvbinfo_capture_t *capture)
     {
         if (asprintf(&psz_temp, "%s.part", param->summary.file) < 0)
         {
-            param->pf_log(DVBINFO_LOG_ERROR, "Could not create temporary summary file %s\n",
+            libdvbpsi_log(param, DVBINFO_LOG_ERROR, "Could not create temporary summary file %s\n",
                           param->summary.file);
             return err;
         }
@@ -341,12 +332,14 @@ static int dvbinfo_process(dvbinfo_capture_t *capture)
             size_t size = param->pf_write(param->fd_out, buffer->p_data, buffer->i_size);
             if (size < 0) /* error writing */
             {
-                param->pf_log(DVBINFO_LOG_ERROR, "error (%d) writting to %s", errno, param->output);
+                libdvbpsi_log(param, DVBINFO_LOG_ERROR,
+                              "error (%d) writting to %s", errno, param->output);
                 break;
             }
             else if (size < buffer->i_size) /* short writting disk full? */
             {
-                param->pf_log(DVBINFO_LOG_ERROR, "error writting to %s (disk full?)", param->output);
+                libdvbpsi_log(param, DVBINFO_LOG_ERROR,
+                              "error writting to %s (disk full?)", param->output);
                 break;
             }
         }
@@ -370,7 +363,8 @@ static int dvbinfo_process(dvbinfo_capture_t *capture)
                 }
                 else
                 {
-                    param->pf_log(DVBINFO_LOG_ERROR, "failed opening summary file (disabling summary logging)\n");
+                    libdvbpsi_log(param, DVBINFO_LOG_ERROR,
+                                  "failed opening summary file (disabling summary logging)\n");
                     param->b_summary = false;
                 }
                 deadline = mdate() + param->summary.period;
@@ -387,7 +381,7 @@ static int dvbinfo_process(dvbinfo_capture_t *capture)
 
 out:
     if (b_error)
-        param->pf_log(DVBINFO_LOG_ERROR, "error while processing\n" );
+        libdvbpsi_log(param, DVBINFO_LOG_ERROR, "error while processing\n" );
 
     if (buffer) buffer_free(buffer);
     free(psz_temp);
@@ -401,7 +395,6 @@ int main(int argc, char **pp_argv)
 {
     dvbinfo_capture_t capture;
     params_t *param = NULL;
-    bool b_monitor = false;
     char c;
 
     printf("dvbinfo: Copyright (C) 2011-2012 M2X BV\n");
@@ -491,8 +484,7 @@ int main(int argc, char **pp_argv)
                 break;
 
             case 'm':
-                b_monitor = true;
-                param->pf_log = log_remote;
+                param->b_monitor = true;
                 break;
 
             case 'o':
@@ -583,27 +575,27 @@ int main(int argc, char **pp_argv)
     };
 
 #ifdef HAVE_SYS_SOCKET_H
-    if (b_monitor)
+    if (param->b_monitor)
     {
         openlog("dvbinfo", LOG_PID, LOG_DAEMON);
         if (daemon(1,0) < 0)
         {
-            param->pf_log(DVBINFO_LOG_ERROR, "Failed to start in background\n");
+            libdvbpsi_log(param, DVBINFO_LOG_ERROR, "Failed to start in background\n");
             params_free(param);
             closelog();
             usage(); /* exits application */
         }
-        param->pf_log(DVBINFO_LOG_INFO, "dvbinfo: Copyright (C) 2011-2012 M2X BV\n");
-        param->pf_log(DVBINFO_LOG_ERROR, "License: LGPL v2.1\n");
+        libdvbpsi_log(param, DVBINFO_LOG_INFO, "dvbinfo: Copyright (C) 2011-2012 M2X BV\n");
+        libdvbpsi_log(param, DVBINFO_LOG_ERROR, "License: LGPL v2.1\n");
     }
 #endif
 
     if (param->input == NULL)
     {
-        param->pf_log(DVBINFO_LOG_ERROR, "No source given\n");
+        libdvbpsi_log(param, DVBINFO_LOG_ERROR, "No source given\n");
         params_free(param);
 #ifdef HAVE_SYS_SOCKET_H
-        if (b_monitor)
+        if (param->b_monitor)
             closelog();
 #endif
         params_free(param);
@@ -614,13 +606,15 @@ int main(int argc, char **pp_argv)
     if (param->b_udp || param->b_tcp)
     {
         capture.size = 7*188;
-        param->pf_log(DVBINFO_LOG_INFO, "Listen: host=%s port=%d\n", param->input, param->port);
+        libdvbpsi_log(param, DVBINFO_LOG_INFO, "Listen: host=%s port=%d\n",
+                      param->input, param->port);
     }
     else
 #endif
     {
         capture.size = 188;
-        param->pf_log(DVBINFO_LOG_INFO, "Examining: %s\n", param->input);
+        libdvbpsi_log(param, DVBINFO_LOG_INFO, "Examining: %s\n",
+                      param->input);
     }
 
     /* Capture thread */
@@ -629,10 +623,10 @@ int main(int argc, char **pp_argv)
     capture.b_alive = true;
     if (pthread_create(&handle, NULL, dvbinfo_capture, (void *)&capture) < 0)
     {
-        param->pf_log(DVBINFO_LOG_ERROR, "failed creating thread\n");
+        libdvbpsi_log(param, DVBINFO_LOG_ERROR, "failed creating thread\n");
         dvbinfo_close(param);
 #ifdef HAVE_SYS_SOCKET_H
-        if (b_monitor)
+        if (param->b_monitor)
             closelog();
 #endif
         params_free(param);
@@ -641,7 +635,7 @@ int main(int argc, char **pp_argv)
     int err = dvbinfo_process(&capture);
     capture.b_alive = false;     /* stop thread */
     if (pthread_join(handle, NULL) < 0)
-        param->pf_log(DVBINFO_LOG_ERROR, "error joining capture thread\n");
+        libdvbpsi_log(param, DVBINFO_LOG_ERROR, "error joining capture thread\n");
     dvbinfo_close(param);
 
     /* cleanup */
@@ -654,7 +648,7 @@ int main(int argc, char **pp_argv)
     fifo_free((&capture)->empty);
 
 #ifdef HAVE_SYS_SOCKET_H
-    if (b_monitor)
+    if (param->b_monitor)
         closelog();
 #endif
     if (err < 0)

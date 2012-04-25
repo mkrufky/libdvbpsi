@@ -1489,8 +1489,8 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
         stream->pid[i_pid].i_received = date;
 
         if (stream->level < DVBPSI_MSG_DEBUG)
-            stream->pf_log(stream->cb_data, 0,
-                           "dvbinfo: %"PRId64" packet %"PRId64" pid %d (0x%x) cc %d\n",
+            stream->pf_log(stream->cb_data, 2,
+                           "dvbinfo: %"PRId64" packet %"PRId64" pid %u (0x%x) cc %d\n",
                            date, stream->i_packets, i_pid, i_pid, i_cc);
 
         if (i_pid == 0x0) /* PAT */
@@ -1664,7 +1664,7 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
         if (b_discontinuity_seen)
         {
             stream->pf_log(stream->cb_data, 2,
-                           "dvbinfo: Continuity counter discontinuity (pid %d 0x%x found %d expected %d)\n",
+                           "dvbinfo: Continuity counter discontinuity (pid %u 0x%x found %d expected %d)\n",
                            i_pid, i_pid, stream->pid[i_pid].i_cc, i_old_cc+1);
 
             /* Discontinuity has been handled */
