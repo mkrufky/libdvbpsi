@@ -47,7 +47,7 @@ dvbpsi_default_authority_dr_t *dvbpsi_DecodeDefaultAuthorityDr(dvbpsi_descriptor
     /* Don't decode twice */
     if (p_descriptor->p_decoded)
         return p_descriptor->p_decoded;
-    
+
     p_decoded = (dvbpsi_default_authority_dr_t*)malloc(sizeof(dvbpsi_default_authority_dr_t));
     if (!p_decoded)
         return NULL;

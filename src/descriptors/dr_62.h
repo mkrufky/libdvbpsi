@@ -56,7 +56,7 @@ typedef struct dvbpsi_frequency_list_dr_s
  *        dvbpsi_descriptor_t *p_descriptor)
  * \brief Decode a Frequency List descriptor (tag 0x62)
  * \param p_descriptor Raw descriptor to decode.
- * \return NULL if the descriptor could not be decoded or a pointer to a 
+ * \return NULL if the descriptor could not be decoded or a pointer to a
  *         dvbpsi_frequency_list_dr_t structure.
  */
 dvbpsi_frequency_list_dr_t *dvbpsi_DecodeFrequencyListDr(dvbpsi_descriptor_t *p_descriptor);

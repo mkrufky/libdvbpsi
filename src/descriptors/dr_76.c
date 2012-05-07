@@ -48,7 +48,7 @@ dvbpsi_content_id_dr_t *dvbpsi_DecodeContentIdDr(dvbpsi_descriptor_t *p_descript
     /* Don't decode twice */
     if (p_descriptor->p_decoded)
         return p_descriptor->p_decoded;
-    
+
     /* Check boundaries */
     if (p_descriptor->i_length > ARRAY_SIZE(p_decoded->p_entries))
         p_descriptor->i_length = ARRAY_SIZE(p_decoded->p_entries);
@@ -65,7 +65,7 @@ dvbpsi_content_id_dr_t *dvbpsi_DecodeContentIdDr(dvbpsi_descriptor_t *p_descript
         entry->i_type = (p_descriptor->p_data[byte] >> 2) & 0x3f;
         entry->i_location = p_descriptor->p_data[byte] & 3;
         byte ++;
-        
+
         if (entry->i_location == CRID_LOCATION_DESCRIPTOR)
         {
             uint8_t len = p_descriptor->p_data[byte];
@@ -76,7 +76,7 @@ dvbpsi_content_id_dr_t *dvbpsi_DecodeContentIdDr(dvbpsi_descriptor_t *p_descript
             byte ++;
             for (i = 0; i < len; i ++)
             {
-                entry->value.path[i] = p_descriptor->p_data[byte + i];     
+                entry->value.path[i] = p_descriptor->p_data[byte + i];
             }
             byte += len;
             entry->value.path[i] = 0;
@@ -85,7 +85,6 @@ dvbpsi_content_id_dr_t *dvbpsi_DecodeContentIdDr(dvbpsi_descriptor_t *p_descript
         {
             entry->value.ref = (p_descriptor->p_data[byte] << 8) | p_descriptor->p_data[byte + 1];
             byte += 2;
-            
         }
         else
         {

@@ -35,7 +35,7 @@ extern "C" {
 
 #define CRID_LOCATION_DESCRIPTOR 0
 #define CRID_LOCATION_CIT        1
-    
+
 /*****************************************************************************
  * dvbpsi_lcn_entry_t
  *****************************************************************************/
@@ -52,7 +52,7 @@ extern "C" {
 typedef struct dvbpsi_crid_entry_s
 {
     uint8_t i_type;
-    uint8_t i_location; 
+    uint8_t i_location;
     union
     {
         uint8_t  path[253];

@@ -68,7 +68,7 @@ dvbpsi_data_broadcast_id_dr_t *dvbpsi_DecodeDataBroadcastIdDr(dvbpsi_descriptor_
     /* Check length */
     if (p_descriptor->i_length < 2)
         return NULL;
-    
+
     p_decoded = NewDataBroadcastDr(p_descriptor->i_length - 2);
     if (!p_decoded)
         return NULL;

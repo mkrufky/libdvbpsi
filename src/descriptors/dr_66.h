@@ -53,7 +53,7 @@ typedef struct dvbpsi_data_broadcast_id_dr_s
  *        dvbpsi_descriptor_t *p_descriptor)
  * \brief Decode a Data broadcast id descriptor (tag 0x66)
  * \param p_descriptor Raw descriptor to decode.
- * \return NULL if the descriptor could not be decoded or a pointer to a 
+ * \return NULL if the descriptor could not be decoded or a pointer to a
  *         dvbpsi_data_broadcast_id_dr_t structure.
  */
 dvbpsi_data_broadcast_id_dr_t *dvbpsi_DecodeDataBroadcastIdDr(dvbpsi_descriptor_t *p_descriptor);
