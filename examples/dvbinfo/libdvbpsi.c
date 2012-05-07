@@ -1489,7 +1489,7 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
         stream->pid[i_pid].i_received = date;
 
         if (stream->level < DVBPSI_MSG_DEBUG)
-            stream->pf_log(stream->cb_data, 2,
+            stream->pf_log(stream->cb_data, 3,
                            "dvbinfo: %"PRId64" packet %"PRId64" pid %u (0x%x) cc %d\n",
                            date, stream->i_packets, i_pid, i_pid, i_cc);
 

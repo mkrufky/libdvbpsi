@@ -175,7 +175,7 @@ static params_t *params_init(void)
     param->summary.mode = SUM_BANDWIDTH;
     param->summary.file = NULL;
     param->summary.fd = stdout;
-    param->summary.period = 1000;
+    param->summary.period = 1000; /* in ms */
 
     /* functions */
     param->pf_read = NULL;
