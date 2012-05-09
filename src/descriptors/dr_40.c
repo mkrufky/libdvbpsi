@@ -1,6 +1,6 @@
 /*
  * dr_40.c
- * Copyright (C) 2001-2011 VideoLAN
+ * Copyright (C) 2001-2012 VideoLAN
  *
  * Authors: rcorno (Nov 22, 2011)
  *
@@ -62,7 +62,7 @@ dvbpsi_network_name_dr_t* dvbpsi_DecodeNetworkNameDr(
 
     /* Decode data */
     p_decoded->i_name_length = p_descriptor->i_length <= 255 ?
-                               p_descriptor->i_lenght : 255;
+                               p_descriptor->i_length : 255;
     if (p_decoded->i_name_length)
         memcpy(p_decoded->i_name_byte,
                p_descriptor->p_data,
