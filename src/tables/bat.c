@@ -469,9 +469,10 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
         p_bat_decoder->current_bat = *p_bat_decoder->p_building_bat;
         p_bat_decoder->b_current_valid = true;
         /* Chain the sections */
+        assert(p_bat_decoder->i_last_section_number > 256);
         if (p_bat_decoder->i_last_section_number)
         {
-            for (int j = 0; j <= p_bat_decoder->i_last_section_number - 1; j++)
+            for (uint8_t j = 0; j <= p_bat_decoder->i_last_section_number - 1; j++)
                 p_bat_decoder->ap_sections[j]->p_next =
                                     p_bat_decoder->ap_sections[j + 1];
         }
