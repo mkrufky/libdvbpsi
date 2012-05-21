@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_03.c
- * Copyright (C) 2001-2011 VideoLAN
+ * Copyright (C) 2001-2012 VideoLAN
  * $Id: dr_03.c,v 1.4 2003/07/25 20:20:40 fenrir Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -70,6 +70,7 @@ dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
   p_decoded->b_free_format = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;
   p_decoded->i_id = (p_descriptor->p_data[0] & 0x40) >> 6;
   p_decoded->i_layer = (p_descriptor->p_data[0] & 0x30) >> 4;
+  p_decoded->b_variable_rate_audio_indicator = (p_descriptor->p_data[0] & 0x08) >> 3;
 
   p_descriptor->p_decoded = (void*)p_decoded;
 
@@ -94,6 +95,8 @@ dvbpsi_descriptor_t * dvbpsi_GenAStreamDr(dvbpsi_astream_dr_t * p_decoded,
       *p_descriptor->p_data |= 0x80;
     *p_descriptor->p_data |= (p_decoded->i_id & 0x01) << 6;
     *p_descriptor->p_data |= (p_decoded->i_layer & 0x03) << 4;
+    if(p_decoded->b_variable_rate_audio_indicator)
+       *p_descriptor->p_data |= 0x08;
 
     if(b_duplicate)
     {

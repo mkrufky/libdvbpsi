@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dr_03.h
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2012 VideoLAN
  * $Id: dr_03.h,v 1.2 2002/05/10 23:50:36 bozo Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -56,9 +56,10 @@ extern "C" {
  */
 typedef struct dvbpsi_astream_dr_s
 {
-  bool          b_free_format;              /*!< free_format_flag */
-  uint8_t       i_id;                       /*!< ID */
-  uint8_t       i_layer;                    /*!< layer */
+  bool          b_free_format;                         /*!< free_format_flag */
+  uint8_t       i_id;                                  /*!< ID */
+  uint8_t       i_layer;                               /*!< layer */
+  bool          b_variable_rate_audio_indicator;       /*!< variable_rate_audio_indicator */
 
 } dvbpsi_astream_dr_t;
 
