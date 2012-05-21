@@ -9,6 +9,7 @@ Changes between 0.2.2 and 1.0.0:
    - removed dvbpis_handle
  * EIT table generation
  * new descriptor 0x40
+ * descriptor 0x03: added variable_rate_audio_indicator
 
 Changes between 0.2.1 and 0.2.2:
 --------------------------------
