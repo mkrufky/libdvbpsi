@@ -67,7 +67,7 @@ dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
     return NULL;
   }
 
-  p_decoded->b_free_format = (p_descriptor->p_data[0] & 0x80) ? 1 : 0;
+  p_decoded->b_free_format = (p_descriptor->p_data[0] & 0x80);
   p_decoded->i_id = (p_descriptor->p_data[0] & 0x40) >> 6;
   p_decoded->i_layer = (p_descriptor->p_data[0] & 0x30) >> 4;
   p_decoded->b_variable_rate_audio_indicator = (p_descriptor->p_data[0] & 0x08) >> 3;
