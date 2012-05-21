@@ -48,31 +48,31 @@
 dvbpsi_bouquet_name_dr_t * dvbpsi_DecodeBouquetNameDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_bouquet_name_dr_t * p_decoded;
+    dvbpsi_bouquet_name_dr_t * p_decoded;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x47))
-    return NULL;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x47))
+        return NULL;
 
-  /* Don't decode twice */
-  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
-     return p_descriptor->p_decoded;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Allocate memory */
-  p_decoded =
-        (dvbpsi_bouquet_name_dr_t*)malloc(sizeof(dvbpsi_bouquet_name_dr_t));
-  if(!p_decoded) return NULL;
+    /* Allocate memory */
+    p_decoded = (dvbpsi_bouquet_name_dr_t*)malloc(sizeof(dvbpsi_bouquet_name_dr_t));
+    if (!p_decoded)
+        return NULL;
 
-  /* Decode data */
-  p_decoded->i_name_length = p_descriptor->i_length;
-  if(p_decoded->i_name_length)
-    memcpy(p_decoded->i_char,
-           p_descriptor->p_data,
-           p_decoded->i_name_length);
+    /* Decode data */
+    p_decoded->i_name_length = p_descriptor->i_length;
+    if(p_decoded->i_name_length)
+        memcpy(p_decoded->i_char,
+               p_descriptor->p_data,
+               p_decoded->i_name_length);
 
-  p_descriptor->p_decoded = (void*)p_decoded;
+    p_descriptor->p_decoded = (void*)p_decoded;
 
-  return p_decoded;
+    return p_decoded;
 }
 
 
@@ -83,26 +83,25 @@ dvbpsi_descriptor_t * dvbpsi_GenBouquetNameDr(
                                         dvbpsi_bouquet_name_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x47, p_decoded->i_name_length, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor =
+            dvbpsi_NewDescriptor(0x47, p_decoded->i_name_length, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     if(p_decoded->i_name_length)
-      memcpy(p_descriptor->p_data,
-             p_decoded->i_char,
-             p_decoded->i_name_length);
+        memcpy(p_descriptor->p_data,
+               p_decoded->i_char,
+               p_decoded->i_name_length);
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
-       /* Duplicate decoded data */
+        /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_bouquet_name_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }

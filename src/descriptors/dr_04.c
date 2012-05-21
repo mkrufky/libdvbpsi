@@ -85,26 +85,25 @@ dvbpsi_hierarchy_dr_t * dvbpsi_DecodeHierarchyDr(
 dvbpsi_descriptor_t * dvbpsi_GenHierarchyDr(dvbpsi_hierarchy_dr_t * p_decoded,
                                             bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x04, 4, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x04, 4, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     p_descriptor->p_data[0] = 0xf0 | p_decoded->i_h_type;
     p_descriptor->p_data[1] = 0xc0 | p_decoded->i_h_layer_index;
     p_descriptor->p_data[2] = 0xc0 | p_decoded->i_h_embedded_layer;
     p_descriptor->p_data[3] = 0xc0 | p_decoded->i_h_priority;
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_hierarchy_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
 

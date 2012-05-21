@@ -48,63 +48,53 @@
 dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
-  int i_subtitles_number, i;
-  dvbpsi_subtitling_dr_t * p_decoded;
+    int i_subtitles_number;
+    dvbpsi_subtitling_dr_t * p_decoded;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x59))
-    return NULL;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x59))
+        return NULL;
 
-  /* Don't decode twice */
-  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
-     return p_descriptor->p_decoded;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Decode data and check the length */
-  if(p_descriptor->i_length < 3)
-    return NULL;
+    /* Decode data and check the length */
+    if (p_descriptor->i_length < 3)
+        return NULL;
 
-  /* Allocate memory */
-  p_decoded =
-        (dvbpsi_subtitling_dr_t*)malloc(sizeof(dvbpsi_subtitling_dr_t));
-  if(!p_decoded) return NULL;
+    if (p_descriptor->i_length % 8)
+        return NULL;
 
-  /* Decode data and check the length */
-  if(p_descriptor->i_length < 3)
-  {
-    free(p_decoded);
-    return NULL;
-  }
+    /* Allocate memory */
+    p_decoded = (dvbpsi_subtitling_dr_t*)malloc(sizeof(dvbpsi_subtitling_dr_t));
+    if (!p_decoded)
+        return NULL;
 
-  if(p_descriptor->i_length % 8)
-  {
-    free(p_decoded);
-    return NULL;
-  }
+    i_subtitles_number = p_descriptor->i_length / 8;
 
-  i_subtitles_number = p_descriptor->i_length / 8;
+    p_decoded->i_subtitles_number = i_subtitles_number;
 
-  p_decoded->i_subtitles_number = i_subtitles_number;
+    for (int i = 0; i < i_subtitles_number; i++)
+    {
+        memcpy(p_decoded->p_subtitle[i].i_iso6392_language_code,
+               p_descriptor->p_data + 8 * i, 3);
 
-  for (i=0; i < i_subtitles_number; i++)
-  {
-    memcpy(p_decoded->p_subtitle[i].i_iso6392_language_code,
-                     p_descriptor->p_data + 8 * i, 3);
+        p_decoded->p_subtitle[i].i_subtitling_type =
+                p_descriptor->p_data[8 * i + 3];
 
-    p_decoded->p_subtitle[i].i_subtitling_type =
-                                 p_descriptor->p_data[8 * i + 3];
+        p_decoded->p_subtitle[i].i_composition_page_id =
+                ((uint16_t)(p_descriptor->p_data[8 * i + 4]) << 8)
+                | p_descriptor->p_data[8 * i + 5];
 
-    p_decoded->p_subtitle[i].i_composition_page_id =
-              ((uint16_t)(p_descriptor->p_data[8 * i + 4]) << 8)
-            | p_descriptor->p_data[8 * i + 5];
+        p_decoded->p_subtitle[i].i_ancillary_page_id =
+                ((uint16_t)(p_descriptor->p_data[8 * i + 6]) << 8)
+                | p_descriptor->p_data[8 * i + 7];
+    }
 
-    p_decoded->p_subtitle[i].i_ancillary_page_id =
-              ((uint16_t)(p_descriptor->p_data[8 * i + 6]) << 8)
-            | p_descriptor->p_data[8 * i + 7];
-  }
+    p_descriptor->p_decoded = (void*)p_decoded;
 
-  p_descriptor->p_decoded = (void*)p_decoded;
-
-  return p_decoded;
+    return p_decoded;
 }
 
 
@@ -115,43 +105,40 @@ dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
                                         dvbpsi_subtitling_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-  int i;
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor =
+            dvbpsi_NewDescriptor(0x59, p_decoded->i_subtitles_number * 8 , NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-      dvbpsi_NewDescriptor(0x59, p_decoded->i_subtitles_number * 8 , NULL);
-
-  if(p_descriptor)
-  {
     /* Encode data */
-    for (i=0; i < p_decoded->i_subtitles_number; i++ )
+    for (int i = 0; i < p_decoded->i_subtitles_number; i++ )
     {
-      memcpy( p_descriptor->p_data + 8 * i,
-              p_decoded->p_subtitle[i].i_iso6392_language_code,
-              3);
+        memcpy( p_descriptor->p_data + 8 * i,
+                p_decoded->p_subtitle[i].i_iso6392_language_code,
+                3);
 
-      p_descriptor->p_data[8 * i + 3] =
-                                  p_decoded->p_subtitle[i].i_subtitling_type;
+        p_descriptor->p_data[8 * i + 3] =
+                p_decoded->p_subtitle[i].i_subtitling_type;
 
-      p_descriptor->p_data[8 * i + 4] =
-                           p_decoded->p_subtitle[i].i_composition_page_id >> 8;
-      p_descriptor->p_data[8 * i + 5] =
-                           p_decoded->p_subtitle[i].i_composition_page_id % 0xFF;
+        p_descriptor->p_data[8 * i + 4] =
+                p_decoded->p_subtitle[i].i_composition_page_id >> 8;
+        p_descriptor->p_data[8 * i + 5] =
+                p_decoded->p_subtitle[i].i_composition_page_id % 0xFF;
 
-      p_descriptor->p_data[8 * i + 6] =
-                           p_decoded->p_subtitle[i].i_ancillary_page_id >> 8;
-      p_descriptor->p_data[8 * i + 7] =
-                           p_decoded->p_subtitle[i].i_ancillary_page_id % 0xFF;
+        p_descriptor->p_data[8 * i + 6] =
+                p_decoded->p_subtitle[i].i_ancillary_page_id >> 8;
+        p_descriptor->p_data[8 * i + 7] =
+                p_decoded->p_subtitle[i].i_ancillary_page_id % 0xFF;
     }
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_subtitling_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }

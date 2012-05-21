@@ -47,36 +47,32 @@
 dvbpsi_private_data_dr_t * dvbpsi_DecodePrivateDataDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_private_data_dr_t * p_decoded;
+    dvbpsi_private_data_dr_t * p_decoded;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x0f))
-    return NULL;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x0f))
+        return NULL;
 
-  /* Don't decode twice */
-  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
-     return p_descriptor->p_decoded;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Allocate memory */
-  p_decoded =
-        (dvbpsi_private_data_dr_t*)malloc(sizeof(dvbpsi_private_data_dr_t));
-  if(!p_decoded) return NULL;
+    if (p_descriptor->i_length != 4)
+        return NULL;
 
-  /* Decode data and check the length */
-  if(p_descriptor->i_length != 4)
-  {
-    free(p_decoded);
-    return NULL;
-  }
+    /* Allocate memory */
+    p_decoded = (dvbpsi_private_data_dr_t*)malloc(sizeof(dvbpsi_private_data_dr_t));
+    if (!p_decoded)
+        return NULL;
 
-  p_decoded->i_private_data =   ((uint32_t)(p_descriptor->p_data[0]) << 24)
-                              | ((uint32_t)(p_descriptor->p_data[1]) << 16)
-                              | ((uint32_t)(p_descriptor->p_data[2]) << 8)
-                              | p_descriptor->p_data[3];
+    p_decoded->i_private_data =   ((uint32_t)(p_descriptor->p_data[0]) << 24)
+            | ((uint32_t)(p_descriptor->p_data[1]) << 16)
+            | ((uint32_t)(p_descriptor->p_data[2]) << 8)
+            | p_descriptor->p_data[3];
 
-  p_descriptor->p_decoded = (void*)p_decoded;
+    p_descriptor->p_decoded = (void*)p_decoded;
 
-  return p_decoded;
+    return p_decoded;
 }
 
 
@@ -87,27 +83,25 @@ dvbpsi_descriptor_t * dvbpsi_GenPrivateDataDr(
                                         dvbpsi_private_data_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x0f, 4, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x0f, 4, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     p_descriptor->p_data[0] = p_decoded->i_private_data >> 24;
     p_descriptor->p_data[1] = p_decoded->i_private_data >> 16;
     p_descriptor->p_data[2] = p_decoded->i_private_data >> 8;
     p_descriptor->p_data[3] = p_decoded->i_private_data;
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
-      /* Duplicate decoded data */
+        /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_private_data_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
 

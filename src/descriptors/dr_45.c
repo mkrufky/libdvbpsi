@@ -46,59 +46,56 @@
 dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
-  int i_services_number, i;
-  dvbpsi_vbi_dr_t * p_decoded;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x45))
+        return NULL;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x45))
-    return NULL;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Don't decode twice */
-  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
-     return p_descriptor->p_decoded;
+    /* Check the length */
+    if (p_descriptor->i_length < 3)
+        return NULL;
+    if (p_descriptor->i_length % 2)
+        return NULL;
 
-  /* Decode data and check the length */
-  if(p_descriptor->i_length < 3)
-    return NULL;
+    /* */
+    dvbpsi_vbi_dr_t * p_decoded;
+    int i_services_number = p_descriptor->i_length / 2;
 
-  if(p_descriptor->i_length % 2)
-    return NULL;
+    /* Allocate memory */
+    p_decoded = (dvbpsi_vbi_dr_t*)malloc(sizeof(dvbpsi_vbi_dr_t));
+    if (!p_decoded)
+        return NULL;
 
-  i_services_number = p_descriptor->i_length / 2;
+    p_decoded->i_services_number = i_services_number;
 
-  /* Allocate memory */
-  p_decoded =
-        (dvbpsi_vbi_dr_t*)malloc(sizeof(dvbpsi_vbi_dr_t));
-  if(!p_decoded) return NULL;
-
-  p_decoded->i_services_number = i_services_number;
-
-  for(i=0; i < i_services_number; i++)
-  {
-    int n, i_lines = 0, i_data_service_id;
-
-    i_data_service_id = ((uint8_t)(p_descriptor->p_data[3 * i + 2 + i_lines]));
-    p_decoded->p_services[i].i_data_service_id = i_data_service_id;
-
-    i_lines = ((uint8_t)(p_descriptor->p_data[3 * i + 3]));
-    p_decoded->p_services[i].i_lines = i_lines;
-    for(n=0; n < i_lines; n++ )
+    for (int i = 0; i < i_services_number; i++)
     {
-      if( (i_data_service_id >= 0x01) && (i_data_service_id <= 0x07) )
-      {
-        p_decoded->p_services[i].p_lines[n].i_parity =
-               ((uint8_t)((p_descriptor->p_data[3 * i + 3 + n])&0x20)>>5);
-        p_decoded->p_services[i].p_lines[n].i_line_offset =
-               ((uint8_t)(p_descriptor->p_data[3 * i + 3 + n])&0x1f);
-      }
+        int i_lines = 0, i_data_service_id;
+
+        i_data_service_id = ((uint8_t)(p_descriptor->p_data[3 * i + 2 + i_lines]));
+        p_decoded->p_services[i].i_data_service_id = i_data_service_id;
+
+        i_lines = ((uint8_t)(p_descriptor->p_data[3 * i + 3]));
+        p_decoded->p_services[i].i_lines = i_lines;
+        for (int n = 0; n < i_lines; n++ )
+        {
+            if( (i_data_service_id >= 0x01) && (i_data_service_id <= 0x07) )
+            {
+                p_decoded->p_services[i].p_lines[n].i_parity =
+                        ((uint8_t)((p_descriptor->p_data[3 * i + 3 + n])&0x20)>>5);
+                p_decoded->p_services[i].p_lines[n].i_line_offset =
+                        ((uint8_t)(p_descriptor->p_data[3 * i + 3 + n])&0x1f);
+            }
+        }
     }
-  }
 
-  p_descriptor->p_decoded = (void*)p_decoded;
+    p_descriptor->p_decoded = (void*)p_decoded;
 
-  return p_decoded;
+    return p_decoded;
 }
-
 
 /*****************************************************************************
  * dvbpsi_GenVBIDataDr
@@ -107,43 +104,39 @@ dvbpsi_descriptor_t * dvbpsi_GenVBIDataDr(
                                         dvbpsi_vbi_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-  int i;
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor =
+            dvbpsi_NewDescriptor(0x45, p_decoded->i_services_number * 5 , NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-      dvbpsi_NewDescriptor(0x45, p_decoded->i_services_number * 5 , NULL);
-
-  if(p_descriptor)
-  {
     /* Encode data */
-    for (i=0; i < p_decoded->i_services_number; i++ )
+    for (int i = 0; i < p_decoded->i_services_number; i++ )
     {
-      int n;
-      p_descriptor->p_data[5 * i + 3] =
-                    ( (uint8_t) p_decoded->p_services[i].i_data_service_id );
+        p_descriptor->p_data[5 * i + 3] =
+                ( (uint8_t) p_decoded->p_services[i].i_data_service_id );
 
-      p_descriptor->p_data[5 * i + 4] = p_decoded->p_services[i].i_lines;
-      for (n=0; n < p_decoded->p_services[i].i_lines; n++ )
-      {
-         if( (p_decoded->p_services[i].i_data_service_id >= 0x01) &&
-             (p_decoded->p_services[i].i_data_service_id <= 0x07) )
-         {
-            p_descriptor->p_data[5 * i + 4 + n] = (uint8_t)
-                ( (((uint8_t) p_decoded->p_services[i].p_lines[n].i_parity)&0x20)<<5) |
-                ( ((uint8_t) p_decoded->p_services[i].p_lines[n].i_line_offset)&0x1f);
-         }
-         else p_descriptor->p_data[5 * i + 3 + n] = 0xFF; /* Stuffing byte */
-      }
+        p_descriptor->p_data[5 * i + 4] = p_decoded->p_services[i].i_lines;
+        for (int n=0; n < p_decoded->p_services[i].i_lines; n++ )
+        {
+            if( (p_decoded->p_services[i].i_data_service_id >= 0x01) &&
+                    (p_decoded->p_services[i].i_data_service_id <= 0x07) )
+            {
+                p_descriptor->p_data[5 * i + 4 + n] = (uint8_t)
+                        ( (((uint8_t) p_decoded->p_services[i].p_lines[n].i_parity)&0x20)<<5) |
+                        ( ((uint8_t) p_decoded->p_services[i].p_lines[n].i_line_offset)&0x1f);
+            }
+            else p_descriptor->p_data[5 * i + 3 + n] = 0xFF; /* Stuffing byte */
+        }
     }
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_vbi_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }

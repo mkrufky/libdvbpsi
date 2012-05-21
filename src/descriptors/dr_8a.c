@@ -45,42 +45,38 @@
  *****************************************************************************/
 dvbpsi_cuei_dr_t * dvbpsi_DecodeCUEIDr(dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_cuei_dr_t *p_decoded;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x8a))
+        return NULL;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x8a))
-    return NULL;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Don't decode twice */
-  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
-     return p_descriptor->p_decoded;
+    if (p_descriptor->i_length == 0x01)
+        return NULL;
 
-  /* Allocate memory */
-  p_decoded = (dvbpsi_cuei_dr_t*)malloc(sizeof(dvbpsi_cuei_dr_t));
-  if (!p_decoded) return NULL;
+    /* Allocate memory */
+    dvbpsi_cuei_dr_t *p_decoded;
+    p_decoded = (dvbpsi_cuei_dr_t*)malloc(sizeof(dvbpsi_cuei_dr_t));
+    if (!p_decoded)
+        return NULL;
 
-  /* Decode data and check the length */
-  if (p_descriptor->i_length == 0x01)
-  {
-    free(p_decoded);
-    return NULL;
-  }
+    /* cue_stream_type according to: SCTE 35 2004 - p15 - table 6.3
+     * cue_stream_type     PID usage
+     *   0x00              splice_insert, splice_null, splice_schedule
+     *   0x01              All Commands
+     *   0x02              Segmentation
+     *   0x03              Tiered Splicing
+     *   0x04              Tiered Segmentation
+     *   0x05 - 0x7f       Reserved
+     *   0x80 - 0xff       User Defined
+     */
+    p_decoded->i_cue_stream_type = p_descriptor->p_data[0];
 
-  /* cue_stream_type according to: SCTE 35 2004 - p15 - table 6.3
-   * cue_stream_type     PID usage
-   *   0x00              splice_insert, splice_null, splice_schedule
-   *   0x01              All Commands
-   *   0x02              Segmentation
-   *   0x03              Tiered Splicing
-   *   0x04              Tiered Segmentation
-   *   0x05 - 0x7f       Reserved
-   *   0x80 - 0xff       User Defined
-   */
-  p_decoded->i_cue_stream_type = p_descriptor->p_data[0];
+    p_descriptor->p_decoded = (void*)p_decoded;
 
-  p_descriptor->p_decoded = (void*)p_decoded;
-
-  return p_decoded;
+    return p_decoded;
 }
 
 /*****************************************************************************
@@ -88,24 +84,22 @@ dvbpsi_cuei_dr_t * dvbpsi_DecodeCUEIDr(dvbpsi_descriptor_t * p_descriptor)
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenCUEIDr(dvbpsi_cuei_dr_t * p_decoded, bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-      dvbpsi_NewDescriptor(0x8a, 0x01, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x8a, 0x01, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     p_descriptor->p_data[0] = p_decoded->i_cue_stream_type;
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
-      /* Duplicate decoded data */
+        /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_cuei_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
 

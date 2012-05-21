@@ -92,31 +92,31 @@ dvbpsi_descriptor_t * dvbpsi_GenRegistrationDr(
                                         dvbpsi_registration_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x05, p_decoded->i_additional_length + 4, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor =
+            dvbpsi_NewDescriptor(0x05, p_decoded->i_additional_length + 4, NULL);
 
-  if(p_descriptor)
-  {
+    if (!p_descriptor)
+        return NULL;
+
     /* Encode data */
     p_descriptor->p_data[0] = p_decoded->i_format_identifier >> 24;
     p_descriptor->p_data[1] = p_decoded->i_format_identifier >> 16;
     p_descriptor->p_data[2] = p_decoded->i_format_identifier >> 8;
     p_descriptor->p_data[3] = p_decoded->i_format_identifier;
-    if(p_decoded->i_additional_length)
-      memcpy(p_descriptor->p_data + 4,
-             p_decoded->i_additional_info,
-             p_decoded->i_additional_length);
+    if (p_decoded->i_additional_length)
+        memcpy(p_descriptor->p_data + 4,
+               p_decoded->i_additional_info,
+               p_decoded->i_additional_length);
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
-      /* Duplicate decoded data */
+        /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_registration_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
 

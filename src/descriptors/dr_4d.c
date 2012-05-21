@@ -62,24 +62,25 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
   i_len1 = p_descriptor->p_data[3];
   i_len2 = p_descriptor->p_data[4+i_len1];
 
-  if( p_descriptor->i_length < 5 + i_len1 + i_len2 )
+  if (p_descriptor->i_length < 5 + i_len1 + i_len2)
     return NULL;
 
   /* Don't decode twice */
-  if(p_descriptor->p_decoded)
+  if (p_descriptor->p_decoded)
     return p_descriptor->p_decoded;
 
   /* Allocate memory */
   p_decoded = malloc(sizeof(dvbpsi_short_event_dr_t));
-  if(!p_decoded) return NULL;
+  if (!p_decoded)
+      return NULL;
 
   /* Decode data and check the length */
   memcpy( p_decoded->i_iso_639_code, &p_descriptor->p_data[0], 3 );
   p_decoded->i_event_name_length = i_len1;
-  if( i_len1 > 0 )
+  if (i_len1 > 0)
       memcpy( p_decoded->i_event_name, &p_descriptor->p_data[3+1], i_len1 );
   p_decoded->i_text_length = i_len2;
-  if( i_len2 > 0 )
+  if (i_len2 > 0)
       memcpy( p_decoded->i_text, &p_descriptor->p_data[4+i_len1+1], i_len2 );
 
   p_descriptor->p_decoded = (void*)p_decoded;
@@ -87,39 +88,37 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
   return p_decoded;
 }
 
-
 /*****************************************************************************
  * dvbpsi_GenShortEventDr
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenShortEventDr(dvbpsi_short_event_dr_t * p_decoded,
                                              bool b_duplicate)
 {
-  int i_len1 = p_decoded->i_event_name_length;
-  int i_len2 = p_decoded->i_text_length;
+    int i_len1 = p_decoded->i_event_name_length;
+    int i_len2 = p_decoded->i_text_length;
 
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-                dvbpsi_NewDescriptor(0x4d, 5 + i_len1 + i_len2, NULL );
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x4d, 5 + i_len1 + i_len2, NULL );
 
-  if(p_descriptor)
-  {
+    if (!p_descriptor)
+        return NULL;
+
     /* Encode data */
     memcpy( &p_descriptor->p_data[0], p_decoded->i_iso_639_code, 3 );
     p_descriptor->p_data[3] = i_len1;
-    if( i_len1 )
+    if (i_len1)
         memcpy( &p_descriptor->p_data[4], p_decoded->i_event_name, i_len1 );
     p_descriptor->p_data[3+1+i_len1] = i_len2;
-    if( i_len2 )
+    if (i_len2)
         memcpy( &p_descriptor->p_data[3+1+i_len1+1], p_decoded->i_text, i_len2 );
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_short_event_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }

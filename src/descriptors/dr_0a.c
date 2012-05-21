@@ -46,40 +46,39 @@
  *****************************************************************************/
 dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_iso639_dr_t * p_decoded;
-  int i;
+    dvbpsi_iso639_dr_t * p_decoded;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x0a))
-     return NULL;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x0a))
+        return NULL;
 
-  /* Don't decode twice */
-  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
-     return p_descriptor->p_decoded;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Allocate memory */
-  p_decoded = (dvbpsi_iso639_dr_t*)malloc(sizeof(dvbpsi_iso639_dr_t));
-  if(!p_decoded) return NULL;
+    if ((p_descriptor->i_length < 1) ||
+        (p_descriptor->i_length % 4 != 0))
+        return NULL;
 
-  /* Decode data and check the length */
-  if((p_descriptor->i_length < 1) || (p_descriptor->i_length % 4 != 0))
-  {
-    free(p_decoded);
-    return NULL;
-  }
+    /* Allocate memory */
+    p_decoded = (dvbpsi_iso639_dr_t*)malloc(sizeof(dvbpsi_iso639_dr_t));
+    if (!p_decoded)
+        return NULL;
 
-  p_decoded->i_code_count = p_descriptor->i_length / 4;
-  i = 0;
-  while( i < p_decoded->i_code_count ) {
-    p_decoded->code[i].iso_639_code[0] = p_descriptor->p_data[i*4];
-    p_decoded->code[i].iso_639_code[1] = p_descriptor->p_data[i*4+1];
-    p_decoded->code[i].iso_639_code[2] = p_descriptor->p_data[i*4+2];
-    p_decoded->code[i].i_audio_type = p_descriptor->p_data[i*4+3];
-    i++;
-  }
-  p_descriptor->p_decoded = (void*)p_decoded;
+    p_decoded->i_code_count = p_descriptor->i_length / 4;
 
-  return p_decoded;
+    int i = 0;
+    while( i < p_decoded->i_code_count )
+    {
+        p_decoded->code[i].iso_639_code[0] = p_descriptor->p_data[i*4];
+        p_decoded->code[i].iso_639_code[1] = p_descriptor->p_data[i*4+1];
+        p_decoded->code[i].iso_639_code[2] = p_descriptor->p_data[i*4+2];
+        p_decoded->code[i].i_audio_type = p_descriptor->p_data[i*4+3];
+        i++;
+    }
+    p_descriptor->p_decoded = (void*)p_decoded;
+
+    return p_decoded;
 }
 
 
@@ -89,30 +88,31 @@ dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor)
 dvbpsi_descriptor_t * dvbpsi_GenISO639Dr(dvbpsi_iso639_dr_t * p_decoded,
                                          bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x0a, p_decoded->i_code_count * 4, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor =
+            dvbpsi_NewDescriptor(0x0a, p_decoded->i_code_count * 4, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     int i = 0;
-    while( i < p_decoded->i_code_count ) {
-      p_descriptor->p_data[i*4] = p_decoded->code[i].iso_639_code[0];
-      p_descriptor->p_data[i*4+1] = p_decoded->code[i].iso_639_code[1];
-      p_descriptor->p_data[i*4+2] = p_decoded->code[i].iso_639_code[2];
-      p_descriptor->p_data[i*4+3] = p_decoded->code[i].i_audio_type;
-      i++;
+    while( i < p_decoded->i_code_count )
+    {
+        p_descriptor->p_data[i*4] = p_decoded->code[i].iso_639_code[0];
+        p_descriptor->p_data[i*4+1] = p_decoded->code[i].iso_639_code[1];
+        p_descriptor->p_data[i*4+2] = p_decoded->code[i].iso_639_code[2];
+        p_descriptor->p_data[i*4+3] = p_decoded->code[i].i_audio_type;
+        i++;
     }
-    if(b_duplicate)
+
+    if (b_duplicate)
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_iso639_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
 

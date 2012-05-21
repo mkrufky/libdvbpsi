@@ -47,43 +47,41 @@
 dvbpsi_terr_deliv_sys_dr_t * dvbpsi_DecodeTerrDelivSysDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_terr_deliv_sys_dr_t * p_decoded;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x5a))
+        return NULL;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x5a))
-    return NULL;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Don't decode twice */
-  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
-     return p_descriptor->p_decoded;
+    /* Allocate memory */
+    dvbpsi_terr_deliv_sys_dr_t * p_decoded;
+    p_decoded = (dvbpsi_terr_deliv_sys_dr_t*)malloc(sizeof(dvbpsi_terr_deliv_sys_dr_t));
+    if (!p_decoded)
+        return NULL;
 
-  /* Allocate memory */
-  p_decoded =
-        (dvbpsi_terr_deliv_sys_dr_t*)malloc(sizeof(dvbpsi_terr_deliv_sys_dr_t));
-  if(!p_decoded) return NULL;
+    /* Decode data */
+    p_decoded->i_centre_frequency      =    (uint32_t)(p_descriptor->p_data[0] << 24)
+                                          | (uint32_t)(p_descriptor->p_data[1] << 16)
+                                          | (uint32_t)(p_descriptor->p_data[2] <<  8)
+                                          | (uint32_t)(p_descriptor->p_data[3]);
+    p_decoded->i_bandwidth             =    (p_descriptor->p_data[4] >> 5) & 0x07;
+    p_decoded->i_priority              =    (p_descriptor->p_data[4] >> 4) & 0x01;
+    p_decoded->i_time_slice_indicator  =    (p_descriptor->p_data[4] >> 3) & 0x01;
+    p_decoded->i_mpe_fec_indicator     =    (p_descriptor->p_data[4] >> 2) & 0x01;
+    p_decoded->i_constellation         =    (p_descriptor->p_data[5] >> 6) & 0x03;
+    p_decoded->i_hierarchy_information =    (p_descriptor->p_data[5] >> 3) & 0x07;
+    p_decoded->i_code_rate_hp_stream   =     p_descriptor->p_data[5]       & 0x07;
+    p_decoded->i_code_rate_lp_stream   =    (p_descriptor->p_data[6] >> 5) & 0x07;
+    p_decoded->i_guard_interval        =    (p_descriptor->p_data[6] >> 3) & 0x03;
+    p_decoded->i_transmission_mode     =    (p_descriptor->p_data[6] >> 1) & 0x03;
+    p_decoded->i_other_frequency_flag  =     p_descriptor->p_data[6]       & 0x01;
 
-  /* Decode data */
-  p_decoded->i_centre_frequency      =    (uint32_t)(p_descriptor->p_data[0] << 24)
-                                        | (uint32_t)(p_descriptor->p_data[1] << 16)
-                                        | (uint32_t)(p_descriptor->p_data[2] <<  8)
-                                        | (uint32_t)(p_descriptor->p_data[3]);
-  p_decoded->i_bandwidth             =    (p_descriptor->p_data[4] >> 5) & 0x07;
-  p_decoded->i_priority              =    (p_descriptor->p_data[4] >> 4) & 0x01;
-  p_decoded->i_time_slice_indicator  =    (p_descriptor->p_data[4] >> 3) & 0x01;
-  p_decoded->i_mpe_fec_indicator     =    (p_descriptor->p_data[4] >> 2) & 0x01;
-  p_decoded->i_constellation         =    (p_descriptor->p_data[5] >> 6) & 0x03;
-  p_decoded->i_hierarchy_information =    (p_descriptor->p_data[5] >> 3) & 0x07;
-  p_decoded->i_code_rate_hp_stream   =     p_descriptor->p_data[5]       & 0x07;
-  p_decoded->i_code_rate_lp_stream   =    (p_descriptor->p_data[6] >> 5) & 0x07;
-  p_decoded->i_guard_interval        =    (p_descriptor->p_data[6] >> 3) & 0x03;
-  p_decoded->i_transmission_mode     =    (p_descriptor->p_data[6] >> 1) & 0x03;
-  p_decoded->i_other_frequency_flag  =     p_descriptor->p_data[6]       & 0x01;
+    p_descriptor->p_decoded = (void*)p_decoded;
 
-  p_descriptor->p_decoded = (void*)p_decoded;
-
-  return p_decoded;
+    return p_decoded;
 }
-
 
 /*****************************************************************************
  * dvbpsi_GenTerrDelivSysDr
@@ -92,12 +90,11 @@ dvbpsi_descriptor_t * dvbpsi_GenTerrDelivSysDr(
                                         dvbpsi_terr_deliv_sys_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x5a, 11, NULL);
+      /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x5a, 11, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     p_descriptor->p_data[0]  =   (p_decoded->i_centre_frequency >> 24) & 0xff;
     p_descriptor->p_data[1]  =   (p_decoded->i_centre_frequency >> 16) & 0xff;
@@ -120,14 +117,13 @@ dvbpsi_descriptor_t * dvbpsi_GenTerrDelivSysDr(
     p_descriptor->p_data[9]  =   0xff;
     p_descriptor->p_data[10] =   0xff;
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_terr_deliv_sys_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }

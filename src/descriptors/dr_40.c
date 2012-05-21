@@ -84,7 +84,6 @@ dvbpsi_descriptor_t * dvbpsi_GenNetworkNameDr(
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x40, p_decoded->i_name_length, NULL);
-
     if (!p_descriptor)
         return NULL;
 

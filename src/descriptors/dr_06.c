@@ -47,29 +47,28 @@
 dvbpsi_ds_alignment_dr_t * dvbpsi_DecodeDSAlignmentDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_ds_alignment_dr_t * p_decoded;
+    dvbpsi_ds_alignment_dr_t * p_decoded;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x06))
-    return NULL;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x06))
+        return NULL;
 
-  /* Allocate memory */
-  p_decoded = (dvbpsi_ds_alignment_dr_t*)
-                                malloc(sizeof(dvbpsi_ds_alignment_dr_t));
-  if(!p_decoded) return NULL;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Decode data and check the length */
-  if(p_descriptor->i_length != 1)
-  {
-    free(p_decoded);
-    return NULL;
-  }
+    if (p_descriptor->i_length != 1)
+        return NULL;
 
-  p_decoded->i_alignment_type = p_descriptor->p_data[0];
+    /* Allocate memory */
+    p_decoded = (dvbpsi_ds_alignment_dr_t*) malloc(sizeof(dvbpsi_ds_alignment_dr_t));
+    if(!p_decoded) return NULL;
 
-  p_descriptor->p_decoded = (void*)p_decoded;
+    p_decoded->i_alignment_type = p_descriptor->p_data[0];
 
-  return p_decoded;
+    p_descriptor->p_decoded = (void*)p_decoded;
+
+    return p_decoded;
 }
 
 
@@ -80,26 +79,22 @@ dvbpsi_descriptor_t * dvbpsi_GenDSAlignmentDr(
                                         dvbpsi_ds_alignment_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x06, 1, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x06, 1, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     p_descriptor->p_data[0] = p_decoded->i_alignment_type;
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
-      /* Duplicate decoded data */
-      dvbpsi_ds_alignment_dr_t * p_dup_decoded =
-        (dvbpsi_ds_alignment_dr_t*)malloc(sizeof(dvbpsi_ds_alignment_dr_t));
-      if(p_dup_decoded)
-        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_ds_alignment_dr_t));
-
-      p_descriptor->p_decoded = (void*)p_dup_decoded;
+        /* Duplicate decoded data */
+        p_descriptor->p_decoded =
+                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                                                  sizeof(dvbpsi_ds_alignment_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
 

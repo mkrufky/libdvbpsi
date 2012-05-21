@@ -81,32 +81,31 @@ dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
 /*****************************************************************************
  * dvbpsi_GenAStreamDr
  *****************************************************************************/
-dvbpsi_descriptor_t * dvbpsi_GenAStreamDr(dvbpsi_astream_dr_t * p_decoded,
-                                          bool b_duplicate)
+dvbpsi_descriptor_t *dvbpsi_GenAStreamDr(dvbpsi_astream_dr_t * p_decoded,
+                                         bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x03, 1, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t *p_descriptor = dvbpsi_NewDescriptor(0x03, 1, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     *p_descriptor->p_data = 0x0f;
-    if(p_decoded->b_free_format)
-      *p_descriptor->p_data |= 0x80;
+    if (p_decoded->b_free_format)
+        *p_descriptor->p_data |= 0x80;
     *p_descriptor->p_data |= (p_decoded->i_id & 0x01) << 6;
     *p_descriptor->p_data |= (p_decoded->i_layer & 0x03) << 4;
-    if(p_decoded->b_variable_rate_audio_indicator)
-       *p_descriptor->p_data |= 0x08;
+    if (p_decoded->b_variable_rate_audio_indicator)
+        *p_descriptor->p_data |= 0x08;
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_astream_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
 

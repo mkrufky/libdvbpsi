@@ -60,7 +60,7 @@ dvbpsi_cable_deliv_sys_dr_t * dvbpsi_DecodeCableDelivSysDr(
   /* Allocate memory */
   p_decoded =
         (dvbpsi_cable_deliv_sys_dr_t*)malloc(sizeof(dvbpsi_cable_deliv_sys_dr_t));
-  if(!p_decoded)
+  if (!p_decoded)
     return NULL;
 
   /* Decode data */
@@ -88,12 +88,12 @@ dvbpsi_descriptor_t * dvbpsi_GenCableDelivSysDr(
                                         dvbpsi_cable_deliv_sys_dr_t * p_decoded,
                                         int b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x44, 11, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor =
+            dvbpsi_NewDescriptor(0x44, 11, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     p_descriptor->p_data[0]  =     (p_decoded->i_frequency >> 24)       & 0xff;
     p_descriptor->p_data[1]  =     (p_decoded->i_frequency >> 16)       & 0xff;
@@ -114,7 +114,6 @@ dvbpsi_descriptor_t * dvbpsi_GenCableDelivSysDr(
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_cable_deliv_sys_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }

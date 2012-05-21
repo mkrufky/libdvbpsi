@@ -47,37 +47,34 @@
 dvbpsi_system_clock_dr_t * dvbpsi_DecodeSystemClockDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_system_clock_dr_t * p_decoded;
+    dvbpsi_system_clock_dr_t * p_decoded;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x0b))
-    return NULL;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x0b))
+        return NULL;
 
-  /* Don't decode twice */
-  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
-     return p_descriptor->p_decoded;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Allocate memory */
-  p_decoded =
-        (dvbpsi_system_clock_dr_t*)malloc(sizeof(dvbpsi_system_clock_dr_t));
-  if(!p_decoded) return NULL;
+    /* Check the length */
+    if (p_descriptor->i_length != 2)
+        return NULL;
 
-  /* Decode data and check the length */
-  if(p_descriptor->i_length != 2)
-  {
-    free(p_decoded);
-    return NULL;
-  }
+    /* Allocate memory */
+    p_decoded =
+            (dvbpsi_system_clock_dr_t*)malloc(sizeof(dvbpsi_system_clock_dr_t));
+    if (!p_decoded)
+        return NULL;
 
-  p_decoded->b_external_clock_ref = (p_descriptor->p_data[0] & 0x80) ? true : false;
-  p_decoded->i_clock_accuracy_integer = p_descriptor->p_data[0] & 0x3f;
-  p_decoded->i_clock_accuracy_exponent = (p_descriptor->p_data[1] & 0xe0) >> 5;
+    p_decoded->b_external_clock_ref = (p_descriptor->p_data[0] & 0x80) ? true : false;
+    p_decoded->i_clock_accuracy_integer = p_descriptor->p_data[0] & 0x3f;
+    p_decoded->i_clock_accuracy_exponent = (p_descriptor->p_data[1] & 0xe0) >> 5;
 
-  p_descriptor->p_decoded = (void*)p_decoded;
+    p_descriptor->p_decoded = (void*)p_decoded;
 
-  return p_decoded;
+    return p_decoded;
 }
-
 
 /*****************************************************************************
  * dvbpsi_GenSystemClockDr
@@ -86,28 +83,26 @@ dvbpsi_descriptor_t * dvbpsi_GenSystemClockDr(
                                         dvbpsi_system_clock_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x0b, 2, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor =
+            dvbpsi_NewDescriptor(0x0b, 2, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     p_descriptor->p_data[0] =
-                        0x40 | (p_decoded->i_clock_accuracy_integer & 0x3f);
-    if(p_decoded->b_external_clock_ref)
-      p_descriptor->p_data[0] |= 0x80;
+            0x40 | (p_decoded->i_clock_accuracy_integer & 0x3f);
+    if (p_decoded->b_external_clock_ref)
+        p_descriptor->p_data[0] |= 0x80;
     p_descriptor->p_data[1] = 0x1f | p_decoded->i_clock_accuracy_exponent << 5;
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_system_clock_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
-

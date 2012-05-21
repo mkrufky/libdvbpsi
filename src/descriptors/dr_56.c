@@ -46,51 +46,50 @@
 dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
-  int i_pages_number, i;
-  dvbpsi_teletext_dr_t * p_decoded;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x56) &&
+            !dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x46))
+        return NULL;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x56) &&
-      !dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x46))
-    return NULL;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Don't decode twice */
-  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
-     return p_descriptor->p_decoded;
+    /* Decode data and check the length */
+    if(p_descriptor->i_length < 3)
+        return NULL;
 
-  /* Decode data and check the length */
-  if(p_descriptor->i_length < 3)
-    return NULL;
+    if(p_descriptor->i_length % 5)
+        return NULL;
 
-  if(p_descriptor->i_length % 5)
-    return NULL;
+    int i_pages_number;
+    i_pages_number = p_descriptor->i_length / 5;
 
-  i_pages_number = p_descriptor->i_length / 5;
+    /* Allocate memory */
+    dvbpsi_teletext_dr_t * p_decoded;
+    p_decoded = (dvbpsi_teletext_dr_t*)malloc(sizeof(dvbpsi_teletext_dr_t));
+    if (!p_decoded)
+        return NULL;
 
-  /* Allocate memory */
-  p_decoded =
-        (dvbpsi_teletext_dr_t*)malloc(sizeof(dvbpsi_teletext_dr_t));
-  if(!p_decoded) return NULL;
+    p_decoded->i_pages_number = i_pages_number;
 
-  p_decoded->i_pages_number = i_pages_number;
+    for (int i = 0; i < i_pages_number; i++)
+    {
+        memcpy(p_decoded->p_pages[i].i_iso6392_language_code,
+               p_descriptor->p_data + 5 * i, 3);
 
-  for(i=0; i < i_pages_number; i++)
-  {
-    memcpy(p_decoded->p_pages[i].i_iso6392_language_code,
-                     p_descriptor->p_data + 5 * i, 3);
-
-    p_decoded->p_pages[i].i_teletext_type =
+        p_decoded->p_pages[i].i_teletext_type =
                 ((uint8_t)(p_descriptor->p_data[5 * i + 3]) >> 3);
 
-    p_decoded->p_pages[i].i_teletext_magazine_number =
-              ((uint16_t)(p_descriptor->p_data[5 * i + 3]) & 0x07);
+        p_decoded->p_pages[i].i_teletext_magazine_number =
+                ((uint16_t)(p_descriptor->p_data[5 * i + 3]) & 0x07);
 
-    p_decoded->p_pages[i].i_teletext_page_number = p_descriptor->p_data[5 * i + 4];
-  }
+        p_decoded->p_pages[i].i_teletext_page_number = p_descriptor->p_data[5 * i + 4];
+    }
 
-  p_descriptor->p_decoded = (void*)p_decoded;
+    p_descriptor->p_decoded = (void*)p_decoded;
 
-  return p_decoded;
+    return p_decoded;
 }
 
 
@@ -101,37 +100,34 @@ dvbpsi_descriptor_t * dvbpsi_GenTeletextDr(
                                         dvbpsi_teletext_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-  int i;
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor =
+            dvbpsi_NewDescriptor(0x56, p_decoded->i_pages_number * 8 , NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-      dvbpsi_NewDescriptor(0x56, p_decoded->i_pages_number * 8 , NULL);
-
-  if(p_descriptor)
-  {
     /* Encode data */
-    for (i=0; i < p_decoded->i_pages_number; i++ )
+    for (int i = 0; i < p_decoded->i_pages_number; i++ )
     {
-      memcpy( p_descriptor->p_data + 8 * i,
-              p_decoded->p_pages[i].i_iso6392_language_code,
-              3);
+        memcpy( p_descriptor->p_data + 8 * i,
+                p_decoded->p_pages[i].i_iso6392_language_code,
+                3);
 
-      p_descriptor->p_data[8 * i + 3] =
-                            (uint8_t) ( ( (uint8_t) p_decoded->p_pages[i].i_teletext_type << 3 ) |
+        p_descriptor->p_data[8 * i + 3] =
+                (uint8_t) ( ( (uint8_t) p_decoded->p_pages[i].i_teletext_type << 3 ) |
                             ( (uint8_t) p_decoded->p_pages[i].i_teletext_magazine_number & 0x07 ) );
 
-      p_descriptor->p_data[8 * i + 4] =
-                            p_decoded->p_pages[i].i_teletext_page_number;
+        p_descriptor->p_data[8 * i + 4] =
+                p_decoded->p_pages[i].i_teletext_page_number;
     }
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_teletext_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }

@@ -47,37 +47,33 @@
 dvbpsi_max_bitrate_dr_t * dvbpsi_DecodeMaxBitrateDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
-  dvbpsi_max_bitrate_dr_t * p_decoded;
+    dvbpsi_max_bitrate_dr_t * p_decoded;
 
-  /* Check the tag */
-  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x0e))
-    return NULL;
+    /* Check the tag */
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x0e))
+        return NULL;
 
-  /* Don't decode twice */
-  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
-     return p_descriptor->p_decoded;
+    /* Don't decode twice */
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+        return p_descriptor->p_decoded;
 
-  /* Allocate memory */
-  p_decoded = (dvbpsi_max_bitrate_dr_t*)malloc(sizeof(dvbpsi_max_bitrate_dr_t));
-  if(!p_decoded) return NULL;
+    if (p_descriptor->i_length != 3)
+        return NULL;
 
-  /* Decode data and check the length */
-  if(p_descriptor->i_length != 3)
-  {
-    free(p_decoded);
-    return NULL;
-  }
+    /* Allocate memory */
+    p_decoded = (dvbpsi_max_bitrate_dr_t*)malloc(sizeof(dvbpsi_max_bitrate_dr_t));
+    if (!p_decoded)
+        return NULL;
 
-  p_decoded->i_max_bitrate =
-                  ((uint32_t)(p_descriptor->p_data[0] & 0x3f) << 16)
-                | ((uint32_t)(p_descriptor->p_data[1]) << 8)
-                | p_descriptor->p_data[2];
+    p_decoded->i_max_bitrate =
+            ((uint32_t)(p_descriptor->p_data[0] & 0x3f) << 16)
+            | ((uint32_t)(p_descriptor->p_data[1]) << 8)
+            | p_descriptor->p_data[2];
 
-  p_descriptor->p_decoded = (void*)p_decoded;
+    p_descriptor->p_decoded = (void*)p_decoded;
 
-  return p_decoded;
+    return p_decoded;
 }
-
 
 /*****************************************************************************
  * dvbpsi_GenMaxBitrateDr
@@ -86,26 +82,23 @@ dvbpsi_descriptor_t * dvbpsi_GenMaxBitrateDr(
                                         dvbpsi_max_bitrate_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-        dvbpsi_NewDescriptor(0x0e, 3, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x0e, 3, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     p_descriptor->p_data[0] = 0xc0 | ((p_decoded->i_max_bitrate >> 16) & 0x3f);
     p_descriptor->p_data[1] = p_decoded->i_max_bitrate >> 8;
     p_descriptor->p_data[2] = p_decoded->i_max_bitrate;
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
-      /* Duplicate decoded data */
+        /* Duplicate decoded data */
         p_descriptor->p_decoded =
                 dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
                                                   sizeof(dvbpsi_max_bitrate_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
-

@@ -93,40 +93,39 @@ dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor)
 dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(dvbpsi_vstream_dr_t * p_decoded,
                                           bool b_duplicate)
 {
-  /* Create the descriptor */
-  dvbpsi_descriptor_t * p_descriptor =
-                dvbpsi_NewDescriptor(0x02, p_decoded->b_mpeg2 ? 3 : 1, NULL);
+    /* Create the descriptor */
+    dvbpsi_descriptor_t * p_descriptor =
+            dvbpsi_NewDescriptor(0x02, p_decoded->b_mpeg2 ? 3 : 1, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-  if(p_descriptor)
-  {
     /* Encode data */
     p_descriptor->p_data[0] = 0;
-    if(p_decoded->b_multiple_frame_rate)
-      p_descriptor->p_data[0] |= 0x80;
+    if (p_decoded->b_multiple_frame_rate)
+        p_descriptor->p_data[0] |= 0x80;
     p_descriptor->p_data[0] |= (p_decoded->i_frame_rate_code & 0x0f) << 3;
-    if(p_decoded->b_constrained_parameter)
-      p_descriptor->p_data[0] |= 0x02;
-    if(p_decoded->b_still_picture)
-      p_descriptor->p_data[0] |= 0x01;
+    if (p_decoded->b_constrained_parameter)
+        p_descriptor->p_data[0] |= 0x02;
+    if (p_decoded->b_still_picture)
+        p_descriptor->p_data[0] |= 0x01;
 
-    if(p_decoded->b_mpeg2)
+    if (p_decoded->b_mpeg2)
     {
-      p_descriptor->p_data[0] |= 0x04;
-      p_descriptor->p_data[1] = p_decoded->i_profile_level_indication;
-      p_descriptor->p_data[2] = 0x1f;
-      p_descriptor->p_data[2] |= (p_decoded->i_chroma_format & 0x03) << 6;
-      if(p_decoded->b_frame_rate_extension)
-        p_descriptor->p_data[2] |= 0x20;
+        p_descriptor->p_data[0] |= 0x04;
+        p_descriptor->p_data[1] = p_decoded->i_profile_level_indication;
+        p_descriptor->p_data[2] = 0x1f;
+        p_descriptor->p_data[2] |= (p_decoded->i_chroma_format & 0x03) << 6;
+        if (p_decoded->b_frame_rate_extension)
+            p_descriptor->p_data[2] |= 0x20;
     }
 
-    if(b_duplicate)
+    if (b_duplicate)
     {
-      /* Duplicate decoded data */
-      p_descriptor->p_decoded =
-              dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
-                                                sizeof(dvbpsi_vstream_dr_t));
+        /* Duplicate decoded data */
+        p_descriptor->p_decoded =
+                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                                                  sizeof(dvbpsi_vstream_dr_t));
     }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
