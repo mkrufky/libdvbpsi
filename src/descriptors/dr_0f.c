@@ -102,12 +102,9 @@ dvbpsi_descriptor_t * dvbpsi_GenPrivateDataDr(
     if(b_duplicate)
     {
       /* Duplicate decoded data */
-      dvbpsi_private_data_dr_t * p_dup_decoded =
-        (dvbpsi_private_data_dr_t*)malloc(sizeof(dvbpsi_private_data_dr_t));
-      if(p_dup_decoded)
-        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_private_data_dr_t));
-
-      p_descriptor->p_decoded = (void*)p_dup_decoded;
+        p_descriptor->p_decoded =
+                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                                                  sizeof(dvbpsi_private_data_dr_t));
     }
   }
 

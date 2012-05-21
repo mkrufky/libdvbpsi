@@ -102,13 +102,10 @@ dvbpsi_descriptor_t * dvbpsi_GenVWindowDr(dvbpsi_vwindow_dr_t * p_decoded,
 
     if(b_duplicate)
     {
-      /* Duplicate decoded data */
-      dvbpsi_vwindow_dr_t * p_dup_decoded =
-                (dvbpsi_vwindow_dr_t*)malloc(sizeof(dvbpsi_vwindow_dr_t));
-      if(p_dup_decoded)
-        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_vwindow_dr_t));
-
-      p_descriptor->p_decoded = (void*)p_dup_decoded;
+        /* Duplicate decoded data */
+        p_descriptor->p_decoded =
+                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                                                  sizeof(dvbpsi_vwindow_dr_t));
     }
   }
 

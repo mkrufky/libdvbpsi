@@ -129,3 +129,19 @@ void dvbpsi_DeleteDescriptors(dvbpsi_descriptor_t* p_descriptor)
         p_descriptor = p_next;
     }
 }
+
+/*****************************************************************************
+ * dvbpsi_DuplicateDecodedDescriptor
+ *****************************************************************************
+ * Destruction of a dvbpsi_descriptor_t structure.
+ *****************************************************************************/
+void *dvbpsi_DuplicateDecodedDescriptor(void *p_decoded, ssize_t i_size)
+{
+    if (!p_decoded)
+        return NULL;
+
+    void *p_duplicate = calloc(1, i_size);
+    if (p_duplicate)
+        memcpy(p_duplicate, p_decoded, i_size);
+    return p_duplicate;
+}

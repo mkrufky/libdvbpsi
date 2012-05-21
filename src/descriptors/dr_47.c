@@ -97,16 +97,12 @@ dvbpsi_descriptor_t * dvbpsi_GenBouquetNameDr(
 
     if(b_duplicate)
     {
-      /* Duplicate decoded data */
-      dvbpsi_bouquet_name_dr_t * p_dup_decoded =
-        (dvbpsi_bouquet_name_dr_t*)malloc(sizeof(dvbpsi_bouquet_name_dr_t));
-      if(p_dup_decoded)
-        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_bouquet_name_dr_t));
-
-      p_descriptor->p_decoded = (void*)p_dup_decoded;
+       /* Duplicate decoded data */
+        p_descriptor->p_decoded =
+                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                                                  sizeof(dvbpsi_bouquet_name_dr_t));
     }
   }
 
   return p_descriptor;
 }
-

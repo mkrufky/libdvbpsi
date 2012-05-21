@@ -101,13 +101,10 @@ dvbpsi_descriptor_t * dvbpsi_GenSystemClockDr(
 
     if(b_duplicate)
     {
-      /* Duplicate decoded data */
-      dvbpsi_system_clock_dr_t * p_dup_decoded =
-        (dvbpsi_system_clock_dr_t*)malloc(sizeof(dvbpsi_system_clock_dr_t));
-      if(p_dup_decoded)
-        memcpy(p_dup_decoded, p_decoded, sizeof(dvbpsi_system_clock_dr_t));
-
-      p_descriptor->p_decoded = (void*)p_dup_decoded;
+        /* Duplicate decoded data */
+        p_descriptor->p_decoded =
+                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                                                  sizeof(dvbpsi_system_clock_dr_t));
     }
   }
 

@@ -119,6 +119,18 @@ bool dvbpsi_CanDecodeAsDescriptor(dvbpsi_descriptor_t *p_descriptor, const uint8
  */
 bool dvbpsi_IsDescriptorDecoded(dvbpsi_descriptor_t *p_descriptor);
 
+/*****************************************************************************
+ * dvbpsi_DuplicateDecodedDescriptor
+ *****************************************************************************/
+/*!
+ * \fn void *dvbpsi_DuplicateDecodedDescriptor(void *p_decoded, ssize_t i_size);
+ * \brief Duplicate a decoded descriptor. The caller is responsible for releasing the associated memory..
+ * \param p_decoded pointer to decoded descriptor obatained with dvbpsi_Decode* function
+ * \param i_size the sizeof decoded descriptor
+ * \return pointer to duplicated descriptor, NULL on error.
+ */
+void *dvbpsi_DuplicateDecodedDescriptor(void *p_decoded, ssize_t i_size);
+
 #ifdef __cplusplus
 };
 #endif
