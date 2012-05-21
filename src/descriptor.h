@@ -68,7 +68,6 @@ typedef struct dvbpsi_descriptor_s
 
 } dvbpsi_descriptor_t;
 
-
 /*****************************************************************************
  * dvbpsi_NewDescriptor
  *****************************************************************************/
@@ -97,6 +96,28 @@ dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
  */
 void dvbpsi_DeleteDescriptors(dvbpsi_descriptor_t* p_descriptor);
 
+/*****************************************************************************
+ * dvbpsi_CanDecodeAsDescriptor
+ *****************************************************************************/
+/*!
+ * \fn bool dvbpsi_CanDecodeAsDescriptor(dvbpsi_descriptor_t *p_descriptor, const uint8_t i_tag);
+ * \brief Checks if descriptor tag matches.
+ * \param p_descriptor pointer to descriptor allocated with @see dvbpsi_NewDescriptor
+ * \param i_tag descriptor tag to evaluate against
+ * \return true if descriptor can be decoded, false if not.
+ */
+bool dvbpsi_CanDecodeAsDescriptor(dvbpsi_descriptor_t *p_descriptor, const uint8_t i_tag);
+
+/*****************************************************************************
+ * dvbpsi_IsDescriptorDecoded
+ *****************************************************************************/
+/*!
+ * \fn bool dvbpsi_IsDescriptorDecoded(dvbpsi_descriptor_t *p_descriptor);
+ * \brief Checks if descriptor was already decoded.
+ * \param p_descriptor pointer to descriptor allocated with @see dvbpsi_NewDescriptor
+ * \return true if descriptor can be decoded, false if already decoded.
+ */
+bool dvbpsi_IsDescriptorDecoded(dvbpsi_descriptor_t *p_descriptor);
 
 #ifdef __cplusplus
 };

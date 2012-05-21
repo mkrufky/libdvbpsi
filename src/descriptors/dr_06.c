@@ -50,12 +50,8 @@ dvbpsi_ds_alignment_dr_t * dvbpsi_DecodeDSAlignmentDr(
   dvbpsi_ds_alignment_dr_t * p_decoded;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x06)
+  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x06))
     return NULL;
-
-  /* Don't decode twice */
-  if(p_descriptor->p_decoded)
-    return p_descriptor->p_decoded;
 
   /* Allocate memory */
   p_decoded = (dvbpsi_ds_alignment_dr_t*)

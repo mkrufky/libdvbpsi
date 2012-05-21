@@ -50,9 +50,13 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
   int i_len2;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x4d ||
-     p_descriptor->i_length < 5 )
+  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x4d) ||
+      p_descriptor->i_length < 5 )
     return NULL;
+
+  /* Don't decode twice */
+  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+     return p_descriptor->p_decoded;
 
   /* Check length */
   i_len1 = p_descriptor->p_data[3];

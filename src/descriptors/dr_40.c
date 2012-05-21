@@ -48,12 +48,12 @@ dvbpsi_network_name_dr_t* dvbpsi_DecodeNetworkNameDr(
     dvbpsi_network_name_dr_t * p_decoded;
 
     /* Check the tag */
-    if (p_descriptor->i_tag != 0x40)
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x40))
         return NULL;
 
     /* Don't decode twice */
-    if (p_descriptor->p_decoded)
-        return p_descriptor->p_decoded;
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+       return p_descriptor->p_decoded;
 
     /* Allocate memory */
     p_decoded = (dvbpsi_network_name_dr_t*)calloc(1, sizeof(dvbpsi_network_name_dr_t));

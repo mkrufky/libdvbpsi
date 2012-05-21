@@ -50,12 +50,12 @@ dvbpsi_private_data_dr_t * dvbpsi_DecodePrivateDataDr(
   dvbpsi_private_data_dr_t * p_decoded;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x0f)
+  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x0f))
     return NULL;
 
   /* Don't decode twice */
-  if(p_descriptor->p_decoded)
-    return p_descriptor->p_decoded;
+  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+     return p_descriptor->p_decoded;
 
   /* Allocate memory */
   p_decoded =

@@ -50,12 +50,12 @@ dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor)
   int i;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x0a)
-    return NULL;
+  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x0a))
+     return NULL;
 
   /* Don't decode twice */
-  if(p_descriptor->p_decoded)
-    return p_descriptor->p_decoded;
+  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+     return p_descriptor->p_decoded;
 
   /* Allocate memory */
   p_decoded = (dvbpsi_iso639_dr_t*)malloc(sizeof(dvbpsi_iso639_dr_t));

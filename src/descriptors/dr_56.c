@@ -50,12 +50,13 @@ dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
   dvbpsi_teletext_dr_t * p_decoded;
 
   /* Check the tag */
-  if( (p_descriptor->i_tag != 0x56) && (p_descriptor->i_tag != 0x46) )
+  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x56) &&
+      !dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x46))
     return NULL;
 
   /* Don't decode twice */
-  if(p_descriptor->p_decoded)
-    return p_descriptor->p_decoded;
+  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+     return p_descriptor->p_decoded;
 
   /* Decode data and check the length */
   if(p_descriptor->i_length < 3)

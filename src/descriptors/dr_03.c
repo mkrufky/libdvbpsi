@@ -49,12 +49,12 @@ dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
   dvbpsi_astream_dr_t * p_decoded;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x03)
-    return NULL;
+  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x03))
+     return NULL;
 
   /* Don't decode twice */
-  if(p_descriptor->p_decoded)
-    return p_descriptor->p_decoded;
+  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+     return p_descriptor->p_decoded;
 
   /* Allocate memory */
   p_decoded = (dvbpsi_astream_dr_t*)malloc(sizeof(dvbpsi_astream_dr_t));
@@ -67,10 +67,10 @@ dvbpsi_astream_dr_t * dvbpsi_DecodeAStreamDr(dvbpsi_descriptor_t * p_descriptor)
     return NULL;
   }
 
-  p_decoded->b_free_format = (p_descriptor->p_data[0] & 0x80);
+  p_decoded->b_free_format = (p_descriptor->p_data[0] & 0x80) ? true : false;
   p_decoded->i_id = (p_descriptor->p_data[0] & 0x40) >> 6;
   p_decoded->i_layer = (p_descriptor->p_data[0] & 0x30) >> 4;
-  p_decoded->b_variable_rate_audio_indicator = (p_descriptor->p_data[0] & 0x08) >> 3;
+  p_decoded->b_variable_rate_audio_indicator = ((p_descriptor->p_data[0] & 0x08) >> 3) ? true : false;
 
   p_descriptor->p_decoded = (void*)p_decoded;
 

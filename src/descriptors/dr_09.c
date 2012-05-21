@@ -49,12 +49,12 @@ dvbpsi_ca_dr_t * dvbpsi_DecodeCADr(dvbpsi_descriptor_t * p_descriptor)
   dvbpsi_ca_dr_t * p_decoded;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x09)
+  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x09))
     return NULL;
 
   /* Don't decode twice */
-  if(p_descriptor->p_decoded)
-    return p_descriptor->p_decoded;
+  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+     return p_descriptor->p_decoded;
 
   /* Allocate memory */
   p_decoded = (dvbpsi_ca_dr_t*)malloc(sizeof(dvbpsi_ca_dr_t));

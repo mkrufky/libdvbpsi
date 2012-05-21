@@ -51,13 +51,13 @@ dvbpsi_extended_event_dr_t * dvbpsi_DecodeExtendedEventDr(dvbpsi_descriptor_t * 
   uint8_t *p;
 
   /* Check the tag */
-  if(p_descriptor->i_tag != 0x4e ||
+  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x4e) ||
      p_descriptor->i_length < 6 )
     return NULL;
 
   /* Don't decode twice */
-  if(p_descriptor->p_decoded)
-    return p_descriptor->p_decoded;
+  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+     return p_descriptor->p_decoded;
 
   /* Allocate memory */
   p_decoded = malloc(sizeof(dvbpsi_extended_event_dr_t));

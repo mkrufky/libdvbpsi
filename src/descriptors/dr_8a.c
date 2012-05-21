@@ -48,12 +48,12 @@ dvbpsi_cuei_dr_t * dvbpsi_DecodeCUEIDr(dvbpsi_descriptor_t * p_descriptor)
   dvbpsi_cuei_dr_t *p_decoded;
 
   /* Check the tag */
-  if (p_descriptor->i_tag != 0x8a)
+  if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x8a))
     return NULL;
 
   /* Don't decode twice */
-  if (p_descriptor->p_decoded)
-    return p_descriptor->p_decoded;
+  if (dvbpsi_IsDescriptorDecoded(p_descriptor))
+     return p_descriptor->p_decoded;
 
   /* Allocate memory */
   p_decoded = (dvbpsi_cuei_dr_t*)malloc(sizeof(dvbpsi_cuei_dr_t));

@@ -39,6 +39,41 @@
 #include "dvbpsi.h"
 #include "descriptor.h"
 
+/*****************************************************************************
+ * dvbpsi_IsDescriptor
+ *****************************************************************************
+ * Is this descriptor of type i_tag?
+ *****************************************************************************/
+static inline bool dvbpsi_IsDescriptor(dvbpsi_descriptor_t *p_descriptor, const uint8_t i_tag)
+{
+    return (p_descriptor->i_tag == i_tag);
+}
+
+/*****************************************************************************
+ * IsDescriptorDecoded
+ *****************************************************************************
+ * Is this descriptor already decoded?
+ *****************************************************************************/
+bool dvbpsi_IsDescriptorDecoded(dvbpsi_descriptor_t *p_descriptor)
+{
+    return (p_descriptor->p_decoded != NULL);
+}
+
+/*****************************************************************************
+ * dvbpsi_CanDescodeAsDescriptor
+ *****************************************************************************
+ * Can Decode this descriptor as?
+ *****************************************************************************/
+bool dvbpsi_CanDecodeAsDescriptor(dvbpsi_descriptor_t *p_descriptor, const uint8_t i_tag)
+{
+    if (!p_descriptor)
+        return false;
+
+    if (!dvbpsi_IsDescriptor(p_descriptor, i_tag))
+        return false;
+
+    return true;
+}
 
 /*****************************************************************************
  * dvbpsi_NewDescriptor
@@ -85,10 +120,10 @@ void dvbpsi_DeleteDescriptors(dvbpsi_descriptor_t* p_descriptor)
         dvbpsi_descriptor_t* p_next = p_descriptor->p_next;
 
         if (p_descriptor->p_data != NULL)
-        free(p_descriptor->p_data);
+            free(p_descriptor->p_data);
 
         if (p_descriptor->p_decoded != NULL)
-          free(p_descriptor->p_decoded);
+            free(p_descriptor->p_decoded);
 
         free(p_descriptor);
         p_descriptor = p_next;
