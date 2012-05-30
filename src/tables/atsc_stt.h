@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006  Adam Charrett
+Copyright (C) 2006-2012  Adam Charrett
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ extern "C" {
  */
 typedef struct dvbpsi_atsc_stt_s
 {
-    uint8_t                 i_protocol;         /*!< PSIP Protocol version */
+    uint8_t                 i_version;          /*!< PSIP Protocol version */
 
     uint32_t                i_system_time;      /*!< GPS seconds since 1 January 1980 00:00:00 UTC. */
     uint8_t                 i_gps_utc_offset;   /*!< Seconds offset between GPS and UTC time. */
@@ -56,7 +56,7 @@ typedef struct dvbpsi_atsc_stt_s
  *****************************************************************************/
 /*!
  * \typedef void (* dvbpsi_atsc_stt_callback)(void* p_cb_data,
-                                         dvbpsi_atsc_stt_t* p_new_stt)
+                                              dvbpsi_atsc_stt_t* p_new_stt)
  * \brief Callback type definition.
  */
 typedef void (* dvbpsi_atsc_stt_callback)(void* p_cb_data, dvbpsi_atsc_stt_t* p_new_stt);
@@ -65,18 +65,18 @@ typedef void (* dvbpsi_atsc_stt_callback)(void* p_cb_data, dvbpsi_atsc_stt_t* p_
  * dvbpsi_atsc_AttachSTT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_AttachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-            dvbpsi_atsc_stt_callback pf_callback, void* p_cb_data)
+ * \fn bool dvbpsi_atsc_AttachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+                   dvbpsi_atsc_stt_callback pf_stt_callback, void* p_cb_data);
  *
  * \brief Creation and initialization of a STT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached
  * \param i_table_id Table ID, 0xCD.
- * \param pf_callback function to call back on new STT.
+ * \param pf_stt_callback function to call back on new STT.
  * \param p_cb_data private data given in argument to the callback.
- * \return 0 if everything went ok.
+ * \return true if everything went ok else false
  */
-int dvbpsi_atsc_AttachSTT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
-          dvbpsi_atsc_stt_callback pf_callback, void* p_cb_data);
+bool dvbpsi_atsc_AttachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+          dvbpsi_atsc_stt_callback pf_stt_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_atsc_DetachSTT
@@ -85,13 +85,13 @@ int dvbpsi_atsc_AttachSTT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  * \fn void dvbpsi_atsc_DetachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id)
  *
  * \brief Destroy a STT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0xCD.
  * \param i_extension Table extension, ignored as this should always be 0.
  *                    (Required to match prototype for demux)
  * \return nothing.
  */
-void dvbpsi_atsc_DetachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_t i_externsion);
+void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_externsion);
 
 /*****************************************************************************
  * dvbpsi_atsc_InitSTT/dvbpsi_atsc_NewSTT
@@ -101,24 +101,21 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
         int b_current_next, uint8_t i_protocol)
  * \brief Initialize a user-allocated dvbpsi_atsc_stt_t structure.
  * \param p_stt pointer to the STT structure
- * \param i_protocol PSIP Protocol version.
+ * \param i_version PSIP Protocol version.
  * \return nothing.
  */
-void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt,uint8_t i_protocol);
+void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_protocol);
 
 /*!
- * \def dvbpsi_NewSTT(p_stt, i_network_id, i_version, b_current_next)
+ * \fn dvbpsi_atsc_stt_t *dvbpsi_NewSTTT(uint8_t i_protocol, uint8_t i_version,
+ *                                       bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_atsc_stt_t structure. Use ObjectRefDec to delete it.
  * \param p_stt pointer to the STT structure
- * \param i_protocol PSIP Protocol version.
- * \return nothing.
+ * \param i_version PSIP Protocol version.
+ * \param b_current_next current next indicator
+ * \return p_stt pointer to the STT structure
  */
-#define dvbpsi_atsc_NewSTT(p_stt, i_protocol)                            \
-do {                                                                     \
-  p_stt = (dvbpsi_atsc_stt_t*)malloc(sizeof(dvbpsi_atsc_stt_t));         \
-  if(p_stt != NULL)                                                      \
-    dvbpsi_atsc_InitSTT(p_stt, i_protocol);                              \
-} while(0);
+dvbpsi_atsc_stt_t *dvbpsi_atsc_NewSTT(uint8_t i_version, bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_atsc_EmptySTT
@@ -132,16 +129,12 @@ do {                                                                     \
 void dvbpsi_atsc_EmptySTT(dvbpsi_atsc_stt_t *p_stt);
 
 /*!
- * \def dvbpsi_atsc_DeleteSTT(p_vct)
- * \brief Clean and free a dvbpsi_stt_t structure.
- * \param p_vct pointer to the STT structure
+ * \fn dvbpsi_atsc_DeleteSTT(dvbpsi_atsc_stt_t *p_stt)
+ * \brief Clean and free a dvbpsi_atsc_stt_t structure.
+ * \param p_stt pointer to the STT structure
  * \return nothing.
  */
-#define dvbpsi_atsc_DeleteSTT(p_stt)                                     \
-do {                                                                     \
-  dvbpsi_atsc_EmptySTT(p_stt);                                           \
-  free(p_stt);                                                           \
-} while(0);
+void dvbpsi_atsc_DeleteSTT(dvbpsi_atsc_stt_t *p_stt);
 
 #ifdef __cplusplus
 };

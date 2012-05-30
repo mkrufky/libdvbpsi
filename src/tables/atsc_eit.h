@@ -71,7 +71,7 @@ typedef struct dvbpsi_atsc_eit_event_s
 typedef struct dvbpsi_atsc_eit_s
 {
     uint8_t                 i_version;          /*!< version_number */
-    int                     b_current_next;     /*!< current_next_indicator */
+    bool                    b_current_next;     /*!< current_next_indicator */
     uint16_t                i_source_id;        /*!< Source id used to match against channels */
     uint8_t                 i_protocol;         /*!< PSIP Protocol version */
 
@@ -93,33 +93,33 @@ typedef void (* dvbpsi_atsc_eit_callback)(void* p_cb_data, dvbpsi_atsc_eit_t* p_
  * dvbpsi_atsc_AttachEIT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_AttachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+ * \fn bool dvbpsi_atsc_AttachEIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
             dvbpsi_atsc_eit_callback pf_callback, void* p_cb_data)
  *
  * \brief Creation and initialization of a EIT decoder.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
+ * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached
  * \param i_table_id Table ID, 0xCB.
  * \param i_extension Table ID extension, here TS ID.
  * \param pf_callback function to call back on new EIT.
  * \param p_cb_data private data given in argument to the callback.
- * \return 0 if everything went ok.
+ * \return true if everything went ok, false otherwise
  */
-int dvbpsi_atsc_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_atsc_eit_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_DetachEIT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id)
- *
+ * \fn void dvbpsi_atsc_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id)
  * \brief Destroy a EIT decoder.
+ * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param p_demux Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0xCB.
  * \param i_extension Table ID extension, here TS ID.
  * \return nothing.
  */
-void dvbpsi_atsc_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+void dvbpsi_atsc_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension);
 
 /*****************************************************************************
@@ -131,35 +131,27 @@ void dvbpsi_atsc_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
  * \brief Initialize a user-allocated dvbpsi_atsc_eit_t structure.
  * \param p_eit pointer to the EIT structure
  * \param i_version EIT version
- * \param b_current_next current next indicator
  * \param i_protocol PSIP Protocol version.
  * \param i_source_id Source id.
+ * \param b_current_next current next indicator
  * \return nothing.
  */
-void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit,uint8_t i_version, int b_current_next,
-                       uint8_t i_protocol, uint16_t i_source_id);
+void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_version, uint8_t i_protocol,
+                         uint16_t i_source_id, bool b_current_next);
 
 /*!
- * \def dvbpsi_atsc_NewEIT(p_eit, i_network_id, i_version, b_current_next,
-          i_protocol i_source_id)
+ * \fn dvbpsi_atsc_eit_t *dvbpsi_atsc_NewEIT(uint8_t i_version, uint8_t i_protocol,
+                                             uint16_t i_source_id, bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_eit_t structure. Use ObjectRefDec to delete it.
- * \param p_eit pointer to the EIT structure
  * \param i_network_id network id
  * \param i_version EIT version
  * \param b_current_next current next indicator
  * \param i_protocol PSIP Protocol version.
  * \param b_cable_eit Whether this is CEIT or a TEIT.
- * \return nothing.
+ * \return p_eit pointer to the EIT structure or NULL on error
  */
-#define dvbpsi_atsc_NewEIT(p_eit, i_version, b_current_next, i_protocol, \
-            i_source_id)                                                 \
-do {                                                                     \
-  p_eit = (dvbpsi_atsc_eit_t*)malloc(sizeof(dvbpsi_atsc_eit_t));         \
-  if(p_eit != NULL)                                                      \
-    dvbpsi_atsc_InitEIT(p_eit, i_version, b_current_next, i_protocol,    \
-        i_source_id);                                                    \
-} while(0);
-
+dvbpsi_atsc_eit_t *dvbpsi_atsc_NewEIT(uint8_t i_version, uint8_t i_protocol,
+                                      uint16_t i_source_id, bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_atsc_EmptyEIT
@@ -173,16 +165,12 @@ do {                                                                     \
 void dvbpsi_atsc_EmptyEIT(dvbpsi_atsc_eit_t *p_eit);
 
 /*!
- * \def dvbpsi_atsc_DeleteEIT(p_eit)
+ * \fn void dvbpsi_atsc_DeleteEIT(dvbpsi_atsc_eit_t *p_eit)
  * \brief Clean and free a dvbpsi_eit_t structure.
- * \param p_vct pointer to the EIT structure
+ * \param p_eit pointer to the EIT structure
  * \return nothing.
  */
-#define dvbpsi_atsc_DeleteEIT(p_eit)                                     \
-do {                                                                     \
-  dvbpsi_atsc_EmptyEIT(p_eit);                                           \
-  free(p_eit);                                                           \
-} while(0);
+void dvbpsi_atsc_DeleteEIT(dvbpsi_atsc_eit_t *p_eit);
 
 #ifdef __cplusplus
 };

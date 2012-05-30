@@ -98,7 +98,7 @@ static void dvbpsi_atsc_DecodeVCTSections(dvbpsi_atsc_vct_t* p_vct,
  * Initialize a VCT subtable decoder.
  *****************************************************************************/
 bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
-                          dvbpsi_atsc_vct_callback pf_callback, void* p_cb_data)
+                          dvbpsi_atsc_vct_callback pf_vct_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
@@ -138,7 +138,7 @@ bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     p_demux->p_first_subdec = p_subdec;
 
     /* VCT decoder information */
-    p_vct_decoder->pf_vct_callback = pf_callback;
+    p_vct_decoder->pf_vct_callback = pf_vct_callback;
     p_vct_decoder->p_cb_data = p_cb_data;
     /* VCT decoder initial state */
     p_vct_decoder->b_current_valid = false;

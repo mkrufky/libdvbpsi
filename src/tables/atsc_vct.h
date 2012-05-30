@@ -113,12 +113,12 @@ typedef void (* dvbpsi_atsc_vct_callback)(void* p_cb_data, dvbpsi_atsc_vct_t* p_
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0xC8 or 0xC9.
  * \param i_extension Table ID extension, here TS ID.
- * \param pf_callback function to call back on new VCT.
+ * \param pf_vct_callback function to call back on new VCT.
  * \param p_cb_data private data given in argument to the callback.
  * \return true if everything went ok, else false.
  */
 bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_atsc_vct_callback pf_callback,
+          uint16_t i_extension, dvbpsi_atsc_vct_callback pf_vct_callback,
                            void* p_cb_data);
 
 /*****************************************************************************

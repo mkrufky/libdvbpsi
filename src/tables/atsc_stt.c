@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006  Adam Charrett
+Copyright (C) 2006-2012  Adam Charrett
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -24,20 +24,31 @@ Decode PSIP System Time Table.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
-#include <stdint.h>
 
-#include "dvbpsi.h"
-#include "dvbpsi_private.h"
-#include "psi.h"
-#include "descriptor.h"
-#include "demux.h"
+#if defined(HAVE_INTTYPES_H)
+#include <inttypes.h>
+#elif defined(HAVE_STDINT_H)
+#include <stdint.h>
+#endif
+
+#include <assert.h>
+
+#include "../dvbpsi.h"
+#include "../dvbpsi_private.h"
+#include "../psi.h"
+#include "../descriptor.h"
+#include "../demux.h"
+
 #include "atsc_stt.h"
 
 typedef struct dvbpsi_atsc_stt_decoder_s
 {
-  dvbpsi_atsc_stt_callback      pf_callback;
-  void *                        p_cb_data;
+     DVBPSI_DECODER_COMMON
+
+     dvbpsi_atsc_stt_callback      pf_stt_callback;
+     void *                        p_cb_data;
 
 } dvbpsi_atsc_stt_decoder_t;
 
@@ -46,62 +57,61 @@ dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor(
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data);
 
-void dvbpsi_atsc_GatherSTTSections(dvbpsi_decoder_t * p_psi_decoder,
-                              void * p_private_decoder,
-                              dvbpsi_psi_section_t * p_section);
+static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t* p_dvbpsi,
+                      void* p_private_decoder, dvbpsi_psi_section_t* p_section);
 
-void dvbpsi_atsc_DecodeSTTSections(dvbpsi_atsc_stt_t* p_stt,
-                              dvbpsi_psi_section_t* p_section);
+static void dvbpsi_atsc_DecodeSTTSections(dvbpsi_atsc_stt_t* p_stt,
+                                   dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
  * dvbpsi_atsc_AttachSTT
  *****************************************************************************
  * Initialize a STT subtable decoder.
  *****************************************************************************/
-int dvbpsi_atsc_AttachSTT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
-                          dvbpsi_atsc_stt_callback pf_callback, void* p_cb_data)
+bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
+                          dvbpsi_atsc_stt_callback pf_stt_callback, void* p_cb_data)
 {
-  dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_psi_decoder->p_private_decoder;
-  dvbpsi_demux_subdec_t* p_subdec;
-  dvbpsi_atsc_stt_decoder_t*  p_stt_decoder;
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
 
-  if(dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0))
-  {
-    DVBPSI_ERROR_ARG("STT decoder",
-                     "Already a decoder for (table_id == 0x%02x)",
-                     i_table_id);
+    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
+    dvbpsi_demux_subdec_t* p_subdec;
+    dvbpsi_atsc_stt_decoder_t*  p_stt_decoder;
 
-    return 1;
-  }
+    if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0))
+    {
+        dvbpsi_error(p_dvbpsi, "STT decoder",
+                               "Already a decoder for (table_id == 0x%02x)",
+                                i_table_id);
+        return false;
+    }
 
-  p_subdec = (dvbpsi_demux_subdec_t*)malloc(sizeof(dvbpsi_demux_subdec_t));
-  if(p_subdec == NULL)
-  {
-    return 1;
-  }
+    p_subdec = (dvbpsi_demux_subdec_t*)malloc(sizeof(dvbpsi_demux_subdec_t));
+    if(p_subdec == NULL)
+        return false;
 
-  p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)malloc(sizeof(dvbpsi_atsc_stt_decoder_t));
-  if(p_stt_decoder == NULL)
-  {
-    free(p_subdec);
-    return 1;
-  }
+    p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)malloc(sizeof(dvbpsi_atsc_stt_decoder_t));
+    if(p_stt_decoder == NULL)
+    {
+        free(p_subdec);
+        return false;
+    }
 
-  /* subtable decoder configuration */
-  p_subdec->pf_callback = &dvbpsi_atsc_GatherSTTSections;
-  p_subdec->p_cb_data = p_stt_decoder;
-  p_subdec->i_id = (uint32_t)i_table_id << 16;
-  p_subdec->pf_detach = dvbpsi_atsc_DetachSTT;
+    /* subtable decoder configuration */
+    p_subdec->pf_callback = &dvbpsi_atsc_GatherSTTSections;
+    p_subdec->p_cb_data = p_stt_decoder;
+    p_subdec->i_id = (uint32_t)i_table_id << 16;
+    p_subdec->pf_detach = dvbpsi_atsc_DetachSTT;
 
-  /* Attach the subtable decoder to the demux */
-  p_subdec->p_next = p_demux->p_first_subdec;
-  p_demux->p_first_subdec = p_subdec;
+    /* Attach the subtable decoder to the demux */
+    p_subdec->p_next = p_demux->p_first_subdec;
+    p_demux->p_first_subdec = p_subdec;
 
-  /* STT decoder information */
-  p_stt_decoder->pf_callback = pf_callback;
-  p_stt_decoder->p_cb_data = p_cb_data;
+    /* STT decoder information */
+    p_stt_decoder->pf_stt_callback = pf_stt_callback;
+    p_stt_decoder->p_cb_data = p_cb_data;
 
-  return 0;
+    return true;
 }
 
 /*****************************************************************************
@@ -109,34 +119,38 @@ int dvbpsi_atsc_AttachSTT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
  *****************************************************************************
  * Close a STT decoder.
  *****************************************************************************/
-void dvbpsi_atsc_DetachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_t i_extension)
+void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
 {
-  dvbpsi_demux_subdec_t* p_subdec;
-  dvbpsi_demux_subdec_t** pp_prev_subdec;
-  dvbpsi_atsc_stt_decoder_t* p_stt_decoder;
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
 
-  p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0);
-  if(p_subdec == NULL)
-  {
-    DVBPSI_ERROR_ARG("STT Decoder",
-                     "No such STT decoder (table_id == 0x%02x,"
-                     "extension == 0x00)",
-                     i_table_id);
-    return;
-  }
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_subdec_t* p_subdec;
+    dvbpsi_demux_subdec_t** pp_prev_subdec;
 
-  p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)p_subdec->p_cb_data;
-  if(!p_stt_decoder)
-      return;
+    p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0);
+    if (p_subdec == NULL)
+    {
+        dvbpsi_error(p_dvbpsi, "STT Decoder",
+                             "No such STT decoder (table_id == 0x%02x,"
+                             "extension == 0x00)",
+                            i_table_id);
+        return;
+    }
 
-  free(p_subdec->p_cb_data);
+    dvbpsi_atsc_stt_decoder_t* p_stt_decoder;
+    p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)p_subdec->p_cb_data;
+    if(!p_stt_decoder)
+        return;
 
-  pp_prev_subdec = &p_demux->p_first_subdec;
-  while(*pp_prev_subdec != p_subdec)
-    pp_prev_subdec = &(*pp_prev_subdec)->p_next;
+    free(p_subdec->p_cb_data);
 
-  *pp_prev_subdec = p_subdec->p_next;
-  free(p_subdec);
+    pp_prev_subdec = &p_demux->p_first_subdec;
+    while(*pp_prev_subdec != p_subdec)
+        pp_prev_subdec = &(*pp_prev_subdec)->p_next;
+
+    *pp_prev_subdec = p_subdec->p_next;
+    free(p_subdec);
 }
 
 /*****************************************************************************
@@ -144,10 +158,26 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id, uint16_
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_atsc_stt_t structure.
  *****************************************************************************/
-void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_protocol)
+void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_version)
 {
-  p_stt->i_protocol = i_protocol;
-  p_stt->p_first_descriptor = NULL;
+    assert(p_stt);
+
+    p_stt->i_version = i_version;
+    p_stt->p_first_descriptor = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_atsc_NewSTT
+ *****************************************************************************
+ * Allocate and initialize a dvbpsi_atsc_stt_t structure.
+ *****************************************************************************/
+dvbpsi_atsc_stt_t *dvbpsi_atsc_NewSTT(uint8_t i_version, bool b_current_next)
+{
+    dvbpsi_atsc_stt_t *p_stt;
+    p_stt = (dvbpsi_atsc_stt_t*)malloc(sizeof(dvbpsi_atsc_stt_t));
+    if (p_stt != NULL)
+        dvbpsi_atsc_InitSTT(p_stt, i_version);
+    return p_stt;
 }
 
 /*****************************************************************************
@@ -162,33 +192,45 @@ void dvbpsi_atsc_EmptySTT(dvbpsi_atsc_stt_t* p_stt)
 }
 
 /*****************************************************************************
+ * dvbpsi_atsc_DeleteSTT
+ *****************************************************************************
+ * Empty and Delere a dvbpsi_atsc_stt_t structure.
+ *****************************************************************************/
+void dvbpsi_atsc_DeleteSTT(dvbpsi_atsc_stt_t *p_stt)
+{
+    if (p_stt)
+        dvbpsi_atsc_EmptySTT(p_stt);
+    free(p_stt);
+    p_stt = NULL;
+}
+
+/*****************************************************************************
  * dvbpsi_atsc_STTAddDescriptor
  *****************************************************************************
  * Add a descriptor to the STT table.
  *****************************************************************************/
-dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor(
-                                               dvbpsi_atsc_stt_t *p_stt,
+dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor( dvbpsi_atsc_stt_t *p_stt,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data)
 {
-  dvbpsi_descriptor_t * p_descriptor
-                        = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
-  if(p_descriptor)
-  {
-    if(p_stt->p_first_descriptor == NULL)
+    dvbpsi_descriptor_t * p_descriptor
+            = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
+    if(p_descriptor)
     {
-      p_stt->p_first_descriptor = p_descriptor;
+        if(p_stt->p_first_descriptor == NULL)
+        {
+            p_stt->p_first_descriptor = p_descriptor;
+        }
+        else
+        {
+            dvbpsi_descriptor_t * p_last_descriptor = p_stt->p_first_descriptor;
+            while(p_last_descriptor->p_next != NULL)
+                p_last_descriptor = p_last_descriptor->p_next;
+            p_last_descriptor->p_next = p_descriptor;
+        }
     }
-    else
-    {
-      dvbpsi_descriptor_t * p_last_descriptor = p_stt->p_first_descriptor;
-      while(p_last_descriptor->p_next != NULL)
-        p_last_descriptor = p_last_descriptor->p_next;
-      p_last_descriptor->p_next = p_descriptor;
-    }
-  }
 
-  return p_descriptor;
+    return p_descriptor;
 }
 
 /*****************************************************************************
@@ -196,38 +238,50 @@ dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor(
  *****************************************************************************
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
-void dvbpsi_atsc_GatherSTTSections(dvbpsi_decoder_t * p_psi_decoder,
-                              void * p_private_decoder,
+static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t *p_dvbpsi, void *p_private_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
-  dvbpsi_atsc_stt_decoder_t * p_stt_decoder
-                        = (dvbpsi_atsc_stt_decoder_t*)p_private_decoder;
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
 
-  if(!p_stt_decoder)
-      return;
+    dvbpsi_atsc_stt_decoder_t *p_stt_decoder =
+            (dvbpsi_atsc_stt_decoder_t*)p_private_decoder;
+    if (!p_stt_decoder)
+    {
+        dvbpsi_error(p_dvbpsi, "EIT decoder", "No decoder specified");
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
 
-  dvbpsi_atsc_stt_t *p_stt;
+    if (!p_section->b_syntax_indicator)
+    {
+        /* Invalid section_syntax_indicator */
+        dvbpsi_error(p_dvbpsi, "STT decoder",
+                     "invalid section (section_syntax_indicator == 0)");
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
 
-  if(!p_section->b_syntax_indicator)
-  {
-    /* Invalid section_syntax_indicator */
-    DVBPSI_ERROR("STT decoder",
-                 "invalid section (section_syntax_indicator == 0)");
-  }
-  else
-  {
-      dvbpsi_atsc_NewSTT(p_stt, p_section->p_payload_start[0]);
-      if (p_stt)
-      {
-          /* Decode the sections */
-          dvbpsi_atsc_DecodeSTTSections(p_stt, p_section);
-          /* Delete the sections */
-          dvbpsi_DeletePSISections(p_section);
-          /* signal the new STT */
-          p_stt_decoder->pf_callback(p_stt_decoder->p_cb_data,
-                                     p_stt);
-      }
-  }
+    /* FIXME: looks different then from other tables decoders */
+    dvbpsi_debug(p_dvbpsi, "STT decoder",
+                   "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
+                   "section %3d up to %3d, " "current %1d",
+                   p_section->i_version, p_section->i_table_id,
+                   p_section->i_extension,
+                   p_section->i_number, p_section->i_last_number,
+                   p_section->b_current_next);
+
+    dvbpsi_atsc_stt_t *p_stt;
+    p_stt = dvbpsi_atsc_NewSTT(p_section->i_version, p_section->b_current_next);
+    if (p_stt)
+    {
+        /* Decode the sections */
+        dvbpsi_atsc_DecodeSTTSections(p_stt, p_section);
+        /* Delete the sections */
+        dvbpsi_DeletePSISections(p_section);
+        /* signal the new STT */
+        p_stt_decoder->pf_stt_callback(p_stt_decoder->p_cb_data, p_stt);
+    }
 }
 
 /*****************************************************************************
@@ -235,7 +289,7 @@ void dvbpsi_atsc_GatherSTTSections(dvbpsi_decoder_t * p_psi_decoder,
  *****************************************************************************
  * STT decoder.
  *****************************************************************************/
-void dvbpsi_atsc_DecodeSTTSections(dvbpsi_atsc_stt_t* p_stt,
+static void dvbpsi_atsc_DecodeSTTSections(dvbpsi_atsc_stt_t* p_stt,
                               dvbpsi_psi_section_t* p_section)
 {
     uint8_t *p_byte, *p_end;
@@ -257,9 +311,9 @@ void dvbpsi_atsc_DecodeSTTSections(dvbpsi_atsc_stt_t* p_stt,
     while(p_byte + 2 <= p_end)
     {
         uint8_t i_tag = p_byte[0];
-        uint8_t i_length = p_byte[1];
-        if(i_length + 2 <= p_end - p_byte)
-          dvbpsi_atsc_STTAddDescriptor(p_stt, i_tag, i_length, p_byte + 2);
-        p_byte += 2 + i_length;
+        uint8_t i_len = p_byte[1];
+        if (i_len + 2 <= p_end - p_byte)
+            dvbpsi_atsc_STTAddDescriptor(p_stt, i_tag, i_len, p_byte + 2);
+        p_byte += 2 + i_len;
     }
 }
