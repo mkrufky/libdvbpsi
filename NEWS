@@ -10,6 +10,8 @@ Changes between 0.2.2 and 1.0.0:
  * EIT table generation
  * new descriptor 0x40
  * descriptor 0x03: added variable_rate_audio_indicator
+ * new descriptor (ATSC): 0x13, 0x14, 0x62, 0x66, 0x73, 0x83 decoders
+ * ATSC tables EIT, ETT, MGT, STT and VCT decoders
 
 Changes between 0.2.1 and 0.2.2:
 --------------------------------
