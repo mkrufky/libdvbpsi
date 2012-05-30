@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010  Adam Charrett
+Copyright (C) 2010-2012  Adam Charrett
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -24,12 +24,18 @@ Decode Carousel Id Descriptor.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
-#include <stdint.h>
 
-#include "dvbpsi.h"
+#if defined(HAVE_INTTYPES_H)
+#include <inttypes.h>
+#elif defined(HAVE_STDINT_H)
+#include <stdint.h>
+#endif
+
+#include "../dvbpsi.h"
 #include "../dvbpsi_private.h"
-#include "descriptor.h"
+#include "../descriptor.h"
 
 #include "dr_13.h"
 
@@ -42,7 +48,7 @@ static dvbpsi_carousel_id_dr_t *NewCarouselDr(const size_t i_private)
                     calloc(1, sizeof(dvbpsi_carousel_id_dr_t) + i_private);
     if (p_carousel)
     {
-        p_carousel->p_private_data = p_carousel + sizeof(dvbpsi_carousel_id_dr_t);
+        p_carousel->p_private_data = ((uint8_t *)p_carousel + sizeof(dvbpsi_carousel_id_dr_t));
         p_carousel->i_private_data_len = i_private;
     }
     return p_carousel;

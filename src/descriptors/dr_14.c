@@ -24,12 +24,18 @@ Decode Assocation Tag Descriptor.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
-#include <stdint.h>
 
-#include "dvbpsi.h"
+#if defined(HAVE_INTTYPES_H)
+#include <inttypes.h>
+#elif defined(HAVE_STDINT_H)
+#include <stdint.h>
+#endif
+
+#include "../dvbpsi.h"
 #include "../dvbpsi_private.h"
-#include "descriptor.h"
+#include "../descriptor.h"
 
 #include "dr_14.h"
 
@@ -44,7 +50,7 @@ static dvbpsi_association_tag_dr_t *NewAssociationTagDr(const size_t i_selector,
     p_tag = (dvbpsi_association_tag_dr_t*) calloc(1, i_size);
     if (p_tag)
     {
-        p_tag->p_selector = p_tag + sizeof(dvbpsi_association_tag_dr_t);
+        p_tag->p_selector = ((uint8_t*)p_tag + sizeof(dvbpsi_association_tag_dr_t));
         p_tag->i_selector_len = i_selector;
 
         p_tag->p_private_data = p_tag->p_selector + i_selector;

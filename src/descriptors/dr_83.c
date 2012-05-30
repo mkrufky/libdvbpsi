@@ -24,12 +24,18 @@ Decode Logical Channel Number Descriptor.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
-#include <stdint.h>
 
-#include "dvbpsi.h"
+#if defined(HAVE_INTTYPES_H)
+#include <inttypes.h>
+#elif defined(HAVE_STDINT_H)
+#include <stdint.h>
+#endif
+
+#include "../dvbpsi.h"
 #include "../dvbpsi_private.h"
-#include "descriptor.h"
+#include "../descriptor.h"
 
 #include "dr_83.h"
 
