@@ -20,6 +20,9 @@ atsc_ett.c
 Decode PSIP Extended Text Table.
 
 */
+
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>

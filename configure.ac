@@ -40,7 +40,7 @@ AC_ARG_ENABLE(debug,
 esac],[debug=false])
 if test "$debug" = "true"
 then
-  CFLAGS_dist="${CFLAGS_dist} -g -ggdb3"
+  CFLAGS_dist="${CFLAGS_dist} -ggdb3"
 fi
 
 dnl --enable-release
