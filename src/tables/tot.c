@@ -87,7 +87,7 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     }
 
     /* subtable decoder configuration */
-    p_subdec->pf_callback = &dvbpsi_GatherTOTSections;
+    p_subdec->pf_gather = &dvbpsi_GatherTOTSections;
     p_subdec->p_cb_data = p_tot_decoder;
     p_subdec->i_id = (uint32_t)i_table_id << 16 | (uint32_t)0;
     p_subdec->pf_detach = dvbpsi_DetachTOT;

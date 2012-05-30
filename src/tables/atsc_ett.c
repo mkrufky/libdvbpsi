@@ -122,7 +122,7 @@ bool dvbpsi_atsc_AttachETT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id, uint16_t i_e
     }
 
     /* PSI decoder configuration */
-    p_subdec->pf_callback = &dvbpsi_atsc_GatherETTSections;
+    p_subdec->pf_gather = &dvbpsi_atsc_GatherETTSections;
     p_subdec->p_cb_data = p_ett_decoder;
     p_subdec->i_id = ((uint32_t)i_table_id << 16) | i_extension;
     p_subdec->pf_detach = dvbpsi_atsc_DetachETT;

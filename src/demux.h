@@ -54,21 +54,6 @@ typedef void (*dvbpsi_demux_new_cb_t) (void *   p_cb_data,
                                        uint16_t i_extension);
 
 /*****************************************************************************
- * dvbpsi_demux_subdec_cb_t
- *****************************************************************************/
-/*!
- * \typedef void (*dvbpsi_demux_subdec_cb_t)
-                    (dvbpsi_t             *p_dvbpsi,
-                     void                 *p_private_decoder,
-                     dvbpsi_psi_section_t *p_section);
- * \brief Subtable specific decoder.
- */
-typedef void (*dvbpsi_demux_subdec_cb_t)
-                     (dvbpsi_t             *p_dvbpsi,
-                      void                 *p_private_decoder,
-                      dvbpsi_psi_section_t *p_section);
-
-/*****************************************************************************
  * dvbpsi_demux_subdec_t
  *****************************************************************************/
 /*!
@@ -86,12 +71,13 @@ struct dvbpsi_demux_s;
 typedef struct dvbpsi_demux_subdec_s
 {
   uint32_t                        i_id;             /*!< subtable id */
-  dvbpsi_demux_subdec_cb_t        pf_callback;      /*!< subdec callback */
+
+  void (*pf_gather)(dvbpsi_t *, void *, dvbpsi_psi_section_t *); /*!< gather subdec callback */
   void *                          p_cb_data;        /*!< subdec callback data */
-  struct dvbpsi_demux_subdec_s *  p_next;           /*!< next subdec */
 
   void (*pf_detach)(dvbpsi_t *, uint8_t, uint16_t); /*!< detach subdec callback */
 
+  struct dvbpsi_demux_subdec_s *  p_next;           /*!< next subdec */
 } dvbpsi_demux_subdec_t;
 
 /*****************************************************************************

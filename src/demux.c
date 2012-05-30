@@ -107,7 +107,6 @@ void dvbpsi_Demux(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
     dvbpsi_demux_t * p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_private;
     dvbpsi_demux_subdec_t * p_subdec = dvbpsi_demuxGetSubDec(p_demux, p_section->i_table_id,
                                                              p_section->i_extension);
-
     if (p_subdec == NULL)
     {
         /* Tell the application we found a new subtable, so that it may attach a
@@ -121,13 +120,9 @@ void dvbpsi_Demux(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
     }
 
     if (p_subdec)
-    {
-        p_subdec->pf_callback(p_dvbpsi, p_subdec->p_cb_data, p_section);
-    }
+        p_subdec->pf_gather(p_dvbpsi, p_subdec->p_cb_data, p_section);
     else
-    {
         dvbpsi_DeletePSISections(p_section);
-    }
 }
 
 /*****************************************************************************

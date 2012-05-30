@@ -84,7 +84,7 @@ bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     }
 
     /* subtable decoder configuration */
-    p_subdec->pf_callback = &dvbpsi_GatherSDTSections;
+    p_subdec->pf_gather = &dvbpsi_GatherSDTSections;
     p_subdec->p_cb_data = p_sdt_decoder;
     p_subdec->i_id = (uint32_t)i_table_id << 16 | (uint32_t)i_extension;
     p_subdec->pf_detach = &dvbpsi_DetachSDT;
