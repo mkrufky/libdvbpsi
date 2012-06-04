@@ -27,37 +27,38 @@ longer needed.
 <p>
 The following examples shows howto translate existing applications. In these examples only
 source code snippits are used and can thus not be compiled standalone. The examples are taken
-from existing applications using libdvbpsi.
+from existing applications using libdvbpsi. For a more elaborate example take a look in examples/ directory
+and especially to the file examples/dvbinfo/libdvbpsi.c from the dvbinfo application.
 </p>
 
 <p>In many existing applications the following scheme is used to attaching a PAT decoder to a dvbpsi handle:</p>
 
 <code>
-    dvbpsi_handle handle;
-    dvbpsi_AttachPAT(handle, handle_PAT, data);
+&nbsp; dvbpsi_handle handle; <br />
+&nbsp; dvbpsi_AttachPAT(handle, handle_PAT, data); <br />
 </code>
 
 <p>The same scheme is used for other PSI tables too, this translate to the following code sequence:</p>
 
 <code>
-    dvbpsi_t *handle = dvbpsi_NewHandle(&dvbpsi_message, DVBPSI_MSG_DEBUG);
-    if (handle == NULL)
-        goto error;
-    if (!dvbpsi_AttachPAT(handle, handle_PAT, data))
-    {
-        dvbpsi_DeleteHandle(handle);
-        handle = NULL;
-        goto error;
-    }
-
-    return 0;
-
-error:
-    if (dvbpsi_HasDecoder(handle))
-        dvbpsi_DetachPAT(andle);
-    if (handle)
-        dvbpsi_DeleteHandle(handle);
-    return -1;
+&nbsp; dvbpsi_t *handle = dvbpsi_NewHandle(&dvbpsi_message, DVBPSI_MSG_DEBUG); <br />
+&nbsp; if (handle == NULL) <br />
+&nbsp;&nbsp; goto error; <br />
+&nbsp; if (!dvbpsi_AttachPAT(handle, handle_PAT, data)) <br />
+&nbsp; { <br />
+&nbsp; &nbsp; dvbpsi_DeleteHandle(handle); <br />
+&nbsp; &nbsp; handle = NULL; <br />
+&nbsp; &nbsp; goto error; <br />
+&nbsp; } <br />
+&nbsp; <br />
+&nbsp; return 0; <br />
+&nbsp; <br />
+error: <br />
+&nbsp; if (dvbpsi_HasDecoder(handle)) <br />
+&nbsp; &nbsp; dvbpsi_DetachPAT(andle); <br />
+&nbsp; if (handle) <br />
+&nbsp; &nbsp;  dvbpsi_DeleteHandle(handle); <br />
+&nbsp; return -1; <br />
 </code>
 
 <p>The <em>message callback function</em> <b>dvbpsi_message</b> is defined as follows below. In this case
@@ -66,17 +67,17 @@ along libdvbpsi messages if wanted. See the following example:
 </p>
 
 <code>
-static void dvbpsi_message(dvbpsi_t *p_dvbpsi, const dvbpsi_msg_level_t level, const char* msg)
-{
-    switch(level)
-    {
-        case DVBPSI_MSG_ERROR: fprintf(stderr, "Error: "); break;
-        case DVBPSI_MSG_WARN:  fprintf(stderr, "Warning: "); break;
-        case DVBPSI_MSG_DEBUG: fprintf(stderr, "Debug: "); break;
-        default:
-            return;
-    }
-    fprintf(stderr, "%s\n", msg);
-}
+static void dvbpsi_message(dvbpsi_t *p_dvbpsi, const dvbpsi_msg_level_t level, const char* msg) <br />
+{ <br />
+&nbsp; switch(level) <br />
+&nbsp; { <br />
+&nbsp; case DVBPSI_MSG_ERROR: fprintf(stderr, "Error: "); break;   <br />
+&nbsp; case DVBPSI_MSG_WARN:  fprintf(stderr, "Warning: "); break; <br />
+&nbsp; case DVBPSI_MSG_DEBUG: fprintf(stderr, "Debug: "); break;   <br />
+&nbsp; default: <br />
+&nbsp; &nbsp; return; <br />
+&nbsp; } <br />
+&nbsp; fprintf(stderr, "%s\n", msg); <br />
+} <br />
 </code>
 */

@@ -27,7 +27,8 @@ TS discontinuities signaled by the <em>PSI decoder</em>. </p>
 <em>specific decoder</em> must be implemented for all the PSI
 tables.</p>
 
-\ref usage
-\ref howto-new-api
-
+<ul>
+<li>\ref usage</li>
+<li>\ref howto-new-api</li>
+</ul>
 */

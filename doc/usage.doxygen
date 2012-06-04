@@ -39,7 +39,9 @@ have been detached.</p>
   <li>ATSC tables: atsc_eit.h atsc_ett.h atsc_mgt.h atsc_stt.h atsc_vct.h</li>
 </ul>
 
-\ref structure
-\ref howto-new-api
-
+<p>See also:</p>
+<ul>
+<li>\ref structure</li>
+<li>\ref howto-new-api</li>
+</ul>
 */
