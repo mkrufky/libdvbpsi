@@ -104,8 +104,6 @@ bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
-    dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_atsc_vct_decoder_t*  p_vct_decoder;
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
@@ -116,26 +114,23 @@ bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
         return false;
     }
 
-    p_subdec = (dvbpsi_demux_subdec_t*)calloc(1, sizeof(dvbpsi_demux_subdec_t));
-    if (p_subdec == NULL)
-        return false;
-
+    dvbpsi_atsc_vct_decoder_t*  p_vct_decoder;
     p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)calloc(1, sizeof(dvbpsi_atsc_vct_decoder_t));
     if (p_vct_decoder == NULL)
+        return false;
+
+    /* subtable decoder configuration */
+    dvbpsi_demux_subdec_t* p_subdec;
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_atsc_DetachVCT,
+                                         dvbpsi_atsc_GatherVCTSections, p_vct_decoder);
+    if (p_subdec == NULL)
     {
-        free(p_subdec);
+        free(p_vct_decoder);
         return false;
     }
 
-    /* subtable decoder configuration */
-    p_subdec->pf_gather = &dvbpsi_atsc_GatherVCTSections;
-    p_subdec->p_cb_data = p_vct_decoder;
-    p_subdec->i_id = ((uint32_t)i_table_id << 16) | i_extension;
-    p_subdec->pf_detach = dvbpsi_atsc_DetachVCT;
-
     /* Attach the subtable decoder to the demux */
-    p_subdec->p_next = p_demux->p_first_subdec;
-    p_demux->p_first_subdec = p_subdec;
+    dvbpsi_AttachDemuxSubDecoder(p_demux, p_subdec);
 
     /* VCT decoder information */
     p_vct_decoder->pf_vct_callback = pf_vct_callback;
@@ -161,10 +156,8 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_demux_subdec_t** pp_prev_subdec;
-    dvbpsi_atsc_vct_decoder_t* p_vct_decoder;
 
+    dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if(p_subdec == NULL)
     {
@@ -175,25 +168,22 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
         return;
     }
 
+    dvbpsi_atsc_vct_decoder_t* p_vct_decoder;
     p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)p_subdec->p_cb_data;
-    if(!p_vct_decoder)
+    if (!p_vct_decoder)
         return;
     free(p_vct_decoder->p_building_vct);
 
-    for(unsigned int i = 0; i < 256; i++)
+    for (unsigned int i = 0; i < 256; i++)
     {
         if (p_vct_decoder->ap_sections[i])
             dvbpsi_DeletePSISections(p_vct_decoder->ap_sections[i]);
     }
     free(p_subdec->p_cb_data);
+    p_subdec->p_cb_data = NULL;
 
-    pp_prev_subdec = &p_demux->p_first_subdec;
-    while(*pp_prev_subdec != p_subdec)
-        pp_prev_subdec = &(*pp_prev_subdec)->p_next;
-
-    *pp_prev_subdec = p_subdec->p_next;
-    free(p_subdec);
-    p_subdec = NULL;
+    dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
+    dvbpsi_DeleteDemuxSubDecoder(p_subdec);
 }
 
 /*****************************************************************************

@@ -68,15 +68,13 @@ static void dvbpsi_atsc_DecodeSTTSections(dvbpsi_atsc_stt_t* p_stt,
  *****************************************************************************
  * Initialize a STT subtable decoder.
  *****************************************************************************/
-bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
+bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
                           dvbpsi_atsc_stt_callback pf_stt_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
-    dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_atsc_stt_decoder_t*  p_stt_decoder;
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0))
     {
@@ -86,26 +84,23 @@ bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
         return false;
     }
 
-    p_subdec = (dvbpsi_demux_subdec_t*)malloc(sizeof(dvbpsi_demux_subdec_t));
-    if(p_subdec == NULL)
+    dvbpsi_atsc_stt_decoder_t*  p_stt_decoder;
+    p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)malloc(sizeof(dvbpsi_atsc_stt_decoder_t));
+    if (p_stt_decoder == NULL)
         return false;
 
-    p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)malloc(sizeof(dvbpsi_atsc_stt_decoder_t));
-    if(p_stt_decoder == NULL)
+    /* subtable decoder configuration */
+    dvbpsi_demux_subdec_t* p_subdec;
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_atsc_DetachSTT,
+                                         dvbpsi_atsc_GatherSTTSections, p_stt_decoder);
+    if (p_subdec == NULL)
     {
-        free(p_subdec);
+        free(p_stt_decoder);
         return false;
     }
 
-    /* subtable decoder configuration */
-    p_subdec->pf_gather = &dvbpsi_atsc_GatherSTTSections;
-    p_subdec->p_cb_data = p_stt_decoder;
-    p_subdec->i_id = (uint32_t)i_table_id << 16;
-    p_subdec->pf_detach = dvbpsi_atsc_DetachSTT;
-
     /* Attach the subtable decoder to the demux */
-    p_subdec->p_next = p_demux->p_first_subdec;
-    p_demux->p_first_subdec = p_subdec;
+    dvbpsi_AttachDemuxSubDecoder(p_demux, p_subdec);
 
     /* STT decoder information */
     p_stt_decoder->pf_stt_callback = pf_stt_callback;
@@ -125,10 +120,10 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_demux_subdec_t** pp_prev_subdec;
 
-    p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0);
+    i_extension = 0;
+    dvbpsi_demux_subdec_t* p_subdec;
+    p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if (p_subdec == NULL)
     {
         dvbpsi_error(p_dvbpsi, "STT Decoder",
@@ -144,13 +139,10 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
         return;
 
     free(p_subdec->p_cb_data);
+    p_subdec->p_cb_data = NULL;
 
-    pp_prev_subdec = &p_demux->p_first_subdec;
-    while(*pp_prev_subdec != p_subdec)
-        pp_prev_subdec = &(*pp_prev_subdec)->p_next;
-
-    *pp_prev_subdec = p_subdec->p_next;
-    free(p_subdec);
+    dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
+    dvbpsi_DeleteDemuxSubDecoder(p_subdec);
 }
 
 /*****************************************************************************

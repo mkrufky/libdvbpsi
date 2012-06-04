@@ -71,11 +71,12 @@ typedef void (* dvbpsi_atsc_stt_callback)(void* p_cb_data, dvbpsi_atsc_stt_t* p_
  * \brief Creation and initialization of a STT decoder.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached
  * \param i_table_id Table ID, 0xCD.
+ * \param i_extension Table ID extension, here it should be 0.
  * \param pf_stt_callback function to call back on new STT.
  * \param p_cb_data private data given in argument to the callback.
  * \return true if everything went ok else false
  */
-bool dvbpsi_atsc_AttachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+bool dvbpsi_atsc_AttachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
           dvbpsi_atsc_stt_callback pf_stt_callback, void* p_cb_data);
 
 /*****************************************************************************

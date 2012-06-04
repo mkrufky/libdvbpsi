@@ -56,14 +56,12 @@
  * Initialize a TDT/TOT subtable decoder.
  *****************************************************************************/
 bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
-                     dvbpsi_tot_callback pf_callback, void* p_cb_data)
+                      dvbpsi_tot_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
-    dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_tot_decoder_t*  p_tot_decoder;
 
     i_extension = 0; /* NOTE: force to 0 when handling TDT/TOT */
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
@@ -75,26 +73,23 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
         return false;
     }
 
-    p_subdec = (dvbpsi_demux_subdec_t*)calloc(1, sizeof(dvbpsi_demux_subdec_t));
-    if(p_subdec == NULL)
-        return false;
-
+    dvbpsi_tot_decoder_t*  p_tot_decoder;
     p_tot_decoder = (dvbpsi_tot_decoder_t*)calloc(1, sizeof(dvbpsi_tot_decoder_t));
     if (p_tot_decoder == NULL)
+        return false;
+
+    /* subtable decoder configuration */
+    dvbpsi_demux_subdec_t* p_subdec;
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachTOT,
+                                         dvbpsi_GatherTOTSections, p_tot_decoder);
+    if (p_subdec == NULL)
     {
-        free(p_subdec);
+        free(p_tot_decoder);
         return false;
     }
 
-    /* subtable decoder configuration */
-    p_subdec->pf_gather = &dvbpsi_GatherTOTSections;
-    p_subdec->p_cb_data = p_tot_decoder;
-    p_subdec->i_id = (uint32_t)i_table_id << 16 | (uint32_t)0;
-    p_subdec->pf_detach = dvbpsi_DetachTOT;
-
     /* Attach the subtable decoder to the demux */
-    p_subdec->p_next = p_demux->p_first_subdec;
-    p_demux->p_first_subdec = p_subdec;
+    dvbpsi_AttachDemuxSubDecoder(p_demux, p_subdec);
 
     /* TDT/TOT decoder information */
     p_tot_decoder->pf_tot_callback = pf_callback;
@@ -116,7 +111,6 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
 
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_private;
     dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_demux_subdec_t** pp_prev_subdec;
 
     i_extension = 0; /* NOTE: force to 0 when handling TDT/TOT */
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
@@ -129,15 +123,8 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
         return;
     }
 
-    free(p_subdec->p_cb_data);
-
-    pp_prev_subdec = &p_demux->p_first_subdec;
-    while(*pp_prev_subdec != p_subdec)
-        pp_prev_subdec = &(*pp_prev_subdec)->p_next;
-
-    *pp_prev_subdec = p_subdec->p_next;
-    free(p_subdec);
-    p_subdec = NULL;
+    dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
+    dvbpsi_DeleteDemuxSubDecoder(p_subdec);
 }
 
 /*****************************************************************************

@@ -96,7 +96,6 @@ bool dvbpsi_atsc_AttachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
-    dvbpsi_demux_subdec_t *p_subdec;
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
@@ -106,27 +105,22 @@ bool dvbpsi_atsc_AttachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
         return false;
     }
 
-    p_subdec = (dvbpsi_demux_subdec_t*)malloc(sizeof(dvbpsi_demux_subdec_t));
-    if (p_subdec == NULL)
-        return false;
-
     dvbpsi_atsc_mgt_decoder_t*  p_mgt_decoder;
     p_mgt_decoder = (dvbpsi_atsc_mgt_decoder_t*)malloc(sizeof(dvbpsi_atsc_mgt_decoder_t));
     if(p_mgt_decoder == NULL)
+        return false;
+
+    dvbpsi_demux_subdec_t* p_subdec;
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_atsc_DetachMGT,
+                                         dvbpsi_atsc_GatherMGTSections, p_mgt_decoder);
+    if (p_subdec == NULL)
     {
-        free(p_subdec);
+        free(p_mgt_decoder);
         return false;
     }
 
-    /* subtable decoder configuration */
-    p_subdec->pf_gather = &dvbpsi_atsc_GatherMGTSections;
-    p_subdec->p_cb_data = p_mgt_decoder;
-    p_subdec->i_id = ((uint32_t)i_table_id << 16) | i_extension;
-    p_subdec->pf_detach = dvbpsi_atsc_DetachMGT;
-
     /* Attach the subtable decoder to the demux */
-    p_subdec->p_next = p_demux->p_first_subdec;
-    p_demux->p_first_subdec = p_subdec;
+    dvbpsi_AttachDemuxSubDecoder(p_demux, p_subdec);
 
     /* MGT decoder information */
     p_mgt_decoder->pf_mgt_callback = pf_callback;
@@ -150,10 +144,9 @@ void dvbpsi_atsc_DetachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
-    dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_demux_subdec_t** pp_prev_subdec;
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
 
+    dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if (p_subdec == NULL)
     {
@@ -166,28 +159,23 @@ void dvbpsi_atsc_DetachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
 
     dvbpsi_atsc_mgt_decoder_t* p_mgt_decoder;
     p_mgt_decoder = (dvbpsi_atsc_mgt_decoder_t*)p_subdec->p_cb_data;
-    if(!p_mgt_decoder)
+    if (!p_mgt_decoder)
         return;
 
     if (p_mgt_decoder->p_building_mgt)
-    {
         free(p_mgt_decoder->p_building_mgt);
-    }
 
     for (unsigned int i = 0; i < 256; i++)
     {
-        if(p_mgt_decoder->ap_sections[i])
+        if (p_mgt_decoder->ap_sections[i])
             dvbpsi_DeletePSISections(p_mgt_decoder->ap_sections[i]);
     }
 
     free(p_subdec->p_cb_data);
+    p_subdec->p_cb_data = NULL;
 
-    pp_prev_subdec = &p_demux->p_first_subdec;
-    while(*pp_prev_subdec != p_subdec)
-        pp_prev_subdec = &(*pp_prev_subdec)->p_next;
-
-    *pp_prev_subdec = p_subdec->p_next;
-    free(p_subdec);
+    dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
+    dvbpsi_DeleteDemuxSubDecoder(p_subdec);
 }
 
 /*****************************************************************************

@@ -63,8 +63,6 @@ bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
-    dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_nit_decoder_t*  p_nit_decoder;
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
@@ -75,26 +73,23 @@ bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
         return false;
     }
 
-    p_subdec = (dvbpsi_demux_subdec_t*)calloc(1, sizeof(dvbpsi_demux_subdec_t));
-    if (p_subdec == NULL)
-        return false;
-
+    dvbpsi_nit_decoder_t*  p_nit_decoder;
     p_nit_decoder = (dvbpsi_nit_decoder_t*)calloc(1, sizeof(dvbpsi_nit_decoder_t));
     if (p_nit_decoder == NULL)
+        return false;
+
+    /* subtable decoder configuration */
+    dvbpsi_demux_subdec_t* p_subdec;
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachNIT,
+                                         dvbpsi_GatherNITSections, p_nit_decoder);
+    if (p_subdec == NULL)
     {
-        free(p_subdec);
+        free(p_nit_decoder);
         return false;
     }
 
-    /* subtable decoder configuration */
-    p_subdec->pf_gather = &dvbpsi_GatherNITSections;
-    p_subdec->p_cb_data = p_nit_decoder;
-    p_subdec->i_id = (uint32_t)i_table_id << 16 | (uint32_t)i_extension;
-    p_subdec->pf_detach = dvbpsi_DetachNIT;
-
     /* Attach the subtable decoder to the demux */
-    p_subdec->p_next = p_demux->p_first_subdec;
-    p_demux->p_first_subdec = p_subdec;
+    dvbpsi_AttachDemuxSubDecoder(p_demux, p_subdec);
 
     /* NIT decoder information */
     p_nit_decoder->i_network_id = i_extension;
@@ -118,10 +113,8 @@ void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
                       uint16_t i_extension)
 {
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_demux_subdec_t** pp_prev_subdec;
-    dvbpsi_nit_decoder_t* p_nit_decoder;
 
+    dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if(p_demux == NULL)
     {
@@ -132,6 +125,7 @@ void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
         return;
     }
 
+    dvbpsi_nit_decoder_t* p_nit_decoder;
     p_nit_decoder = (dvbpsi_nit_decoder_t*)p_subdec->p_cb_data;
     free(p_nit_decoder->p_building_nit);
 
@@ -141,14 +135,11 @@ void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
             dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[i]);
     }
     free(p_subdec->p_cb_data);
+    p_subdec->p_cb_data = NULL;
 
-    pp_prev_subdec = &p_demux->p_first_subdec;
-    while(*pp_prev_subdec != p_subdec)
-        pp_prev_subdec = &(*pp_prev_subdec)->p_next;
-
-    *pp_prev_subdec = p_subdec->p_next;
-    free(p_subdec);
-    p_subdec = NULL;
+    /* Free demux sub table decoder */
+    dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
+    dvbpsi_DeleteDemuxSubDecoder(p_subdec);
 }
 
 /****************************************************************************

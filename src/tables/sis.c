@@ -60,8 +60,6 @@ bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
-    dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_sis_decoder_t*  p_sis_decoder;
 
     i_extension = 0;
 
@@ -74,26 +72,23 @@ bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
         return false;
     }
 
-    p_subdec = (dvbpsi_demux_subdec_t*)malloc(sizeof(dvbpsi_demux_subdec_t));
-    if (p_subdec == NULL)
-        return false;
-
+    dvbpsi_sis_decoder_t*  p_sis_decoder;
     p_sis_decoder = (dvbpsi_sis_decoder_t*)malloc(sizeof(dvbpsi_sis_decoder_t));
     if (p_sis_decoder == NULL)
+        return false;
+
+    /* subtable decoder configuration */
+    dvbpsi_demux_subdec_t* p_subdec;
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachSIS,
+                                         dvbpsi_GatherSISSections, p_sis_decoder);
+    if (p_subdec == NULL)
     {
-        free(p_subdec);
+        free(p_sis_decoder);
         return false;
     }
 
-    /* subtable decoder configuration */
-    p_subdec->pf_gather = &dvbpsi_GatherSISSections;
-    p_subdec->p_cb_data = p_sis_decoder;
-    p_subdec->i_id = (uint32_t)i_table_id << 16 | (uint32_t)i_extension;
-    p_subdec->pf_detach = dvbpsi_DetachSIS;
-
     /* Attach the subtable decoder to the demux */
-    p_subdec->p_next = p_demux->p_first_subdec;
-    p_demux->p_first_subdec = p_subdec;
+    dvbpsi_AttachDemuxSubDecoder(p_demux, p_subdec);
 
     /* SIS decoder information */
     p_sis_decoder->pf_sis_callback = pf_callback;
@@ -114,11 +109,9 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_demux_subdec_t* p_subdec;
-    dvbpsi_demux_subdec_t** pp_prev_subdec;
 
     i_extension = 0;
-
+    dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if (p_demux == NULL)
     {
@@ -129,18 +122,8 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
         return;
     }
 
-    dvbpsi_sis_decoder_t* p_sis_decoder;
-    p_sis_decoder = (dvbpsi_sis_decoder_t*)p_subdec->p_cb_data;
-    free(p_sis_decoder);
-    p_subdec->p_cb_data = NULL;
-
-    pp_prev_subdec = &p_demux->p_first_subdec;
-    while(*pp_prev_subdec != p_subdec)
-        pp_prev_subdec = &(*pp_prev_subdec)->p_next;
-
-    *pp_prev_subdec = p_subdec->p_next;
-    free(p_subdec);
-    p_subdec = NULL;
+    dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
+    dvbpsi_DeleteDemuxSubDecoder(p_subdec);
 }
 
 /*****************************************************************************
