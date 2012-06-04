@@ -141,8 +141,8 @@ static void message(dvbpsi_t *handle, const dvbpsi_msg_level_t level, const char
 /*****************************************************************************
  * NewSubtable
  *****************************************************************************/
-static void NewSubtable(void * p_zero, dvbpsi_t *p_dvbpsi,
-                 uint8_t i_table_id, uint16_t i_extension)
+static void NewSubtable(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                        void * p_zero)
 {
   if(i_table_id == 0x42)
   {

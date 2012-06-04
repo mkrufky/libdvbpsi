@@ -111,8 +111,8 @@ void dvbpsi_Demux(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
     {
         /* Tell the application we found a new subtable, so that it may attach a
          * subtable decoder */
-        p_demux->pf_new_callback(p_demux->p_new_cb_data, p_dvbpsi,
-                                 p_section->i_table_id, p_section->i_extension);
+        p_demux->pf_new_callback(p_dvbpsi, p_section->i_table_id, p_section->i_extension,
+                                 p_demux->p_new_cb_data);
 
         /* Check if a new subtable decoder is available */
         p_subdec = dvbpsi_demuxGetSubDec(p_demux, p_section->i_table_id,
@@ -151,4 +151,86 @@ void dvbpsi_DetachDemux(dvbpsi_t *p_dvbpsi)
 
     dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
     p_dvbpsi->p_private = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_NewDemuxSubDecoder
+ *****************************************************************************
+ * Allocate a new demux sub table decoder
+ *****************************************************************************/
+dvbpsi_demux_subdec_t *dvbpsi_NewDemuxSubDecoder(const uint8_t i_table_id,
+                                                 const uint16_t i_extension,
+                                                 dvbpsi_demux_detach_cb_t pf_detach,
+                                                 dvbpsi_demux_gather_cb_t pf_gather,
+                                                 void *cb_data)
+{
+    assert(pf_gather);
+    assert(pf_detach);
+
+    dvbpsi_demux_subdec_t *p_subdec = calloc(1, sizeof(dvbpsi_demux_subdec_t));
+    if (p_subdec == NULL)
+        return NULL;
+
+    uint32_t i_id = (uint32_t)i_table_id << 16 | (uint32_t)i_extension;
+
+    /* subtable decoder configuration */
+    p_subdec->i_id = i_id;
+    p_subdec->p_cb_data = cb_data;
+    p_subdec->pf_gather = pf_gather;
+    p_subdec->pf_detach = pf_detach;
+
+    return p_subdec;
+}
+
+/*****************************************************************************
+ * dvbpsi_DeleteDemuxSubDecoder
+ *****************************************************************************
+ * Free a demux sub table decoder
+ *****************************************************************************/
+void dvbpsi_DeleteDemuxSubDecoder(dvbpsi_demux_subdec_t *p_subdec)
+{
+    assert(p_subdec);
+
+    if (!p_subdec)
+        return;
+
+    free(p_subdec->p_cb_data);
+    free(p_subdec);
+    p_subdec = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_AttachDemuxSubDecoder
+ *****************************************************************************/
+void dvbpsi_AttachDemuxSubDecoder(dvbpsi_demux_t *p_demux, dvbpsi_demux_subdec_t *p_subdec)
+{
+    assert(p_demux);
+    assert(p_subdec);
+
+    if (!p_demux || !p_subdec)
+        abort();
+
+    p_subdec->p_next = p_demux->p_first_subdec;
+    p_demux->p_first_subdec = p_subdec;
+}
+
+/*****************************************************************************
+ * dvbpsi_DetachDemuxSubDecoder
+ *****************************************************************************/
+void dvbpsi_DetachDemuxSubDecoder(dvbpsi_demux_t *p_demux, dvbpsi_demux_subdec_t *p_subdec)
+{
+    assert(p_demux);
+    assert(p_demux->p_first_subdec);
+
+    assert(p_subdec);
+
+    if (!p_demux || !p_subdec)
+        abort();
+
+    dvbpsi_demux_subdec_t** pp_prev_subdec;
+    pp_prev_subdec = &p_demux->p_first_subdec;
+    while(*pp_prev_subdec != p_subdec)
+        pp_prev_subdec = &(*pp_prev_subdec)->p_next;
+
+    *pp_prev_subdec = p_subdec->p_next;
 }

@@ -198,8 +198,8 @@ static void DumpBAT(void* p_zero, dvbpsi_bat_t* p_bat)
 /*****************************************************************************
  * NewSubtable
  *****************************************************************************/
-static void NewSubtableBAT(void * p_zero, dvbpsi_t *p_dvbpsi,
-                 uint8_t i_table_id, uint16_t i_extension)
+static void NewSubtableBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                           void * p_zero)
 {
   if(i_table_id == 0x4a)
   {

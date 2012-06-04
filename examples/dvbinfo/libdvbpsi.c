@@ -525,8 +525,8 @@ static void summary_packet(FILE *fd, ts_stream_t *stream)
 /*****************************************************************************
  * handle_subtable
  *****************************************************************************/
-static void handle_subtable(void *p_data, dvbpsi_t *p_dvbpsi,
-                            uint8_t i_table_id, uint16_t i_extension)
+static void handle_subtable(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                            void *p_data)
 {
     switch (i_table_id)
     {
