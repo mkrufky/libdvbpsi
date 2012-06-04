@@ -3,14 +3,14 @@
  * \section intro_sec Introduction
 
 \author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
-\author Christophe Massion <massiot@via.ecp.fr>
+\author Christophe Massiot <massiot@via.ecp.fr>
 \author Jean-Paul Saman <jpsaman@videolan.org>
 \author Johan Billen <jobi@via.ecp.fr>
 \author Johann Hanne <jhml@gmx.net>
 \author and others (see AUTHORS file)
 
-<p>The <em>libdvbpsi</em> is a library developed by the <a
-href="http://www.videolan.org/">VideoLAN</a> team. This document
+<p>The <em>libdvbpsi</em> is a library developed by <a
+href="http://www.videolan.org/">VideoLAN</a>. This document
 describes how to use it and the "C" API.</p>
 
 <h2>What is libdvbpsi ?</h2>
@@ -37,7 +37,7 @@ describes how to use it and the "C" API.</p>
   <li>Program Map Table (<em>PMT</em>)</li>
   <li>Section Description Table (<em>SDT</em>)</li>
   <li>Splice Information Section Table (<em>SIS</em>)</li>
-  <li>TOT Table (<em>TOT</em>)</li>
+  <li>TOT/TDT Table (<em>TOT</em>)</li>
 </ul>
 
 <h2>Usage</h2>

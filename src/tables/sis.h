@@ -107,6 +107,10 @@ typedef struct dvbpsi_sis_s
  * \typedef struct dvbpsi_sis_cmd_splice_null_s dvbpsi_sis_cmd_splice_null_t
  * \brief splice_null() splice command definition
  */
+/*!
+ * \struct dvbpsi_sis_cmd_splice_null_s
+ * \brief splice_null() splice command definition
+ */
 typedef struct dvbpsi_sis_cmd_splice_null_s
 {
     /* nothing */
@@ -115,6 +119,10 @@ typedef struct dvbpsi_sis_cmd_splice_null_s
 /*!
  * \typedef struct dvbpsi_sis_break_duration_s dvbpsi_sis_break_duration_t
  * \brief splice event definition
+ */
+/*!
+ * \struct dvbpsi_sis_break_duration_s
+ * \brief splice break duration
  */
 typedef struct dvbpsi_sis_break_duration_s
 {
@@ -132,7 +140,11 @@ typedef struct dvbpsi_sis_break_duration_s
  * \typedef struct dvbpsi_sis_component_utc_splice_time_s dvbpsi_sis_component_utc_splice_time_t
  * \brief combined component tag and UTC splice time definition
  */
-typedef struct dvbpsi_sis_component_utc_splice_time_s dvbpsi_sis_component_utc_splice_time_s;
+typedef struct dvbpsi_sis_component_utc_splice_time_s dvbpsi_sis_component_utc_splice_time_t;
+/*!
+ * \struct dvbpsi_sis_component_utc_splice_time_s
+ * \brief combined component tag and UTC splice time definition
+ */
 struct dvbpsi_sis_component_utc_splice_time_s
 {
     uint8_t     component_tag;      /*!< identifies the elementary PID stream containing
@@ -144,12 +156,16 @@ struct dvbpsi_sis_component_utc_splice_time_s
                                          Maybe converted to UTC without use of
                                          GPS_UTC_offset value from System Time table. */
 
-    dvbpsi_sis_component_utc_splice_time_s *p_next; /*!< next component, utc splice time structure */
+    dvbpsi_sis_component_utc_splice_time_t *p_next; /*!< next component, utc splice time structure */
 };
 
 /*!
  * \typedef struct dvbpsi_sis_splice_event_s dvbpsi_sis_splice_event_t
  * \brief splice event definition
+ */
+/*!
+ * \struct dvbpsi_sis_splice_event_s
+ * \brief splice events structure, @see dvbpsi_sis_splice_event_t
  */
 typedef struct dvbpsi_sis_splice_event_s dvbpsi_sis_splice_event_t;
 struct dvbpsi_sis_splice_event_s
@@ -171,7 +187,7 @@ struct dvbpsi_sis_splice_event_s
     uint8_t         i_component_count;          /*!< number of stream PID in the following
                                                      loop. A component is equivalent to
                                                      elementary stream PIDs.*/
-    dvbpsi_sis_component_utc_splice_time_s  *p_data;
+    dvbpsi_sis_component_utc_splice_time_t  *p_data;
                                                 /*!< identifies the elementary PID stream containing
                                                      the Splice Point specified by the value of
                                                      splice_time() that follows. */
@@ -195,6 +211,10 @@ struct dvbpsi_sis_splice_event_s
  * \typedef struct dvbpsi_sis_cmd_splice_schedule_s dvbpsi_sis_cmd_splice_schedule_t
  * \brief splice_schedule() splice command definition
  */
+/*!
+ * \struct dvbpsi_sis_cmd_splice_schedule_s
+ * \brief splice_schedule() splice command definition
+ */
 typedef struct dvbpsi_sis_cmd_splice_schedule_s
 {
     uint8_t                     i_splice_count; /*!< Count of splice events */
@@ -203,6 +223,10 @@ typedef struct dvbpsi_sis_cmd_splice_schedule_s
 
 /*!
  * \typedef struct dvbpsi_sis_splice_time_s dvbpsi_sis_splice_time_t
+ * \brief splice_time() splice definition
+ */
+/*!
+ * \struct dvbpsi_sis_splice_time_s
  * \brief splice_time() splice definition
  */
 typedef struct dvbpsi_sis_splice_time_s dvbpsi_sis_splice_time_t;
@@ -220,7 +244,11 @@ struct dvbpsi_sis_splice_time_s
 };
 
 /*!
- * \typedef struct dvbpsi_sis_splice_time_s dvbpsi_sis_splice_time_t
+ * \typedef struct dvbpsi_sis_component_splice_time_s dvbpsi_sis_component_splice_time_t
+ * \brief component_tag, splice_time definition
+ */
+/*!
+ * \struct dvbpsi_sis_component_splice_time_s
  * \brief component_tag, splice_time definition
  */
 typedef struct dvbpsi_sis_component_splice_time_s dvbpsi_sis_component_splice_time_t;
@@ -240,6 +268,10 @@ struct dvbpsi_sis_component_splice_time_s
  * \typedef struct dvbpsi_sis_cmd_splice_insert_s dvbpsi_sis_cmd_splice_insert_t
  * \brief splice_insert() splice command definition
  */
+/*!
+ * \struct dvbpsi_sis_cmd_splice_insert_s
+ * \brief splice_insert() splice command definition
+ */
 typedef struct dvbpsi_sis_cmd_splice_insert_s
 {
     uint32_t        i_splice_event_id;               /*!< splice event identifier */
@@ -252,7 +284,7 @@ typedef struct dvbpsi_sis_cmd_splice_insert_s
     bool            b_splice_immediate_flag;    /*!< signals immediate splice insertion */
 
     /*      if (b_program_splice_flag) && (!b_splice_immediate_flag) */
-    dvbpsi_sis_splice_time_t *p_splice_time;           /*!< splice time */
+    dvbpsi_sis_splice_time_t *p_splice_time;    /*!< splice time */
 
     /*      if (!b_program_splice_flag) */
     uint8_t         i_component_count;           /*!< number of stream PID in the following loop.
@@ -276,6 +308,10 @@ typedef struct dvbpsi_sis_cmd_splice_insert_s
  * \typedef struct dvbpsi_sis_cmd_time_signal_s dvbpsi_sis_cmd_time_signal_t
  * \brief time_signal() splice command definition
  */
+/*!
+ * \struct dvbpsi_sis_cmd_time_signal_s
+ * \brief time_signal() splice command definition
+ */
 typedef struct dvbpsi_sis_cmd_time_signal_s
 {
     dvbpsi_sis_splice_time_t *p_splice_time;       /*!< splice time command */
@@ -283,6 +319,10 @@ typedef struct dvbpsi_sis_cmd_time_signal_s
 
 /*!
  * \typedef struct dvbpsi_sis_cmd_bandwidth_reservation_s dvbpsi_sis_cmd_bandwidth_reservation_t
+ * \brief bandwidth_reservation() splice command definition
+ */
+/*!
+ * \struct dvbpsi_sis_cmd_bandwidth_reservation_s
  * \brief bandwidth_reservation() splice command definition
  */
 typedef struct dvbpsi_sis_cmd_bandwidth_reservation_s

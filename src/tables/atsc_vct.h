@@ -107,8 +107,8 @@ typedef void (* dvbpsi_atsc_vct_callback)(void* p_cb_data, dvbpsi_atsc_vct_t* p_
  *****************************************************************************/
 /*!
  * \fn bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
- *          dvbpsi_atsc_vct_callback pf_callback, void* p_cb_data)
- *
+          uint16_t i_extension, dvbpsi_atsc_vct_callback pf_vct_callback,
+                           void* p_cb_data)
  * \brief Creation and initialization of a VCT decoder.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0xC8 or 0xC9.
@@ -126,7 +126,7 @@ bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
- *                                uint16_t i_extension);
+ *                                uint16_t i_extension)
  *
  * \brief Destroy a VCT decoder.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
@@ -140,8 +140,9 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
  * dvbpsi_atsc_InitVCT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_version,
-        bool b_current_next, uint8_t i_protocol, uint16_t i_ts_id, bool b_cable_vct)
+ * \fn void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_protocol,
+                         uint16_t i_ts_id, bool b_cable_vct,
+                         uint8_t i_version, bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_atsc_vct_t structure.
  * \param p_vct pointer to the VCT structure
  * \param i_protocol PSIP Protocol version.
@@ -188,7 +189,7 @@ void dvbpsi_atsc_EmptyVCT(dvbpsi_atsc_vct_t *p_vct);
  * dvbpsi_atsc_DeleteVCT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DeleteVCT(dvbpsi_atsc_vct_t *p_vct)
+ * \fn void dvbpsi_atsc_DeleteVCT(dvbpsi_atsc_vct_t *p_vct)
  * \brief Clean and free a dvbpsi_vct_t structure.
  * \param p_vct pointer to the VCT structure
  * \return nothing.

@@ -23,8 +23,7 @@ dvbpsi_DetachPAT()). The dvbpsi handle must be released by calling
 dvbpsi_DeleteHandle(). At the time of calling the decoder must already
 have been detached.</p>
 
-<p>For specific tools, the best to do is to have a look at the include
-file:</p>
+<p>Look at the header files for specific table, see the list below:</p>
 
 <ul>
   <li>Program Specific Information: psi.h</li>
@@ -36,11 +35,11 @@ file:</p>
   <li>Network Informtation Table: nit.h</li>
   <li>Stream Description Table: sdt.h</li>
   <li>Splice Information Section Table: sis.h</li>
-  <li>TOT: tot.h</li>
+  <li>TDT/TOT: tot.h</li>
+  <li>ATSC tables: atsc_eit.h atsc_ett.h atsc_mgt.h atsc_stt.h atsc_vct.h</li>
 </ul>
 
 \ref structure
-
 \ref howto-new-api
 
 */

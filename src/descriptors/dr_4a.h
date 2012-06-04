@@ -38,7 +38,6 @@
 extern "C" {
 #endif
 
-
 /*****************************************************************************
  * dvbpsi_linkage_dr_t
  *****************************************************************************/
@@ -52,6 +51,10 @@ extern "C" {
 /*!
  * \typedef struct dvbpsi_linkage_dr_s dvbpsi_linkage_dr_t
  * \brief dvbpsi_linkage_dr_t type definition.
+ */
+/*!
+ * \struct dvbpsi_linkage_dr_s
+ * \brief struct dvbpsi_linkage_dr_s @see dvbpsi_linkage_dr_t
  */
 typedef struct dvbpsi_linkage_dr_s
 {
@@ -94,22 +97,20 @@ typedef struct dvbpsi_linkage_dr_s
  */
 dvbpsi_linkage_dr_t* dvbpsi_DecodeLinkageDr(dvbpsi_descriptor_t * p_descriptor);
 
-
 /*****************************************************************************
- * dvbpsi_GenCountryAvailabilityDr
+ * dvbpsi_GenLinkageDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t * dvbpsi_GenCountryAvailabilityDr(
-                        dvbpsi_linkage_dr_t * p_decoded, int b_duplicate)
+ * \fn dvbpsi_descriptor_t *dvbpsi_GenLinkageDr(dvbpsi_linkage_dr_t *p_decoded,
+                                          bool b_duplicate);
  * \brief "linkage" descriptor generator.
- * \param p_decoded pointer to a decoded "linkage" descriptor
- * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param p_decoded pointer to a decoded "linkage" descriptor structure
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
-dvbpsi_descriptor_t * dvbpsi_GenLinkageDr(dvbpsi_linkage_dr_t * p_decoded,
-                                          bool b_duplicate);
+dvbpsi_descriptor_t *dvbpsi_GenLinkageDr(dvbpsi_linkage_dr_t * p_decoded,
+                                         bool b_duplicate);
 
 #ifdef __cplusplus
 };

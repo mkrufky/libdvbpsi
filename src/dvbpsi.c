@@ -170,7 +170,7 @@ void dvbpsi_DeleteHandle(dvbpsi_t *handle)
  * dvbpsi_NewDecoder
  *****************************************************************************/
 #define DVBPSI_INVALID_CC (0xFF)
-dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback callback,
+dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_t callback,
     const int i_section_max_size, const bool b_discontinuity, const size_t psi_size)
 {
     dvbpsi_decoder_t *p_decoder = (dvbpsi_decoder_t *) calloc(1, psi_size);

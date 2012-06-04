@@ -52,10 +52,13 @@ extern "C" {
  * \typedef struct dvbpsi_network_nameg_dr_s dvbpsi_network_name_dr_t
  * \brief dvbpsi_network_name_dr_t type definition.
  */
+/*!
+ * \struct dvbpsi_network_name_dr_s
+ * \brief struct dvbpsi_network_name_dr_s definition @see dvbpsi_network_name_dr_t
+ */
 typedef struct dvbpsi_network_name_dr_s
 {
-  uint8_t      i_name_length;            /*!< length of the i_name_byte
-                                                  array */
+  uint8_t      i_name_length;            /*!< length of the i_name_byte array */
   uint8_t      i_name_byte[255];         /*!< the name of the delivery system */
 
 } dvbpsi_network_name_dr_t;
@@ -80,7 +83,7 @@ dvbpsi_network_name_dr_t* dvbpsi_DecodeNetworkNameDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenNetworkNameDr(
-                        dvbpsi_network_name_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_network_name_dr_t * p_decoded, bool b_duplicate)
  * \brief "network name" descriptor generator.
  * \param p_decoded pointer to a decoded "network name" descriptor
  * structure

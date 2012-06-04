@@ -54,14 +54,18 @@ typedef uint8_t iso_639_language_code_t[3]; /*!< ISO639 three letter language co
  * \typedef struct dvbpsi_country_availability_dr_s dvbpsi_country_availability_dr_t
  * \brief dvbpsi_country_availability_dr_t type definition.
  */
+/*!
+ * \struct dvbpsi_country_availability_dr_s
+ * \brief dvbpsi_country_availability_dr_s type definition @see dvbpsi_country_availability_dr_t
+ */
 typedef struct dvbpsi_country_availability_dr_s
 {
   bool          b_country_availability_flag;    /*!< country availability flag */
   uint8_t       i_code_count;                   /*!< length of the i_iso_639_code
                                                 array */
   struct {
-    iso_639_language_code_t  iso_639_code;
-  } code[84];                                   /*!< ISO_639_language_code */
+    iso_639_language_code_t  iso_639_code;      /*!< ISO_639 language code */
+  } code[84];                                   /*!< ISO_639_language_code array */
 
 } dvbpsi_country_availability_dr_t;
 
@@ -79,17 +83,17 @@ typedef struct dvbpsi_country_availability_dr_s
 dvbpsi_country_availability_dr_t* dvbpsi_DecodeCountryAvailability(
                                         dvbpsi_descriptor_t * p_descriptor);
 
-
 /*****************************************************************************
  * dvbpsi_GenCountryAvailabilityDr
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenCountryAvailabilityDr(
-                        dvbpsi_country_availability_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_country_availability_dr_t * p_decoded,
+                        bool b_duplicate)
  * \brief "country availability" descriptor generator.
  * \param p_decoded pointer to a decoded "country availability" descriptor
  * structure
- * \param b_duplicate if non zero then duplicate the p_decoded structure into
+ * \param b_duplicate if true then duplicate the p_decoded structure into
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */

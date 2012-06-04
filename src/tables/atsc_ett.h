@@ -42,13 +42,16 @@ extern "C" {
  */
 typedef struct dvbpsi_atsc_ett_s
 {
-    uint8_t                 i_version;          /*!< version_number */
-    bool                    b_current_next;     /*!< current_next_indicator */
-    uint8_t                 i_protocol;         /*!< PSIP Protocol version */
-    uint16_t                i_ett_table_id;     /*!< ETT Table ID extension, normally 0x0000 */
-    uint32_t                i_etm_id;           /*!< ETM Identifier, made up of source id and event id (or 0 for channel ETT) */
-    uint16_t                i_etm_length;
-    uint8_t                *p_etm;
+    uint8_t                 i_version;      /*!< version_number */
+    bool                    b_current_next; /*!< current_next_indicator */
+    uint8_t                 i_protocol;     /*!< PSIP Protocol version */
+    uint16_t                i_ett_table_id; /*!< ETT Table ID extension,
+                                                 normally 0x0000 */
+    uint32_t                i_etm_id;       /*!< ETM Identifier, made up of
+                                                 source id and event id
+                                                 (or 0 for channel ETT) */
+    uint16_t                i_etm_length;   /*!< length of p_etm */
+    uint8_t                *p_etm;          /*!< pointer to etm data */
 } dvbpsi_atsc_ett_t;
 
 /*****************************************************************************
@@ -98,8 +101,8 @@ void dvbpsi_atsc_DetachETT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_atsc_InitETT/dvbpsi_atsc_NewETT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_InitETT(dvbpsi_atsc_ett_t* p_ett, uint8_t i_version,
-                                uint8_t i_protocol, bool b_current_next)
+ * \fn void dvbpsi_atsc_InitETT(dvbpsi_atsc_ett_t *p_ett, uint8_t i_version, uint8_t i_protocol,
+                         uint16_t i_ett_table_id, uint32_t i_etm_id, bool b_current_next);
  * \brief Initialize a user-allocated dvbpsi_atsc_ett_t structure.
  * \param p_ett pointer to the ETT structure
  * \param i_version version
@@ -113,7 +116,7 @@ void dvbpsi_atsc_InitETT(dvbpsi_atsc_ett_t *p_ett, uint8_t i_version, uint8_t i_
                          uint16_t i_ett_table_id, uint32_t i_etm_id, bool b_current_next);
 
 /*!
-\ * \fn dvbpsi_atsc_ett_t *dvbpsi_atsc_NewETT(uint8_t i_version, uint8_t i_protocol,
+ * \fn dvbpsi_atsc_ett_t *dvbpsi_atsc_NewETT(uint8_t i_version, uint8_t i_protocol,
                           uint16_t i_ett_table_id, uint32_t i_etm_id, bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_atsc_ett_t structure. Use ObjectRefDec to delete it.
  * \param i_protocol PSIP Protocol version.

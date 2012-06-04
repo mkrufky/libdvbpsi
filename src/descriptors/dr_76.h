@@ -51,13 +51,13 @@ extern "C" {
  */
 typedef struct dvbpsi_crid_entry_s
 {
-    uint8_t i_type;
-    uint8_t i_location;
+    uint8_t i_type;         /*!< content type */
+    uint8_t i_location;     /*!< content location */
     union
     {
-        uint8_t  path[253];
-        uint16_t ref;
-    }value;
+        uint8_t  path[253]; /*!< content path */
+        uint16_t ref;       /*!< content reference */
+    } value;                /*!< content specific value */
 }dvbpsi_crid_entry_t;
 
 /*****************************************************************************

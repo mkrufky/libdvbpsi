@@ -164,7 +164,7 @@ dvbpsi_pat_t *dvbpsi_NewPAT(uint16_t i_ts_id, uint8_t i_version, bool b_current_
 void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat);
 
 /*!
- * \fn void dvbpsi_DeletePAT(dvbpsi_pat_t (*_pat)
+ * \fn void dvbpsi_DeletePAT(dvbpsi_pat_t *p_pat)
  * \brief Clean and free a dvbpsi_pat_t structure.
  * \param p_pat pointer to the PAT structure
  * \return nothing.

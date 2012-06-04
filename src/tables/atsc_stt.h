@@ -65,9 +65,8 @@ typedef void (* dvbpsi_atsc_stt_callback)(void* p_cb_data, dvbpsi_atsc_stt_t* p_
  * dvbpsi_atsc_AttachSTT
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_atsc_AttachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-                   dvbpsi_atsc_stt_callback pf_stt_callback, void* p_cb_data);
- *
+ * \fn bool dvbpsi_atsc_AttachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+          dvbpsi_atsc_stt_callback pf_stt_callback, void* p_cb_data)
  * \brief Creation and initialization of a STT decoder.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached
  * \param i_table_id Table ID, 0xCD.
@@ -83,7 +82,7 @@ bool dvbpsi_atsc_AttachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
  * dvbpsi_atsc_DetachSTT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_DetachSTT(dvbpsi_demux_t * p_demux, uint8_t i_table_id)
+ * \fn void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_externsion)
  *
  * \brief Destroy a STT decoder.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
@@ -98,8 +97,7 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
  * dvbpsi_atsc_InitSTT/dvbpsi_atsc_NewSTT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t* p_stt, uint8_t i_version,
-        int b_current_next, uint8_t i_protocol)
+ * \fn void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_protocol)
  * \brief Initialize a user-allocated dvbpsi_atsc_stt_t structure.
  * \param p_stt pointer to the STT structure
  * \param i_version PSIP Protocol version.
@@ -108,10 +106,8 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
 void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_protocol);
 
 /*!
- * \fn dvbpsi_atsc_stt_t *dvbpsi_NewSTTT(uint8_t i_protocol, uint8_t i_version,
- *                                       bool b_current_next)
+ * \fn dvbpsi_atsc_stt_t *dvbpsi_atsc_NewSTT(uint8_t i_version, bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_atsc_stt_t structure. Use ObjectRefDec to delete it.
- * \param p_stt pointer to the STT structure
  * \param i_version PSIP Protocol version.
  * \param b_current_next current next indicator
  * \return p_stt pointer to the STT structure

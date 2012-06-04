@@ -43,7 +43,7 @@ extern "C" {
  */
 typedef struct dvbpsi_default_authority_dr_s
 {
-    uint8_t authority[255]; /*< default authorizty descriptor */
+    uint8_t authority[255]; /*!< default authority descriptor */
 } dvbpsi_default_authority_dr_t;
 
 /*****************************************************************************

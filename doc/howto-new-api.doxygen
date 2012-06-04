@@ -1,4 +1,4 @@
-/*! \page Howto port dvbpsi API (upto version 0.2.0) to version 1.0.0
+/*! \page howto-new-api Howto port dvbpsi API (upto version 0.2.0) to version 1.0.0
 
 <p>An update to libdvbpsi API was long overdue. In time the API grew to be inconsistent and
 needed some cleanup. The following issue are addressed in this version:</p>
@@ -12,7 +12,8 @@ needed some cleanup. The following issue are addressed in this version:</p>
 <p>The biggest change is the addition off an explicit dvbpsi_t pointer to
 ALL table decoder and encoder API's. This dvbpsi_t pointer is a dvbpsi handle
 which must be allocated using <em>dvbpsi_NewHandle()</em> and takes a callback function
-for logging.
+for logging. The handle must be deleted with <em>dvbpsi_DeleteHandle()</em> if it is no
+longer needed.
 </p>
 
 <code>dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, enum dvbpsi_msg_level level);</code>
@@ -61,7 +62,7 @@ error:
 
 <p>The <em>message callback function</em> <b>dvbpsi_message</b> is defined as follows below. In this case
 the output goes directly to the console. Applications however can call into their messaging API and pass
-along libdvbpsi messages if wanted.
+along libdvbpsi messages if wanted. See the following example:
 </p>
 
 <code>

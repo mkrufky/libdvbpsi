@@ -38,16 +38,16 @@ Decode Association Tag Descriptor.
  */
 typedef struct dvbpsi_association_tag_dr_s
 {
-    uint16_t i_tag;              /*< association tag identifier */
-    uint16_t i_use;              /*< indicator if association tag identifier is in use */
-    uint8_t  i_selector_len;     /*< length of selector data in bytes */
-    uint8_t *p_selector;         /*< pointer to selector. Memory is allocated
-                                     right after sizeof struct, when freeing this
-                                     struct the private data is freed at the same time. */
-    uint8_t  i_private_data_len; /*< length of private data segment in bytes */
-    uint8_t *p_private_data;     /*< pointer to private data. Memory is allocated
-                                     right after sizeof struct, when freeing this
-                                     struct the private data is freed at the same time. */
+    uint16_t i_tag;              /*!< association tag identifier */
+    uint16_t i_use;              /*!< indicator if association tag identifier is in use */
+    uint8_t  i_selector_len;     /*!< length of selector data in bytes */
+    uint8_t *p_selector;         /*!< pointer to selector. Memory is allocated
+                                      right after sizeof struct, when freeing this
+                                      struct the private data is freed at the same time. */
+    uint8_t  i_private_data_len; /*!< length of private data segment in bytes */
+    uint8_t *p_private_data;     /*!< pointer to private data. Memory is allocated
+                                      right after sizeof struct, when freeing this
+                                      struct the private data is freed at the same time. */
 } dvbpsi_association_tag_dr_t;
 
 /*****************************************************************************

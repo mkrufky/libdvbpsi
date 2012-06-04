@@ -153,7 +153,7 @@ void dvbpsi_InitNIT(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
                     uint8_t i_version, bool b_current_next);
 
 /*!
- * \fn dvbpsi_nit_t *dvbpsi_NewNIT(uint16_t i_ts_id, uint8_t i_version,
+ * \fn dvbpsi_nit_t *dvbpsi_NewNIT(uint16_t i_network_id, uint8_t i_version,
  *                                 bool b_current_next);
  * \brief Allocate and initialize a new dvbpsi_nit_t structure.
  * \param i_network_id network id

@@ -93,8 +93,8 @@ typedef void (* dvbpsi_atsc_eit_callback)(void* p_cb_data, dvbpsi_atsc_eit_t* p_
  * dvbpsi_atsc_AttachEIT
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_atsc_AttachEIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
-            dvbpsi_atsc_eit_callback pf_callback, void* p_cb_data)
+ * \fn bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+          uint16_t i_extension, dvbpsi_atsc_eit_callback pf_callback, void* p_cb_data)
  *
  * \brief Creation and initialization of a EIT decoder.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached
@@ -111,7 +111,8 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_DetachEIT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id)
+ * \fn void dvbpsi_atsc_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+          uint16_t i_extension)
  * \brief Destroy a EIT decoder.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param p_demux Subtable demultiplexor to which the decoder is attached.
@@ -126,8 +127,8 @@ void dvbpsi_atsc_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_atsc_InitEIT/dvbpsi_atsc_NewEIT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_version,
-        int b_current_next, uint8_t i_protocol, uint16_t i_source_id)
+ * \fn void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_version, uint8_t i_protocol,
+                         uint16_t i_source_id, bool b_current_next);
  * \brief Initialize a user-allocated dvbpsi_atsc_eit_t structure.
  * \param p_eit pointer to the EIT structure
  * \param i_version EIT version

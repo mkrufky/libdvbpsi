@@ -188,9 +188,9 @@ void dvbpsi_Demux(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section);
 /*!
  * \fn dvbpsi_demux_subdec_t *dvbpsi_NewDemuxSubDecoder(const uint8_t i_table_id,
                                                  const uint16_t i_extension,
-                                                 dvbpsi_demux_detach_cb_t *pf_detach,
-                                                 dvbpsi_demux_gather_cb_t *pf_gather,
-                                                 void *cb_data)
+                                                 dvbpsi_demux_detach_cb_t pf_detach,
+                                                 dvbpsi_demux_gather_cb_t pf_gather,
+                                                 dvbpsi_decoder_t *p_decoder)
  * \brief Allocates a new demux sub table decoder and initializes it.
  * \param i_table_id table id to create subtable decoder for
  * \param i_extension table extension to create subtable decoder for
@@ -213,7 +213,6 @@ dvbpsi_demux_subdec_t *dvbpsi_NewDemuxSubDecoder(const uint8_t i_table_id,
  * \brief Releases memory allocated with @see dvbpsi_NewDemuxSubDecoder. It will
  * also release p_cb_data pointer.
  * \param p_subdec pointer to demux subtable decoder.
- * \param p_new_cb_data Data given to the previous callback.
  * \return nothing.
  */
 void dvbpsi_DeleteDemuxSubDecoder(dvbpsi_demux_subdec_t *p_subdec);

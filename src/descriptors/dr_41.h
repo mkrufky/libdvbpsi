@@ -42,7 +42,7 @@ extern "C" {
  * dvbpsi_network_name_dr_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_service_list_dr_t
+ * \struct dvbpsi_service_list_dr_s
  * \brief "service list" descriptor structure.
  *
  * This structure is used to store a decoded "service list"
@@ -59,7 +59,7 @@ typedef struct dvbpsi_service_list_dr_s
   struct {
       uint16_t     i_service_id;            /*!< service id */
       uint8_t      i_service_type;          /*!< service type */
-  } i_service[64];
+  } i_service[64];                          /*!< array of services */
 
 } dvbpsi_service_list_dr_t;
 
@@ -83,7 +83,7 @@ dvbpsi_service_list_dr_t* dvbpsi_DecodeServiceListDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenServiceListDr(
-                        dvbpsi_service_list_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_service_list_dr_t * p_decoded, bool b_duplicate)
  * \brief "service list" descriptor generator.
  * \param p_decoded pointer to a decoded "service list" descriptor
  * structure

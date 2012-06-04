@@ -185,7 +185,7 @@ dvbpsi_bat_t *dvbpsi_NewBAT(uint16_t i_bouquet_id, uint8_t i_version,
 void dvbpsi_EmptyBAT(dvbpsi_bat_t *p_bat);
 
 /*!
- * \fn dvbpsi_DeleteBAT(dvbpis_bat_t *p_bat)
+ * \fn dvbpsi_DeleteBAT(dvbpsi_bat_t *p_bat)
  * \brief Clean and free a dvbpsi_bat_t structure.
  * \param p_bat pointer to the BAT structure
  * \return nothing.
