@@ -51,7 +51,7 @@ typedef struct dvbpsi_tot_decoder_s
  * Callback for the PSI decoder.
  *****************************************************************************/
 void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
-                              void * p_private_decoder,
+                              dvbpsi_decoder_t* p_decoder,
                               dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************

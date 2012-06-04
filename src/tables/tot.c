@@ -69,11 +69,11 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
         dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
                      "Already a decoder for (table_id == 0x%02x,"
                      "extension == 0x%02x)",
-                     i_table_id, 0);
+                     i_table_id, i_extension);
         return false;
     }
 
-    dvbpsi_tot_decoder_t*  p_tot_decoder;
+    dvbpsi_tot_decoder_t *p_tot_decoder;
     p_tot_decoder = (dvbpsi_tot_decoder_t*)calloc(1, sizeof(dvbpsi_tot_decoder_t));
     if (p_tot_decoder == NULL)
         return false;
@@ -81,7 +81,7 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachTOT,
-                                         dvbpsi_GatherTOTSections, p_tot_decoder);
+                                         dvbpsi_GatherTOTSections, DVBPSI_DECODER(p_tot_decoder));
     if (p_subdec == NULL)
     {
         free(p_tot_decoder);
@@ -119,7 +119,7 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
         dvbpsi_error(p_dvbpsi, "TDT/TOT Decoder",
                      "No such TDT/TOT decoder (table_id == 0x%02x,"
                      "extension == 0x%02x)",
-                     i_table_id, 0);
+                     i_table_id, i_extension);
         return;
     }
 
@@ -207,14 +207,14 @@ dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
  * Callback for the PSI decoder.
  *****************************************************************************/
 void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
-                              void * p_private_decoder,
+                              dvbpsi_decoder_t* p_decoder,
                               dvbpsi_psi_section_t* p_section)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
     dvbpsi_tot_decoder_t* p_tot_decoder
-                        = (dvbpsi_tot_decoder_t*)p_private_decoder;
+                        = (dvbpsi_tot_decoder_t*)p_decoder;
 
     dvbpsi_debug(p_dvbpsi, "TDT/TOT decoder", "got a section");
 

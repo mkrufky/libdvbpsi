@@ -78,8 +78,8 @@ static dvbpsi_descriptor_t *dvbpsi_atsc_MGTTableAddDescriptor(
                                                uint8_t *p_data);
 
 static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
-                              void * p_private_decoder,
-                              dvbpsi_psi_section_t * p_section);
+                                          dvbpsi_decoder_t *p_decoder,
+                                          dvbpsi_psi_section_t * p_section);
 
 static void dvbpsi_atsc_DecodeMGTSections(dvbpsi_atsc_mgt_t* p_mgt,
                               dvbpsi_psi_section_t* p_section);
@@ -112,7 +112,7 @@ bool dvbpsi_atsc_AttachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
 
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_atsc_DetachMGT,
-                                         dvbpsi_atsc_GatherMGTSections, p_mgt_decoder);
+                                         dvbpsi_atsc_GatherMGTSections, DVBPSI_DECODER(p_mgt_decoder));
     if (p_subdec == NULL)
     {
         free(p_mgt_decoder);
@@ -158,7 +158,7 @@ void dvbpsi_atsc_DetachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     }
 
     dvbpsi_atsc_mgt_decoder_t* p_mgt_decoder;
-    p_mgt_decoder = (dvbpsi_atsc_mgt_decoder_t*)p_subdec->p_cb_data;
+    p_mgt_decoder = (dvbpsi_atsc_mgt_decoder_t*)p_subdec->p_decoder;
     if (!p_mgt_decoder)
         return;
 
@@ -171,8 +171,8 @@ void dvbpsi_atsc_DetachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
             dvbpsi_DeletePSISections(p_mgt_decoder->ap_sections[i]);
     }
 
-    free(p_subdec->p_cb_data);
-    p_subdec->p_cb_data = NULL;
+    free(p_subdec->p_decoder);
+    p_subdec->p_decoder = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
@@ -341,13 +341,12 @@ static dvbpsi_descriptor_t *dvbpsi_atsc_MGTTableAddDescriptor(
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
 static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
-                              void * p_private_decoder,
+                              dvbpsi_decoder_t *p_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
 
-    dvbpsi_atsc_mgt_decoder_t * p_mgt_decoder
-            = (dvbpsi_atsc_mgt_decoder_t*)p_private_decoder;
+    dvbpsi_atsc_mgt_decoder_t * p_mgt_decoder = (dvbpsi_atsc_mgt_decoder_t*)p_decoder;
     if (!p_mgt_decoder)
     {
         dvbpsi_error(p_dvbpsi, "ATSC MGT decoder", "No decoder specified");

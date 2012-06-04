@@ -87,7 +87,7 @@ static dvbpsi_descriptor_t *dvbpsi_atsc_VCTChannelAddDescriptor(
                                                uint8_t *p_data);
 
 static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t * p_dvbpsi,
-                    void * p_private_decoder, dvbpsi_psi_section_t * p_section);
+                dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t * p_section);
 
 static void dvbpsi_atsc_DecodeVCTSections(dvbpsi_atsc_vct_t* p_vct,
                               dvbpsi_psi_section_t* p_section);
@@ -122,7 +122,7 @@ bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_atsc_DetachVCT,
-                                         dvbpsi_atsc_GatherVCTSections, p_vct_decoder);
+                                         dvbpsi_atsc_GatherVCTSections, DVBPSI_DECODER(p_vct_decoder));
     if (p_subdec == NULL)
     {
         free(p_vct_decoder);
@@ -169,7 +169,7 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     }
 
     dvbpsi_atsc_vct_decoder_t* p_vct_decoder;
-    p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)p_subdec->p_cb_data;
+    p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)p_subdec->p_decoder;
     if (!p_vct_decoder)
         return;
     free(p_vct_decoder->p_building_vct);
@@ -179,8 +179,8 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
         if (p_vct_decoder->ap_sections[i])
             dvbpsi_DeletePSISections(p_vct_decoder->ap_sections[i]);
     }
-    free(p_subdec->p_cb_data);
-    p_subdec->p_cb_data = NULL;
+    free(p_subdec->p_decoder);
+    p_subdec->p_decoder = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
@@ -379,12 +379,11 @@ static dvbpsi_descriptor_t *dvbpsi_atsc_VCTChannelAddDescriptor(
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
 static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
-                              void * p_private_decoder,
+                              dvbpsi_decoder_t *p_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_atsc_vct_decoder_t * p_vct_decoder
-                        = (dvbpsi_atsc_vct_decoder_t*)p_private_decoder;
+    dvbpsi_atsc_vct_decoder_t * p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)p_decoder;
 
     if (!p_section->b_syntax_indicator)
     {

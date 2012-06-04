@@ -60,7 +60,7 @@ typedef void (*dvbpsi_demux_new_cb_t) (dvbpsi_t *p_dvbpsi,  /*!< pointer to dvbp
  * \brief Callback used for gathering psi sections on behalf of subtable decoders.
  */
 typedef void (*dvbpsi_demux_gather_cb_t) (dvbpsi_t *p_dvbpsi, /*!< pointer to dvbpsi handle */
-                                          void *p_cb_data,    /*!< pointer to callback data */
+                                          dvbpsi_decoder_t *p_decoder, /*!< pointer to decoder */
                                           dvbpsi_psi_section_t *p_section); /*!< pointer to psi section */
 
 /*!
@@ -92,7 +92,7 @@ typedef struct dvbpsi_demux_subdec_s
   uint32_t                      i_id;      /*!< subtable id */
 
   dvbpsi_demux_gather_cb_t      pf_gather; /*!< gather subdec callback */
-  void *                        p_cb_data; /*!< subdec callback data */
+  dvbpsi_decoder_t             *p_decoder; /*!< private decoder for this subdec */
 
   dvbpsi_demux_detach_cb_t      pf_detach; /*!< detach subdec callback */
 
@@ -196,14 +196,14 @@ void dvbpsi_Demux(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section);
  * \param i_extension table extension to create subtable decoder for
  * \param pf_detach pointer to detach function for subtable decoder.
  * \param pf_gather pointer to gather function for subtable decoder.
- * \param p_cb_data pointer to private decoder.
+ * \param p_decoder pointer to private decoder.
  * \return pointer to demux subtable decoder.
  */
 dvbpsi_demux_subdec_t *dvbpsi_NewDemuxSubDecoder(const uint8_t i_table_id,
                                                  const uint16_t i_extension,
                                                  dvbpsi_demux_detach_cb_t pf_detach,
                                                  dvbpsi_demux_gather_cb_t pf_gather,
-                                                 void *cb_data);
+                                                 dvbpsi_decoder_t *p_decoder);
 
 /*****************************************************************************
  * dvbpsi_DeleteDemuxSubDecoder

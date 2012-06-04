@@ -79,7 +79,7 @@ bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachEIT,
-                                         dvbpsi_GatherEITSections, p_eit_decoder);
+                                         dvbpsi_GatherEITSections, DVBPSI_DECODER(p_eit_decoder));
     if (p_subdec == NULL)
     {
         free(p_eit_decoder);
@@ -126,7 +126,7 @@ void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     }
 
     dvbpsi_eit_decoder_t* p_eit_decoder;
-    p_eit_decoder = (dvbpsi_eit_decoder_t*)p_subdec->p_cb_data;
+    p_eit_decoder = (dvbpsi_eit_decoder_t*)p_subdec->p_decoder;
     free(p_eit_decoder->p_building_eit);
 
     for (unsigned int i = 0; i <= 255; i++)
@@ -134,8 +134,8 @@ void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
         if (p_eit_decoder->ap_sections[i])
             dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[i]);
     }
-    free(p_subdec->p_cb_data);
-    p_subdec->p_cb_data = NULL;
+    free(p_subdec->p_decoder);
+    p_subdec->p_decoder = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
@@ -273,7 +273,7 @@ dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor( dvbpsi_eit_event_t* p_event,
  *****************************************************************************
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
-void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, void *p_private_decoder,
+void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_decoder,
                               dvbpsi_psi_section_t *p_section)
 {
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;

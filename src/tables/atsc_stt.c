@@ -58,7 +58,7 @@ dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor(
                                                uint8_t *p_data);
 
 static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t* p_dvbpsi,
-                      void* p_private_decoder, dvbpsi_psi_section_t* p_section);
+                      dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t* p_section);
 
 static void dvbpsi_atsc_DecodeSTTSections(dvbpsi_atsc_stt_t* p_stt,
                                    dvbpsi_psi_section_t* p_section);
@@ -69,7 +69,7 @@ static void dvbpsi_atsc_DecodeSTTSections(dvbpsi_atsc_stt_t* p_stt,
  * Initialize a STT subtable decoder.
  *****************************************************************************/
 bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
-                          dvbpsi_atsc_stt_callback pf_stt_callback, void* p_cb_data)
+                           dvbpsi_atsc_stt_callback pf_stt_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
@@ -92,7 +92,7 @@ bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_atsc_DetachSTT,
-                                         dvbpsi_atsc_GatherSTTSections, p_stt_decoder);
+                                         dvbpsi_atsc_GatherSTTSections, DVBPSI_DECODER(p_stt_decoder));
     if (p_subdec == NULL)
     {
         free(p_stt_decoder);
@@ -134,12 +134,12 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     }
 
     dvbpsi_atsc_stt_decoder_t* p_stt_decoder;
-    p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)p_subdec->p_cb_data;
+    p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)p_subdec->p_decoder;
     if(!p_stt_decoder)
         return;
 
-    free(p_subdec->p_cb_data);
-    p_subdec->p_cb_data = NULL;
+    free(p_subdec->p_decoder);
+    p_subdec->p_decoder = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
@@ -230,14 +230,14 @@ dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor( dvbpsi_atsc_stt_t *p_stt,
  *****************************************************************************
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
-static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t *p_dvbpsi, void *p_private_decoder,
-                              dvbpsi_psi_section_t * p_section)
+static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t *p_dvbpsi,
+                                          dvbpsi_decoder_t *p_decoder,
+                                          dvbpsi_psi_section_t * p_section)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
-    dvbpsi_atsc_stt_decoder_t *p_stt_decoder =
-            (dvbpsi_atsc_stt_decoder_t*)p_private_decoder;
+    dvbpsi_atsc_stt_decoder_t *p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)p_decoder;
     if (!p_stt_decoder)
     {
         dvbpsi_error(p_dvbpsi, "EIT decoder", "No decoder specified");

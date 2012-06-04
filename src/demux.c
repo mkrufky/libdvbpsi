@@ -120,7 +120,7 @@ void dvbpsi_Demux(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
     }
 
     if (p_subdec)
-        p_subdec->pf_gather(p_dvbpsi, p_subdec->p_cb_data, p_section);
+        p_subdec->pf_gather(p_dvbpsi, p_subdec->p_decoder, p_section);
     else
         dvbpsi_DeletePSISections(p_section);
 }
@@ -162,7 +162,7 @@ dvbpsi_demux_subdec_t *dvbpsi_NewDemuxSubDecoder(const uint8_t i_table_id,
                                                  const uint16_t i_extension,
                                                  dvbpsi_demux_detach_cb_t pf_detach,
                                                  dvbpsi_demux_gather_cb_t pf_gather,
-                                                 void *cb_data)
+                                                 dvbpsi_decoder_t *p_decoder)
 {
     assert(pf_gather);
     assert(pf_detach);
@@ -175,7 +175,7 @@ dvbpsi_demux_subdec_t *dvbpsi_NewDemuxSubDecoder(const uint8_t i_table_id,
 
     /* subtable decoder configuration */
     p_subdec->i_id = i_id;
-    p_subdec->p_cb_data = cb_data;
+    p_subdec->p_decoder = p_decoder;
     p_subdec->pf_gather = pf_gather;
     p_subdec->pf_detach = pf_detach;
 
@@ -193,8 +193,8 @@ void dvbpsi_DeleteDemuxSubDecoder(dvbpsi_demux_subdec_t *p_subdec)
 
     if (!p_subdec)
         return;
-
-    free(p_subdec->p_cb_data);
+    /* FIXME: find a saner way to release private decoder resources */
+    free(p_subdec->p_decoder);
     free(p_subdec);
     p_subdec = NULL;
 }

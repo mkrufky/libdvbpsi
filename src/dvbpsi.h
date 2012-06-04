@@ -166,6 +166,8 @@ typedef struct dvbpsi_psi_section_s dvbpsi_psi_section_t;
  */
 typedef struct dvbpsi_decoder_s dvbpsi_decoder_t;
 
+#define DVBPSI_DECODER(x) ((dvbpsi_decoder_t *)(x))
+
 /*****************************************************************************
  * dvbpsi_callback
  *****************************************************************************/

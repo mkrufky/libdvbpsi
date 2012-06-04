@@ -78,7 +78,7 @@ bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachSDT,
-                                         dvbpsi_GatherSDTSections, p_sdt_decoder);
+                                         dvbpsi_GatherSDTSections, DVBPSI_DECODER(p_sdt_decoder));
     if (p_subdec == NULL)
     {
         free(p_sdt_decoder);
@@ -124,10 +124,10 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
         return;
     }
 
-    assert(p_subdec->p_cb_data);
+    assert(p_subdec->p_decoder);
 
     dvbpsi_sdt_decoder_t* p_sdt_decoder;
-    p_sdt_decoder = (dvbpsi_sdt_decoder_t*)p_subdec->p_cb_data;
+    p_sdt_decoder = (dvbpsi_sdt_decoder_t*)p_subdec->p_decoder;
     free(p_sdt_decoder->p_building_sdt);
 
     for (unsigned int i = 0; i <= 255; i++)
@@ -277,7 +277,7 @@ dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
 void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
-                              void * p_private_decoder,
+                              dvbpsi_decoder_t *p_private_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
     assert(p_dvbpsi);

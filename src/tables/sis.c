@@ -80,7 +80,7 @@ bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachSIS,
-                                         dvbpsi_GatherSISSections, p_sis_decoder);
+                                         dvbpsi_GatherSISSections, DVBPSI_DECODER(p_sis_decoder));
     if (p_subdec == NULL)
     {
         free(p_sis_decoder);
@@ -230,15 +230,14 @@ dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor(dvbpsi_sis_t *p_sis,
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
 void dvbpsi_GatherSISSections(dvbpsi_t *p_dvbpsi,
-                              void * p_private_decoder,
+                              dvbpsi_decoder_t *p_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_sis_decoder_t * p_sis_decoder
-                        = (dvbpsi_sis_decoder_t*)p_private_decoder;
+    dvbpsi_sis_decoder_t * p_sis_decoder = (dvbpsi_sis_decoder_t*)p_decoder;
 
     dvbpsi_debug(p_dvbpsi, "SIS decoder",
                      "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "

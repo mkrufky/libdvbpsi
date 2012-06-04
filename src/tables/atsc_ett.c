@@ -76,8 +76,8 @@ typedef struct dvbpsi_atsc_ett_decoder_s
  * Callback for the PSI decoder.
  *****************************************************************************/
 static void dvbpsi_atsc_GatherETTSections(dvbpsi_t * p_dvbpsi,
-                              void * p_private_decoder,
-                              dvbpsi_psi_section_t* p_section);
+                                          dvbpsi_decoder_t *p_decoder,
+                                          dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
  * dvbpsi_atsc_DecodeETTSection
@@ -85,7 +85,7 @@ static void dvbpsi_atsc_GatherETTSections(dvbpsi_t * p_dvbpsi,
  * TDT decoder.
  *****************************************************************************/
 static void dvbpsi_atsc_DecodeETTSection(dvbpsi_atsc_ett_t* p_ett,
-                             dvbpsi_psi_section_t* p_section);
+                                         dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
  * dvbpsi_atsc_AttachETT
@@ -116,7 +116,7 @@ bool dvbpsi_atsc_AttachETT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id, uint16_t i_e
     /* PSI decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_atsc_DetachETT,
-                                         dvbpsi_atsc_GatherETTSections, p_ett_decoder);
+                                         dvbpsi_atsc_GatherETTSections, DVBPSI_DECODER(p_ett_decoder));
     if (p_subdec == NULL)
     {
         free(p_ett_decoder);
@@ -157,7 +157,7 @@ void dvbpsi_atsc_DetachETT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     }
 
     dvbpsi_atsc_ett_decoder_t* p_ett_decoder;
-    p_ett_decoder = (dvbpsi_atsc_ett_decoder_t*)p_subdec->p_cb_data;
+    p_ett_decoder = (dvbpsi_atsc_ett_decoder_t*)p_subdec->p_decoder;
     if (!p_ett_decoder)
         return;
 
@@ -168,8 +168,8 @@ void dvbpsi_atsc_DetachETT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
         free(p_etm_version);
     }
 
-    free(p_subdec->p_cb_data);
-    p_subdec->p_cb_data = NULL;
+    free(p_subdec->p_decoder);
+    p_subdec->p_decoder = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
@@ -236,16 +236,15 @@ void dvbpsi_atsc_DeleteETT(dvbpsi_atsc_ett_t *p_ett)
  * Callback for the PSI decoder.
  *****************************************************************************/
 static void dvbpsi_atsc_GatherETTSections(dvbpsi_t* p_dvbpsi,
-                              void * p_private_decoder,
-                              dvbpsi_psi_section_t* p_section)
+                                          dvbpsi_decoder_t *p_decoder,
+                                          dvbpsi_psi_section_t* p_section)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
     // FIXME: Gather*Sections needs updating
     // dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_atsc_ett_decoder_t* p_ett_decoder
-                        = (dvbpsi_atsc_ett_decoder_t*)p_private_decoder;
+    dvbpsi_atsc_ett_decoder_t* p_ett_decoder = (dvbpsi_atsc_ett_decoder_t*)p_decoder;
     if (!p_ett_decoder)
     {
         dvbpsi_error(p_dvbpsi, "ATSC ETT decoder", "No decoder specified");
