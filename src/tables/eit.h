@@ -93,6 +93,7 @@ typedef struct dvbpsi_eit_s
   uint16_t                  i_ts_id;            /*!< transport stream id */
   uint16_t                  i_network_id;       /*!< original network id */
   uint8_t                   i_segment_last_section_number; /*!< segment last section number */
+  uint8_t                   i_table_id;         /*!< table id */
   uint8_t                   i_last_table_id;    /*!< last table id */
 
   dvbpsi_eit_event_t *      p_first_event;      /*!< event information list */
@@ -156,7 +157,7 @@ void dvbpsi_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
  * \fn void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id,
           uint8_t i_version, int b_current_next, uint16_t i_ts_id,
           uint16_t i_network_id, uint8_t i_segment_last_section_number,
-          uint8_t i_last_table_id)
+          uint8_t i_table_id, uint8_t i_last_table_id)
  * \brief Initialize a user-allocated dvbpsi_eit_t structure.
  * \param p_eit pointer to the EIT structure
  * \param i_service_id service ID
@@ -165,6 +166,7 @@ void dvbpsi_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
  * \param i_ts_id transport stream ID
  * \param i_network_id original network id
  * \param i_segment_last_section_number segment_last_section_number
+ * \param i_table_id i_table_id
  * \param i_last_table_id i_last_table_id
  * \return nothing.
  */
@@ -172,7 +174,7 @@ __attribute__((deprecated))
 void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
                     int b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
                     uint8_t i_segment_last_section_number,
-                    uint8_t i_last_table_id);
+                    uint8_t i_table_id, uint8_t i_last_table_id);
 
 /*!
  * \def dvbpsi_NewEIT(p_eit, i_ts_id, i_version, b_current_next, i_network_id)
@@ -184,11 +186,11 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
  * \param i_network_id original network id
  * \return nothing.
  */
-#define dvbpsi_NewEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id) \
+#define dvbpsi_NewEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_table_id, i_last_table_id) \
 do {                                                                    \
   p_eit = (dvbpsi_eit_t*)malloc(sizeof(dvbpsi_eit_t));                  \
   if(p_eit != NULL)                                                     \
-    dvbpsi_InitEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id); \
+    dvbpsi_InitEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_table_id, i_last_table_id); \
 } while(0);
 
 

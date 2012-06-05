@@ -159,7 +159,7 @@ void dvbpsi_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
 void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
                     int b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
                     uint8_t i_segment_last_section_number,
-                    uint8_t i_last_table_id)
+                    uint8_t i_table_id, uint8_t i_last_table_id)
 {
   p_eit->i_service_id = i_service_id;
   p_eit->i_version = i_version;
@@ -167,6 +167,7 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
   p_eit->i_ts_id = i_ts_id;
   p_eit->i_network_id = i_network_id;
   p_eit->i_segment_last_section_number = i_segment_last_section_number;
+  p_eit->i_table_id = i_table_id;
   p_eit->i_last_table_id = i_last_table_id;
   p_eit->p_first_event = NULL;
 }
@@ -390,6 +391,7 @@ void dvbpsi_GatherEITSections(dvbpsi_decoder_t * p_psi_decoder,
                      ((uint16_t)(p_section->p_payload_start[2]) << 8)
                      | p_section->p_payload_start[3],
                      p_section->p_payload_start[4],
+                     p_section->i_table_id,
                      p_section->p_payload_start[5]);
       p_eit_decoder->i_last_section_number = p_section->i_last_number;
       p_eit_decoder->i_first_received_section_number = p_section->i_number;
