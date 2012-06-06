@@ -54,7 +54,7 @@ typedef struct dvbpsi_s dvbpsi_t;
  * \typedef enum dvbpsi_msg_level dvbpsi_msg_level_t
  * \brief DVBPSI message level enum
  */
-typedef enum dvbpsi_msg_level dvbpsi_mst_level_t
+typedef enum dvbpsi_msg_level dvbpsi_msg_level_t;
 enum dvbpsi_msg_level
 {
     DVBPSI_MSG_NONE  = -1, /*!< No messages */
@@ -174,15 +174,15 @@ typedef struct dvbpsi_decoder_s dvbpsi_decoder_t;
 #define DVBPSI_DECODER(x) ((dvbpsi_decoder_t *)(x))
 
 /*****************************************************************************
- * dvbpsi_callback_t
+ * dvbpsi_callback_gather_t
  *****************************************************************************/
 /*!
- * \typedef void (* dvbpsi_callback_t)(dvbpsi_t *p_dvbpsi,
-                                       dvbpsi_psi_section_t* p_section)
- * \brief Callback type definition.
+ * \typedef void (* dvbpsi_callback_gather_t)(dvbpsi_t *p_dvbpsi,
+                                              dvbpsi_psi_section_t* p_section)
+ * \brief Callback used for gathering psi sections on behalf of PSI decoders.
  */
-typedef void (* dvbpsi_callback_t)(dvbpsi_t *p_dvbpsi,
-                                   dvbpsi_psi_section_t* p_section);
+typedef void (* dvbpsi_callback_gather_t)(dvbpsi_t *p_dvbpsi,  /*!< pointer to dvbpsi handle */
+                            dvbpsi_psi_section_t* p_section);  /*!< pointer to psi section */
 
 /*****************************************************************************
  * dvbpsi_decoder_t
@@ -195,7 +195,7 @@ typedef void (* dvbpsi_callback_t)(dvbpsi_t *p_dvbpsi,
  * decoder.
  */
 #define DVBPSI_DECODER_COMMON                                                     \
-    dvbpsi_callback_t  pf_callback;/*!< PSI decoder's callback */                 \
+    dvbpsi_callback_gather_t  pf_gather;/*!< PSI decoder's callback */                 \
     int      i_section_max_size;   /*!< Max size of a section for this decoder */ \
     uint8_t  i_continuity_counter; /*!< Continuity counter */                     \
     bool     b_discontinuity;      /*!< Discontinuity flag */                     \
@@ -212,10 +212,10 @@ struct dvbpsi_decoder_s
  * dvbpsi_NewDecoder
  *****************************************************************************/
 /*!
- * \fn dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_t callback,
+ * \fn dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
  *     const int i_section_max_size, const bool b_discontinuity, const size_t psi_size);
  * \brief Create a new dvbpsi_decoder_t.
- * \param callback dvbpsi_callback handler
+ * \param pf_gather pointer to gather function for PSI decoder.
  * \param i_section_max_size Max size of a section for this decoder
  * \param b_discontinuity Discontinuity flag
  * \param psi_size size of new PSI struct, eg: sizeof(dvbpsi_pat_t)
@@ -224,7 +224,7 @@ struct dvbpsi_decoder_s
  * Creates a dvbpsi_decoder_t pointer to struct dvbpsi_decoder_s. It should be
  * delete with @see dvbpsi_DeleteDecoder() function.
  */
-dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_t callback,
+dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
                                     const int i_section_max_size,
                                     const bool b_discontinuity,
                                     const size_t psi_size);

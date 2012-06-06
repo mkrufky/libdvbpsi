@@ -170,14 +170,16 @@ void dvbpsi_DeleteHandle(dvbpsi_t *handle)
  * dvbpsi_NewDecoder
  *****************************************************************************/
 #define DVBPSI_INVALID_CC (0xFF)
-dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_t callback,
+dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
     const int i_section_max_size, const bool b_discontinuity, const size_t psi_size)
 {
+    assert(psi_size >= sizeof(dvbpsi_decoder_t));
+
     dvbpsi_decoder_t *p_decoder = (dvbpsi_decoder_t *) calloc(1, psi_size);
     if (p_decoder == NULL)
         return NULL;
 
-    p_decoder->pf_callback = callback;
+    p_decoder->pf_gather = pf_gather;
     p_decoder->p_current_section = NULL;
     p_decoder->i_section_max_size = i_section_max_size;
     p_decoder->b_discontinuity = b_discontinuity;
@@ -398,8 +400,8 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
                         p_section->i_last_number = 0;
                         p_section->p_payload_start = p_section->p_data + 3;
                     }
-                    if (p_decoder->pf_callback)
-                        p_decoder->pf_callback(handle, p_section);
+                    if (p_decoder->pf_gather)
+                        p_decoder->pf_gather(handle, p_section);
                     p_decoder->p_current_section = NULL;
                 }
                 else
