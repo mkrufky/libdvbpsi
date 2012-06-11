@@ -30,6 +30,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include <assert.h>
+
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
 #elif defined(HAVE_STDINT_H)
@@ -84,6 +86,50 @@ void dvbpsi_DeletePSISections(dvbpsi_psi_section_t *p_section)
         free(p_section);
         p_section = p_next;
     }
+    p_section = NULL;
+}
+
+/*****************************************************************************
+ * dvbpsi_CheckPSISection
+ *****************************************************************************
+ * Check if PSI section has the expected table_id and it the syntax indicator
+ * is true.
+ *****************************************************************************/
+bool dvbpsi_CheckPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section,
+                            const uint8_t table_id, const char *psz_table_name)
+{
+    assert(p_dvbpsi);
+    assert(p_section);
+
+    if (p_section->i_table_id != table_id)
+    {
+        /* Invalid table_id value */
+        dvbpsi_error(p_dvbpsi, psz_table_name,
+                     "invalid section (table_id == 0x%02x)",
+                     p_section->i_table_id);
+        goto error;
+    }
+
+    if (!p_section->b_syntax_indicator)
+    {
+        /* Invalid section_syntax_indicator */
+        dvbpsi_error(p_dvbpsi, psz_table_name,
+                     "invalid section (section_syntax_indicator == 0)");
+        goto error;
+    }
+
+    /* FIXME: Do we need to check the CRC for ALL tables? */
+
+    dvbpsi_debug(p_dvbpsi, psz_table_name,
+                   "Table version %2d, " "i_extension %5d, "
+                   "section %3d up to %3d, " "current %1d",
+                   p_section->i_version, p_section->i_extension,
+                   p_section->i_number, p_section->i_last_number,
+                   p_section->b_current_next);
+    return true;
+
+error:
+    return false;
 }
 
 /*****************************************************************************

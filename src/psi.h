@@ -119,6 +119,23 @@ dvbpsi_psi_section_t * dvbpsi_NewPSISection(int i_max_size);
 void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section);
 
 /*****************************************************************************
+ * dvbpsi_CheckPSISection
+ *****************************************************************************/
+/*!
+ * \fn bool dvbpsi_CheckPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section,
+                            const uint8_t table_id, const char *psz_table_name)
+ * \brief Check if PSI section has the expected table_id and it the syntax indicator
+ * is true.
+ * \param p_dvbpsi pointer to dvbpsi library handle
+ * \param p_section pointer to the PSI section structure
+ * \param table_id expected table id
+ * \param psz_table_name table name to use when reporting errors.
+ * \return boolean value (false if the section did not pass the tests).
+ */
+bool dvbpsi_CheckPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section,
+                            const uint8_t table_id, const char *psz_table_name);
+
+/*****************************************************************************
  * dvbpsi_ValidPSISection
  *****************************************************************************/
 /*!
