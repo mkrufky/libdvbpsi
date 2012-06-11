@@ -242,6 +242,14 @@ static void dvbpsi_atsc_GatherETTSections(dvbpsi_t* p_dvbpsi,
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0xCC, "ATSC ETT decoder"))
+    {
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
+
+    /* We have a valid ETT section */
+
     // FIXME: Gather*Sections needs updating
     // dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
     dvbpsi_atsc_ett_decoder_t* p_ett_decoder = (dvbpsi_atsc_ett_decoder_t*)p_decoder;
@@ -252,31 +260,6 @@ static void dvbpsi_atsc_GatherETTSections(dvbpsi_t* p_dvbpsi,
         return;
     }
 
-    if (!p_section->b_syntax_indicator)
-    {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "ATSC ETT decoder",
-                     "invalid section (section_syntax_indicator == 0)");
-        dvbpsi_DeletePSISections(p_section);
-        return;
-    }
-
-    if (p_section->i_table_id != 0xCC)
-    {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "ATSC ETT decoder",
-                     "invalid table id (0x%x)", p_section->i_table_id);
-        dvbpsi_DeletePSISections(p_section);
-        return;
-    }
-
-    dvbpsi_debug(p_dvbpsi,"ATSC ETT decoder",
-                 "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
-                 "section %3d up to %3d, " "current %1d",
-                 p_section->i_version, p_section->i_table_id,
-                 p_section->i_extension,
-                 p_section->i_number, p_section->i_last_number,
-                 p_section->b_current_next);
 #if 0
     /* We have a valid ETT section */
     /* TS discontinuity check */

@@ -263,36 +263,15 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0x02, "PMT decoder"))
+    {
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
+
+    /* */
     dvbpsi_pmt_decoder_t* p_pmt_decoder = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_private;
     assert(p_pmt_decoder);
-
-    bool b_reinit = false;
-
-    dvbpsi_debug(p_dvbpsi, "PMT decoder",
-                   "Table version %2d, " "i_extension %5d, "
-                   "section %3d up to %3d, " "current %1d",
-                   p_section->i_version, p_section->i_extension,
-                   p_section->i_number, p_section->i_last_number,
-                   p_section->b_current_next);
-
-    if (p_section->i_table_id != 0x02)
-    {
-        /* Invalid table_id value */
-        dvbpsi_error(p_dvbpsi, "PMT decoder",
-                     "invalid section (table_id == 0x%02x)",
-                     p_section->i_table_id);
-        dvbpsi_DeletePSISections(p_section);
-        return;
-    }
-
-    if (!p_section->b_syntax_indicator)
-    {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "PMT decoder",
-                     "invalid section (section_syntax_indicator == 0)");
-        dvbpsi_DeletePSISections(p_section);
-        return;
-    }
 
     /* Now if b_append is true then we have a valid PMT section */
     if (p_pmt_decoder->i_program_number != p_section->i_extension)
@@ -302,6 +281,8 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
         dvbpsi_DeletePSISections(p_section);
         return;
     }
+
+    bool b_reinit = false;
 
     /* TS discontinuity check */
     if (p_pmt_decoder->b_discontinuity)

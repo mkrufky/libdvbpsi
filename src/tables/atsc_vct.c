@@ -107,7 +107,7 @@ bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
-        dvbpsi_error(p_dvbpsi, "VCT decoder",
+        dvbpsi_error(p_dvbpsi, "ATSC VCT decoder",
                      "Already a decoder for (table_id == 0x%02x,"
                      "extension == 0x%02x)",
                      i_table_id, i_extension);
@@ -161,7 +161,7 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if(p_subdec == NULL)
     {
-        dvbpsi_error(p_dvbpsi, "VCT Decoder",
+        dvbpsi_error(p_dvbpsi, "ATSC VCT Decoder",
                          "No such VCT decoder (table_id == 0x%02x,"
                          "extension == 0x%04x)",
                          i_table_id, i_extension);
@@ -382,25 +382,22 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
                               dvbpsi_decoder_t *p_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_atsc_vct_decoder_t * p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)p_decoder;
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
 
-    if (!p_section->b_syntax_indicator)
+    const uint8_t i_table_id = (p_section->i_table_id == 0x8C ||
+                                p_section->i_table_id == 0x9C) ?
+                                p_section->i_table_id : 0x8C;
+
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, i_table_id, "ATSC VCT decoder"))
     {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "VCT decoder",
-                     "invalid section (section_syntax_indicator == 0)");
         dvbpsi_DeletePSISections(p_section);
         return;
     }
 
-    dvbpsi_debug(p_dvbpsi, "VCT decoder",
-                   "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
-                   "section %3d up to %3d, " "current %1d",
-                   p_section->i_version, p_section->i_table_id,
-                   p_section->i_extension,
-                   p_section->i_number, p_section->i_last_number,
-                   p_section->b_current_next);
+    /* */
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_atsc_vct_decoder_t * p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)p_decoder;
 
     bool b_reinit = false;
 

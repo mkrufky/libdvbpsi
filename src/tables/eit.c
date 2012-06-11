@@ -276,32 +276,24 @@ dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor( dvbpsi_eit_event_t* p_event,
 void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_decoder,
                               dvbpsi_psi_section_t *p_section)
 {
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_eit_decoder_t* p_eit_decoder
-                        = (dvbpsi_eit_decoder_t*)p_private_decoder;
-    bool b_reinit = false;
-
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
-    dvbpsi_debug(p_dvbpsi, "EIT decoder",
-                   "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
-                   "section %3d up to %3d, " "current %1d",
-                   p_section->i_version, p_section->i_table_id,
-                   p_section->i_extension,
-                   p_section->i_number, p_section->i_last_number,
-                   p_section->b_current_next);
+    const uint8_t i_table_id = (p_section->i_table_id >= 0x4e &&
+                                p_section->i_table_id <= 0x6f) ?
+                                    p_section->i_table_id : 0x4e;
 
-    if (!p_section->b_syntax_indicator)
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, i_table_id, "EIT decoder"))
     {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "EIT decoder",
-                               "invalid section (section_syntax_indicator == 0)");
         dvbpsi_DeletePSISections(p_section);
         return;
     }
 
     /* We have a valid EIT section */
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_eit_decoder_t* p_eit_decoder
+                        = (dvbpsi_eit_decoder_t*)p_private_decoder;
+    bool b_reinit = false;
 
     /* TS discontinuity check */
     if  (p_demux->b_discontinuity)

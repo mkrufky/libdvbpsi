@@ -296,36 +296,21 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
                               dvbpsi_decoder_t *p_private_decoder,
                               dvbpsi_psi_section_t *p_section)
 {
-    dvbpsi_nit_decoder_t* p_nit_decoder
-                        = (dvbpsi_nit_decoder_t*)p_private_decoder;
-
     assert(p_dvbpsi);
 
-    dvbpsi_debug(p_dvbpsi, "NIT decoder",
-                   "Table version %2d, " "i_extension %5d, "
-                   "section %3d up to %3d, " "current %1d",
-                   p_section->i_version, p_section->i_extension,
-                   p_section->i_number, p_section->i_last_number,
-                   p_section->b_current_next);
+    const uint8_t i_table_id = ((p_section->i_table_id == 0x40) ||
+                                (p_section->i_table_id == 0x41)) ?
+                                    p_section->i_table_id : 0x40;
 
-    if (p_section->i_table_id != 0x40 && p_section->i_table_id != 0x41)
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, i_table_id, "NIT decoder"))
     {
-        /* Invalid table_id value */
-        dvbpsi_error(p_dvbpsi, "NIT decoder",
-                     "invalid section (table_id == 0x%02x)",
-                     p_section->i_table_id);
         dvbpsi_DeletePSISections(p_section);
         return;
     }
 
-    if (!p_section->b_syntax_indicator)
-    {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "NIT decoder",
-                    "invalid section (section_syntax_indicator == false)");
-        dvbpsi_DeletePSISections(p_section);
-        return;
-    }
+    /* */
+    dvbpsi_nit_decoder_t* p_nit_decoder
+                        = (dvbpsi_nit_decoder_t*)p_private_decoder;
 
     /* Now if b_append is true then we have a valid NIT section */
     if (p_nit_decoder->i_network_id != p_section->i_extension)

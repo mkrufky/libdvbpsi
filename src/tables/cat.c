@@ -188,36 +188,17 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0x01, "CAT decoder"))
+    {
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
+
+    /* */
     dvbpsi_cat_decoder_t* p_cat_decoder
                           = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_private;
 
     bool b_reinit = false;
-
-    if (p_section->i_table_id != 0x01)
-    {
-        /* Invalid table_id value */
-        dvbpsi_error(p_dvbpsi, "CAT decoder",
-                     "invalid section (table_id == 0x%02x)",
-                     p_section->i_table_id);
-        dvbpsi_DeletePSISections(p_section);
-        return;
-    }
-
-    if (!p_section->b_syntax_indicator)
-    {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "CAT decoder",
-                    "invalid section (section_syntax_indicator == 0)");
-        dvbpsi_DeletePSISections(p_section);
-        return;
-    }
-
-    dvbpsi_debug(p_dvbpsi, "CAT decoder",
-                        "Table version %2d, " "i_extension %5d, "
-                         "section %3d up to %3d, " "current %1d",
-                        p_section->i_version, p_section->i_extension,
-                        p_section->i_number, p_section->i_last_number,
-                        p_section->b_current_next);
 
     /* TS discontinuity check */
     if (p_cat_decoder->b_discontinuity)

@@ -283,26 +283,16 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_private;
-    dvbpsi_sdt_decoder_t *p_sdt_decoder
-                        = (dvbpsi_sdt_decoder_t*)p_private_decoder;
-
-    dvbpsi_debug(p_dvbpsi, "SDT decoder",
-                   "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
-                   "section %3d up to %3d, " "current %1d",
-                   p_section->i_version, p_section->i_table_id,
-                   p_section->i_extension,
-                   p_section->i_number, p_section->i_last_number,
-                   p_section->b_current_next);
-
-    if (!p_section->b_syntax_indicator)
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0x42, "SDT decoder"))
     {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "SDT decoder",
-                    "invalid section (section_syntax_indicator == 0)");
         dvbpsi_DeletePSISections(p_section);
         return;
     }
+
+    /* */
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_private;
+    dvbpsi_sdt_decoder_t *p_sdt_decoder
+                        = (dvbpsi_sdt_decoder_t*)p_private_decoder;
 
     bool b_reinit = false;
 

@@ -304,27 +304,17 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
     dvbpsi_bat_decoder_t * p_bat_decoder = (dvbpsi_bat_decoder_t *) p_decoder;
 
-    bool b_reinit = false;
-
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
-    if (!p_section->b_syntax_indicator)
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0x4a, "BAT decoder"))
     {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "BAT decoder",
-                     "invalid section (section_syntax_indicator == 0)");
         dvbpsi_DeletePSISections(p_section);
         return;
     }
 
-    dvbpsi_debug(p_dvbpsi, "BAT decoder",
-                   "Table version %2d, " "i_table_id %2d, " "i_extension %5d, "
-                   "section %3d up to %3d, " "current %1d",
-                   p_section->i_version, p_section->i_table_id,
-                   p_section->i_extension,
-                   p_section->i_number, p_section->i_last_number,
-                   p_section->b_current_next);
+    /* */
+    bool b_reinit = false;
 
     /* We have a valid BAT section */
     /* TS discontinuity check */

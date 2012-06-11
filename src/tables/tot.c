@@ -74,7 +74,8 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     }
 
     dvbpsi_tot_decoder_t *p_tot_decoder;
-    p_tot_decoder = (dvbpsi_tot_decoder_t*)calloc(1, sizeof(dvbpsi_tot_decoder_t));
+    p_tot_decoder = (dvbpsi_tot_decoder_t *) dvbpsi_NewDecoder(NULL,
+                                                0, true, sizeof(dvbpsi_tot_decoder_t));
     if (p_tot_decoder == NULL)
         return false;
 
@@ -213,29 +214,20 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
+    const uint8_t i_table_id = ((p_section->i_table_id == 0x70 ||
+                                 p_section->i_table_id == 0x73)) ?
+                                    p_section->i_table_id : 0x70;
+
+    p_section->b_syntax_indicator = true;
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, i_table_id, "TDT/TOT decoder"))
+    {
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
+
+    /* Valid TDT/TOT section */
     dvbpsi_tot_decoder_t* p_tot_decoder
                         = (dvbpsi_tot_decoder_t*)p_decoder;
-
-    dvbpsi_debug(p_dvbpsi, "TDT/TOT decoder", "got a section");
-
-    if (p_section->i_table_id != 0x70 && p_section->i_table_id != 0x73)
-    {
-        /* Invalid table_id value */
-        dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
-                     "invalid section (table_id == 0x%02x)",
-                     p_section->i_table_id);
-        dvbpsi_DeletePSISections(p_section);
-        return;
-    }
-
-    if (p_section->b_syntax_indicator != false)
-    {
-        /* Invalid section_syntax_indicator */
-        dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
-                    "invalid section (section_syntax_indicator != 0)");
-        dvbpsi_DeletePSISections(p_section);
-        return;
-    }
 
     /* TS discontinuity check */
     if (p_tot_decoder->b_discontinuity)
