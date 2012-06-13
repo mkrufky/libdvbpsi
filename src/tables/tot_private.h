@@ -42,6 +42,13 @@ typedef struct dvbpsi_tot_decoder_s
     dvbpsi_tot_callback           pf_tot_callback;
     void *                        p_cb_data;
 
+    /* */
+    dvbpsi_tot_t                  current_tot;
+    dvbpsi_tot_t                  *p_building_tot;
+
+    bool                          b_current_valid;
+    uint8_t                       i_last_section_number;
+    dvbpsi_psi_section_t *        ap_sections [256];
 } dvbpsi_tot_decoder_t;
 
 

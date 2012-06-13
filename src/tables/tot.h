@@ -57,11 +57,15 @@ extern "C" {
  */
 typedef struct dvbpsi_tot_s
 {
-  uint64_t                  i_utc_time;         /*!< UTC_time */
+    uint16_t                  i_ts_id;            /*!< transport_stream_id */
+    uint8_t                   i_version;          /*!< version_number */
+    bool                      b_current_next;     /*!< current_next_indicator */
 
-  dvbpsi_descriptor_t *     p_first_descriptor; /*!< descriptor list */
+    uint64_t                  i_utc_time;         /*!< UTC_time */
 
-  uint32_t      i_crc;                          /*!< CRC_32 (TOT only) */
+    dvbpsi_descriptor_t *     p_first_descriptor; /*!< descriptor list */
+
+    uint32_t      i_crc;                          /*!< CRC_32 (TOT only) */
 
 } dvbpsi_tot_t;
 
@@ -113,18 +117,26 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * \fn void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time)
  * \brief Initialize a user-allocated dvbpsi_tot_t structure.
  * \param p_tot pointer to the TDT/TOT structure
+ * \param i_ts_id transport stream ID
+ * \param i_version SDT version
+ * \param b_current_next current next indicator
  * \param i_utc_time the time in UTC
  * \return nothing.
  */
-void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time);
+void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
+                    bool b_current_next, uint64_t i_utc_time);
 
 /*!
  * \fn dvbpsi_tot_t *dvbpsi_NewTOT(uint64_t i_utc_time)
  * \brief Allocate and initialize a new dvbpsi_tot_t structure.
+ * \param i_ts_id transport stream ID
+ * \param i_version SDT version
+ * \param b_current_next current next indicator
  * \param i_utc_time the time in UTC
  * \return p_tot pointer to the TDT/TOT structure
  */
-dvbpsi_tot_t *dvbpsi_NewTOT(uint64_t i_utc_time);
+dvbpsi_tot_t *dvbpsi_NewTOT(uint16_t i_ts_id, uint8_t i_version,
+                            bool b_current_next, uint64_t i_utc_time);
 
 /*****************************************************************************
  * dvbpsi_EmptyTOT/dvbpsi_DeleteTOT

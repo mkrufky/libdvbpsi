@@ -85,7 +85,7 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
                                          dvbpsi_GatherTOTSections, DVBPSI_DECODER(p_tot_decoder));
     if (p_subdec == NULL)
     {
-        free(p_tot_decoder);
+        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_tot_decoder));
         return false;
     }
 
@@ -95,6 +95,12 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     /* TDT/TOT decoder information */
     p_tot_decoder->pf_tot_callback = pf_callback;
     p_tot_decoder->p_cb_data = p_cb_data;
+
+    /* TDT/TOT  decoder initial state */
+    p_tot_decoder->b_current_valid = false;
+    p_tot_decoder->p_building_tot = NULL;
+    for (unsigned int i = 0; i <= 255; i++)
+        p_tot_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -124,6 +130,23 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
         return;
     }
 
+    assert(p_subdec->p_decoder);
+
+    dvbpsi_tot_decoder_t* p_tot_decoder;
+    p_tot_decoder = (dvbpsi_tot_decoder_t*)p_subdec->p_decoder;
+    if (p_tot_decoder->p_building_tot)
+        dvbpsi_DeleteTOT(p_tot_decoder->p_building_tot);
+    p_tot_decoder->p_building_tot = NULL;
+
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_tot_decoder->ap_sections[i])
+        {
+            dvbpsi_DeletePSISections(p_tot_decoder->ap_sections[i]);
+            p_tot_decoder->ap_sections[i] = NULL;
+        }
+    }
+
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
 }
@@ -133,8 +156,15 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_tot_t structure.
  *****************************************************************************/
-void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time)
+void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
+                    bool b_current_next, uint64_t i_utc_time)
 {
+    assert(p_tot);
+
+    p_tot->i_ts_id = i_ts_id;
+    p_tot->i_version = i_version;
+    p_tot->b_current_next = b_current_next;
+
     p_tot->i_crc = 0;
     p_tot->i_utc_time = i_utc_time;
     p_tot->p_first_descriptor = NULL;
@@ -145,11 +175,12 @@ void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time)
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_tot_t structure.
  *****************************************************************************/
-dvbpsi_tot_t *dvbpsi_NewTOT(uint64_t i_utc_time)
+dvbpsi_tot_t *dvbpsi_NewTOT(uint16_t i_ts_id, uint8_t i_version,
+                            bool b_current_next, uint64_t i_utc_time)
 {
   dvbpsi_tot_t *p_tot = (dvbpsi_tot_t*)malloc(sizeof(dvbpsi_tot_t));
   if (p_tot != NULL)
-        dvbpsi_InitTOT(p_tot, i_utc_time);
+        dvbpsi_InitTOT(p_tot, i_ts_id, i_version, b_current_next, i_utc_time);
   return p_tot;
 }
 
@@ -202,6 +233,118 @@ dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
     return p_descriptor;
 }
 
+/* */
+static void dvbpsi_ReInitTOT(dvbpsi_tot_decoder_t* p_decoder, const bool b_force)
+{
+    assert(p_decoder);
+
+    /* Force redecoding */
+    if (b_force)
+    {
+        p_decoder->b_current_valid = false;
+
+        /* Free structures */
+        if (p_decoder->p_building_tot)
+            dvbpsi_DeleteTOT(p_decoder->p_building_tot);
+    }
+    p_decoder->p_building_tot = NULL;
+
+    /* Clear the section array */
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_decoder->ap_sections[i] != NULL)
+        {
+            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
+            p_decoder->ap_sections[i] = NULL;
+        }
+    }
+}
+
+static bool dvbpsi_CheckTOT(dvbpsi_t *p_dvbpsi, dvbpsi_tot_decoder_t *p_tot_decoder,
+                            dvbpsi_psi_section_t *p_section)
+{
+    bool b_reinit = false;
+    assert(p_dvbpsi);
+    assert(p_tot_decoder);
+
+    if (p_tot_decoder->p_building_tot->i_ts_id != p_section->i_extension)
+    {
+        /* transport_stream_id */
+        dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
+                "'transport_stream_id' differs"
+                " whereas no TS discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_tot_decoder->p_building_tot->i_version != p_section->i_version)
+    {
+        /* version_number */
+        dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
+                "'version_number' differs"
+                " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_tot_decoder->i_last_section_number != p_section->i_last_number)
+    {
+        /* last_section_number */
+        dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
+                "'last_section_number' differs"
+                " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+
+    return b_reinit;
+}
+
+static bool dvbpsi_IsCompleteTOT(dvbpsi_tot_decoder_t* p_tot_decoder)
+{
+    assert(p_tot_decoder);
+
+    bool b_complete = false;
+
+    for (unsigned int i = 0; i < p_tot_decoder->i_last_section_number; i++)
+    {
+        if (!p_tot_decoder->ap_sections[i])
+            break;
+        if (i == p_tot_decoder->i_last_section_number)
+            b_complete = true;
+    }
+    return b_complete;
+}
+
+static bool dvbpsi_AddSectionTOT(dvbpsi_t *p_dvbpsi, dvbpsi_tot_decoder_t *p_tot_decoder,
+                                 dvbpsi_psi_section_t* p_section)
+{
+    assert(p_dvbpsi);
+    assert(p_tot_decoder);
+    assert(p_section);
+
+    /* Initialize the structures if it's the first section received */
+    if (!p_tot_decoder->p_building_tot)
+    {
+        p_tot_decoder->p_building_tot = dvbpsi_NewTOT(p_section->i_extension,
+                             p_section->i_version, p_section->b_current_next,
+                             ((uint64_t)p_section->p_payload_start[0] << 32)
+                           | ((uint64_t)p_section->p_payload_start[1] << 24)
+                           | ((uint64_t)p_section->p_payload_start[2] << 16)
+                           | ((uint64_t)p_section->p_payload_start[3] <<  8)
+                           |  (uint64_t)p_section->p_payload_start[4]);
+        if (p_tot_decoder->p_building_tot == NULL)
+            return false;
+        p_tot_decoder->i_last_section_number = p_section->i_last_number;
+    }
+
+    /* Fill the section array */
+    if (p_tot_decoder->ap_sections[p_section->i_number] != NULL)
+    {
+        dvbpsi_debug(p_dvbpsi, "SDT decoder", "overwrite section number %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_tot_decoder->ap_sections[p_section->i_number]);
+    }
+    p_tot_decoder->ap_sections[p_section->i_number] = p_section;
+
+    return true;
+}
+
 /*****************************************************************************
  * dvbpsi_GatherTOTSections
  *****************************************************************************
@@ -226,34 +369,78 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
     }
 
     /* Valid TDT/TOT section */
-    dvbpsi_tot_decoder_t* p_tot_decoder
-                        = (dvbpsi_tot_decoder_t*)p_decoder;
+    dvbpsi_tot_decoder_t* p_tot_decoder = (dvbpsi_tot_decoder_t*)p_decoder;
 
     /* TS discontinuity check */
     if (p_tot_decoder->b_discontinuity)
     {
         /* We don't care about discontinuities with the TDT/TOT as it
            only consists of one section anyway */
+        //dvbpsi_ReInitTOT(p_tot_decoder, true);
         p_tot_decoder->b_discontinuity = false;
     }
-
-    dvbpsi_tot_t* p_building_tot;
-    p_building_tot = (dvbpsi_tot_t*)malloc(sizeof(dvbpsi_tot_t));
-    if (p_building_tot)
-        dvbpsi_InitTOT(p_building_tot,   ((uint64_t)p_section->p_payload_start[0] << 32)
-                                       | ((uint64_t)p_section->p_payload_start[1] << 24)
-                                       | ((uint64_t)p_section->p_payload_start[2] << 16)
-                                       | ((uint64_t)p_section->p_payload_start[3] <<  8)
-                                       |  (uint64_t)p_section->p_payload_start[4]);
     else
-        dvbpsi_error(p_dvbpsi, "TOT/TDT decoder", "failed decoding section");
+    {
+        /* Perform a few sanity checks */
+        if (p_tot_decoder->p_building_tot)
+        {
+            if (dvbpsi_CheckTOT(p_dvbpsi, p_tot_decoder, p_section))
+                dvbpsi_ReInitTOT(p_tot_decoder, true);
+        }
+#if 0
+/* FIXME: Check TDT/TOT table definition for how the version numbering works for this table */
+        else
+        {
+            if(    (p_tot_decoder->b_current_valid)
+                && (p_tot_decoder->current_tot.i_version == p_section->i_version)
+                && (p_tot_decoder->current_tot.b_current_next == p_section->b_current_next))
+            {
+                /* Don't decode since this version is already decoded */
+                dvbpsi_debug(p_dvbpsi, "TOT decoder",
+                             "ignoring already decoded section %d",
+                             p_section->i_number);
+                dvbpsi_DeletePSISections(p_section);
+                return;
+            }
+        }
+#endif
+    }
 
-    /* Decode the section */
-    dvbpsi_DecodeTOTSections(p_dvbpsi, p_building_tot, p_section);
-    /* Delete the section */
-    dvbpsi_DeletePSISections(p_section);
-    /* signal the new TDT/TOT */
-    p_tot_decoder->pf_tot_callback(p_tot_decoder->p_cb_data, p_building_tot);
+    /* Add section to TOT */
+    if (!dvbpsi_AddSectionTOT(p_dvbpsi, p_tot_decoder, p_section))
+    {
+        dvbpsi_error(p_dvbpsi, "TOT decoder", "failed decoding section %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
+
+    /* Check if we have all the sections */
+    if (dvbpsi_IsCompleteTOT(p_tot_decoder) || true)
+    {
+        assert(p_tot_decoder->pf_tot_callback);
+
+        /* Save the current information */
+        p_tot_decoder->current_tot = *p_tot_decoder->p_building_tot;
+        p_tot_decoder->b_current_valid = true;
+        /* Chain the sections */
+        if (p_tot_decoder->i_last_section_number)
+        {
+            for (uint8_t i = 0; i <= p_tot_decoder->i_last_section_number - 1; i++)
+                p_tot_decoder->ap_sections[i]->p_next = p_tot_decoder->ap_sections[i + 1];
+        }
+        /* Decode the sections */
+        dvbpsi_DecodeTOTSections(p_dvbpsi, p_tot_decoder->p_building_tot,
+                                 p_tot_decoder->ap_sections[0]);
+        /* Delete the sections */
+        dvbpsi_DeletePSISections(p_tot_decoder->ap_sections[0]);
+        p_tot_decoder->ap_sections[0] = NULL;
+        /* signal the new TOT */
+        p_tot_decoder->pf_tot_callback(p_tot_decoder->p_cb_data,
+                                       p_tot_decoder->p_building_tot);
+        /* Reinitialize the structures */
+        dvbpsi_ReInitTOT(p_tot_decoder, false);
+    }
 }
 
 /*****************************************************************************
