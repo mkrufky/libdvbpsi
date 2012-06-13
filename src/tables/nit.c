@@ -1,7 +1,7 @@
 /*****************************************************************************
  * nit.c: NIT decoder/generator
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2011 VideoLAN
+ * Copyright (C) 2001-2012 VideoLAN
  * $Id$
  *
  * Authors: Johann Hanne
@@ -290,6 +290,107 @@ dvbpsi_descriptor_t* dvbpsi_NITTSAddDescriptor(dvbpsi_nit_ts_t* p_ts,
     return p_descriptor;
 }
 
+/* */
+static void dvbpsi_ReInitNIT(dvbpsi_nit_decoder_t* p_decoder, const bool b_force)
+{
+    assert(p_decoder);
+
+    /* Force redecoding */
+    if (b_force)
+    {
+        p_decoder->b_current_valid = false;
+
+        /* Free structures */
+        if (p_decoder->p_building_nit)
+            dvbpsi_DeleteNIT(p_decoder->p_building_nit);
+    }
+    p_decoder->p_building_nit = NULL;
+
+    /* Clear the section array */
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_decoder->ap_sections[i] != NULL)
+        {
+            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
+            p_decoder->ap_sections[i] = NULL;
+        }
+    }
+}
+
+static bool dvbpsi_CheckNIT(dvbpsi_t *p_dvbpsi, dvbpsi_nit_decoder_t *p_nit_decoder,
+                            dvbpsi_psi_section_t *p_section)
+{
+    assert(p_dvbpsi);
+    assert(p_nit_decoder);
+
+    bool b_reinit = false;
+
+    if (p_nit_decoder->p_building_nit->i_version != p_section->i_version)
+    {
+        /* version_number */
+        dvbpsi_error(p_dvbpsi, "NIT decoder",
+                "'version_number' differs"
+                " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_nit_decoder->i_last_section_number
+                                    != p_section->i_last_number)
+    {
+        /* last_section_number */
+        dvbpsi_error(p_dvbpsi, "NIT decoder",
+                "'last_section_number' differs"
+                " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+
+    return b_reinit;
+}
+
+static bool dvbpsi_IsCompleteNIT(dvbpsi_nit_decoder_t* p_nit_decoder)
+{
+    assert(p_nit_decoder);
+
+    bool b_complete = false;
+
+    for (unsigned int i = 0; i <= p_nit_decoder->i_last_section_number; i++)
+    {
+        if (!p_nit_decoder->ap_sections[i])
+            break;
+        if (i == p_nit_decoder->i_last_section_number)
+            b_complete = true;
+    }
+    return b_complete;
+}
+
+static bool dvbpsi_AddSectionNIT(dvbpsi_t *p_dvbpsi, dvbpsi_nit_decoder_t *p_nit_decoder,
+                                 dvbpsi_psi_section_t* p_section)
+{
+    assert(p_dvbpsi);
+    assert(p_nit_decoder);
+    assert(p_section);
+
+    /* Initialize the structures if it's the first section received */
+    if (p_nit_decoder->p_building_nit == NULL)
+    {
+        p_nit_decoder->p_building_nit = dvbpsi_NewNIT(p_nit_decoder->i_network_id,
+                                  p_section->i_version, p_section->b_current_next);
+        if (p_nit_decoder->p_building_nit == NULL)
+            return false;
+        p_nit_decoder->i_last_section_number = p_section->i_last_number;
+    }
+
+    /* Fill the section array */
+    if (p_nit_decoder->ap_sections[p_section->i_number] != NULL)
+    {
+        dvbpsi_debug(p_dvbpsi, "NIT decoder", "overwrite section number %d",
+                               p_section->i_number);
+        dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[p_section->i_number]);
+    }
+    p_nit_decoder->ap_sections[p_section->i_number] = p_section;
+
+    return true;
+}
+
 /*****************************************************************************
  * dvbpsi_GatherNITSections
  *****************************************************************************
@@ -315,7 +416,7 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
     dvbpsi_nit_decoder_t* p_nit_decoder
                         = (dvbpsi_nit_decoder_t*)p_private_decoder;
 
-    /* Now if b_append is true then we have a valid NIT section */
+    /* We have a valid NIT section */
     if (p_nit_decoder->i_network_id != p_section->i_extension)
     {
         /* Invalid program_number */
@@ -324,12 +425,10 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
         return;
     }
 
-    bool b_reinit = false;
-
     /* TS discontinuity check */
     if (p_nit_decoder->b_discontinuity)
     {
-        b_reinit = true;
+        dvbpsi_ReInitNIT(p_nit_decoder, true);
         p_nit_decoder->b_discontinuity = false;
     }
     else
@@ -337,23 +436,8 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
         /* Perform some few sanity checks */
         if (p_nit_decoder->p_building_nit)
         {
-            if (p_nit_decoder->p_building_nit->i_version != p_section->i_version)
-            {
-                /* version_number */
-                dvbpsi_error(p_dvbpsi, "NIT decoder",
-                        "'version_number' differs"
-                        " whereas no discontinuity has occured");
-                b_reinit = true;
-            }
-            else if (p_nit_decoder->i_last_section_number
-                                            != p_section->i_last_number)
-            {
-                /* last_section_number */
-                dvbpsi_error(p_dvbpsi, "NIT decoder",
-                        "'last_section_number' differs"
-                        " whereas no discontinuity has occured");
-                b_reinit = true;
-            }
+            if (dvbpsi_CheckNIT(p_dvbpsi, p_nit_decoder, p_section))
+                dvbpsi_ReInitNIT(p_nit_decoder, true);
         }
         else
         {
@@ -362,73 +446,33 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
                 && (p_nit_decoder->current_nit.b_current_next == p_section->b_current_next))
             {
                 /* Don't decode since this version is already decoded */
+                dvbpsi_debug(p_dvbpsi, "NIT decoder",
+                             "ignoring already decoded section %d",
+                             p_section->i_number);
                 dvbpsi_DeletePSISections(p_section);
                 return;;
             }
         }
     }
 
-    /* Reinit the decoder if wanted */
-    if (b_reinit)
+    /* Add section to NIT */
+    if (!dvbpsi_AddSectionNIT(p_dvbpsi, p_nit_decoder, p_section))
     {
-        /* Force redecoding */
-        p_nit_decoder->b_current_valid = false;
-        /* Free structures */
-        if(p_nit_decoder->p_building_nit)
-        {
-            dvbpsi_DeleteNIT(p_nit_decoder->p_building_nit);
-            p_nit_decoder->p_building_nit = NULL;
-        }
-        /* Clear the section array */
-        for (unsigned int i = 0; i <= 255; i++)
-        {
-            if (p_nit_decoder->ap_sections[i] != NULL)
-            {
-                dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[i]);
-                p_nit_decoder->ap_sections[i] = NULL;
-            }
-        }
+        dvbpsi_error(p_dvbpsi, "NIT decoder", "failed decoding section %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_section);
+        return;
     }
-
-    /* Initialize the structures if it's the first section received */
-    if (!p_nit_decoder->p_building_nit)
-    {
-        p_nit_decoder->p_building_nit = (dvbpsi_nit_t*)malloc(sizeof(dvbpsi_nit_t));
-        if (p_nit_decoder->p_building_nit)
-            dvbpsi_InitNIT(p_nit_decoder->p_building_nit,
-                           p_nit_decoder->i_network_id,
-                           p_section->i_version,
-                           p_section->b_current_next);
-        else
-            dvbpsi_debug(p_dvbpsi, "NIT decoder", "failed decoding section");
-        p_nit_decoder->i_last_section_number = p_section->i_last_number;
-    }
-
-    /* Fill the section array */
-    if (p_nit_decoder->ap_sections[p_section->i_number] != NULL)
-    {
-        dvbpsi_debug(p_dvbpsi, "NIT decoder", "overwrite section number %d",
-                               p_section->i_number);
-        dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[p_section->i_number]);
-    }
-    p_nit_decoder->ap_sections[p_section->i_number] = p_section;
 
     /* Check if we have all the sections */
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_nit_decoder->i_last_section_number; i++)
+    if (dvbpsi_IsCompleteNIT(p_nit_decoder))
     {
-        if (!p_nit_decoder->ap_sections[i])
-            break;
-        if (i == p_nit_decoder->i_last_section_number)
-            b_complete = true;
-    }
+        assert(p_nit_decoder->pf_nit_callback);
 
-    if (b_complete)
-    {
         /* Save the current information */
         p_nit_decoder->current_nit = *p_nit_decoder->p_building_nit;
         p_nit_decoder->b_current_valid = true;
+
         /* Chain the sections */
         if (p_nit_decoder->i_last_section_number)
         {
@@ -436,19 +480,19 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
                 p_nit_decoder->ap_sections[i]->p_next =
                                     p_nit_decoder->ap_sections[i + 1];
         }
+
         /* Decode the sections */
         dvbpsi_DecodeNITSections(p_nit_decoder->p_building_nit,
                                  p_nit_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[0]);
         p_nit_decoder->ap_sections[0] = NULL;
+
         /* signal the new NIT */
         p_nit_decoder->pf_nit_callback(p_nit_decoder->p_cb_data,
                                        p_nit_decoder->p_building_nit);
         /* Reinitialize the structures */
-        p_nit_decoder->p_building_nit = NULL;
-        for (unsigned int i = 0; i <= p_nit_decoder->i_last_section_number; i++)
-            p_nit_decoder->ap_sections[i] = NULL;
+        dvbpsi_ReInitNIT(p_nit_decoder, false);
     }
 }
 
