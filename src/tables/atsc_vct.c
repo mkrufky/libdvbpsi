@@ -172,15 +172,18 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)p_subdec->p_decoder;
     if (!p_vct_decoder)
         return;
-    free(p_vct_decoder->p_building_vct);
+    if (p_vct_decoder->p_building_vct)
+        dvbpsi_atsc_DeleteVCT(p_vct_decoder->p_building_vct);
+    p_vct_decoder->p_building_vct = NULL;
 
     for (unsigned int i = 0; i < 256; i++)
     {
         if (p_vct_decoder->ap_sections[i])
+        {
             dvbpsi_DeletePSISections(p_vct_decoder->ap_sections[i]);
+            p_vct_decoder->ap_sections[i] = NULL;
+        }
     }
-    free(p_subdec->p_decoder);
-    p_subdec->p_decoder = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
@@ -473,7 +476,7 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
         /* Free structures */
         if(p_vct_decoder->p_building_vct)
         {
-            free(p_vct_decoder->p_building_vct);
+            dvbpsi_atsc_DeleteVCT(p_vct_decoder->p_building_vct);
             p_vct_decoder->p_building_vct = NULL;
         }
 

@@ -116,7 +116,7 @@ void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
 
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
-    if(p_demux == NULL)
+    if (p_subdec == NULL)
     {
         dvbpsi_error(p_dvbpsi, "NIT Decoder",
                      "No such NIT decoder (table_id == 0x%02x,"
@@ -127,15 +127,18 @@ void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
 
     dvbpsi_nit_decoder_t* p_nit_decoder;
     p_nit_decoder = (dvbpsi_nit_decoder_t*)p_subdec->p_decoder;
-    free(p_nit_decoder->p_building_nit);
+    if (p_nit_decoder->p_building_nit)
+        dvbpsi_DeleteNIT(p_nit_decoder->p_building_nit);
+    p_nit_decoder->p_building_nit = NULL;
 
     for (unsigned int i = 0; i <= 255; i++)
     {
         if (p_nit_decoder->ap_sections[i])
+        {
             dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[i]);
+            p_nit_decoder->ap_sections[i] = NULL;
+        }
     }
-    free(p_subdec->p_decoder);
-    p_subdec->p_decoder = NULL;
 
     /* Free demux sub table decoder */
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
@@ -373,7 +376,7 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
         /* Free structures */
         if(p_nit_decoder->p_building_nit)
         {
-            free(p_nit_decoder->p_building_nit);
+            dvbpsi_DeleteNIT(p_nit_decoder->p_building_nit);
             p_nit_decoder->p_building_nit = NULL;
         }
         /* Clear the section array */

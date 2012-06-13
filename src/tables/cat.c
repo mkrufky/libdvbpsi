@@ -91,15 +91,20 @@ void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
 
     dvbpsi_cat_decoder_t* p_cat_decoder
                         = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_private;
-    free(p_cat_decoder->p_building_cat);
+    if (p_cat_decoder->p_building_cat)
+        dvbpsi_DeleteCAT(p_cat_decoder->p_building_cat);
+    p_cat_decoder->p_building_cat = NULL;
 
     for (unsigned int i = 0; i <= 255; i++)
     {
         if (p_cat_decoder->ap_sections[i])
-            free(p_cat_decoder->ap_sections[i]);
+        {
+            dvbpsi_DeletePSISections(p_cat_decoder->ap_sections[i]);
+            p_cat_decoder->ap_sections[i] = NULL;
+        }
     }
 
-    dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
+    dvbpsi_DeleteDecoder(p_dvbpsi->p_private);
     p_dvbpsi->p_private = NULL;
 }
 
@@ -110,6 +115,8 @@ void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
  *****************************************************************************/
 void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat, uint8_t i_version, bool b_current_next)
 {
+    assert(p_cat);
+
     p_cat->i_version = i_version;
     p_cat->b_current_next = b_current_next;
     p_cat->p_first_descriptor = NULL;
@@ -250,7 +257,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
         /* Free structures */
         if (p_cat_decoder->p_building_cat)
         {
-            free(p_cat_decoder->p_building_cat);
+            dvbpsi_DeleteCAT(p_cat_decoder->p_building_cat);
             p_cat_decoder->p_building_cat = NULL;
         }
         /* Clear the section array */

@@ -158,16 +158,17 @@ void dvbpsi_atsc_DetachEIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id, uint16_t i_e
         return;
 
     if (p_eit_decoder->p_building_eit)
-        free(p_eit_decoder->p_building_eit);
+        dvbpsi_atsc_DeleteEIT(p_eit_decoder->p_building_eit);
+    p_eit_decoder->p_building_eit = NULL;
 
     for (unsigned int i = 0; i < 256; i++)
     {
         if (p_eit_decoder->ap_sections[i])
+        {
             dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[i]);
+            p_eit_decoder->ap_sections[i] = NULL;
+        }
     }
-
-    free(p_subdec->p_decoder);
-    p_subdec->p_decoder = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
@@ -402,7 +403,7 @@ static void dvbpsi_atsc_GatherEITSections(dvbpsi_t * p_dvbpsi,
         /* Free structures */
         if (p_eit_decoder->p_building_eit)
         {
-            free(p_eit_decoder->p_building_eit);
+            dvbpsi_atsc_DeleteEIT(p_eit_decoder->p_building_eit);
             p_eit_decoder->p_building_eit = NULL;
         }
         /* Clear the section array */

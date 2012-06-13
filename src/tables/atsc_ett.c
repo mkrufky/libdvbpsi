@@ -144,8 +144,9 @@ void dvbpsi_atsc_DetachETT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
-    dvbpsi_demux_subdec_t* p_subdec;
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+
+    dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if (p_subdec == NULL)
     {
@@ -167,9 +168,6 @@ void dvbpsi_atsc_DetachETT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
         p_next = p_etm_version->p_next;
         free(p_etm_version);
     }
-
-    free(p_subdec->p_decoder);
-    p_subdec->p_decoder = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);

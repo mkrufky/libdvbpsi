@@ -62,7 +62,6 @@ bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
-
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
         dvbpsi_error(p_dvbpsi, "BAT decoder",
@@ -128,15 +127,18 @@ void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
 
     dvbpsi_bat_decoder_t* p_bat_decoder;
     p_bat_decoder = (dvbpsi_bat_decoder_t*)p_subdec->p_decoder;
-    free(p_bat_decoder->p_building_bat);
+    if (p_bat_decoder->p_building_bat)
+        dvbpsi_DeleteBAT(p_bat_decoder->p_building_bat);
+    p_bat_decoder->p_building_bat = NULL;
 
     for (unsigned int i = 0; i < 256; i++)
     {
         if (p_bat_decoder->ap_sections[i])
+        {
             dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[i]);
+            p_bat_decoder->ap_sections[i] = NULL;
+        }
     }
-    free(p_subdec->p_decoder);
-    p_subdec->p_decoder = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
@@ -391,7 +393,7 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
         /* Free structures */
         if (p_bat_decoder->p_building_bat)
         {
-            free(p_bat_decoder->p_building_bat);
+            dvbpsi_DeleteBAT(p_bat_decoder->p_building_bat);
             p_bat_decoder->p_building_bat = NULL;
         }
         /* Clear the section array */

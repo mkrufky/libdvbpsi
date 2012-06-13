@@ -194,7 +194,7 @@ void dvbpsi_DeleteDemuxSubDecoder(dvbpsi_demux_subdec_t *p_subdec)
     if (!p_subdec)
         return;
     /* FIXME: find a saner way to release private decoder resources */
-    free(p_subdec->p_decoder);
+    dvbpsi_DeleteDecoder(p_subdec->p_decoder);
     free(p_subdec);
     p_subdec = NULL;
 }

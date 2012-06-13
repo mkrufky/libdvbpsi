@@ -138,9 +138,6 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     if(!p_stt_decoder)
         return;
 
-    free(p_subdec->p_decoder);
-    p_subdec->p_decoder = NULL;
-
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
 }

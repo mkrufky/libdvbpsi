@@ -92,12 +92,15 @@ void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
 
     dvbpsi_pmt_decoder_t* p_pmt_decoder;
     p_pmt_decoder = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_private;
-    free(p_pmt_decoder->p_building_pmt);
+    if (p_pmt_decoder->p_building_pmt)
+        dvbpsi_DeletePMT(p_pmt_decoder->p_building_pmt);
+    p_pmt_decoder->p_building_pmt = NULL;
 
     for (unsigned int i = 0; i <= 255; i++)
     {
         if (p_pmt_decoder->ap_sections[i])
-            free(p_pmt_decoder->ap_sections[i]);
+            dvbpsi_DeletePSISections(p_pmt_decoder->ap_sections[i]);
+        p_pmt_decoder->ap_sections[i] = NULL;
     }
 
     dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
@@ -265,7 +268,7 @@ static void dvbpsi_ReInitPMT(dvbpsi_pmt_decoder_t* p_decoder, const bool b_force
 
         /* Free structures */
         if (p_decoder->p_building_pmt)
-            free(p_decoder->p_building_pmt);
+            dvbpsi_DeletePMT(p_decoder->p_building_pmt);
     }
     p_decoder->p_building_pmt = NULL;
 

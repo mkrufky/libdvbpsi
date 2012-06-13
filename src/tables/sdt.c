@@ -128,7 +128,9 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
 
     dvbpsi_sdt_decoder_t* p_sdt_decoder;
     p_sdt_decoder = (dvbpsi_sdt_decoder_t*)p_subdec->p_decoder;
-    free(p_sdt_decoder->p_building_sdt);
+    if (p_sdt_decoder->p_building_sdt)
+        dvbpsi_DeleteSDT(p_sdt_decoder->p_building_sdt);
+    p_sdt_decoder->p_building_sdt = NULL;
 
     for (unsigned int i = 0; i <= 255; i++)
     {
@@ -283,7 +285,7 @@ static void dvbpsi_ReInitSDT(dvbpsi_sdt_decoder_t* p_decoder, const bool b_force
 
         /* Free structures */
         if (p_decoder->p_building_sdt)
-            free(p_decoder->p_building_sdt);
+            dvbpsi_DeleteSDT(p_decoder->p_building_sdt);
     }
     p_decoder->p_building_sdt = NULL;
 
@@ -298,13 +300,12 @@ static void dvbpsi_ReInitSDT(dvbpsi_sdt_decoder_t* p_decoder, const bool b_force
     }
 }
 
-static bool dvbpsi_CheckSDT(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
+static bool dvbpsi_CheckSDT(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_decoder_t *p_sdt_decoder,
+                            dvbpsi_psi_section_t *p_section)
 {
     bool b_reinit = false;
-    assert(p_dvbpsi->p_private);
-
-    dvbpsi_sdt_decoder_t* p_sdt_decoder;
-    p_sdt_decoder = (dvbpsi_sdt_decoder_t *)p_dvbpsi->p_private;
+    assert(p_dvbpsi);
+    assert(p_sdt_decoder);
 
     if (p_sdt_decoder->p_building_sdt->i_ts_id != p_section->i_extension)
     {
@@ -416,7 +417,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
         /* Perform a few sanity checks */
         if (p_sdt_decoder->p_building_sdt)
         {
-            if (dvbpsi_CheckSDT(p_dvbpsi, p_section))
+            if (dvbpsi_CheckSDT(p_dvbpsi, p_sdt_decoder, p_section))
                 dvbpsi_ReInitSDT(p_sdt_decoder, true);
         }
         else
@@ -426,6 +427,9 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
                 && (p_sdt_decoder->current_sdt.b_current_next == p_section->b_current_next))
             {
                 /* Don't decode since this version is already decoded */
+                dvbpsi_debug(p_dvbpsi, "SDT decoder",
+                             "ignoring already decoded section %d",
+                             p_section->i_number);
                 dvbpsi_DeletePSISections(p_section);
                 return;
             }

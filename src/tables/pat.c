@@ -89,15 +89,18 @@ void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi)
     assert(p_dvbpsi->p_private);
 
     dvbpsi_pat_decoder_t* p_pat_decoder = (dvbpsi_pat_decoder_t*)p_dvbpsi->p_private;
-    free(p_pat_decoder->p_building_pat);
+    if (p_pat_decoder->p_building_pat)
+        dvbpsi_DeletePAT(p_pat_decoder->p_building_pat);
+    p_pat_decoder->p_building_pat = NULL;
 
     for (unsigned int i = 0; i <= 255; i++)
     {
         if (p_pat_decoder->ap_sections[i])
-            free(p_pat_decoder->ap_sections[i]);
+            dvbpsi_DeletePSISections(p_pat_decoder->ap_sections[i]);
+        p_pat_decoder->ap_sections[i] = NULL;
     }
 
-    dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
+    dvbpsi_DeleteDecoder(p_dvbpsi->p_private);
     p_dvbpsi->p_private = NULL;
 }
 
@@ -204,7 +207,7 @@ static void dvbpsi_ReInitPAT(dvbpsi_pat_decoder_t* p_pat_decoder, const bool b_f
 
         /* Free structures */
         if (p_pat_decoder->p_building_pat)
-            free(p_pat_decoder->p_building_pat);
+            dvbpsi_DeletePAT(p_pat_decoder->p_building_pat);
     }
     p_pat_decoder->p_building_pat = NULL;
 
