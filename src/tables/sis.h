@@ -54,8 +54,11 @@ extern "C" {
 typedef struct dvbpsi_sis_s
 {
   /* section */
-  uint8_t                   i_protocol_version;     /*!< Protocol version
-                                                         shall be 0 */
+  uint16_t                  i_ts_id;            /*!< transport_stream_id */
+  uint8_t                   i_version;          /*!< version_number */
+  uint8_t                   i_protocol_version; /*!< Protocol version
+                                                     shall be 0 */
+  bool                      b_current_next;     /*!< current_next_indicator */
 
   /* encryption */
   bool                      b_encrypted_packet;     /*!< 1 when packet is
@@ -379,18 +382,26 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \fn void dvbpsi_InitSIS(dvbpsi_sis_t* p_sis, uint8_t i_protocol_version)
  * \brief Initialize a user-allocated dvbpsi_sis_t structure.
  * \param p_sis pointer to the SIS structure
+ * \param i_ts_id transport stream ID
+ * \param i_version SIS version
+ * \param b_current_next current next indicator
  * \param i_protocol_version SIS protocol version (currently 0)
  * \return nothing.
  */
-void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version);
+void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
+                    bool b_current_next, uint8_t i_protocol_version);
 
 /*!
  * \fn dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version)
  * \brief Allocate and initialize a new dvbpsi_sis_t structure.
+ * \param i_ts_id transport stream ID
+ * \param i_version SIS version
+ * \param b_current_next current next indicator
  * \param i_protocol_version SIS protocol version (currently 0)
  * \return p_sis pointer to the SIS structure
  */
-dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version);
+dvbpsi_sis_t* dvbpsi_NewSIS(uint16_t i_ts_id, uint8_t i_version,
+                            bool b_current_next, uint8_t i_protocol_version);
 
 /*****************************************************************************
  * dvbpsi_EmptySIS/dvbpsi_DeleteSIS

@@ -40,11 +40,13 @@ typedef struct dvbpsi_sis_decoder_s
     void *                        p_cb_data;
 
     /* */
-    dvbpsi_sis_t                  *current_sis;
+    dvbpsi_sis_t                  current_sis;
     dvbpsi_sis_t                  *p_building_sis;
 
     bool                          b_current_valid;
 
+    uint8_t                       i_last_section_number;
+    dvbpsi_psi_section_t *        ap_sections [256];
 } dvbpsi_sis_decoder_t;
 
 /*****************************************************************************

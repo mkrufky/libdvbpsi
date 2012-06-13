@@ -131,8 +131,13 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_sis_t structure.
  *****************************************************************************/
-void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version)
+void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
+                    bool b_current_next, uint8_t i_protocol_version)
 {
+    p_sis->i_ts_id = i_ts_id;
+    p_sis->i_version = i_version;
+    p_sis->b_current_next = b_current_next;
+
     assert(i_protocol_version == 0);
     p_sis->i_protocol_version = 0; /* must be 0 */
 
@@ -163,11 +168,12 @@ void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version)
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_sis_t structure.
  *****************************************************************************/
-dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version)
+dvbpsi_sis_t* dvbpsi_NewSIS(uint16_t i_ts_id, uint8_t i_version,
+                            bool b_current_next, uint8_t i_protocol_version)
 {
     dvbpsi_sis_t* p_sis = (dvbpsi_sis_t*)malloc(sizeof(dvbpsi_sis_t));
     if(p_sis != NULL)
-        dvbpsi_InitSIS(p_sis, i_protocol_version);
+        dvbpsi_InitSIS(p_sis, i_ts_id, i_version, b_current_next, i_protocol_version);
     return p_sis;
 }
 
@@ -224,6 +230,118 @@ dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor(dvbpsi_sis_t *p_sis,
     return p_descriptor;
 }
 
+/* */
+static void dvbpsi_ReInitSIS(dvbpsi_sis_decoder_t* p_decoder, const bool b_force)
+{
+    assert(p_decoder);
+
+    /* Force redecoding */
+    if (b_force)
+        p_decoder->b_current_valid = false;
+
+    /* Free structures */
+    if (p_decoder->p_building_sis)
+        free(p_decoder->p_building_sis);
+    p_decoder->p_building_sis = NULL;
+
+    /* Clear the section array */
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_decoder->ap_sections[i] != NULL)
+        {
+            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
+            p_decoder->ap_sections[i] = NULL;
+        }
+    }
+}
+
+static bool dvbpsi_CheckSIS(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
+{
+    bool b_reinit = false;
+    assert(p_dvbpsi->p_private);
+
+    dvbpsi_sis_decoder_t* p_sis_decoder;
+    p_sis_decoder = (dvbpsi_sis_decoder_t *)p_dvbpsi->p_private;
+
+    if (p_sis_decoder->p_building_sis->i_protocol_version != 0)
+    {
+        dvbpsi_error(p_dvbpsi, "SIS decoder",
+                     "'protocol_version' differs"
+                     " while no discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_sis_decoder->p_building_sis->i_ts_id != p_section->i_extension)
+    {
+        dvbpsi_error(p_dvbpsi, "SIS decoder",
+                "'transport_stream_id' differs"
+                " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_sis_decoder->p_building_sis->i_version != p_section->i_version)
+    {
+        /* version_number */
+        dvbpsi_error(p_dvbpsi, "SIS decoder",
+                "'version_number' differs"
+                " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_sis_decoder->i_last_section_number != p_section->i_last_number)
+    {
+        /* last_section_number */
+        dvbpsi_error(p_dvbpsi, "SIS decoder",
+                "'last_section_number' differs"
+                " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+
+    return b_reinit;
+}
+
+static bool dvbpsi_IsCompleteSIS(dvbpsi_sis_decoder_t* p_sis_decoder)
+{
+    assert(p_sis_decoder);
+
+    bool b_complete = false;
+
+    for (unsigned int i = 0; i <= p_sis_decoder->i_last_section_number; i++)
+    {
+        if (!p_sis_decoder->ap_sections[i])
+            break;
+        if (i == p_sis_decoder->i_last_section_number)
+            b_complete = true;
+    }
+    return b_complete;
+}
+
+static bool dvbpsi_AddSectionSIS(dvbpsi_t *p_dvbpsi, dvbpsi_sis_decoder_t *p_sis_decoder,
+                                 dvbpsi_psi_section_t* p_section)
+{
+    assert(p_dvbpsi);
+    assert(p_sis_decoder);
+    assert(p_section);
+
+    /* Initialize the structures if it's the first section received */
+    if (!p_sis_decoder->p_building_sis)
+    {
+        p_sis_decoder->p_building_sis = dvbpsi_NewSIS(p_section->i_extension,
+                             p_section->i_version, p_section->b_current_next, 0);
+        if (p_sis_decoder->p_building_sis == NULL)
+            return false;
+        p_sis_decoder->i_last_section_number = p_section->i_last_number;
+    }
+
+    /* Fill the section array */
+    if (p_sis_decoder->ap_sections[p_section->i_number] != NULL)
+    {
+        dvbpsi_debug(p_dvbpsi, "SDT decoder", "overwrite section number %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_sis_decoder->ap_sections[p_section->i_number]);
+    }
+    p_sis_decoder->ap_sections[p_section->i_number] = p_section;
+
+    return true;
+}
+
 /*****************************************************************************
  * dvbpsi_GatherSISSections
  *****************************************************************************
@@ -255,12 +373,11 @@ void dvbpsi_GatherSISSections(dvbpsi_t *p_dvbpsi,
         return;
     }
 
-    bool b_reinit = false;
-
     /* TS discontinuity check */
     if (p_demux->b_discontinuity)
     {
-        b_reinit = true;
+        dvbpsi_ReInitSIS(p_sis_decoder, true);
+        p_sis_decoder->b_discontinuity = false;
         p_demux->b_discontinuity = false;
     }
     else
@@ -268,52 +385,64 @@ void dvbpsi_GatherSISSections(dvbpsi_t *p_dvbpsi,
         /* Perform a few sanity checks */
         if (p_sis_decoder->p_building_sis)
         {
-            if (p_sis_decoder->p_building_sis->i_protocol_version != 0)
-            {
-                /* transport_stream_id */
-                dvbpsi_error(p_dvbpsi, "SIS decoder",
-                             "'protocol_version' differs");
-                b_reinit = true;
-            }
+            if (dvbpsi_CheckSIS(p_dvbpsi, p_section))
+                dvbpsi_ReInitSIS(p_sis_decoder, true);
         }
         else
         {
-            if (p_sis_decoder->b_current_valid)
-            {
-                /* Don't decode since this version is already decoded */
-                dvbpsi_DeletePSISections(p_section);
-                return;
-            }
+            if(     (p_sis_decoder->b_current_valid)
+                 && (p_sis_decoder->current_sis.i_version == p_section->i_version)
+                 && (p_sis_decoder->current_sis.b_current_next == p_section->b_current_next))
+             {
+                 /* Don't decode since this version is already decoded */
+                 dvbpsi_debug(p_dvbpsi, "SIT decoder",
+                             "ignoring already decoded section %d",
+                             p_section->i_number);
+                 dvbpsi_DeletePSISections(p_section);
+                 return;
+             }
         }
     }
 
-    /* Reinit the decoder if wanted */
-    if (b_reinit)
+    /* Add section to SIS */
+    if (!dvbpsi_AddSectionSIS(p_dvbpsi, p_sis_decoder, p_section))
     {
-        /* Force redecoding */
-        p_sis_decoder->b_current_valid = false;
+        dvbpsi_error(p_dvbpsi, "SIS decoder", "failed decoding section %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
 
-        /* Free structures */
-        if (p_sis_decoder->p_building_sis)
+    /* Check if we have all the sections */
+    if (dvbpsi_IsCompleteSIS(p_sis_decoder))
+    {
+        assert(p_sis_decoder->pf_sis_callback);
+
+        /* Save the current information */
+        p_sis_decoder->current_sis = *p_sis_decoder->p_building_sis;
+        p_sis_decoder->b_current_valid = true;
+        /* Chain the sections */
+        if (p_sis_decoder->i_last_section_number)
         {
-            free(p_sis_decoder->p_building_sis);
-            p_sis_decoder->p_building_sis = NULL;
+            for (unsigned int i = 0; (int)i <= p_sis_decoder->i_last_section_number - 1; i++)
+                p_sis_decoder->ap_sections[i]->p_next = p_sis_decoder->ap_sections[i + 1];
         }
-    }
-
-    /* Initialize the structures if it's the first section received */
-    if (!p_sis_decoder->p_building_sis)
-    {
-        p_sis_decoder->p_building_sis = (dvbpsi_sis_t*)malloc(sizeof(dvbpsi_sis_t));
-        if (p_sis_decoder->p_building_sis)
-            dvbpsi_InitSIS(p_sis_decoder->p_building_sis, 0);
-        else
-            dvbpsi_error(p_dvbpsi, "SIS decoder", "failed decoding section");
+        /* Decode the sections */
+        dvbpsi_DecodeSISSections(p_dvbpsi, p_sis_decoder->p_building_sis,
+                                 p_sis_decoder->ap_sections[0]);
+        /* Delete the sections */
+        dvbpsi_DeletePSISections(p_sis_decoder->ap_sections[0]);
+        p_sis_decoder->ap_sections[0] = NULL;
+        /* signal the new SDT */
+        p_sis_decoder->pf_sis_callback(p_sis_decoder->p_cb_data,
+                                       p_sis_decoder->p_building_sis);
+        /* Reinitialize the structures */
+        dvbpsi_ReInitSIS(p_sis_decoder, false);
     }
 }
 
 /*****************************************************************************
- * dvbpsi_DecodeSISSection
+ * dvbpsi_DecodeSISSections
  *****************************************************************************
  * SIS decoder.
  *****************************************************************************/
