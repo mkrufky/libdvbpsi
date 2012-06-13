@@ -165,7 +165,7 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
                     uint8_t i_last_table_id);
 
 /*!
- * \fn dvbpsi_eit_t* dvbpsi_NewtEIT(uint16_t i_service_id,
+ * \fn dvbpsi_eit_t* dvbpsi_NewEIT(uint16_t i_service_id,
           uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
           uint16_t i_network_id, uint8_t i_segment_last_section_number,
           uint8_t i_last_table_id)
@@ -179,7 +179,7 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
  * \param i_last_table_id i_last_table_id
  * \return p_eit pointer to the EIT structure
  */
-dvbpsi_eit_t* dvbpsi_NewtEIT(uint16_t i_service_id,
+dvbpsi_eit_t* dvbpsi_NewEIT(uint16_t i_service_id,
           uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
           uint16_t i_network_id, uint8_t i_segment_last_section_number,
           uint8_t i_last_table_id);

@@ -169,7 +169,7 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_eit_t structure.
  *****************************************************************************/
-dvbpsi_eit_t* dvbpsi_NewtEIT(uint16_t i_service_id, uint8_t i_version,
+dvbpsi_eit_t* dvbpsi_NewEIT(uint16_t i_service_id, uint8_t i_version,
                              bool b_current_next, uint16_t i_ts_id,
                              uint16_t i_network_id, uint8_t i_segment_last_section_number,
                              uint8_t i_last_table_id)
@@ -271,138 +271,72 @@ dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor( dvbpsi_eit_event_t* p_event,
     return p_descriptor;
 }
 
-/*****************************************************************************
- * dvbpsi_GatherEITSections
- *****************************************************************************
- * Callback for the subtable demultiplexor.
- *****************************************************************************/
-void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_decoder,
-                              dvbpsi_psi_section_t *p_section)
+/* */
+static void dvbpsi_ReInitEIT(dvbpsi_eit_decoder_t* p_decoder, const bool b_force)
 {
-    assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_decoder);
 
-    const uint8_t i_table_id = (p_section->i_table_id >= 0x4e &&
-                                p_section->i_table_id <= 0x6f) ?
-                                    p_section->i_table_id : 0x4e;
-
-    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, i_table_id, "EIT decoder"))
+    /* Force redecoding */
+    if (b_force)
     {
-        dvbpsi_DeletePSISections(p_section);
-        return;
-    }
+        p_decoder->b_current_valid = false;
 
-    /* We have a valid EIT section */
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_eit_decoder_t* p_eit_decoder
-                        = (dvbpsi_eit_decoder_t*)p_private_decoder;
-    bool b_reinit = false;
-
-    /* TS discontinuity check */
-    if  (p_demux->b_discontinuity)
-    {
-        b_reinit = true;
-        p_demux->b_discontinuity = false;
-    }
-    else
-    {
-        /* Perform a few sanity checks */
-        if (p_eit_decoder->p_building_eit)
-        {
-            if (p_eit_decoder->p_building_eit->i_service_id
-                   != p_section->i_extension)
-            {
-                /* service_id */
-                dvbpsi_error(p_dvbpsi, "EIT decoder",
-                             "'service_id' differs"
-                             " whereas no TS discontinuity has occurred");
-                b_reinit = true;
-            }
-            else if (p_eit_decoder->p_building_eit->i_version
-                        != p_section->i_version)
-            {
-                /* version_number */
-                dvbpsi_error(p_dvbpsi, "EIT decoder",
-                             "'version_number' differs"
-                             " whereas no discontinuity has occurred");
-                b_reinit = true;
-            }
-            else if (p_eit_decoder->i_last_section_number
-                        != p_section->i_last_number)
-            {
-                /* last_section_number */
-                dvbpsi_error(p_dvbpsi, "EIT decoder",
-                             "'last_section_number' differs"
-                             " whereas no discontinuity has occured");
-                b_reinit = true;
-            }
-        }
-        else
-        {
-            if (   (p_eit_decoder->b_current_valid)
-                && (p_eit_decoder->current_eit.i_version == p_section->i_version)
-                && (p_eit_decoder->current_eit.b_current_next == p_section->b_current_next))
-            {
-                /* Don't decode since this version is already decoded */
-                dvbpsi_DeletePSISections(p_section);
-                return;
-            }
-        }
-    }
-
-    /* Reinit the decoder if wanted */
-    if (b_reinit)
-    {
-        /* Force redecoding */
-        p_eit_decoder->b_current_valid = false;
         /* Free structures */
-        if (p_eit_decoder->p_building_eit)
-        {
-            dvbpsi_DeleteEIT(p_eit_decoder->p_building_eit);
-            p_eit_decoder->p_building_eit = NULL;
-        }
-        /* Clear the section array */
-        for (unsigned int i = 0; i <= 255; i++)
-        {
-            if (p_eit_decoder->ap_sections[i] != NULL)
-            {
-                dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[i]);
-                p_eit_decoder->ap_sections[i] = NULL;
-            }
-        }
+        if (p_decoder->p_building_eit)
+            dvbpsi_DeleteEIT(p_decoder->p_building_eit);
     }
+    p_decoder->p_building_eit = NULL;
 
-    /* Initialize the structures if it's the first section received */
-    if (!p_eit_decoder->p_building_eit)
+    /* Clear the section array */
+    for (unsigned int i = 0; i <= 255; i++)
     {
-        p_eit_decoder->p_building_eit = (dvbpsi_eit_t*)calloc(1, sizeof(dvbpsi_eit_t));
-        if (p_eit_decoder->p_building_eit)
+        if (p_decoder->ap_sections[i] != NULL)
         {
-            dvbpsi_InitEIT(p_eit_decoder->p_building_eit,
-                     p_section->i_extension,
-                     p_section->i_version,
-                     p_section->b_current_next,
-                     ((uint16_t)(p_section->p_payload_start[0]) << 8)
-                     | p_section->p_payload_start[1],
-                     ((uint16_t)(p_section->p_payload_start[2]) << 8)
-                     | p_section->p_payload_start[3],
-                     p_section->p_payload_start[4],
-                     p_section->p_payload_start[5]);
-            p_eit_decoder->i_last_section_number = p_section->i_last_number;
-            p_eit_decoder->i_first_received_section_number = p_section->i_number;
+            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
+            p_decoder->ap_sections[i] = NULL;
         }
-        else dvbpsi_error(p_dvbpsi, "EIT decoder", "failed decoding EIT section");
     }
+}
 
-    /* Fill the section array */
-    if (p_eit_decoder->ap_sections[p_section->i_number] != NULL)
+static bool dvbpsi_CheckEIT(dvbpsi_t *p_dvbpsi, dvbpsi_eit_decoder_t *p_eit_decoder,
+                            dvbpsi_psi_section_t *p_section)
+{
+    bool b_reinit = false;
+    assert(p_dvbpsi);
+    assert(p_eit_decoder);
+
+    if (p_eit_decoder->p_building_eit->i_service_id != p_section->i_extension)
     {
-        dvbpsi_debug(p_dvbpsi, "EIT decoder", "overwrite section number %d", p_section->i_number);
-        dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[p_section->i_number]);
+        /* service_id */
+        dvbpsi_error(p_dvbpsi, "EIT decoder",
+                     "'service_id' differs"
+                     " whereas no TS discontinuity has occurred");
+        b_reinit = true;
     }
-    p_eit_decoder->ap_sections[p_section->i_number] = p_section;
+    else if (p_eit_decoder->p_building_eit->i_version != p_section->i_version)
+    {
+        /* version_number */
+        dvbpsi_error(p_dvbpsi, "EIT decoder",
+                     "'version_number' differs"
+                     " whereas no discontinuity has occurred");
+        b_reinit = true;
+    }
+    else if (p_eit_decoder->i_last_section_number != p_section->i_last_number)
+    {
+        /* last_section_number */
+        dvbpsi_error(p_dvbpsi, "EIT decoder",
+                     "'last_section_number' differs"
+                     " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
 
-    /* Check if we have all the sections */
+    return b_reinit;
+}
+
+static bool dvbpsi_IsCompleteEIT(dvbpsi_eit_decoder_t* p_eit_decoder, dvbpsi_psi_section_t* p_section)
+{
+    assert(p_eit_decoder);
+
     bool b_complete = false;
 
     /* As there may be gaps in the section_number fields (see below), we
@@ -448,8 +382,123 @@ void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_de
         }
     }
 
-    if (b_complete)
+    return b_complete;
+}
+
+static bool dvbpsi_AddSectionEIT(dvbpsi_t *p_dvbpsi, dvbpsi_eit_decoder_t *p_eit_decoder,
+                                 dvbpsi_psi_section_t* p_section)
+{
+    assert(p_dvbpsi);
+    assert(p_eit_decoder);
+    assert(p_section);
+
+    /* Initialize the structures if it's the first section received */
+    if (!p_eit_decoder->p_building_eit)
     {
+        p_eit_decoder->p_building_eit = dvbpsi_NewEIT(p_section->i_extension,
+                                p_section->i_version,
+                                p_section->b_current_next,
+                                ((uint16_t)(p_section->p_payload_start[0]) << 8)
+                                    | p_section->p_payload_start[1],
+                                ((uint16_t)(p_section->p_payload_start[2]) << 8)
+                                    | p_section->p_payload_start[3],
+                                p_section->p_payload_start[4],
+                                p_section->p_payload_start[5]);
+
+        p_eit_decoder->i_last_section_number = p_section->i_last_number;
+        p_eit_decoder->i_first_received_section_number = p_section->i_number;
+
+        if (p_eit_decoder->p_building_eit == NULL)
+            return false;
+        p_eit_decoder->i_last_section_number = p_section->i_last_number;
+    }
+
+    /* Fill the section array */
+    if (p_eit_decoder->ap_sections[p_section->i_number] != NULL)
+    {
+        dvbpsi_debug(p_dvbpsi, "EIT decoder",
+                     "overwrite section number %d", p_section->i_number);
+        dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[p_section->i_number]);
+    }
+    p_eit_decoder->ap_sections[p_section->i_number] = p_section;
+
+    return true;
+}
+
+/*****************************************************************************
+ * dvbpsi_GatherEITSections
+ *****************************************************************************
+ * Callback for the subtable demultiplexor.
+ *****************************************************************************/
+void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_decoder,
+                              dvbpsi_psi_section_t *p_section)
+{
+    assert(p_dvbpsi);
+    assert(p_dvbpsi->p_private);
+
+    const uint8_t i_table_id = (p_section->i_table_id >= 0x4e &&
+                                p_section->i_table_id <= 0x6f) ?
+                                    p_section->i_table_id : 0x4e;
+
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, i_table_id, "EIT decoder"))
+    {
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
+
+    /* We have a valid EIT section */
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_eit_decoder_t* p_eit_decoder
+                        = (dvbpsi_eit_decoder_t*)p_private_decoder;
+
+    /* TS discontinuity check */
+    if (p_demux->b_discontinuity)
+    {
+        dvbpsi_ReInitEIT(p_eit_decoder, true);
+        p_eit_decoder->b_discontinuity = false;
+        p_demux->b_discontinuity = false;
+    }
+    else
+    {
+        /* Perform a few sanity checks */
+        if (p_eit_decoder->p_building_eit)
+        {
+            if (dvbpsi_CheckEIT(p_dvbpsi, p_eit_decoder, p_section))
+                dvbpsi_ReInitEIT(p_eit_decoder, true);
+        }
+        else
+        {
+            if (   (p_eit_decoder->b_current_valid)
+                && (p_eit_decoder->current_eit.i_version == p_section->i_version)
+                && (p_eit_decoder->current_eit.b_current_next == p_section->b_current_next))
+            {
+                /* Don't decode since this version is already decoded */
+                dvbpsi_debug(p_dvbpsi, "SDT decoder",
+                             "ignoring already decoded section %d",
+                             p_section->i_number);
+                dvbpsi_DeletePSISections(p_section);
+                return;
+            }
+        }
+    }
+
+    /* Add section to EIT */
+    if (!dvbpsi_AddSectionEIT(p_dvbpsi, p_eit_decoder, p_section))
+    {
+        dvbpsi_error(p_dvbpsi, "EIT decoder", "failed decoding section %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_section);
+        return;
+    }
+
+    /* Check if we have all the sections */
+    /* FIXME: p_section has just been added to the p_eit_decoder,
+     * Why do we have to explicitly check against it in dvbpsi_IsCompleteEIT() ?
+     */
+    if (dvbpsi_IsCompleteEIT(p_eit_decoder, p_section))
+    {
+        assert(p_eit_decoder->pf_eit_callback);
+
         /* Save the current information */
         p_eit_decoder->current_eit = *p_eit_decoder->p_building_eit;
         p_eit_decoder->b_current_valid = true;
