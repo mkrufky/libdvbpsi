@@ -1166,6 +1166,10 @@ static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot)
     else if (table_id == 0x73) /* TOT */
         printf("  TOT: Time Offset Table\n");
 
+    printf("\tVersion number : %d\n", p_tot->i_version);
+    printf("\tCurrent next   : %s\n", p_tot->b_current_next ? "yes" : "no");
+    printf("\tTransport stream id : %d\n", p_tot->i_ts_id);
+
     printf("\tUTC time       : %"PRId64"\n", p_tot->i_utc_time);
     if (table_id == 0x73) /* TOT */
         printf("\tCRC 32         : %d\n", p_tot->i_crc);
