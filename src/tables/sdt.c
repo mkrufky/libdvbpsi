@@ -271,6 +271,116 @@ dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
     return p_descriptor;
 }
 
+/* */
+static void dvbpsi_ReInitSDT(dvbpsi_sdt_decoder_t* p_decoder, const bool b_force)
+{
+    assert(p_decoder);
+
+    /* Force redecoding */
+    if (b_force)
+    {
+        p_decoder->b_current_valid = false;
+
+        /* Free structures */
+        if (p_decoder->p_building_sdt)
+            free(p_decoder->p_building_sdt);
+    }
+    p_decoder->p_building_sdt = NULL;
+
+    /* Clear the section array */
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_decoder->ap_sections[i] != NULL)
+        {
+            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
+            p_decoder->ap_sections[i] = NULL;
+        }
+    }
+}
+
+static bool dvbpsi_CheckSDT(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
+{
+    bool b_reinit = false;
+    assert(p_dvbpsi->p_private);
+
+    dvbpsi_sdt_decoder_t* p_sdt_decoder;
+    p_sdt_decoder = (dvbpsi_sdt_decoder_t *)p_dvbpsi->p_private;
+
+    if (p_sdt_decoder->p_building_sdt->i_ts_id != p_section->i_extension)
+    {
+        /* transport_stream_id */
+        dvbpsi_error(p_dvbpsi, "SDT decoder",
+                "'transport_stream_id' differs"
+                " whereas no TS discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_sdt_decoder->p_building_sdt->i_version != p_section->i_version)
+    {
+        /* version_number */
+        dvbpsi_error(p_dvbpsi, "SDT decoder",
+                "'version_number' differs"
+                " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_sdt_decoder->i_last_section_number != p_section->i_last_number)
+    {
+        /* last_section_number */
+        dvbpsi_error(p_dvbpsi, "SDT decoder",
+                "'last_section_number' differs"
+                " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+
+    return b_reinit;
+}
+
+static bool dvbpsi_IsCompleteSDT(dvbpsi_sdt_decoder_t* p_sdt_decoder)
+{
+    assert(p_sdt_decoder);
+
+    bool b_complete = false;
+
+    for (unsigned int i = 0; i <= p_sdt_decoder->i_last_section_number; i++)
+    {
+        if (!p_sdt_decoder->ap_sections[i])
+            break;
+        if (i == p_sdt_decoder->i_last_section_number)
+            b_complete = true;
+    }
+    return b_complete;
+}
+
+static bool dvbpsi_AddSectionSDT(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_decoder_t *p_sdt_decoder,
+                                 dvbpsi_psi_section_t* p_section)
+{
+    assert(p_dvbpsi);
+    assert(p_sdt_decoder);
+    assert(p_section);
+
+    /* Initialize the structures if it's the first section received */
+    if (!p_sdt_decoder->p_building_sdt)
+    {
+        p_sdt_decoder->p_building_sdt = dvbpsi_NewSDT(p_section->i_extension,
+                             p_section->i_version, p_section->b_current_next,
+                             ((uint16_t)(p_section->p_payload_start[0]) << 8)
+                                         | p_section->p_payload_start[1]);
+        if (p_sdt_decoder->p_building_sdt == NULL)
+            return false;
+        p_sdt_decoder->i_last_section_number = p_section->i_last_number;
+    }
+
+    /* Fill the section array */
+    if (p_sdt_decoder->ap_sections[p_section->i_number] != NULL)
+    {
+        dvbpsi_debug(p_dvbpsi, "SDT decoder", "overwrite section number %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_sdt_decoder->ap_sections[p_section->i_number]);
+    }
+    p_sdt_decoder->ap_sections[p_section->i_number] = p_section;
+
+    return true;
+}
+
 /*****************************************************************************
  * dvbpsi_GatherSDTSections
  *****************************************************************************
@@ -289,17 +399,16 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
         return;
     }
 
-    /* */
+    /* We have a valid SDT section */
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_private;
     dvbpsi_sdt_decoder_t *p_sdt_decoder
                         = (dvbpsi_sdt_decoder_t*)p_private_decoder;
 
-    bool b_reinit = false;
-
     /* TS discontinuity check */
     if (p_demux->b_discontinuity)
     {
-        b_reinit = true;
+        dvbpsi_ReInitSDT(p_sdt_decoder, true);
+        p_sdt_decoder->b_discontinuity = false;
         p_demux->b_discontinuity = false;
     }
     else
@@ -307,30 +416,8 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
         /* Perform a few sanity checks */
         if (p_sdt_decoder->p_building_sdt)
         {
-            if (p_sdt_decoder->p_building_sdt->i_ts_id != p_section->i_extension)
-            {
-                /* transport_stream_id */
-                dvbpsi_error(p_dvbpsi, "SDT decoder",
-                        "'transport_stream_id' differs"
-                        " whereas no TS discontinuity has occured");
-                b_reinit = true;
-            }
-            else if (p_sdt_decoder->p_building_sdt->i_version != p_section->i_version)
-            {
-                /* version_number */
-                dvbpsi_error(p_dvbpsi, "SDT decoder",
-                        "'version_number' differs"
-                        " whereas no discontinuity has occured");
-                b_reinit = true;
-            }
-            else if (p_sdt_decoder->i_last_section_number != p_section->i_last_number)
-            {
-                /* last_section_number */
-                dvbpsi_error(p_dvbpsi, "SDT decoder",
-                        "'last_section_number' differs"
-                        " whereas no discontinuity has occured");
-                b_reinit = true;
-            }
+            if (dvbpsi_CheckSDT(p_dvbpsi, p_section))
+                dvbpsi_ReInitSDT(p_sdt_decoder, true);
         }
         else
         {
@@ -345,68 +432,20 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
         }
     }
 
-    /* Reinit the decoder if wanted */
-    if (b_reinit)
+    /* Add section to SDT */
+    if (!dvbpsi_AddSectionSDT(p_dvbpsi, p_sdt_decoder, p_section))
     {
-        /* Force redecoding */
-        p_sdt_decoder->b_current_valid = false;
-        /* Free structures */
-        if (p_sdt_decoder->p_building_sdt)
-        {
-            free(p_sdt_decoder->p_building_sdt);
-            p_sdt_decoder->p_building_sdt = NULL;
-        }
-        /* Clear the section array */
-        for (unsigned int i = 0; i <= 255; i++)
-        {
-            if (p_sdt_decoder->ap_sections[i] != NULL)
-            {
-                dvbpsi_DeletePSISections(p_sdt_decoder->ap_sections[i]);
-                p_sdt_decoder->ap_sections[i] = NULL;
-            }
-        }
-    }
-
-    /* Initialize the structures if it's the first section received */
-    if (!p_sdt_decoder->p_building_sdt)
-    {
-        p_sdt_decoder->p_building_sdt = (dvbpsi_sdt_t*)calloc(1, sizeof(dvbpsi_sdt_t));
-        if (p_sdt_decoder->p_building_sdt)
-        {
-            dvbpsi_InitSDT(p_sdt_decoder->p_building_sdt,
-                            p_section->i_extension,
-                            p_section->i_version,
-                            p_section->b_current_next,
-                            ((uint16_t)(p_section->p_payload_start[0]) << 8)
-                                | p_section->p_payload_start[1]);
-            p_sdt_decoder->i_last_section_number = p_section->i_last_number;
-        }
-        else
-            dvbpsi_debug(p_dvbpsi, "SDT decoder", "failed decoding section");
-    }
-
-    /* Fill the section array */
-    if (p_sdt_decoder->ap_sections[p_section->i_number] != NULL)
-    {
-        dvbpsi_debug(p_dvbpsi, "SDT decoder", "overwrite section number %d",
+        dvbpsi_error(p_dvbpsi, "SDT decoder", "failed decoding section %d",
                      p_section->i_number);
-        dvbpsi_DeletePSISections(p_sdt_decoder->ap_sections[p_section->i_number]);
+        dvbpsi_DeletePSISections(p_section);
+        return;
     }
-    p_sdt_decoder->ap_sections[p_section->i_number] = p_section;
 
     /* Check if we have all the sections */
-    bool b_complete = false;
-    for (unsigned int i = 0; i <= p_sdt_decoder->i_last_section_number; i++)
+    if (dvbpsi_IsCompleteSDT(p_sdt_decoder))
     {
-        if (!p_sdt_decoder->ap_sections[i])
-            break;
+        assert(p_sdt_decoder->pf_sdt_callback);
 
-        if (i == p_sdt_decoder->i_last_section_number)
-            b_complete = true;
-    }
-
-    if (b_complete)
-    {
         /* Save the current information */
         p_sdt_decoder->current_sdt = *p_sdt_decoder->p_building_sdt;
         p_sdt_decoder->b_current_valid = true;
@@ -426,9 +465,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
         p_sdt_decoder->pf_sdt_callback(p_sdt_decoder->p_cb_data,
                                        p_sdt_decoder->p_building_sdt);
         /* Reinitialize the structures */
-        p_sdt_decoder->p_building_sdt = NULL;
-        for (unsigned int i = 0; i <= p_sdt_decoder->i_last_section_number; i++)
-            p_sdt_decoder->ap_sections[i] = NULL;
+        dvbpsi_ReInitSDT(p_sdt_decoder, false);
     }
 }
 
