@@ -94,6 +94,11 @@ bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     p_sis_decoder->pf_sis_callback = pf_callback;
     p_sis_decoder->p_cb_data = p_cb_data;
 
+    /* SIS decoder initial state */
+    p_sis_decoder->b_current_valid = false;
+    p_sis_decoder->p_building_sis = NULL;
+    for (unsigned int i = 0; i <= 255; i++)
+        p_sis_decoder->ap_sections[i] = NULL;
     return true;
 }
 
@@ -120,6 +125,23 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
                          "extension == 0x%02x)",
                          i_table_id, i_extension);
         return;
+    }
+
+    assert(p_subdec->p_decoder);
+
+    dvbpsi_sis_decoder_t* p_sis_decoder;
+    p_sis_decoder = (dvbpsi_sis_decoder_t*)p_subdec->p_decoder;
+    if (p_sis_decoder->p_building_sis)
+        dvbpsi_DeleteSIS(p_sis_decoder->p_building_sis);
+    p_sis_decoder->p_building_sis = NULL;
+
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_sis_decoder->ap_sections[i])
+        {
+            dvbpsi_DeletePSISections(p_sis_decoder->ap_sections[i]);
+            p_sis_decoder->ap_sections[i] = NULL;
+        }
     }
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
@@ -237,11 +259,13 @@ static void dvbpsi_ReInitSIS(dvbpsi_sis_decoder_t* p_decoder, const bool b_force
 
     /* Force redecoding */
     if (b_force)
+    {
         p_decoder->b_current_valid = false;
 
-    /* Free structures */
-    if (p_decoder->p_building_sis)
-        free(p_decoder->p_building_sis);
+        /* Free structures */
+        if (p_decoder->p_building_sis)
+            dvbpsi_DeleteSIS(p_decoder->p_building_sis);
+    }
     p_decoder->p_building_sis = NULL;
 
     /* Clear the section array */
@@ -255,13 +279,12 @@ static void dvbpsi_ReInitSIS(dvbpsi_sis_decoder_t* p_decoder, const bool b_force
     }
 }
 
-static bool dvbpsi_CheckSIS(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
+static bool dvbpsi_CheckSIS(dvbpsi_t *p_dvbpsi, dvbpsi_sis_decoder_t* p_sis_decoder,
+                            dvbpsi_psi_section_t *p_section)
 {
     bool b_reinit = false;
-    assert(p_dvbpsi->p_private);
-
-    dvbpsi_sis_decoder_t* p_sis_decoder;
-    p_sis_decoder = (dvbpsi_sis_decoder_t *)p_dvbpsi->p_private;
+    assert(p_dvbpsi);
+    assert(p_sis_decoder);
 
     if (p_sis_decoder->p_building_sis->i_protocol_version != 0)
     {
@@ -385,7 +408,7 @@ void dvbpsi_GatherSISSections(dvbpsi_t *p_dvbpsi,
         /* Perform a few sanity checks */
         if (p_sis_decoder->p_building_sis)
         {
-            if (dvbpsi_CheckSIS(p_dvbpsi, p_section))
+            if (dvbpsi_CheckSIS(p_dvbpsi, p_sis_decoder, p_section))
                 dvbpsi_ReInitSIS(p_sis_decoder, true);
         }
         else
