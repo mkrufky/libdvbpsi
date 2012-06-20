@@ -77,6 +77,7 @@ typedef struct dvbpsi_atsc_eit_s
 
     dvbpsi_atsc_eit_event_t   *p_first_event;   /*!< First event information structure. */
 
+    dvbpsi_descriptor_t     *p_first_descriptor; /*!< First descriptor structure. */
 } dvbpsi_atsc_eit_t;
 
 /*****************************************************************************
