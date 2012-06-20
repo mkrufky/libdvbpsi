@@ -34,24 +34,37 @@ extern "C" {
  * \struct dvbpsi_atsc_ett_s
  * \brief ETT structure.
  *
- * This structure is used to store a decoded ETT.
+ * The Extended Text Table (ETT) contains Extended Text Message (ETM) streams. They
+ * provide detailed descriptions of virtual channels (channel ETM) and (event ETM).
+ * An ETM consist of a multiple string data structure (see Section 6.10), and thus, it
+ * may represent a description in several different languages (each string corresponding
+ * to one language).
  */
 /*!
  * \typedef struct dvbpsi_atsc_ett_s dvbpsi_atsc_ett_t
  * \brief dvbpsi_atsc_ett_t type definition.
+ *
+ * This structure is used to store a decoded ETT.
+ * (ATSC document A/56-2009, section 6.6.)
  */
 typedef struct dvbpsi_atsc_ett_s
 {
+    /* general PSI table */
     uint8_t                 i_version;      /*!< version_number */
     bool                    b_current_next; /*!< current_next_indicator */
     uint8_t                 i_protocol;     /*!< PSIP Protocol version */
+
+    /* ETT specific */
     uint16_t                i_ett_table_id; /*!< ETT Table ID extension,
                                                  normally 0x0000 */
     uint32_t                i_etm_id;       /*!< ETM Identifier, made up of
                                                  source id and event id
                                                  (or 0 for channel ETT) */
-    uint16_t                i_etm_length;   /*!< length of p_etm */
-    uint8_t                *p_etm;          /*!< pointer to etm data */
+    uint32_t                i_etm_length;   /*!< length of p_etm_data */
+    uint8_t                 *p_etm_data;    /*!< ETM data organized as a
+                                                 multiple string structure */
+
+    dvbpsi_descriptor_t    *p_first_descriptor; /*!< First descriptor. */
 } dvbpsi_atsc_ett_t;
 
 /*****************************************************************************
