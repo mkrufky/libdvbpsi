@@ -40,6 +40,7 @@ typedef struct params_s
     int  port;
     bool b_udp;
     bool b_tcp;
+    bool b_file;
 
     /* */
     int  fd_in;

@@ -46,6 +46,7 @@ void buffer_free(buffer_t *buffer);
  * fifo_new()  - create a new fifo holding buffer_t pointers
  * fifo_free() - release fifo and all buffers contained therein
  * fifo_count()- number of buffers in fifo_t
+ * fifo_size() - total size of buffers in fifo_t
  * fifo_push() - push buffer at end of fifo
  * fifo_pop()  - pop buffer from start of fifo
  * fifo_wake() - wake up fifo listeners
@@ -53,6 +54,7 @@ void buffer_free(buffer_t *buffer);
 fifo_t *fifo_new(void);
 void fifo_free(fifo_t *fifo);
 ssize_t fifo_count(fifo_t *fifo);
+size_t fifo_size(fifo_t *fifo);
 void fifo_push(fifo_t *fifo, buffer_t *buffer);
 buffer_t *fifo_pop(fifo_t *fifo);
 void fifo_wake(fifo_t *fifo);

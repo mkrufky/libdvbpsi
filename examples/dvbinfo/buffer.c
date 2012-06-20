@@ -44,6 +44,7 @@ struct fifo_s
     pthread_cond_t  wait;
     bool       b_force_wake;
     ssize_t    i_count;
+    size_t     i_size; /* fifo size in bytes */
     buffer_t  *p_first;
     buffer_t **pp_last;
 };
@@ -73,6 +74,7 @@ fifo_t *fifo_new(void)
     if (fifo == NULL) return NULL;
 
     fifo->i_count = 0;
+    fifo->i_size = 0;
     fifo->b_force_wake = false;
     fifo->p_first = NULL;
     fifo->pp_last = &fifo->p_first;
@@ -129,6 +131,14 @@ ssize_t fifo_count(fifo_t *fifo)
     return count;
 }
 
+size_t fifo_size(fifo_t *fifo)
+{
+    pthread_mutex_lock(&fifo->lock);
+    size_t size = fifo->i_size;
+    pthread_mutex_unlock(&fifo->lock);
+    return size;
+}
+
 void fifo_push(fifo_t *fifo, buffer_t *buffer)
 {
     buffer_t *p_last;
@@ -148,6 +158,7 @@ void fifo_push(fifo_t *fifo, buffer_t *buffer)
     *fifo->pp_last = buffer;
     fifo->pp_last = &p_last->p_next;
     fifo->i_count += i_depth;
+    fifo->i_size += buffer->i_size;
 
     assert(fifo->p_first != NULL);
     assert(fifo->pp_last  != NULL);
@@ -175,6 +186,7 @@ buffer_t *fifo_pop(fifo_t *fifo)
 
     fifo->p_first = buffer->p_next;
     fifo->i_count--;
+    fifo->i_size -= buffer->i_size;
 
     if (fifo->p_first == NULL)
     {

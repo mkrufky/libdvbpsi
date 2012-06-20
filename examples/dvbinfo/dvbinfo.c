@@ -64,6 +64,7 @@
 #   include "tcp.h"
 #endif
 
+#define FIFO_THRESHOLD_SIZE (400 * 1024 * 1024) /* threshold in bytes */
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 static const int   i_summary_mode[] = { SUM_BANDWIDTH, SUM_TABLE, SUM_PACKET, SUM_WIRE };
@@ -76,6 +77,10 @@ typedef struct dvbinfo_capture_s
 {
     fifo_t  *fifo;
     fifo_t  *empty;
+
+    pthread_mutex_t lock;
+    pthread_cond_t  fifo_full;
+    bool     b_fifo_full;
 
     size_t   size;  /* prefered capture size */
 
@@ -277,6 +282,30 @@ static void *dvbinfo_capture(void *data)
 
         buffer->i_date = mdate();
 
+        /* check fifo size */
+        if (fifo_size(capture->fifo) >= FIFO_THRESHOLD_SIZE)
+        {
+            pthread_mutex_lock(&capture->lock);
+            capture->b_fifo_full = true;
+            pthread_mutex_unlock(&capture->lock);
+
+            if (param->b_file)
+            {
+                /* wait till buffer becomes smaller again */
+                pthread_mutex_lock(&capture->lock);
+                while(capture->b_fifo_full)
+                    pthread_cond_wait(&capture->fifo_full, &capture->lock);
+                pthread_mutex_unlock(&capture->lock);
+            }
+            else
+            {
+                libdvbpsi_log(capture->params, DVBINFO_LOG_ERROR,
+                          "error fifo full discarding buffer");
+                fifo_push(capture->empty, buffer);
+                continue;
+            }
+        }
+
         /* store buffer */
         fifo_push(capture->fifo, buffer);
         buffer = NULL;
@@ -374,6 +403,15 @@ static int dvbinfo_process(dvbinfo_capture_t *capture)
         /* reuse buffer */
         fifo_push(capture->empty, buffer);
         buffer = NULL;
+
+        /* check fifo size */
+        if (fifo_size(capture->fifo) < FIFO_THRESHOLD_SIZE)
+        {
+            pthread_mutex_lock(&capture->lock);
+            capture->b_fifo_full = false;
+            pthread_cond_signal(&capture->fifo_full);
+            pthread_mutex_unlock(&capture->lock);
+        }
     }
 
     libdvbpsi_exit(stream);
@@ -407,6 +445,9 @@ int main(int argc, char **pp_argv)
     capture.params = param;
     capture.fifo = fifo_new();
     capture.empty = fifo_new();
+    capture.b_fifo_full = false;
+    pthread_mutex_init(&capture.lock, NULL);
+    pthread_cond_init(&capture.fifo_full, NULL);
 
     static const struct option long_options[] =
     {
@@ -461,6 +502,7 @@ int main(int argc, char **pp_argv)
                     }
                     /* */
                     param->pf_read = read;
+                    param->b_file = true;
                 }
                 break;
 
@@ -646,6 +688,9 @@ int main(int argc, char **pp_argv)
 
     fifo_free((&capture)->fifo);
     fifo_free((&capture)->empty);
+
+    pthread_mutex_destroy(&capture.lock);
+    pthread_cond_destroy(&capture.fifo_full);
 
 #ifdef HAVE_SYS_SOCKET_H
     if (param->b_monitor)
