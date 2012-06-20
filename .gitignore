@@ -23,6 +23,7 @@ libtool
 stamp-*
 *-stamp
 doc/doxygen
+doc/decoder.png
 examples/decode_mpeg
 examples/decode_pat
 examples/decode_pmt
