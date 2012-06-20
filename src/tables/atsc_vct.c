@@ -377,13 +377,126 @@ static dvbpsi_descriptor_t *dvbpsi_atsc_VCTChannelAddDescriptor(
 }
 
 /*****************************************************************************
+ * dvbpsi_ReInitVCT                                                          *
+ *****************************************************************************/
+static void dvbpsi_ReInitVCT(dvbpsi_atsc_vct_decoder_t *p_decoder, const bool b_force)
+{
+    assert(p_decoder);
+
+    /* Force redecoding */
+    if (b_force)
+    {
+        p_decoder->b_current_valid = false;
+
+        /* Free structures */
+        if (p_decoder->p_building_vct)
+            dvbpsi_atsc_DeleteVCT(p_decoder->p_building_vct);
+    }
+    p_decoder->p_building_vct = NULL;
+
+    /* Clear the section array */
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_decoder->ap_sections[i] != NULL)
+        {
+            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
+            p_decoder->ap_sections[i] = NULL;
+        }
+    }
+}
+
+static bool dvbpsi_CheckVCT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_vct_decoder_t *p_vct_decoder,
+                            dvbpsi_psi_section_t *p_section)
+{
+    bool b_reinit = false;
+
+    assert(p_dvbpsi);
+    assert(p_vct_decoder);
+
+    if (p_vct_decoder->p_building_vct->i_ts_id != p_section->i_extension)
+    {
+        /* transport_stream_id */
+        dvbpsi_error(p_dvbpsi, "ATSC VCT decoder",
+                     "'transport_stream_id' differs"
+                     " whereas no TS discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_vct_decoder->p_building_vct->i_version != p_section->i_version)
+    {
+        /* version_number */
+        dvbpsi_error(p_dvbpsi, "ATSC VCT decoder",
+                     "'version_number' differs"
+                     " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_vct_decoder->i_last_section_number != p_section->i_last_number)
+    {
+        /* last_section_number */
+        dvbpsi_error(p_dvbpsi, "ATSC VCT decoder",
+                     "'last_section_number' differs"
+                     " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+
+    return b_reinit;
+}
+
+static bool dvbpsi_AddSectionVCT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_vct_decoder_t *p_vct_decoder,
+                                 dvbpsi_psi_section_t* p_section)
+{
+    assert(p_dvbpsi);
+    assert(p_vct_decoder);
+    assert(p_section);
+
+    /* Initialize the structures if it's the first section received */
+    if (!p_vct_decoder->p_building_vct)
+    {
+        p_vct_decoder->p_building_vct = dvbpsi_atsc_NewVCT(p_section->i_extension,
+                              p_section->p_payload_start[0], p_section->i_table_id == 0xC9,
+                              p_section->i_version, p_section->b_current_next);
+        if (p_vct_decoder->p_building_vct)
+            return false;
+
+        p_vct_decoder->i_last_section_number = p_section->i_last_number;
+    }
+
+    /* Fill the section array */
+    if (p_vct_decoder->ap_sections[p_section->i_number] != NULL)
+    {
+        dvbpsi_debug(p_dvbpsi, "ATSC VCT decoder", "overwrite section number %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_vct_decoder->ap_sections[p_section->i_number]);
+    }
+    p_vct_decoder->ap_sections[p_section->i_number] = p_section;
+
+    return true;
+}
+
+static bool dvbpsi_IsCompleteVCT(dvbpsi_atsc_vct_decoder_t *p_decoder)
+{
+    assert(p_decoder);
+
+    bool b_complete = false;
+
+    for (unsigned int i = 0; i <= p_decoder->i_last_section_number; i++)
+    {
+        if (!p_decoder->ap_sections[i])
+            break;
+        if (i == p_decoder->i_last_section_number)
+            b_complete = true;
+    }
+
+    return b_complete;
+}
+
+/*****************************************************************************
  * dvbpsi_atsc_GatherVCTSections
  *****************************************************************************
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
 static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
-                              dvbpsi_decoder_t *p_decoder,
-                              dvbpsi_psi_section_t * p_section)
+                                          dvbpsi_decoder_t *p_decoder,
+                                          dvbpsi_psi_section_t *p_section)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
@@ -400,14 +513,13 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
 
     /* */
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
-    dvbpsi_atsc_vct_decoder_t * p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)p_decoder;
-
-    bool b_reinit = false;
+    dvbpsi_atsc_vct_decoder_t *p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*)p_decoder;
 
     /* TS discontinuity check */
     if (p_demux->b_discontinuity)
     {
-        b_reinit = true;
+        dvbpsi_ReInitVCT(p_vct_decoder, true);
+        p_vct_decoder->b_discontinuity = false;
         p_demux->b_discontinuity = false;
     }
     else
@@ -415,35 +527,24 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
         /* Perform a few sanity checks */
         if (p_vct_decoder->p_building_vct)
         {
-            if (p_vct_decoder->p_building_vct->i_ts_id != p_section->i_extension)
-            {
-                /* transport_stream_id */
-                dvbpsi_error(p_dvbpsi, "VCT decoder",
-                             "'transport_stream_id' differs"
-                             " whereas no TS discontinuity has occured");
-                b_reinit = true;
-            }
-            else if (p_vct_decoder->p_building_vct->i_version
-                     != p_section->i_version)
-            {
-                /* version_number */
-                dvbpsi_error(p_dvbpsi, "VCT decoder",
-                             "'version_number' differs"
-                             " whereas no discontinuity has occured");
-                b_reinit = true;
-            }
-            else if (p_vct_decoder->i_last_section_number !=
-                     p_section->i_last_number)
-            {
-                /* last_section_number */
-                dvbpsi_error(p_dvbpsi, "VCT decoder",
-                             "'last_section_number' differs"
-                             " whereas no discontinuity has occured");
-                b_reinit = true;
-            }
+            if (dvbpsi_CheckVCT(p_dvbpsi, p_vct_decoder, p_section))
+                dvbpsi_ReInitVCT(p_vct_decoder, true);
         }
         else
         {
+            if (   (p_vct_decoder->b_current_valid)
+                && (p_vct_decoder->current_vct.i_version == p_section->i_version)
+                && (p_vct_decoder->current_vct.b_current_next ==
+                                               p_section->b_current_next))
+            {
+                /* Don't decode since this version is already decoded */
+                dvbpsi_debug(p_dvbpsi, "ATSC VCT decoder",
+                             "ignoring already decoded section %d",
+                             p_section->i_number);
+                dvbpsi_DeletePSISections(p_section);
+                return;
+            }
+#if 0 /* FIXME: when to signal new table? */
             if ((p_vct_decoder->b_current_valid)
                 && (p_vct_decoder->current_vct.i_version == p_section->i_version))
             {
@@ -460,80 +561,28 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
                     }
                 }
                 else
-                    dvbpsi_error(p_dvbpsi, "VCT decoder", "Could not signal new VCT.");
+                    dvbpsi_error(p_dvbpsi, "ATSC VCT decoder", "Could not signal new ATSC VCT.");
             }
             dvbpsi_DeletePSISections(p_section);
             return;
+#endif
         }
     }
 
-    /* Reinit the decoder if wanted */
-    if (b_reinit)
+    /* Add section to VCT */
+    if (!dvbpsi_AddSectionVCT(p_dvbpsi, p_vct_decoder, p_section))
     {
-        /* Force redecoding */
-        p_vct_decoder->b_current_valid = false;
-
-        /* Free structures */
-        if(p_vct_decoder->p_building_vct)
-        {
-            dvbpsi_atsc_DeleteVCT(p_vct_decoder->p_building_vct);
-            p_vct_decoder->p_building_vct = NULL;
-        }
-
-        /* Clear the section array */
-        for(unsigned int i = 0; i < 256; i++)
-        {
-            if(p_vct_decoder->ap_sections[i] != NULL)
-            {
-                dvbpsi_DeletePSISections(p_vct_decoder->ap_sections[i]);
-                p_vct_decoder->ap_sections[i] = NULL;
-            }
-        }
-    }
-
-    /* Append the section to the list if wanted */
-    bool b_complete = false;
-
-    /* Initialize the structures if it's the first section received */
-    if (!p_vct_decoder->p_building_vct)
-    {
-        p_vct_decoder->p_building_vct =
-                (dvbpsi_atsc_vct_t*)malloc(sizeof(dvbpsi_atsc_vct_t));
-        if (p_vct_decoder )
-        {
-            dvbpsi_atsc_InitVCT(p_vct_decoder->p_building_vct,
-                                p_section->i_version,
-                                p_section->b_current_next,
-                                p_section->p_payload_start[0],
-                                p_section->i_extension,
-                                p_section->i_table_id == 0xC9);
-            p_vct_decoder->i_last_section_number = p_section->i_last_number;
-        }
-        else
-            dvbpsi_error(p_dvbpsi, "VCT decoder", "failed decoding VCT section");
-    }
-
-    /* Fill the section array */
-    if (p_vct_decoder->ap_sections[p_section->i_number] != NULL)
-    {
-        dvbpsi_debug(p_dvbpsi, "VCT decoder", "overwrite section number %d",
+        dvbpsi_error(p_dvbpsi, "ATSC_VCT decoder", "failed decoding section %d",
                      p_section->i_number);
-        dvbpsi_DeletePSISections(p_vct_decoder->ap_sections[p_section->i_number]);
+        dvbpsi_DeletePSISections(p_section);
+        return;
     }
-    p_vct_decoder->ap_sections[p_section->i_number] = p_section;
 
     /* Check if we have all the sections */
-    for (unsigned int i = 0; i <= p_vct_decoder->i_last_section_number; i++)
+    if (dvbpsi_IsCompleteVCT(p_vct_decoder))
     {
-        if (!p_vct_decoder->ap_sections[i])
-            break;
+        assert(p_vct_decoder->pf_vct_callback);
 
-        if (i == p_vct_decoder->i_last_section_number)
-            b_complete = true;
-    }
-
-    if (b_complete)
-    {
         /* Save the current information */
         p_vct_decoder->current_vct = *p_vct_decoder->p_building_vct;
         p_vct_decoder->b_current_valid = true;
@@ -555,9 +604,7 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
         p_vct_decoder->pf_vct_callback(p_vct_decoder->p_cb_data,
                                        p_vct_decoder->p_building_vct);
         /* Reinitialize the structures */
-        p_vct_decoder->p_building_vct = NULL;
-        for (unsigned int i = 0; i <= p_vct_decoder->i_last_section_number; i++)
-            p_vct_decoder->ap_sections[i] = NULL;
+        dvbpsi_ReInitVCT(p_vct_decoder, false);
     }
 }
 
