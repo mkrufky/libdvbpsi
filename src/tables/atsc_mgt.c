@@ -337,6 +337,120 @@ static dvbpsi_descriptor_t *dvbpsi_atsc_MGTTableAddDescriptor(
 }
 
 /*****************************************************************************
+ * dvbpsi_ReInitMGT                                                          *
+ *****************************************************************************/
+static void dvbpsi_ReInitMGT(dvbpsi_atsc_mgt_decoder_t *p_decoder, const bool b_force)
+{
+    assert(p_decoder);
+
+    /* Force redecoding */
+    if (b_force)
+    {
+        p_decoder->b_current_valid = false;
+
+        /* Free structures */
+        if (p_decoder->p_building_mgt)
+            dvbpsi_atsc_DeleteMGT(p_decoder->p_building_mgt);
+    }
+    p_decoder->p_building_mgt = NULL;
+
+    /* Clear the section array */
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_decoder->ap_sections[i] != NULL)
+        {
+            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
+            p_decoder->ap_sections[i] = NULL;
+        }
+    }
+}
+
+static bool dvbpsi_CheckMGT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_mgt_decoder_t *p_decoder,
+                            dvbpsi_psi_section_t *p_section)
+{
+    bool b_reinit = false;
+
+    assert(p_dvbpsi);
+    assert(p_decoder);
+
+    if (p_decoder->p_building_mgt->i_table_id_ext != p_section->i_extension)
+    {
+        /* transport_stream_id */
+        dvbpsi_error(p_dvbpsi, "ATSC MGT decoder",
+                     "'transport_stream_id' differs"
+                     " whereas no TS discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_decoder->p_building_mgt->i_version != p_section->i_version)
+    {
+        /* version_number */
+        dvbpsi_error(p_dvbpsi, "ATSC MGT decoder",
+                     "'version_number' differs"
+                     " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_decoder->i_last_section_number != p_section->i_last_number)
+    {
+        /* last_section_number */
+        dvbpsi_error(p_dvbpsi, "ATSC MGT decoder",
+                     "'last_section_number' differs"
+                     " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+
+    return b_reinit;
+}
+
+static bool dvbpsi_AddSectionMGT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_mgt_decoder_t *p_decoder,
+                                 dvbpsi_psi_section_t* p_section)
+{
+    assert(p_dvbpsi);
+    assert(p_decoder);
+    assert(p_section);
+
+    /* Initialize the structures if it's the first section received */
+    if (!p_decoder->p_building_mgt)
+    {
+        p_decoder->p_building_mgt = dvbpsi_atsc_NewMGT(p_section->i_version,
+                                                       p_section->p_payload_start[0],
+                                                       p_section->i_extension,
+                                                       p_section->b_current_next);
+        if (p_decoder->p_building_mgt)
+            return false;
+
+        p_decoder->i_last_section_number = p_section->i_last_number;
+    }
+
+    /* Fill the section array */
+    if (p_decoder->ap_sections[p_section->i_number] != NULL)
+    {
+        dvbpsi_debug(p_dvbpsi, "ATSC MGT decoder", "overwrite section number %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_decoder->ap_sections[p_section->i_number]);
+    }
+    p_decoder->ap_sections[p_section->i_number] = p_section;
+
+    return true;
+}
+
+static bool dvbpsi_IsCompleteMGT(dvbpsi_atsc_mgt_decoder_t *p_decoder)
+{
+    assert(p_decoder);
+
+    bool b_complete = false;
+
+    for (unsigned int i = 0; i <= p_decoder->i_last_section_number; i++)
+    {
+        if (!p_decoder->ap_sections[i])
+            break;
+        if (i == p_decoder->i_last_section_number)
+            b_complete = true;
+    }
+
+    return b_complete;
+}
+
+/*****************************************************************************
  * dvbpsi_atsc_GatherMGTSections
  *****************************************************************************
  * Callback for the subtable demultiplexor.
@@ -355,6 +469,7 @@ static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
     }
 
     /* We have a valid MGT section */
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
     dvbpsi_atsc_mgt_decoder_t * p_mgt_decoder = (dvbpsi_atsc_mgt_decoder_t*)p_decoder;
     if (!p_mgt_decoder)
     {
@@ -363,49 +478,36 @@ static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
         return;
     }
 
-    bool b_reinit = false;
-
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
     /* TS discontinuity check */
     if (p_demux->b_discontinuity)
     {
-        b_reinit = true;
+        dvbpsi_ReInitMGT(p_mgt_decoder, true);
+        p_mgt_decoder->b_discontinuity = false;
         p_demux->b_discontinuity = false;
     }
     else
     {
         /* Perform a few sanity checks */
-        if(p_mgt_decoder->p_building_mgt)
+        if (p_mgt_decoder->p_building_mgt)
         {
-            if(p_mgt_decoder->p_building_mgt->i_table_id_ext != p_section->i_extension)
-            {
-                /* transport_stream_id */
-                dvbpsi_error(p_dvbpsi, "ATSC MGT decoder",
-                             "'transport_stream_id' differs"
-                             " whereas no TS discontinuity has occured");
-                b_reinit = true;
-            }
-            else if(p_mgt_decoder->p_building_mgt->i_version
-                    != p_section->i_version)
-            {
-                /* version_number */
-                dvbpsi_error(p_dvbpsi, "ATSC MGT decoder",
-                             "'version_number' differs"
-                             " whereas no discontinuity has occured");
-                b_reinit = true;
-            }
-            else if(p_mgt_decoder->i_last_section_number !=
-                    p_section->i_last_number)
-            {
-                /* last_section_number */
-                dvbpsi_error(p_dvbpsi, "ATSC MGT decoder",
-                             "'last_section_number' differs"
-                             " whereas no discontinuity has occured");
-                b_reinit = true;
-            }
+            if (dvbpsi_CheckMGT(p_dvbpsi, p_mgt_decoder, p_section))
+                dvbpsi_ReInitMGT(p_mgt_decoder, true);
         }
         else
         {
+            if (   (p_mgt_decoder->b_current_valid)
+                && (p_mgt_decoder->current_mgt.i_version == p_section->i_version)
+                && (p_mgt_decoder->current_mgt.b_current_next ==
+                                               p_section->b_current_next))
+            {
+                /* Don't decode since this version is already decoded */
+                dvbpsi_debug(p_dvbpsi, "ATSC MGT decoder",
+                             "ignoring already decoded section %d",
+                             p_section->i_number);
+                dvbpsi_DeletePSISections(p_section);
+                return;
+            }
+#if 0 /* Do we need to signal b_current_next here? or later */
             if ((p_mgt_decoder->b_current_valid) &&
                 (p_mgt_decoder->current_mgt.i_version == p_section->i_version))
             {
@@ -426,79 +528,29 @@ static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
             }
             dvbpsi_DeletePSISections(p_section);
             return;
+#endif
         }
     }
 
-    /* Reinit the decoder if wanted */
-    if (b_reinit)
+    /* Add section to MGT */
+    if (!dvbpsi_AddSectionMGT(p_dvbpsi, p_mgt_decoder, p_section))
     {
-        /* Force redecoding */
-        p_mgt_decoder->b_current_valid = false;
-        /* Free structures */
-        if(p_mgt_decoder->p_building_mgt)
-        {
-            dvbpsi_atsc_DeleteMGT(p_mgt_decoder->p_building_mgt);
-            p_mgt_decoder->p_building_mgt = NULL;
-        }
-        /* Clear the section array */
-        for (unsigned int i = 0; i < 256; i++)
-        {
-            if(p_mgt_decoder->ap_sections[i] != NULL)
-            {
-                dvbpsi_DeletePSISections(p_mgt_decoder->ap_sections[i]);
-                p_mgt_decoder->ap_sections[i] = NULL;
-            }
-        }
+        dvbpsi_error(p_dvbpsi, "ATSC MGT decoder", "failed decoding section %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_section);
+        return;
     }
-
-    /* Append the section to the list if wanted */
-    bool b_complete = false;
-
-    /* Initialize the structures if it's the first section received */
-    if(!p_mgt_decoder->p_building_mgt)
-    {
-        p_mgt_decoder->p_building_mgt =
-                (dvbpsi_atsc_mgt_t*)malloc(sizeof(dvbpsi_atsc_mgt_t));
-        if (p_mgt_decoder)
-        {
-            dvbpsi_atsc_InitMGT(p_mgt_decoder->p_building_mgt,
-                                p_section->i_version,
-                                p_section->p_payload_start[0],
-                                p_section->i_extension,
-                                p_section->b_current_next);
-            p_mgt_decoder->i_last_section_number = p_section->i_last_number;
-        }
-        else
-            dvbpsi_error(p_dvbpsi, "ATSC MGT decoder", "failed decoding ATSC MGT section");
-    }
-
-    /* Fill the section array */
-    if(p_mgt_decoder->ap_sections[p_section->i_number] != NULL)
-    {
-        dvbpsi_error(p_dvbpsi, "ATSC MGT decoder", "overwrite section number %d",
-                      p_section->i_number);
-        dvbpsi_DeletePSISections(p_mgt_decoder->ap_sections[p_section->i_number]);
-    }
-    p_mgt_decoder->ap_sections[p_section->i_number] = p_section;
 
     /* Check if we have all the sections */
-    b_complete = false;
-    for (uint8_t i = 0; i <= p_mgt_decoder->i_last_section_number; i++)
+    if (dvbpsi_IsCompleteMGT(p_mgt_decoder))
     {
-        if (!p_mgt_decoder->ap_sections[i])
-            break;
+        assert(p_mgt_decoder->pf_mgt_callback);
 
-        if (i == p_mgt_decoder->i_last_section_number)
-            b_complete = true;
-    }
-
-    if (b_complete)
-    {
         /* Save the current information */
         p_mgt_decoder->current_mgt = *p_mgt_decoder->p_building_mgt;
         p_mgt_decoder->b_current_valid = true;
         /* Chain the sections */
-        if(p_mgt_decoder->i_last_section_number)
+        if (p_mgt_decoder->i_last_section_number)
         {
             for (uint8_t i = 0; i <= p_mgt_decoder->i_last_section_number - 1; i++)
                 p_mgt_decoder->ap_sections[i]->p_next =
@@ -513,9 +565,7 @@ static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
         p_mgt_decoder->pf_mgt_callback(p_mgt_decoder->p_cb_data,
                                        p_mgt_decoder->p_building_mgt);
         /* Reinitialize the structures */
-        p_mgt_decoder->p_building_mgt = NULL;
-        for (uint8_t i = 0; i <= p_mgt_decoder->i_last_section_number; i++)
-            p_mgt_decoder->ap_sections[i] = NULL;
+        dvbpsi_ReInitMGT(p_mgt_decoder, false);
     }
     dvbpsi_DeletePSISections(p_section);
 }
