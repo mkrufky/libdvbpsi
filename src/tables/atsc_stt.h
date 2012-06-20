@@ -43,6 +43,7 @@ extern "C" {
 typedef struct dvbpsi_atsc_stt_s
 {
     uint8_t                 i_version;          /*!< PSIP Protocol version */
+    bool                    b_current_next;     /*!< current_next_indicator */
 
     uint32_t                i_system_time;      /*!< GPS seconds since 1 January 1980 00:00:00 UTC. */
     uint8_t                 i_gps_utc_offset;   /*!< Seconds offset between GPS and UTC time. */

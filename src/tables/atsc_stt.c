@@ -50,10 +50,17 @@ typedef struct dvbpsi_atsc_stt_decoder_s
      dvbpsi_atsc_stt_callback      pf_stt_callback;
      void *                        p_cb_data;
 
+     dvbpsi_atsc_stt_t             current_stt;
+     dvbpsi_atsc_stt_t *           p_building_stt;
+
+     bool                          b_current_valid;
+
+     uint8_t                       i_last_section_number;
+     dvbpsi_psi_section_t *        ap_sections [256];
+
 } dvbpsi_atsc_stt_decoder_t;
 
-dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor(
-                                               dvbpsi_atsc_stt_t *p_stt,
+dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor(dvbpsi_atsc_stt_t *p_stt,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data);
 
@@ -75,7 +82,6 @@ bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     assert(p_dvbpsi->p_private);
 
     dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
-
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0))
     {
         dvbpsi_error(p_dvbpsi, "ATSC STT decoder",
@@ -105,6 +111,13 @@ bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     /* STT decoder information */
     p_stt_decoder->pf_stt_callback = pf_stt_callback;
     p_stt_decoder->p_cb_data = p_cb_data;
+
+    /* VCT decoder initial state */
+    p_stt_decoder->b_current_valid = false;
+    p_stt_decoder->p_building_stt = NULL;
+
+    for(unsigned int i = 0; i < 256; i++)
+        p_stt_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -137,6 +150,19 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)p_subdec->p_decoder;
     if(!p_stt_decoder)
         return;
+
+    if (p_stt_decoder->p_building_stt)
+        dvbpsi_atsc_DeleteSTT(p_stt_decoder->p_building_stt);
+    p_stt_decoder->p_building_stt = NULL;
+
+    for (unsigned int i = 0; i < 256; i++)
+    {
+        if (p_stt_decoder->ap_sections[i])
+        {
+            dvbpsi_DeletePSISections(p_stt_decoder->ap_sections[i]);
+            p_stt_decoder->ap_sections[i] = NULL;
+        }
+    }
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
@@ -202,11 +228,10 @@ dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor( dvbpsi_atsc_stt_t *p_stt,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data)
 {
-    dvbpsi_descriptor_t * p_descriptor
-            = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
-    if(p_descriptor)
+    dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
+    if (p_descriptor)
     {
-        if(p_stt->p_first_descriptor == NULL)
+        if (p_stt->p_first_descriptor == NULL)
         {
             p_stt->p_first_descriptor = p_descriptor;
         }
@@ -220,6 +245,110 @@ dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor( dvbpsi_atsc_stt_t *p_stt,
     }
 
     return p_descriptor;
+}
+
+/*****************************************************************************
+ * dvbpsi_ReInitSTT                                                          *
+ *****************************************************************************/
+static void dvbpsi_ReInitSTT(dvbpsi_atsc_stt_decoder_t *p_decoder, const bool b_force)
+{
+    assert(p_decoder);
+
+    /* Force redecoding */
+    if (b_force)
+    {
+        p_decoder->b_current_valid = false;
+
+        /* Free structures */
+        if (p_decoder->p_building_stt)
+            dvbpsi_atsc_DeleteSTT(p_decoder->p_building_stt);
+    }
+    p_decoder->p_building_stt = NULL;
+
+    /* Clear the section array */
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_decoder->ap_sections[i] != NULL)
+        {
+            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
+            p_decoder->ap_sections[i] = NULL;
+        }
+    }
+}
+
+static bool dvbpsi_CheckSTT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_stt_decoder_t *p_decoder,
+                            dvbpsi_psi_section_t *p_section)
+{
+    bool b_reinit = false;
+
+    assert(p_dvbpsi);
+    assert(p_decoder);
+
+    if (p_decoder->p_building_stt->i_version != p_section->i_version)
+    {
+        /* version_number */
+        dvbpsi_error(p_dvbpsi, "ATSC STT decoder",
+                     "'version_number' differs"
+                     " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+    else if (p_decoder->i_last_section_number != p_section->i_last_number)
+    {
+        /* last_section_number */
+        dvbpsi_error(p_dvbpsi, "ATSC STT decoder",
+                     "'last_section_number' differs"
+                     " whereas no discontinuity has occured");
+        b_reinit = true;
+    }
+
+    return b_reinit;
+}
+
+static bool dvbpsi_AddSectionSTT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_stt_decoder_t *p_decoder,
+                                 dvbpsi_psi_section_t* p_section)
+{
+    assert(p_dvbpsi);
+    assert(p_decoder);
+    assert(p_section);
+
+    /* Initialize the structures if it's the first section received */
+    if (!p_decoder->p_building_stt)
+    {
+        p_decoder->p_building_stt = dvbpsi_atsc_NewSTT(p_section->i_version,
+                                                       p_section->b_current_next);
+        if (p_decoder->p_building_stt)
+            return false;
+
+        p_decoder->i_last_section_number = p_section->i_last_number;
+    }
+
+    /* Fill the section array */
+    if (p_decoder->ap_sections[p_section->i_number] != NULL)
+    {
+        dvbpsi_debug(p_dvbpsi, "ATSC STT decoder", "overwrite section number %d",
+                     p_section->i_number);
+        dvbpsi_DeletePSISections(p_decoder->ap_sections[p_section->i_number]);
+    }
+    p_decoder->ap_sections[p_section->i_number] = p_section;
+
+    return true;
+}
+
+static bool dvbpsi_IsCompleteSTT(dvbpsi_atsc_stt_decoder_t *p_decoder)
+{
+    assert(p_decoder);
+
+    bool b_complete = false;
+
+    for (unsigned int i = 0; i <= p_decoder->i_last_section_number; i++)
+    {
+        if (!p_decoder->ap_sections[i])
+            break;
+        if (i == p_decoder->i_last_section_number)
+            b_complete = true;
+    }
+
+    return b_complete;
 }
 
 /*****************************************************************************
@@ -241,6 +370,7 @@ static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* */
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
     dvbpsi_atsc_stt_decoder_t *p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)p_decoder;
     if (!p_stt_decoder)
     {
@@ -249,17 +379,96 @@ static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t *p_dvbpsi,
         return;
     }
 
-    /* FIXME: looks different then from other tables decoders */
-    dvbpsi_atsc_stt_t *p_stt;
-    p_stt = dvbpsi_atsc_NewSTT(p_section->i_version, p_section->b_current_next);
-    if (p_stt)
+    /* TS discontinuity check */
+    if (p_demux->b_discontinuity)
     {
-        /* Decode the sections */
-        dvbpsi_atsc_DecodeSTTSections(p_stt, p_section);
-        /* Delete the sections */
+        dvbpsi_ReInitSTT(p_stt_decoder, true);
+        p_stt_decoder->b_discontinuity = false;
+        p_demux->b_discontinuity = false;
+    }
+    else
+    {
+        /* Perform a few sanity checks */
+        if (p_stt_decoder->p_building_stt)
+        {
+            if (dvbpsi_CheckSTT(p_dvbpsi, p_stt_decoder, p_section))
+                dvbpsi_ReInitSTT(p_stt_decoder, true);
+        }
+        else
+        {
+            if (   (p_stt_decoder->b_current_valid)
+                && (p_stt_decoder->current_stt.i_version == p_section->i_version)
+                && (p_stt_decoder->current_stt.b_current_next ==
+                                               p_section->b_current_next))
+            {
+                /* Don't decode since this version is already decoded */
+                dvbpsi_debug(p_dvbpsi, "ATSC STT decoder",
+                             "ignoring already decoded section %d",
+                             p_section->i_number);
+                dvbpsi_DeletePSISections(p_section);
+                return;
+            }
+#if 0 /* FIXME: when to signal new table? */
+            if ((p_stt_decoder->b_current_valid)
+                && (p_stt_decoder->current_vct.i_version == p_section->i_version))
+            {
+                /* Signal a new VCT if the previous one wasn't active */
+                if ((!p_stt_decoder->current_stt.b_current_next)
+                    && (p_section->b_current_next))
+                {
+                    dvbpsi_atsc_stt_t * p_stt = (dvbpsi_atsc_stt_t*)malloc(sizeof(dvbpsi_atsc_stt_t));
+                    if (p_stt)
+                    {
+                        p_stt_decoder->current_stt.b_current_next = 1;
+                        *p_stt = p_stt_decoder->current_stt;
+                        p_stt_decoder->pf_stt_callback(p_stt_decoder->p_cb_data, p_stt);
+                    }
+                }
+                else
+                    dvbpsi_error(p_dvbpsi, "ATSC STT decoder", "Could not signal new ATSC STT.");
+            }
+            dvbpsi_DeletePSISections(p_section);
+            return;
+#endif
+        }
+    }
+
+    /* Add section to STT */
+    if (!dvbpsi_AddSectionSTT(p_dvbpsi, p_stt_decoder, p_section))
+    {
+        dvbpsi_error(p_dvbpsi, "ATSC STT decoder", "failed decoding section %d",
+                     p_section->i_number);
         dvbpsi_DeletePSISections(p_section);
+        return;
+    }
+
+    /* Check if we have all the sections */
+    if (dvbpsi_IsCompleteSTT(p_stt_decoder))
+    {
+        assert(p_stt_decoder->pf_stt_callback);
+
+        /* Save the current information */
+        p_stt_decoder->current_stt = *p_stt_decoder->p_building_stt;
+        p_stt_decoder->b_current_valid = true;
+
+        /* Chain the sections */
+        assert(p_stt_decoder->i_last_section_number > 256);
+        if (p_stt_decoder->i_last_section_number)
+        {
+            for(uint8_t i = 0; i <= p_stt_decoder->i_last_section_number - 1; i++)
+                p_stt_decoder->ap_sections[i]->p_next =
+                        p_stt_decoder->ap_sections[i + 1];
+        }
+        /* Decode the sections */
+        dvbpsi_atsc_DecodeSTTSections(p_stt_decoder->p_building_stt,
+                                      p_stt_decoder->ap_sections[0]);
+        /* Delete the sections */
+        dvbpsi_DeletePSISections(p_stt_decoder->ap_sections[0]);
         /* signal the new STT */
-        p_stt_decoder->pf_stt_callback(p_stt_decoder->p_cb_data, p_stt);
+        p_stt_decoder->pf_stt_callback(p_stt_decoder->p_cb_data,
+                                       p_stt_decoder->p_building_stt);
+        /* Reinitialize the structures */
+        dvbpsi_ReInitSTT(p_stt_decoder, false);
     }
 }
 
