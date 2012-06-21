@@ -289,22 +289,6 @@ static bool dvbpsi_CheckPMT(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
     return b_reinit;
 }
 
-static bool dvbpsi_IsCompletePMT(dvbpsi_pmt_decoder_t* p_pmt_decoder)
-{
-    assert(p_pmt_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_pmt_decoder->i_last_section_number; i++)
-    {
-        if (!p_pmt_decoder->ap_sections[i])
-            break;
-        if (i == p_pmt_decoder->i_last_section_number)
-            b_complete = true;
-    }
-    return b_complete;
-}
-
 static bool dvbpsi_AddSectionPMT(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_decoder_t *p_pmt_decoder,
                                  dvbpsi_psi_section_t* p_section)
 {
@@ -406,7 +390,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
         return;
     }
 
-    if (dvbpsi_IsCompletePMT(p_pmt_decoder))
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_pmt_decoder)))
     {
         assert(p_pmt_decoder->pf_pmt_callback);
 

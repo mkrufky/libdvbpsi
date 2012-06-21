@@ -236,22 +236,6 @@ static bool dvbpsi_CheckPAT(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
     return b_reinit;
 }
 
-static bool dvbpsi_IsCompletePAT(dvbpsi_pat_decoder_t* p_pat_decoder)
-{
-    assert(p_pat_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_pat_decoder->i_last_section_number; i++)
-    {
-        if (!p_pat_decoder->ap_sections[i])
-            break;
-        if (i == p_pat_decoder->i_last_section_number)
-            b_complete = true;
-    }
-    return b_complete;
-}
-
 static bool dvbpsi_AddSectionPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_decoder_t *p_pat_decoder,
                                  dvbpsi_psi_section_t* p_section)
 {
@@ -343,7 +327,7 @@ void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sectio
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_IsCompletePAT(p_pat_decoder))
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_pat_decoder)))
     {
         assert(p_pat_decoder->pf_pat_callback);
 

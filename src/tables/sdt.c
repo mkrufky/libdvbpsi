@@ -311,22 +311,6 @@ static bool dvbpsi_CheckSDT(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_decoder_t *p_sdt_deco
     return b_reinit;
 }
 
-static bool dvbpsi_IsCompleteSDT(dvbpsi_sdt_decoder_t* p_sdt_decoder)
-{
-    assert(p_sdt_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_sdt_decoder->i_last_section_number; i++)
-    {
-        if (!p_sdt_decoder->ap_sections[i])
-            break;
-        if (i == p_sdt_decoder->i_last_section_number)
-            b_complete = true;
-    }
-    return b_complete;
-}
-
 static bool dvbpsi_AddSectionSDT(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_decoder_t *p_sdt_decoder,
                                  dvbpsi_psi_section_t* p_section)
 {
@@ -422,7 +406,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_IsCompleteSDT(p_sdt_decoder))
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_sdt_decoder)))
     {
         assert(p_sdt_decoder->pf_sdt_callback);
 

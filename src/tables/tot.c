@@ -271,22 +271,6 @@ static bool dvbpsi_CheckTOT(dvbpsi_t *p_dvbpsi, dvbpsi_tot_decoder_t *p_tot_deco
     return b_reinit;
 }
 
-static bool dvbpsi_IsCompleteTOT(dvbpsi_tot_decoder_t* p_tot_decoder)
-{
-    assert(p_tot_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i < p_tot_decoder->i_last_section_number; i++)
-    {
-        if (!p_tot_decoder->ap_sections[i])
-            break;
-        if (i == p_tot_decoder->i_last_section_number)
-            b_complete = true;
-    }
-    return b_complete;
-}
-
 static bool dvbpsi_AddSectionTOT(dvbpsi_t *p_dvbpsi, dvbpsi_tot_decoder_t *p_tot_decoder,
                                  dvbpsi_psi_section_t* p_section)
 {
@@ -392,7 +376,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_IsCompleteTOT(p_tot_decoder) || true)
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_tot_decoder)))
     {
         assert(p_tot_decoder->pf_tot_callback);
 

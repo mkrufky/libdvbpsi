@@ -219,6 +219,28 @@ void dvbpsi_ReInitDecoder(dvbpsi_decoder_t* p_decoder, const bool b_force)
 }
 
 /*****************************************************************************
+ * dvbpsi_SectionsCompleteDecoder
+ *****************************************************************************/
+bool dvbpsi_SectionsCompleteDecoder(dvbpsi_decoder_t* p_decoder)
+{
+    assert(p_decoder);
+    assert(p_decoder->i_last_section_number <= 255);
+
+    bool b_complete = false;
+
+    for (unsigned int i = 0; i <= p_decoder->i_last_section_number &&
+                             i <= 255; i++)
+    {
+        if (!p_decoder->ap_sections[i])
+            break;
+        if (i == p_decoder->i_last_section_number)
+            b_complete = true;
+    }
+
+    return b_complete;
+}
+
+/*****************************************************************************
  * dvbpsi_DeleteDecoder
  *****************************************************************************/
 void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder)

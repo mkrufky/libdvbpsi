@@ -323,22 +323,6 @@ static bool dvbpsi_CheckNIT(dvbpsi_t *p_dvbpsi, dvbpsi_nit_decoder_t *p_nit_deco
     return b_reinit;
 }
 
-static bool dvbpsi_IsCompleteNIT(dvbpsi_nit_decoder_t* p_nit_decoder)
-{
-    assert(p_nit_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_nit_decoder->i_last_section_number; i++)
-    {
-        if (!p_nit_decoder->ap_sections[i])
-            break;
-        if (i == p_nit_decoder->i_last_section_number)
-            b_complete = true;
-    }
-    return b_complete;
-}
-
 static bool dvbpsi_AddSectionNIT(dvbpsi_t *p_dvbpsi, dvbpsi_nit_decoder_t *p_nit_decoder,
                                  dvbpsi_psi_section_t* p_section)
 {
@@ -442,7 +426,7 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_IsCompleteNIT(p_nit_decoder))
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_nit_decoder)))
     {
         assert(p_nit_decoder->pf_nit_callback);
 

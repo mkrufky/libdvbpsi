@@ -313,23 +313,6 @@ static bool dvbpsi_AddSectionETT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_ett_decoder_t *
     return true;
 }
 
-static bool dvbpsi_IsCompleteETT(dvbpsi_atsc_ett_decoder_t *p_decoder)
-{
-    assert(p_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_decoder->i_last_section_number; i++)
-    {
-        if (!p_decoder->ap_sections[i])
-            break;
-        if (i == p_decoder->i_last_section_number)
-            b_complete = true;
-    }
-
-    return b_complete;
-}
-
 /*****************************************************************************
  * dvbpsi_atsc_GatherETTSections
  *****************************************************************************
@@ -400,7 +383,7 @@ static void dvbpsi_atsc_GatherETTSections(dvbpsi_t* p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_IsCompleteETT(p_ett_decoder))
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_ett_decoder)))
     {
         assert(p_ett_decoder->pf_ett_callback);
 

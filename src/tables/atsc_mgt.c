@@ -405,23 +405,6 @@ static bool dvbpsi_AddSectionMGT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_mgt_decoder_t *
     return true;
 }
 
-static bool dvbpsi_IsCompleteMGT(dvbpsi_atsc_mgt_decoder_t *p_decoder)
-{
-    assert(p_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_decoder->i_last_section_number; i++)
-    {
-        if (!p_decoder->ap_sections[i])
-            break;
-        if (i == p_decoder->i_last_section_number)
-            b_complete = true;
-    }
-
-    return b_complete;
-}
-
 /*****************************************************************************
  * dvbpsi_atsc_GatherMGTSections
  *****************************************************************************
@@ -514,7 +497,7 @@ static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_IsCompleteMGT(p_mgt_decoder))
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_mgt_decoder)))
     {
         assert(p_mgt_decoder->pf_mgt_callback);
 

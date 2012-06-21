@@ -228,24 +228,6 @@ static bool dvbpsi_CheckCAT(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
     return b_reinit;
 }
 
-static bool dvbpsi_IsCompleteCAT(dvbpsi_cat_decoder_t* p_cat_decoder)
-{
-    assert(p_cat_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_cat_decoder->i_last_section_number; i++)
-    {
-        if (!p_cat_decoder->ap_sections[i])
-            break;
-
-        if (i == p_cat_decoder->i_last_section_number)
-            b_complete = true;
-    }
-
-    return b_complete;
-}
-
 static bool dvbpsi_AddSectionCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_decoder_t *p_decoder,
                                  dvbpsi_psi_section_t* p_section)
 {
@@ -338,7 +320,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_IsCompleteCAT(p_cat_decoder))
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_cat_decoder)))
     {
         assert(p_cat_decoder->pf_cat_callback);
 

@@ -297,22 +297,6 @@ static bool dvbpsi_CheckSIS(dvbpsi_t *p_dvbpsi, dvbpsi_sis_decoder_t* p_sis_deco
     return b_reinit;
 }
 
-static bool dvbpsi_IsCompleteSIS(dvbpsi_sis_decoder_t* p_sis_decoder)
-{
-    assert(p_sis_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_sis_decoder->i_last_section_number; i++)
-    {
-        if (!p_sis_decoder->ap_sections[i])
-            break;
-        if (i == p_sis_decoder->i_last_section_number)
-            b_complete = true;
-    }
-    return b_complete;
-}
-
 static bool dvbpsi_AddSectionSIS(dvbpsi_t *p_dvbpsi, dvbpsi_sis_decoder_t *p_sis_decoder,
                                  dvbpsi_psi_section_t* p_section)
 {
@@ -414,7 +398,7 @@ void dvbpsi_GatherSISSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_IsCompleteSIS(p_sis_decoder))
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_sis_decoder)))
     {
         assert(p_sis_decoder->pf_sis_callback);
 

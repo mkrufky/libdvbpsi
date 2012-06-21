@@ -331,23 +331,6 @@ static bool dvbpsi_CheckBAT(dvbpsi_t *p_dvbpsi, dvbpsi_bat_decoder_t *p_bat_deco
     return b_reinit;
 }
 
-static bool dvbpsi_IsCompleteBAT(dvbpsi_bat_decoder_t* p_bat_decoder)
-{
-    assert(p_bat_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_bat_decoder->i_last_section_number; i++)
-    {
-        if (!p_bat_decoder->ap_sections[i])
-            break;
-        if (i == p_bat_decoder->i_last_section_number)
-            b_complete = true;
-    }
-
-    return b_complete;
-}
-
 static bool dvbpsi_AddSectionBAT(dvbpsi_t *p_dvbpsi, dvbpsi_bat_decoder_t *p_bat_decoder,
                                  dvbpsi_psi_section_t* p_section)
 {
@@ -459,7 +442,7 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_IsCompleteBAT(p_bat_decoder))
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_bat_decoder)))
     {
         assert(p_bat_decoder->pf_bat_callback);
 

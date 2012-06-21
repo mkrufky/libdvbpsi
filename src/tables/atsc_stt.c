@@ -304,23 +304,6 @@ static bool dvbpsi_AddSectionSTT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_stt_decoder_t *
     return true;
 }
 
-static bool dvbpsi_IsCompleteSTT(dvbpsi_atsc_stt_decoder_t *p_decoder)
-{
-    assert(p_decoder);
-
-    bool b_complete = false;
-
-    for (unsigned int i = 0; i <= p_decoder->i_last_section_number; i++)
-    {
-        if (!p_decoder->ap_sections[i])
-            break;
-        if (i == p_decoder->i_last_section_number)
-            b_complete = true;
-    }
-
-    return b_complete;
-}
-
 /*****************************************************************************
  * dvbpsi_atsc_GatherSTTSections
  *****************************************************************************
@@ -413,7 +396,7 @@ static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_IsCompleteSTT(p_stt_decoder))
+    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_stt_decoder)))
     {
         assert(p_stt_decoder->pf_stt_callback);
 
