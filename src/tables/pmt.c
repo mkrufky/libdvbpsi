@@ -398,12 +398,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
         p_pmt_decoder->current_pmt = *p_pmt_decoder->p_building_pmt;
         p_pmt_decoder->b_current_valid = true;
         /* Chain the sections */
-        if (p_pmt_decoder->i_last_section_number)
-        {
-            for (unsigned int i = 0; (int)i <= p_pmt_decoder->i_last_section_number - 1; i++)
-                p_pmt_decoder->ap_sections[i]->p_next =
-                                        p_pmt_decoder->ap_sections[i + 1];
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_pmt_decoder));
         /* Decode the sections */
         dvbpsi_DecodePMTSections(p_pmt_decoder->p_building_pmt,
                                  p_pmt_decoder->ap_sections[0]);

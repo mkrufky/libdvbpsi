@@ -241,6 +241,22 @@ bool dvbpsi_SectionsCompleteDecoder(dvbpsi_decoder_t* p_decoder)
 }
 
 /*****************************************************************************
+ * dvbpsi_ChainSectionsDecoder
+ *****************************************************************************/
+void dvbpsi_ChainSectionsDecoder(dvbpsi_decoder_t *p_decoder)
+{
+    assert(p_decoder);
+    assert(p_decoder->i_last_section_number <= 255);
+
+    if (p_decoder->i_last_section_number)
+    {
+        for (uint8_t i = 0; i <= p_decoder->i_last_section_number - 1 &&
+                            i <= 255; i++)
+            p_decoder->ap_sections[i]->p_next = p_decoder->ap_sections[i + 1];
+    }
+}
+
+/*****************************************************************************
  * dvbpsi_DeleteDecoder
  *****************************************************************************/
 void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder)

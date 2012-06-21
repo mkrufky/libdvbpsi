@@ -336,12 +336,7 @@ void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sectio
         p_pat_decoder->b_current_valid = true;
 
         /* Chain the sections */
-        if (p_pat_decoder->i_last_section_number)
-        {
-            for (unsigned int i = 0; (int)i <= p_pat_decoder->i_last_section_number - 1; i++)
-                p_pat_decoder->ap_sections[i]->p_next =
-                                    p_pat_decoder->ap_sections[i + 1];
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_pat_decoder));
 
         /* Decode the sections */
         dvbpsi_DecodePATSections(p_pat_decoder->p_building_pat,

@@ -384,11 +384,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
         p_tot_decoder->current_tot = *p_tot_decoder->p_building_tot;
         p_tot_decoder->b_current_valid = true;
         /* Chain the sections */
-        if (p_tot_decoder->i_last_section_number)
-        {
-            for (uint8_t i = 0; i <= p_tot_decoder->i_last_section_number - 1; i++)
-                p_tot_decoder->ap_sections[i]->p_next = p_tot_decoder->ap_sections[i + 1];
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_tot_decoder));
         /* Decode the sections */
         dvbpsi_DecodeTOTSections(p_dvbpsi, p_tot_decoder->p_building_tot,
                                  p_tot_decoder->ap_sections[0]);

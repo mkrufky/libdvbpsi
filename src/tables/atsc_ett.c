@@ -391,17 +391,13 @@ static void dvbpsi_atsc_GatherETTSections(dvbpsi_t* p_dvbpsi,
         p_ett_decoder->current_ett = *p_ett_decoder->p_building_ett;
         p_ett_decoder->b_current_valid = true;
         /* Chain the sections */
-        if (p_ett_decoder->i_last_section_number)
-        {
-            for (uint8_t i = 0; i <= p_ett_decoder->i_last_section_number - 1; i++)
-                p_ett_decoder->ap_sections[i]->p_next =
-                        p_ett_decoder->ap_sections[i + 1];
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_ett_decoder));
         /* Decode the sections */
         dvbpsi_atsc_DecodeETTSections(p_ett_decoder->p_building_ett,
                                       p_ett_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_ett_decoder->ap_sections[0]);
+        p_ett_decoder->ap_sections[0] = NULL;
         /* signal the new ETT */
         p_ett_decoder->pf_ett_callback(p_ett_decoder->p_cb_data,
                                        p_ett_decoder->p_building_ett);

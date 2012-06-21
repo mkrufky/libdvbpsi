@@ -435,12 +435,7 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
         p_nit_decoder->b_current_valid = true;
 
         /* Chain the sections */
-        if (p_nit_decoder->i_last_section_number)
-        {
-            for (unsigned int i = 0; (int)i <= p_nit_decoder->i_last_section_number - 1; i++)
-                p_nit_decoder->ap_sections[i]->p_next =
-                                    p_nit_decoder->ap_sections[i + 1];
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_nit_decoder));
 
         /* Decode the sections */
         dvbpsi_DecodeNITSections(p_nit_decoder->p_building_nit,
@@ -448,7 +443,6 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[0]);
         p_nit_decoder->ap_sections[0] = NULL;
-
         /* signal the new NIT */
         p_nit_decoder->pf_nit_callback(p_nit_decoder->p_cb_data,
                                        p_nit_decoder->p_building_nit);

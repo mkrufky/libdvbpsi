@@ -414,11 +414,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
         p_sdt_decoder->current_sdt = *p_sdt_decoder->p_building_sdt;
         p_sdt_decoder->b_current_valid = true;
         /* Chain the sections */
-        if (p_sdt_decoder->i_last_section_number)
-        {
-            for (unsigned int i = 0; (int)i <= p_sdt_decoder->i_last_section_number - 1; i++)
-                p_sdt_decoder->ap_sections[i]->p_next = p_sdt_decoder->ap_sections[i + 1];
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_sdt_decoder));
         /* Decode the sections */
         dvbpsi_DecodeSDTSections(p_sdt_decoder->p_building_sdt,
                                  p_sdt_decoder->ap_sections[0]);

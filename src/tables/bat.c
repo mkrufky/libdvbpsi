@@ -450,17 +450,13 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
         p_bat_decoder->current_bat = *p_bat_decoder->p_building_bat;
         p_bat_decoder->b_current_valid = true;
         /* Chain the sections */
-        if (p_bat_decoder->i_last_section_number)
-        {
-            for (uint8_t j = 0; j <= p_bat_decoder->i_last_section_number - 1; j++)
-                p_bat_decoder->ap_sections[j]->p_next =
-                                    p_bat_decoder->ap_sections[j + 1];
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_bat_decoder));
         /* Decode the sections */
         dvbpsi_DecodeBATSections(p_bat_decoder->p_building_bat,
                                  p_bat_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[0]);
+        p_bat_decoder->ap_sections[0] = NULL;
         /* signal the new BAT */
         p_bat_decoder->pf_bat_callback(p_bat_decoder->p_cb_data,
                                        p_bat_decoder->p_building_bat);

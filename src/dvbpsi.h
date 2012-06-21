@@ -271,6 +271,17 @@ void dvbpsi_ReInitDecoder(dvbpsi_decoder_t* p_decoder, const bool b_force);
 bool dvbpsi_SectionsCompleteDecoder(dvbpsi_decoder_t* p_decoder);
 
 /*****************************************************************************
+ * dvbpsi_ChainSectionsDecoder
+ *****************************************************************************/
+/*!
+ * \fn void dvbpsi_ChainSectionsDecoder(dvbpsi_decoder_t *p_decoder);
+ * \brief Chain the sections if the last has been received.
+ * \param p_decoder pointer to dvbpsi_decoder_t with decoder
+ * \return nothing
+ */
+void dvbpsi_ChainSectionsDecoder(dvbpsi_decoder_t *p_decoder);
+
+/*****************************************************************************
  * dvbpsi_HasDecoder
  *****************************************************************************/
 /*!

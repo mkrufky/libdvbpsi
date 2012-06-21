@@ -406,11 +406,7 @@ void dvbpsi_GatherSISSections(dvbpsi_t *p_dvbpsi,
         p_sis_decoder->current_sis = *p_sis_decoder->p_building_sis;
         p_sis_decoder->b_current_valid = true;
         /* Chain the sections */
-        if (p_sis_decoder->i_last_section_number)
-        {
-            for (unsigned int i = 0; (int)i <= p_sis_decoder->i_last_section_number - 1; i++)
-                p_sis_decoder->ap_sections[i]->p_next = p_sis_decoder->ap_sections[i + 1];
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_sis_decoder));
         /* Decode the sections */
         dvbpsi_DecodeSISSections(p_dvbpsi, p_sis_decoder->p_building_sis,
                                  p_sis_decoder->ap_sections[0]);

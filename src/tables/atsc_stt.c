@@ -405,18 +405,13 @@ static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t *p_dvbpsi,
         p_stt_decoder->b_current_valid = true;
 
         /* Chain the sections */
-        assert(p_stt_decoder->i_last_section_number > 256);
-        if (p_stt_decoder->i_last_section_number)
-        {
-            for(uint8_t i = 0; i <= p_stt_decoder->i_last_section_number - 1; i++)
-                p_stt_decoder->ap_sections[i]->p_next =
-                        p_stt_decoder->ap_sections[i + 1];
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_stt_decoder));
         /* Decode the sections */
         dvbpsi_atsc_DecodeSTTSections(p_stt_decoder->p_building_stt,
                                       p_stt_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_stt_decoder->ap_sections[0]);
+        p_stt_decoder->ap_sections[0] = NULL;
         /* signal the new STT */
         p_stt_decoder->pf_stt_callback(p_stt_decoder->p_cb_data,
                                        p_stt_decoder->p_building_stt);

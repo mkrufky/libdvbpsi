@@ -480,19 +480,7 @@ void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_de
         p_eit_decoder->b_current_valid = true;
 
         /* Chain the sections */
-        if (p_eit_decoder->i_last_section_number)
-        {
-            dvbpsi_psi_section_t * p_prev_section;
-            p_prev_section = p_eit_decoder->ap_sections[0];
-            for (unsigned int i = 1; i <= p_eit_decoder->i_last_section_number; i++)
-            {
-                if (p_eit_decoder->ap_sections[i] != NULL)
-                {
-                    p_prev_section->p_next = p_eit_decoder->ap_sections[i];
-                    p_prev_section = p_eit_decoder->ap_sections[i];
-                }
-            }
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_eit_decoder));
 
         /* Decode the sections */
         dvbpsi_DecodeEITSections(p_eit_decoder->p_building_eit, p_eit_decoder->ap_sections[0]);

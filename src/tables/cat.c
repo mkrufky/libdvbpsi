@@ -328,11 +328,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
         p_cat_decoder->current_cat = *p_cat_decoder->p_building_cat;
         p_cat_decoder->b_current_valid = true;
         /* Chain the sections */
-        if (p_cat_decoder->i_last_section_number)
-        {
-            for (int i = 0; i <= p_cat_decoder->i_last_section_number - 1; i++)
-                p_cat_decoder->ap_sections[i]->p_next = p_cat_decoder->ap_sections[i + 1];
-        }
+        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_cat_decoder));
         /* Decode the sections */
         dvbpsi_DecodeCATSections(p_cat_decoder->p_building_cat,
                                  p_cat_decoder->ap_sections[0]);
