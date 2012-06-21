@@ -257,6 +257,26 @@ void dvbpsi_ChainSectionsDecoder(dvbpsi_decoder_t *p_decoder)
 }
 
 /*****************************************************************************
+ * dvbpsi_AddSectionDecoder
+ *****************************************************************************/
+bool dvbpsi_AddSectionDecoder(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section)
+{
+    assert(p_decoder);
+    assert(p_section);
+
+    bool b_overwrite = false;
+
+    if (p_decoder->ap_sections[p_section->i_number] != NULL)
+    {
+        dvbpsi_DeletePSISections(p_decoder->ap_sections[p_section->i_number]);
+        b_overwrite = true;
+    }
+    p_decoder->ap_sections[p_section->i_number] = p_section;
+
+    return b_overwrite;
+}
+
+/*****************************************************************************
  * dvbpsi_DeleteDecoder
  *****************************************************************************/
 void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder)

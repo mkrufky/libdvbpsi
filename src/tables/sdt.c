@@ -331,13 +331,9 @@ static bool dvbpsi_AddSectionSDT(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_decoder_t *p_sdt
     }
 
     /* Fill the section array */
-    if (p_sdt_decoder->ap_sections[p_section->i_number] != NULL)
-    {
+    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_sdt_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "SDT decoder", "overwrite section number %d",
                      p_section->i_number);
-        dvbpsi_DeletePSISections(p_sdt_decoder->ap_sections[p_section->i_number]);
-    }
-    p_sdt_decoder->ap_sections[p_section->i_number] = p_section;
 
     return true;
 }

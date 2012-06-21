@@ -350,13 +350,9 @@ static bool dvbpsi_AddSectionBAT(dvbpsi_t *p_dvbpsi, dvbpsi_bat_decoder_t *p_bat
     }
 
     /* Fill the section array */
-    if (p_bat_decoder->ap_sections[p_section->i_number] != NULL)
-    {
+    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_bat_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "BAT decoder", "overwrite section number %d",
                      p_section->i_number);
-        dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[p_section->i_number]);
-    }
-    p_bat_decoder->ap_sections[p_section->i_number] = p_section;
 
     return true;
 }

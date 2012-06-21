@@ -282,6 +282,18 @@ bool dvbpsi_SectionsCompleteDecoder(dvbpsi_decoder_t* p_decoder);
 void dvbpsi_ChainSectionsDecoder(dvbpsi_decoder_t *p_decoder);
 
 /*****************************************************************************
+ * dvbpsi_AddSectionDecoder
+ *****************************************************************************/
+/*!
+ * \fn bool dvbpsi_AddSectionDecoder(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section);
+ * \brief Add a section to the dvbpsi_decoder_t::ap_sections[] array.
+ * \param p_decoder pointer to dvbpsi_decoder_t with decoder
+ * \param p_section PSI section to add to dvbpsi_decoder_t::ap_sections[] array
+ * \return true if it overwrites a earlier section, false otherwise
+ */
+bool dvbpsi_AddSectionDecoder(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section);
+
+/*****************************************************************************
  * dvbpsi_HasDecoder
  *****************************************************************************/
 /*!

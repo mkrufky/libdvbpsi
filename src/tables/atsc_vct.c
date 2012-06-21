@@ -432,13 +432,9 @@ static bool dvbpsi_AddSectionVCT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_vct_decoder_t *
     }
 
     /* Fill the section array */
-    if (p_vct_decoder->ap_sections[p_section->i_number] != NULL)
-    {
+    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_vct_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "ATSC VCT decoder", "overwrite section number %d",
                      p_section->i_number);
-        dvbpsi_DeletePSISections(p_vct_decoder->ap_sections[p_section->i_number]);
-    }
-    p_vct_decoder->ap_sections[p_section->i_number] = p_section;
 
     return true;
 }

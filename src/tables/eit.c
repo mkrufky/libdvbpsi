@@ -390,13 +390,9 @@ static bool dvbpsi_AddSectionEIT(dvbpsi_t *p_dvbpsi, dvbpsi_eit_decoder_t *p_eit
     }
 
     /* Fill the section array */
-    if (p_eit_decoder->ap_sections[p_section->i_number] != NULL)
-    {
+    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_eit_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "EIT decoder",
                      "overwrite section number %d", p_section->i_number);
-        dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[p_section->i_number]);
-    }
-    p_eit_decoder->ap_sections[p_section->i_number] = p_section;
 
     return true;
 }

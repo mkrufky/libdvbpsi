@@ -247,13 +247,9 @@ static bool dvbpsi_AddSectionCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_decoder_t *p_dec
     }
 
     /* Fill the section array */
-    if (p_decoder->ap_sections[p_section->i_number] != NULL)
-    {
+    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "CAT decoder", "overwrite section number %d",
                      p_section->i_number);
-        dvbpsi_DeletePSISections(p_decoder->ap_sections[p_section->i_number]);
-    }
-    p_decoder->ap_sections[p_section->i_number] = p_section;
 
     return true;
 }
