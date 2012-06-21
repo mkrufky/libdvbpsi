@@ -285,26 +285,16 @@ static void dvbpsi_ReInitBAT(dvbpsi_bat_decoder_t* p_decoder, const bool b_force
 {
     assert(p_decoder);
 
+    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+
     /* Force redecoding */
     if (b_force)
     {
-        p_decoder->b_current_valid = false;
-
         /* Free structures */
         if (p_decoder->p_building_bat)
             dvbpsi_DeleteBAT(p_decoder->p_building_bat);
     }
     p_decoder->p_building_bat = NULL;
-
-    /* Clear the section array */
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_decoder->ap_sections[i] != NULL)
-        {
-            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
-            p_decoder->ap_sections[i] = NULL;
-        }
-    }
 }
 
 static bool dvbpsi_CheckBAT(dvbpsi_t *p_dvbpsi, dvbpsi_bat_decoder_t *p_bat_decoder,

@@ -244,26 +244,16 @@ static void dvbpsi_ReInitSIS(dvbpsi_sis_decoder_t* p_decoder, const bool b_force
 {
     assert(p_decoder);
 
+    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+
     /* Force redecoding */
     if (b_force)
     {
-        p_decoder->b_current_valid = false;
-
         /* Free structures */
         if (p_decoder->p_building_sis)
             dvbpsi_DeleteSIS(p_decoder->p_building_sis);
     }
     p_decoder->p_building_sis = NULL;
-
-    /* Clear the section array */
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_decoder->ap_sections[i] != NULL)
-        {
-            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
-            p_decoder->ap_sections[i] = NULL;
-        }
-    }
 }
 
 static bool dvbpsi_CheckSIS(dvbpsi_t *p_dvbpsi, dvbpsi_sis_decoder_t* p_sis_decoder,

@@ -234,26 +234,16 @@ static void dvbpsi_ReInitSTT(dvbpsi_atsc_stt_decoder_t *p_decoder, const bool b_
 {
     assert(p_decoder);
 
+    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+
     /* Force redecoding */
     if (b_force)
     {
-        p_decoder->b_current_valid = false;
-
         /* Free structures */
         if (p_decoder->p_building_stt)
             dvbpsi_atsc_DeleteSTT(p_decoder->p_building_stt);
     }
     p_decoder->p_building_stt = NULL;
-
-    /* Clear the section array */
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_decoder->ap_sections[i] != NULL)
-        {
-            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
-            p_decoder->ap_sections[i] = NULL;
-        }
-    }
 }
 
 static bool dvbpsi_CheckSTT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_stt_decoder_t *p_decoder,

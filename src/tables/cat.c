@@ -172,30 +172,20 @@ dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
 }
 
 /* */
-static void dvbpsi_ReInitCAT(dvbpsi_cat_decoder_t* p_cat_decoder, const bool b_force)
+static void dvbpsi_ReInitCAT(dvbpsi_cat_decoder_t* p_decoder, const bool b_force)
 {
-    assert(p_cat_decoder);
+    assert(p_decoder);
+
+    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
 
     /* Force redecoding */
     if (b_force)
     {
-        p_cat_decoder->b_current_valid = false;
-
         /* Free structures */
-        if (p_cat_decoder->p_building_cat)
-            dvbpsi_DeleteCAT(p_cat_decoder->p_building_cat);
+        if (p_decoder->p_building_cat)
+            dvbpsi_DeleteCAT(p_decoder->p_building_cat);
     }
-    p_cat_decoder->p_building_cat = NULL;
-
-    /* Clear the section array */
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_cat_decoder->ap_sections[i] != NULL)
-        {
-            dvbpsi_DeletePSISections(p_cat_decoder->ap_sections[i]);
-            p_cat_decoder->ap_sections[i] = NULL;
-        }
-    }
+    p_decoder->p_building_cat = NULL;
 }
 
 static bool dvbpsi_CheckCAT(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)

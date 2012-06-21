@@ -197,6 +197,28 @@ dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
 }
 
 /*****************************************************************************
+ * dvbpsi_ReinitDecoder
+ *****************************************************************************/
+void dvbpsi_ReInitDecoder(dvbpsi_decoder_t* p_decoder, const bool b_force)
+{
+    assert(p_decoder);
+
+    /* Force redecoding */
+    if (b_force)
+        p_decoder->b_current_valid = false;
+
+    /* Clear the section array */
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_decoder->ap_sections[i] != NULL)
+        {
+            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
+            p_decoder->ap_sections[i] = NULL;
+        }
+    }
+}
+
+/*****************************************************************************
  * dvbpsi_DeleteDecoder
  *****************************************************************************/
 void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder)

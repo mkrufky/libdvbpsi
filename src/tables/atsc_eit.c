@@ -295,26 +295,16 @@ static void dvbpsi_ReInitEIT(dvbpsi_atsc_eit_decoder_t *p_decoder, const bool b_
 {
     assert(p_decoder);
 
+    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+
     /* Force redecoding */
     if (b_force)
     {
-        p_decoder->b_current_valid = false;
-
         /* Free structures */
         if (p_decoder->p_building_eit)
             dvbpsi_atsc_DeleteEIT(p_decoder->p_building_eit);
     }
     p_decoder->p_building_eit = NULL;
-
-    /* Clear the section array */
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_decoder->ap_sections[i] != NULL)
-        {
-            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
-            p_decoder->ap_sections[i] = NULL;
-        }
-    }
 }
 
 static bool dvbpsi_CheckEIT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_eit_decoder_t *p_decoder,

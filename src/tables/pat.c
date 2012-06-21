@@ -183,30 +183,20 @@ dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
 }
 
 /* */
-static void dvbpsi_ReInitPAT(dvbpsi_pat_decoder_t* p_pat_decoder, const bool b_force)
+static void dvbpsi_ReInitPAT(dvbpsi_pat_decoder_t* p_decoder, const bool b_force)
 {
-    assert(p_pat_decoder);
+    assert(p_decoder);
+
+    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
 
     /* Force redecoding */
     if (b_force)
     {
-        p_pat_decoder->b_current_valid = false;
-
         /* Free structures */
-        if (p_pat_decoder->p_building_pat)
-            dvbpsi_DeletePAT(p_pat_decoder->p_building_pat);
+        if (p_decoder->p_building_pat)
+            dvbpsi_DeletePAT(p_decoder->p_building_pat);
     }
-    p_pat_decoder->p_building_pat = NULL;
-
-    /* Clear the section array */
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_pat_decoder->ap_sections[i] != NULL)
-        {
-            dvbpsi_DeletePSISections(p_pat_decoder->ap_sections[i]);
-            p_pat_decoder->ap_sections[i] = NULL;
-        }
-    }
+    p_decoder->p_building_pat = NULL;
 }
 
 static bool dvbpsi_CheckPAT(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)

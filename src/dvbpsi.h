@@ -247,6 +247,19 @@ dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
 void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder);
 
 /*****************************************************************************
+ * dvbpsi_ReinitDecoder
+ *****************************************************************************/
+/*!
+ * \fn void dvbpsi_ReInitDecoder(dvbpsi_decoder_t* p_decoder, const bool b_force);
+ * \brief Reinit a decoder.
+ * \param p_decoder pointer to dvbpsi_decoder_t with decoder
+ * \param b_force  If 'b_force' is true then dvbpsi_decoder_t::b_current_valid
+ * is set to false, invalidating the current section.
+ * \return nothing
+ */
+void dvbpsi_ReInitDecoder(dvbpsi_decoder_t* p_decoder, const bool b_force);
+
+/*****************************************************************************
  * dvbpsi_HasDecoder
  *****************************************************************************/
 /*!
