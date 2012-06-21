@@ -200,6 +200,9 @@ typedef void (* dvbpsi_callback_gather_t)(dvbpsi_t *p_dvbpsi,  /*!< pointer to d
     uint8_t  i_continuity_counter; /*!< Continuity counter */                     \
     bool     b_discontinuity;      /*!< Discontinuity flag */                     \
     dvbpsi_psi_section_t *p_current_section; /*!< Current section */              \
+    bool     b_current_valid;      /*!< Current valid indicator */                \
+    uint8_t  i_last_section_number;/*!< Last received section number */           \
+    dvbpsi_psi_section_t *ap_sections[256]; /*!< Array of received PSI sections */ \
     int      i_need;               /*!< Bytes needed */                           \
     bool     b_complete_header;    /*!< Flag for header completion */
 

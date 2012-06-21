@@ -70,12 +70,7 @@ bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
     p_pmt_decoder->i_program_number = i_program_number;
     p_pmt_decoder->pf_pmt_callback = pf_callback;
     p_pmt_decoder->p_cb_data = p_cb_data;
-
-    /* PMT decoder initial state */
-    p_pmt_decoder->b_current_valid = false;
     p_pmt_decoder->p_building_pmt = NULL;
-    for (unsigned int i = 0; i <= 255; i++)
-        p_pmt_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -95,13 +90,6 @@ void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
     if (p_pmt_decoder->p_building_pmt)
         dvbpsi_DeletePMT(p_pmt_decoder->p_building_pmt);
     p_pmt_decoder->p_building_pmt = NULL;
-
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_pmt_decoder->ap_sections[i])
-            dvbpsi_DeletePSISections(p_pmt_decoder->ap_sections[i]);
-        p_pmt_decoder->ap_sections[i] = NULL;
-    }
 
     dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
     p_dvbpsi->p_private = NULL;

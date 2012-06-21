@@ -43,11 +43,6 @@ typedef struct dvbpsi_sdt_decoder_s
     dvbpsi_sdt_t                  current_sdt;
     dvbpsi_sdt_t *                p_building_sdt;
 
-    bool                          b_current_valid;
-
-    uint8_t                       i_last_section_number;
-    dvbpsi_psi_section_t *        ap_sections [256];
-
 } dvbpsi_sdt_decoder_t;
 
 /*****************************************************************************

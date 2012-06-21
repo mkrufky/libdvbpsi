@@ -92,11 +92,7 @@ bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     /* EIT decoder information */
     p_eit_decoder->pf_eit_callback = pf_callback;
     p_eit_decoder->p_cb_data = p_cb_data;
-    /* EIT decoder initial state */
-    p_eit_decoder->b_current_valid = false;
     p_eit_decoder->p_building_eit = NULL;
-    for (unsigned int i = 0; i <= 255; i++)
-        p_eit_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -130,15 +126,6 @@ void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     if (p_eit_decoder->p_building_eit)
         dvbpsi_DeleteEIT(p_eit_decoder->p_building_eit);
     p_eit_decoder->p_building_eit = NULL;
-
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_eit_decoder->ap_sections[i])
-        {
-            dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[i]);
-            p_eit_decoder->ap_sections[i] = NULL;
-        }
-    }
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);

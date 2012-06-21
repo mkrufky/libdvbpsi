@@ -91,12 +91,7 @@ bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     /* SDT decoder information */
     p_sdt_decoder->pf_sdt_callback = pf_callback;
     p_sdt_decoder->p_cb_data = p_cb_data;
-
-    /* SDT decoder initial state */
-    p_sdt_decoder->b_current_valid = false;
     p_sdt_decoder->p_building_sdt = NULL;
-    for (unsigned int i = 0; i <= 255; i++)
-        p_sdt_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -131,15 +126,6 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     if (p_sdt_decoder->p_building_sdt)
         dvbpsi_DeleteSDT(p_sdt_decoder->p_building_sdt);
     p_sdt_decoder->p_building_sdt = NULL;
-
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_sdt_decoder->ap_sections[i])
-        {
-            dvbpsi_DeletePSISections(p_sdt_decoder->ap_sections[i]);
-            p_sdt_decoder->ap_sections[i] = NULL;
-        }
-    }
 
     /* Free sub table decoder */
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);

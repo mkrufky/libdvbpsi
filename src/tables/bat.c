@@ -92,12 +92,7 @@ bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     /* BAT decoder information */
     p_bat_decoder->pf_bat_callback = pf_callback;
     p_bat_decoder->p_cb_data = p_cb_data;
-    /* BAT decoder initial state */
-    p_bat_decoder->b_current_valid = false;
     p_bat_decoder->p_building_bat = NULL;
-
-    for (unsigned int i = 0; i < 256; i++)
-        p_bat_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -130,15 +125,6 @@ void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     if (p_bat_decoder->p_building_bat)
         dvbpsi_DeleteBAT(p_bat_decoder->p_building_bat);
     p_bat_decoder->p_building_bat = NULL;
-
-    for (unsigned int i = 0; i < 256; i++)
-    {
-        if (p_bat_decoder->ap_sections[i])
-        {
-            dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[i]);
-            p_bat_decoder->ap_sections[i] = NULL;
-        }
-    }
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);

@@ -95,11 +95,7 @@ bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
     p_nit_decoder->i_network_id = i_extension;
     p_nit_decoder->pf_nit_callback = pf_callback;
     p_nit_decoder->p_cb_data = p_cb_data;
-    /* NIT decoder initial state */
-    p_nit_decoder->b_current_valid = false;
     p_nit_decoder->p_building_nit = NULL;
-    for (unsigned int i = 0; i <= 255; i++)
-        p_nit_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -130,15 +126,6 @@ void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
     if (p_nit_decoder->p_building_nit)
         dvbpsi_DeleteNIT(p_nit_decoder->p_building_nit);
     p_nit_decoder->p_building_nit = NULL;
-
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_nit_decoder->ap_sections[i])
-        {
-            dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[i]);
-            p_nit_decoder->ap_sections[i] = NULL;
-        }
-    }
 
     /* Free demux sub table decoder */
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);

@@ -53,11 +53,6 @@ typedef struct dvbpsi_atsc_eit_decoder_s
     dvbpsi_atsc_eit_t             current_eit;
     dvbpsi_atsc_eit_t *           p_building_eit;
 
-    bool                          b_current_valid;
-
-    uint8_t                       i_last_section_number;
-    dvbpsi_psi_section_t *        ap_sections [256];
-
 } dvbpsi_atsc_eit_decoder_t;
 
 
@@ -121,11 +116,7 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     /* EIT decoder information */
     p_eit_decoder->pf_eit_callback = pf_callback;
     p_eit_decoder->p_cb_data = p_cb_data;
-    /* EIT decoder initial state */
-    p_eit_decoder->b_current_valid = false;
     p_eit_decoder->p_building_eit = NULL;
-    for (int i = 0; i < 256; i++)
-        p_eit_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -160,15 +151,6 @@ void dvbpsi_atsc_DetachEIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id, uint16_t i_e
     if (p_eit_decoder->p_building_eit)
         dvbpsi_atsc_DeleteEIT(p_eit_decoder->p_building_eit);
     p_eit_decoder->p_building_eit = NULL;
-
-    for (unsigned int i = 0; i < 256; i++)
-    {
-        if (p_eit_decoder->ap_sections[i])
-        {
-            dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[i]);
-            p_eit_decoder->ap_sections[i] = NULL;
-        }
-    }
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);

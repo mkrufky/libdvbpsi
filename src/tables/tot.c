@@ -95,12 +95,7 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     /* TDT/TOT decoder information */
     p_tot_decoder->pf_tot_callback = pf_callback;
     p_tot_decoder->p_cb_data = p_cb_data;
-
-    /* TDT/TOT  decoder initial state */
-    p_tot_decoder->b_current_valid = false;
     p_tot_decoder->p_building_tot = NULL;
-    for (unsigned int i = 0; i <= 255; i++)
-        p_tot_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -137,15 +132,6 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
     if (p_tot_decoder->p_building_tot)
         dvbpsi_DeleteTOT(p_tot_decoder->p_building_tot);
     p_tot_decoder->p_building_tot = NULL;
-
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_tot_decoder->ap_sections[i])
-        {
-            dvbpsi_DeletePSISections(p_tot_decoder->ap_sections[i]);
-            p_tot_decoder->ap_sections[i] = NULL;
-        }
-    }
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);

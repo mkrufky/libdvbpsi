@@ -66,13 +66,7 @@ bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
     /* PAT decoder information */
     p_pat_decoder->pf_pat_callback = pf_callback;
     p_pat_decoder->p_cb_data = p_cb_data;
-
-    /* PAT decoder initial state */
-    p_pat_decoder->b_current_valid = false;
     p_pat_decoder->p_building_pat = NULL;
-
-    for(unsigned int i = 0; i <= 255; i++)
-        p_pat_decoder->ap_sections[i] = NULL;
 
     p_dvbpsi->p_private = (void *)p_pat_decoder;
     return true;
@@ -92,13 +86,6 @@ void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi)
     if (p_pat_decoder->p_building_pat)
         dvbpsi_DeletePAT(p_pat_decoder->p_building_pat);
     p_pat_decoder->p_building_pat = NULL;
-
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_pat_decoder->ap_sections[i])
-            dvbpsi_DeletePSISections(p_pat_decoder->ap_sections[i]);
-        p_pat_decoder->ap_sections[i] = NULL;
-    }
 
     dvbpsi_DeleteDecoder(p_dvbpsi->p_private);
     p_dvbpsi->p_private = NULL;

@@ -69,11 +69,7 @@ bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
     /* CAT decoder configuration */
     p_cat_decoder->pf_cat_callback = pf_callback;
     p_cat_decoder->p_cb_data = p_cb_data;
-    /* CAT decoder initial state */
-    p_cat_decoder->b_current_valid = false;
     p_cat_decoder->p_building_cat = NULL;
-    for (unsigned int i = 0; i <= 255; i++)
-        p_cat_decoder->ap_sections[i] = NULL;
 
     p_dvbpsi->p_private = p_cat_decoder;
     return true;
@@ -94,15 +90,6 @@ void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
     if (p_cat_decoder->p_building_cat)
         dvbpsi_DeleteCAT(p_cat_decoder->p_building_cat);
     p_cat_decoder->p_building_cat = NULL;
-
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_cat_decoder->ap_sections[i])
-        {
-            dvbpsi_DeletePSISections(p_cat_decoder->ap_sections[i]);
-            p_cat_decoder->ap_sections[i] = NULL;
-        }
-    }
 
     dvbpsi_DeleteDecoder(p_dvbpsi->p_private);
     p_dvbpsi->p_private = NULL;

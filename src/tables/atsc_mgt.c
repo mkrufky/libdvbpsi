@@ -54,11 +54,6 @@ typedef struct dvbpsi_atsc_mgt_decoder_s
     dvbpsi_atsc_mgt_t             current_mgt;
     dvbpsi_atsc_mgt_t *           p_building_mgt;
 
-    bool                          b_current_valid;
-
-    uint8_t                       i_last_section_number;
-    dvbpsi_psi_section_t *        ap_sections [256];
-
 } dvbpsi_atsc_mgt_decoder_t;
 
 static dvbpsi_descriptor_t *dvbpsi_atsc_MGTAddDescriptor(
@@ -125,11 +120,7 @@ bool dvbpsi_atsc_AttachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     /* MGT decoder information */
     p_mgt_decoder->pf_mgt_callback = pf_callback;
     p_mgt_decoder->p_cb_data = p_cb_data;
-    /* MGT decoder initial state */
-    p_mgt_decoder->b_current_valid = false;
     p_mgt_decoder->p_building_mgt = NULL;
-    for (unsigned int i = 0; i < 256; i++)
-        p_mgt_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -165,15 +156,6 @@ void dvbpsi_atsc_DetachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     if (p_mgt_decoder->p_building_mgt)
         dvbpsi_atsc_DeleteMGT(p_mgt_decoder->p_building_mgt);
     p_mgt_decoder->p_building_mgt = NULL;
-
-    for (unsigned int i = 0; i < 256; i++)
-    {
-        if (p_mgt_decoder->ap_sections[i])
-        {
-            dvbpsi_DeletePSISections(p_mgt_decoder->ap_sections[i]);
-            p_mgt_decoder->ap_sections[i] = NULL;
-        }
-    }
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);

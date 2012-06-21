@@ -47,11 +47,6 @@ typedef struct dvbpsi_nit_decoder_s
     dvbpsi_nit_t                  current_nit;
     dvbpsi_nit_t *                p_building_nit;
 
-    bool                          b_current_valid;
-
-    uint8_t                       i_last_section_number;
-    dvbpsi_psi_section_t *        ap_sections [256];
-
 } dvbpsi_nit_decoder_t;
 
 /*****************************************************************************

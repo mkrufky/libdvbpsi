@@ -185,6 +185,12 @@ dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
     p_decoder->b_discontinuity = b_discontinuity;
     p_decoder->i_continuity_counter = DVBPSI_INVALID_CC;
     p_decoder->p_current_section = NULL;
+    p_decoder->b_current_valid = false;
+
+    p_decoder->i_last_section_number = 0;
+    for (unsigned int i = 0; i <= 255; i++)
+        p_decoder->ap_sections[i] = NULL;
+
     p_decoder->b_complete_header = false;
 
     return p_decoder;
@@ -196,6 +202,13 @@ dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
 void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder)
 {
     assert(p_decoder);
+
+    for (unsigned int i = 0; i <= 255; i++)
+    {
+        if (p_decoder->ap_sections[i])
+            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
+        p_decoder->ap_sections[i] = NULL;
+    }
 
     dvbpsi_DeletePSISections(p_decoder->p_current_section);
     free(p_decoder);

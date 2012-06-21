@@ -52,11 +52,6 @@ typedef struct dvbpsi_atsc_vct_decoder_s
     dvbpsi_atsc_vct_t             current_vct;
     dvbpsi_atsc_vct_t *           p_building_vct;
 
-    bool                          b_current_valid;
-
-    uint8_t                       i_last_section_number;
-    dvbpsi_psi_section_t *        ap_sections [256];
-
 } dvbpsi_atsc_vct_decoder_t;
 
 static dvbpsi_descriptor_t *dvbpsi_atsc_VCTAddDescriptor(
@@ -135,12 +130,7 @@ bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     /* VCT decoder information */
     p_vct_decoder->pf_vct_callback = pf_vct_callback;
     p_vct_decoder->p_cb_data = p_cb_data;
-    /* VCT decoder initial state */
-    p_vct_decoder->b_current_valid = false;
     p_vct_decoder->p_building_vct = NULL;
-
-    for(unsigned int i = 0; i < 256; i++)
-        p_vct_decoder->ap_sections[i] = NULL;
 
     return true;
 }
@@ -175,15 +165,6 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     if (p_vct_decoder->p_building_vct)
         dvbpsi_atsc_DeleteVCT(p_vct_decoder->p_building_vct);
     p_vct_decoder->p_building_vct = NULL;
-
-    for (unsigned int i = 0; i < 256; i++)
-    {
-        if (p_vct_decoder->ap_sections[i])
-        {
-            dvbpsi_DeletePSISections(p_vct_decoder->ap_sections[i]);
-            p_vct_decoder->ap_sections[i] = NULL;
-        }
-    }
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);

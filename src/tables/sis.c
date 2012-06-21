@@ -93,12 +93,8 @@ bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     /* SIS decoder information */
     p_sis_decoder->pf_sis_callback = pf_callback;
     p_sis_decoder->p_cb_data = p_cb_data;
-
-    /* SIS decoder initial state */
-    p_sis_decoder->b_current_valid = false;
     p_sis_decoder->p_building_sis = NULL;
-    for (unsigned int i = 0; i <= 255; i++)
-        p_sis_decoder->ap_sections[i] = NULL;
+
     return true;
 }
 
@@ -134,15 +130,6 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     if (p_sis_decoder->p_building_sis)
         dvbpsi_DeleteSIS(p_sis_decoder->p_building_sis);
     p_sis_decoder->p_building_sis = NULL;
-
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_sis_decoder->ap_sections[i])
-        {
-            dvbpsi_DeletePSISections(p_sis_decoder->ap_sections[i]);
-            p_sis_decoder->ap_sections[i] = NULL;
-        }
-    }
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
     dvbpsi_DeleteDemuxSubDecoder(p_subdec);
