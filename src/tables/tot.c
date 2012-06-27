@@ -310,10 +310,11 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_private);
 
-    const uint8_t i_table_id = ((p_section->i_table_id == 0x70 ||
-                                 p_section->i_table_id == 0x73)) ?
+    const uint8_t i_table_id = ((p_section->i_table_id == 0x70 ||  /* TDT */
+                                 p_section->i_table_id == 0x73)) ? /* TOT */
                                     p_section->i_table_id : 0x70;
 
+    /* FIXME: setting b_syntax_indicator is a workaround here */
     p_section->b_syntax_indicator = true;
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, i_table_id, "TDT/TOT decoder"))
     {
@@ -412,22 +413,11 @@ static bool dvbpsi_ValidTOTSection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_s
         return true;
     }
 
-    /* Check the CRC_32 if it's a TOT */
-    uint32_t i_crc = 0xffffffff;
-    uint8_t* p_byte = p_section->p_data;
-
-    while (p_byte < p_section->p_payload_end)
-    {
-        i_crc = (i_crc << 8) ^ dvbpsi_crc32_table[(i_crc >> 24) ^ (*p_byte)];
-        p_byte++;
-    }
-
-    if (i_crc == 0)
-        return true;
-    else
+    if (p_section->b_syntax_indicator &&
+        !dvbpsi_ValidPSISection(p_section))
     {
         dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
-                               "Bad CRC_32 (0x%08x) !!!", i_crc);
+                               "Bad CRC_32!!!");
         return false;
     }
 
