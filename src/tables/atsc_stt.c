@@ -209,20 +209,14 @@ dvbpsi_descriptor_t *dvbpsi_atsc_STTAddDescriptor( dvbpsi_atsc_stt_t *p_stt,
                                                uint8_t *p_data)
 {
     dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
-    if (p_descriptor)
-    {
-        if (p_stt->p_first_descriptor == NULL)
-        {
-            p_stt->p_first_descriptor = p_descriptor;
-        }
-        else
-        {
-            dvbpsi_descriptor_t * p_last_descriptor = p_stt->p_first_descriptor;
-            while(p_last_descriptor->p_next != NULL)
-                p_last_descriptor = p_last_descriptor->p_next;
-            p_last_descriptor->p_next = p_descriptor;
-        }
-    }
+    if (p_descriptor == NULL)
+        return NULL;
+
+    p_stt->p_first_descriptor = dvbpsi_AddDescriptor(p_stt->p_first_descriptor,
+                                                     p_descriptor);
+    assert(p_stt->p_first_descriptor);
+    if (p_stt->p_first_descriptor == NULL)
+        return NULL;
 
     return p_descriptor;
 }

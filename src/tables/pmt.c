@@ -177,15 +177,12 @@ dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
     if (p_descriptor == NULL)
         return NULL;
 
+    p_pmt->p_first_descriptor = dvbpsi_AddDescriptor(p_pmt->p_first_descriptor,
+                                                     p_descriptor);
+    assert(p_pmt->p_first_descriptor);
     if (p_pmt->p_first_descriptor == NULL)
-        p_pmt->p_first_descriptor = p_descriptor;
-    else
-    {
-        dvbpsi_descriptor_t* p_last_descriptor = p_pmt->p_first_descriptor;
-        while(p_last_descriptor->p_next != NULL)
-            p_last_descriptor = p_last_descriptor->p_next;
-        p_last_descriptor->p_next = p_descriptor;
-    }
+        return NULL;
+
     return p_descriptor;
 }
 

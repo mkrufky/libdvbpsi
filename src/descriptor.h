@@ -97,6 +97,20 @@ dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
 void dvbpsi_DeleteDescriptors(dvbpsi_descriptor_t* p_descriptor);
 
 /*****************************************************************************
+ * dvbpsi_AddDescriptor
+ *****************************************************************************/
+/*!
+ * \fn  dvbpsi_descriptor_t *dvbpsi_AddDescriptor(dvbpsi_descriptor_t *p_list,
+                                          dvbpsi_descriptor_t *p_descriptor);
+ * \brief Add a descriptor to the end of descriptor list.
+ * \param p_list the first descriptor in the descriptor list.
+ * \param p_descriptor the descriptor to add to the list
+ * \return a pointer to the first element in the descriptor list.
+ */
+dvbpsi_descriptor_t *dvbpsi_AddDescriptor(dvbpsi_descriptor_t *p_list,
+                                          dvbpsi_descriptor_t *p_descriptor);
+
+/*****************************************************************************
  * dvbpsi_CanDecodeAsDescriptor
  *****************************************************************************/
 /*!

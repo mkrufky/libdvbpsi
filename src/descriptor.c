@@ -36,6 +36,8 @@
 #include <stdint.h>
 #endif
 
+#include <assert.h>
+
 #include "dvbpsi.h"
 #include "descriptor.h"
 
@@ -106,6 +108,28 @@ dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
     }
 
     return p_descriptor;
+}
+
+/*****************************************************************************
+ * dvbpsi_AddDescriptor
+ *****************************************************************************
+ * Add 'p_descriptor' to the list of descriptors 'p_list'
+ *****************************************************************************/
+dvbpsi_descriptor_t *dvbpsi_AddDescriptor(dvbpsi_descriptor_t *p_list,
+                                          dvbpsi_descriptor_t *p_descriptor)
+{
+    assert(p_descriptor);
+
+    if (p_list == NULL)
+        p_list = p_descriptor;
+    else
+    {
+        dvbpsi_descriptor_t *p_last = p_list;
+        while (p_last->p_next != NULL)
+                p_last = p_last->p_next;
+        p_last->p_next = p_descriptor;
+    }
+    return p_list;
 }
 
 /*****************************************************************************

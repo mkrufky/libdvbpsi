@@ -265,15 +265,12 @@ dvbpsi_descriptor_t* dvbpsi_NITTSAddDescriptor(dvbpsi_nit_ts_t* p_ts,
     if (p_descriptor == NULL)
         return NULL;
 
+    p_ts->p_first_descriptor = dvbpsi_AddDescriptor(p_ts->p_first_descriptor,
+                                                    p_descriptor);
+    assert(p_ts->p_first_descriptor);
     if (p_ts->p_first_descriptor == NULL)
-      p_ts->p_first_descriptor = p_descriptor;
-    else
-    {
-        dvbpsi_descriptor_t* p_last_descriptor = p_ts->p_first_descriptor;
-        while(p_last_descriptor->p_next != NULL)
-            p_last_descriptor = p_last_descriptor->p_next;
-        p_last_descriptor->p_next = p_descriptor;
-    }
+        return NULL;
+
     return p_descriptor;
 }
 

@@ -268,24 +268,18 @@ static dvbpsi_descriptor_t *dvbpsi_atsc_EITChannelAddDescriptor(
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data)
 {
-  dvbpsi_descriptor_t * p_descriptor
-                        = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
-  if(p_descriptor)
-  {
-    if(p_event->p_first_descriptor == NULL)
-    {
-      p_event->p_first_descriptor = p_descriptor;
-    }
-    else
-    {
-      dvbpsi_descriptor_t * p_last_descriptor = p_event->p_first_descriptor;
-      while(p_last_descriptor->p_next != NULL)
-        p_last_descriptor = p_last_descriptor->p_next;
-      p_last_descriptor->p_next = p_descriptor;
-    }
-  }
+    dvbpsi_descriptor_t * p_descriptor
+                            = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
+    if (p_descriptor == NULL)
+        return NULL;
 
-  return p_descriptor;
+    p_event->p_first_descriptor = dvbpsi_AddDescriptor(p_event->p_first_descriptor,
+                                                       p_descriptor);
+    assert(p_event->p_first_descriptor);
+    if (p_event->p_first_descriptor == NULL)
+        return NULL;
+
+    return p_descriptor;
 }
 
 /*****************************************************************************
