@@ -58,9 +58,9 @@ bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
                            dvbpsi_eit_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
+    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_decoder;
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension) != NULL)
     {
@@ -72,7 +72,8 @@ bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     }
 
     dvbpsi_eit_decoder_t*  p_eit_decoder;
-    p_eit_decoder = (dvbpsi_eit_decoder_t*)calloc(1, sizeof(dvbpsi_eit_decoder_t));
+    p_eit_decoder = (dvbpsi_eit_decoder_t*) dvbpsi_NewDecoder(NULL,
+                                             0, true, sizeof(dvbpsi_eit_decoder_t));
     if (p_eit_decoder == NULL)
         return false;
 
@@ -82,7 +83,7 @@ bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
                                          dvbpsi_GatherEITSections, DVBPSI_DECODER(p_eit_decoder));
     if (p_subdec == NULL)
     {
-        free(p_eit_decoder);
+        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_eit_decoder));
         return false;
     }
 
@@ -106,9 +107,9 @@ void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
 
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
@@ -403,7 +404,7 @@ void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_de
                               dvbpsi_psi_section_t *p_section)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     const uint8_t i_table_id = (p_section->i_table_id >= 0x4e &&
                                 p_section->i_table_id <= 0x6f) ?
@@ -416,7 +417,7 @@ void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_de
     }
 
     /* We have a valid EIT section */
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
     dvbpsi_eit_decoder_t* p_eit_decoder
                         = (dvbpsi_eit_decoder_t*)p_private_decoder;
 

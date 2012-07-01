@@ -59,9 +59,9 @@ bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_bat_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
+    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_decoder;
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
         dvbpsi_error(p_dvbpsi, "BAT decoder",
@@ -72,7 +72,8 @@ bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     }
 
     dvbpsi_bat_decoder_t*  p_bat_decoder;
-    p_bat_decoder = (dvbpsi_bat_decoder_t*)calloc(1, sizeof(dvbpsi_bat_decoder_t));
+    p_bat_decoder = (dvbpsi_bat_decoder_t*) dvbpsi_NewDecoder(NULL,
+                                             0, true, sizeof(dvbpsi_bat_decoder_t));
     if (p_bat_decoder == NULL)
         return false;
 
@@ -82,7 +83,7 @@ bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
                                          dvbpsi_GatherBATSections, DVBPSI_DECODER(p_bat_decoder));
     if (p_subdec == NULL)
     {
-        free(p_bat_decoder);
+        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_bat_decoder));
         return false;
     }
 
@@ -105,9 +106,9 @@ bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
 void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
 
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
@@ -363,11 +364,11 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
                               dvbpsi_decoder_t *p_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
     dvbpsi_bat_decoder_t * p_bat_decoder = (dvbpsi_bat_decoder_t *) p_decoder;
 
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0x4a, "BAT decoder"))
     {

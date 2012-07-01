@@ -60,9 +60,9 @@ bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                       void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
+    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_decoder;
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
@@ -74,7 +74,8 @@ bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
     }
 
     dvbpsi_nit_decoder_t*  p_nit_decoder;
-    p_nit_decoder = (dvbpsi_nit_decoder_t*)calloc(1, sizeof(dvbpsi_nit_decoder_t));
+    p_nit_decoder = (dvbpsi_nit_decoder_t*) dvbpsi_NewDecoder(NULL,
+                                             0, true, sizeof(dvbpsi_nit_decoder_t));
     if (p_nit_decoder == NULL)
         return false;
 
@@ -84,7 +85,7 @@ bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                                          dvbpsi_GatherNITSections, DVBPSI_DECODER(p_nit_decoder));
     if (p_subdec == NULL)
     {
-        free(p_nit_decoder);
+        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_nit_decoder));
         return false;
     }
 
@@ -108,7 +109,7 @@ bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
 void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
                       uint16_t i_extension)
 {
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
 
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);

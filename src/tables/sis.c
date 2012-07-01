@@ -57,9 +57,9 @@ bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
                       dvbpsi_sis_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
+    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_decoder;
 
     i_extension = 0;
 
@@ -73,7 +73,8 @@ bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     }
 
     dvbpsi_sis_decoder_t*  p_sis_decoder;
-    p_sis_decoder = (dvbpsi_sis_decoder_t*)malloc(sizeof(dvbpsi_sis_decoder_t));
+    p_sis_decoder = (dvbpsi_sis_decoder_t*) dvbpsi_NewDecoder(NULL,
+                                             0, true, sizeof(dvbpsi_sis_decoder_t));
     if (p_sis_decoder == NULL)
         return false;
 
@@ -83,7 +84,7 @@ bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
                                          dvbpsi_GatherSISSections, DVBPSI_DECODER(p_sis_decoder));
     if (p_subdec == NULL)
     {
-        free(p_sis_decoder);
+        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_sis_decoder));
         return false;
     }
 
@@ -107,9 +108,9 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
 
     i_extension = 0;
     dvbpsi_demux_subdec_t* p_subdec;
@@ -329,7 +330,7 @@ void dvbpsi_GatherSISSections(dvbpsi_t *p_dvbpsi,
                               dvbpsi_psi_section_t * p_section)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0xFC, "SIS decoder"))
     {
@@ -338,7 +339,7 @@ void dvbpsi_GatherSISSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* */
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
     dvbpsi_sis_decoder_t * p_sis_decoder = (dvbpsi_sis_decoder_t*)p_decoder;
 
     if (p_section->b_private_indicator)

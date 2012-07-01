@@ -84,9 +84,9 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
                            dvbpsi_atsc_eit_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
+    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_decoder;
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
@@ -97,7 +97,8 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     }
 
     dvbpsi_atsc_eit_decoder_t* p_eit_decoder;
-    p_eit_decoder = (dvbpsi_atsc_eit_decoder_t*)malloc(sizeof(dvbpsi_atsc_eit_decoder_t));
+    p_eit_decoder = (dvbpsi_atsc_eit_decoder_t*) dvbpsi_NewDecoder(NULL,
+                                                    0, true, sizeof(dvbpsi_atsc_eit_decoder_t));
     if (p_eit_decoder == NULL)
         return false;
 
@@ -106,7 +107,7 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
                                          dvbpsi_atsc_GatherEITSections, DVBPSI_DECODER(p_eit_decoder));
     if (p_subdec == NULL)
     {
-        free(p_eit_decoder);
+        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_eit_decoder));
         return false;
     }
 
@@ -129,9 +130,9 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
 void dvbpsi_atsc_DetachEIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
     if (p_subdec == NULL)
@@ -375,7 +376,7 @@ static void dvbpsi_atsc_GatherEITSections(dvbpsi_t * p_dvbpsi,
                                           dvbpsi_psi_section_t * p_section)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0xCB, "ATSC EIT decoder"))
     {
@@ -384,7 +385,7 @@ static void dvbpsi_atsc_GatherEITSections(dvbpsi_t * p_dvbpsi,
     }
 
     /* We have a valid EIT section */
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
     dvbpsi_atsc_eit_decoder_t *p_eit_decoder = (dvbpsi_atsc_eit_decoder_t*)p_decoder;
     if (!p_eit_decoder)
     {

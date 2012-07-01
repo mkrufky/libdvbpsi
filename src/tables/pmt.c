@@ -56,7 +56,7 @@ bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
                       dvbpsi_pmt_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private == NULL);
+    assert(p_dvbpsi->p_decoder == NULL);
 
     dvbpsi_pmt_decoder_t* p_pmt_decoder;
     p_pmt_decoder = (dvbpsi_pmt_decoder_t*) dvbpsi_NewDecoder(&dvbpsi_GatherPMTSections,
@@ -64,7 +64,7 @@ bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
     if (p_pmt_decoder == NULL)
         return false;
 
-    p_dvbpsi->p_private = (void *)p_pmt_decoder;
+    p_dvbpsi->p_decoder = DVBPSI_DECODER(p_pmt_decoder);
 
     /* PMT decoder configuration */
     p_pmt_decoder->i_program_number = i_program_number;
@@ -83,16 +83,16 @@ bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
 void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     dvbpsi_pmt_decoder_t* p_pmt_decoder;
-    p_pmt_decoder = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_private;
+    p_pmt_decoder = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_decoder;
     if (p_pmt_decoder->p_building_pmt)
         dvbpsi_DeletePMT(p_pmt_decoder->p_building_pmt);
     p_pmt_decoder->p_building_pmt = NULL;
 
-    dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
-    p_dvbpsi->p_private = NULL;
+    dvbpsi_DeleteDecoder(p_dvbpsi->p_decoder);
+    p_dvbpsi->p_decoder = NULL;
 }
 
 /*****************************************************************************
@@ -261,10 +261,10 @@ static void dvbpsi_ReInitPMT(dvbpsi_pmt_decoder_t* p_decoder, const bool b_force
 static bool dvbpsi_CheckPMT(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
 {
     bool b_reinit = false;
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     dvbpsi_pmt_decoder_t* p_pmt_decoder;
-    p_pmt_decoder = (dvbpsi_pmt_decoder_t *)p_dvbpsi->p_private;
+    p_pmt_decoder = (dvbpsi_pmt_decoder_t *)p_dvbpsi->p_decoder;
 
     if (p_pmt_decoder->p_building_pmt->i_version != p_section->i_version)
     {
@@ -322,7 +322,7 @@ static bool dvbpsi_AddSectionPMT(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_decoder_t *p_pmt
 void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0x02, "PMT decoder"))
     {
@@ -331,7 +331,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
     }
 
     /* */
-    dvbpsi_pmt_decoder_t* p_pmt_decoder = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_private;
+    dvbpsi_pmt_decoder_t* p_pmt_decoder = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_decoder;
     assert(p_pmt_decoder);
 
     /* We have a valid PMT section */

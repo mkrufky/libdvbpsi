@@ -146,24 +146,24 @@ uint32_t dvbpsi_crc32_table[256] =
  *****************************************************************************/
 dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, enum dvbpsi_msg_level level)
 {
-    dvbpsi_t *handle = calloc(1, sizeof(dvbpsi_t));
-    if (handle != NULL)
+    dvbpsi_t *p_dvbpsi = calloc(1, sizeof(dvbpsi_t));
+    if (p_dvbpsi != NULL)
     {
-        handle->p_private  = NULL;
-        handle->pf_message = callback;
-        handle->i_msg_level = level;
+        p_dvbpsi->p_decoder  = NULL;
+        p_dvbpsi->pf_message = callback;
+        p_dvbpsi->i_msg_level = level;
     }
-    return handle;
+    return p_dvbpsi;
 }
 
 /*****************************************************************************
  * dvbpsi_DeleteHandle
  *****************************************************************************/
-void dvbpsi_DeleteHandle(dvbpsi_t *handle)
+void dvbpsi_DeleteHandle(dvbpsi_t *p_dvbpsi)
 {
-    assert(handle->p_private == NULL);
-    handle->pf_message = NULL;
-    free(handle);
+    assert(p_dvbpsi->p_decoder == NULL);
+    p_dvbpsi->pf_message = NULL;
+    free(p_dvbpsi);
 }
 
 /*****************************************************************************
@@ -299,7 +299,7 @@ void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder)
  *****************************************************************************/
 bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi)
 {
-    if (p_dvbpsi && p_dvbpsi->p_private)
+    if (p_dvbpsi && p_dvbpsi->p_decoder)
         return true;
     else
         return false;
@@ -310,7 +310,7 @@ bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi)
  *****************************************************************************
  * Injection of a TS packet into a PSI decoder.
  *****************************************************************************/
-bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
+bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
 {
     uint8_t i_expected_counter;           /* Expected continuity counter */
     dvbpsi_psi_section_t* p_section;      /* Current section */
@@ -321,13 +321,13 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
     int i_available;                      /* Byte count available in the
                                              packet */
 
-    dvbpsi_decoder_t *p_decoder = (dvbpsi_decoder_t *)handle->p_private;
+    dvbpsi_decoder_t *p_decoder = p_dvbpsi->p_decoder;
     assert(p_decoder);
 
     /* TS start code */
     if (p_data[0] != 0x47)
     {
-        dvbpsi_error(handle, "PSI decoder", "not a TS packet");
+        dvbpsi_error(p_dvbpsi, "PSI decoder", "not a TS packet");
         return false;
     }
 
@@ -343,7 +343,7 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
         if (i_expected_counter == ((p_decoder->i_continuity_counter + 1) & 0xf)
             && !p_decoder->b_discontinuity)
         {
-            dvbpsi_error(handle, "PSI decoder",
+            dvbpsi_error(p_dvbpsi, "PSI decoder",
                      "TS duplicate (received %d, expected %d) for PID %d",
                      p_decoder->i_continuity_counter, i_expected_counter,
                      ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
@@ -352,7 +352,7 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
 
         if (i_expected_counter != p_decoder->i_continuity_counter)
         {
-            dvbpsi_error(handle, "PSI decoder",
+            dvbpsi_error(p_dvbpsi, "PSI decoder",
                      "TS discontinuity (received %d, expected %d) for PID %d",
                      p_decoder->i_continuity_counter, i_expected_counter,
                      ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
@@ -436,7 +436,7 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
                 /* Check that the section isn't too long */
                 if (p_decoder->i_need > p_decoder->i_section_max_size - 3)
                 {
-                    dvbpsi_error(handle, "PSI decoder", "PSI section too long");
+                    dvbpsi_error(p_dvbpsi, "PSI decoder", "PSI section too long");
                     dvbpsi_DeletePSISections(p_section);
                     p_decoder->p_current_section = NULL;
                     /* If there is a new section not being handled then go forward
@@ -494,16 +494,16 @@ bool dvbpsi_PushPacket(dvbpsi_t *handle, uint8_t* p_data)
                         p_section->p_payload_start = p_section->p_data + 3;
                     }
                     if (p_decoder->pf_gather)
-                        p_decoder->pf_gather(handle, p_section);
+                        p_decoder->pf_gather(p_dvbpsi, p_section);
                     p_decoder->p_current_section = NULL;
                 }
                 else
                 {
                     if (!dvbpsi_ValidPSISection(p_section))
-                        dvbpsi_error(handle, "misc PSI", "Bad CRC_32 table 0x%x !!!",
+                        dvbpsi_error(p_dvbpsi, "misc PSI", "Bad CRC_32 table 0x%x !!!",
                                              p_section->p_data[0]);
                     else
-                        dvbpsi_error(handle, "misc PSI", "table 0x%x", p_section->p_data[0]);
+                        dvbpsi_error(p_dvbpsi, "misc PSI", "table 0x%x", p_section->p_data[0]);
 
                     /* PSI section isn't valid => trash it */
                     dvbpsi_DeletePSISections(p_section);

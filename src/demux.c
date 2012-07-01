@@ -54,7 +54,7 @@ bool dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
                         void *                p_new_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private == NULL);
+    assert(p_dvbpsi->p_decoder == NULL);
 
     dvbpsi_demux_t *p_demux;
     p_demux = (dvbpsi_demux_t*) dvbpsi_NewDecoder(&dvbpsi_Demux, 4096, true,
@@ -67,7 +67,7 @@ bool dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
     p_demux->pf_new_callback = pf_new_cb;
     p_demux->p_new_cb_data = p_new_cb_data;
 
-    p_dvbpsi->p_private = (void *)p_demux;
+    p_dvbpsi->p_decoder = DVBPSI_DECODER(p_demux);
     return true;
 }
 
@@ -102,9 +102,9 @@ dvbpsi_demux_subdec_t * dvbpsi_demuxGetSubDec(dvbpsi_demux_t * p_demux,
 void dvbpsi_Demux(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t * p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_private;
+    dvbpsi_demux_t * p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_decoder;
     dvbpsi_demux_subdec_t * p_subdec = dvbpsi_demuxGetSubDec(p_demux, p_section->i_table_id,
                                                              p_section->i_extension);
     if (p_subdec == NULL)
@@ -133,9 +133,9 @@ void dvbpsi_Demux(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
 void dvbpsi_DetachDemux(dvbpsi_t *p_dvbpsi)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_decoder;
     dvbpsi_demux_subdec_t* p_subdec = p_demux->p_first_subdec;
 
     while (p_subdec)
@@ -149,8 +149,8 @@ void dvbpsi_DetachDemux(dvbpsi_t *p_dvbpsi)
         else free(p_subdec_temp);
     }
 
-    dvbpsi_DeleteDecoder((dvbpsi_decoder_t *)p_dvbpsi->p_private);
-    p_dvbpsi->p_private = NULL;
+    dvbpsi_DeleteDecoder(p_dvbpsi->p_decoder);
+    p_dvbpsi->p_decoder = NULL;
 }
 
 /*****************************************************************************

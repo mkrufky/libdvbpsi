@@ -76,6 +76,12 @@ typedef void (* dvbpsi_message_cb)(dvbpsi_t *handle,
                                    const dvbpsi_msg_level_t level,
                                    const char* msg);
 
+/*!
+ * \typedef struct dvbpsi_decoder_s dvbpsi_decoder_t
+ * \brief dvbpsi_decoder_t type definition.
+ */
+typedef struct dvbpsi_decoder_s dvbpsi_decoder_t;
+
 /*****************************************************************************
  * dvbpsi_t
  *****************************************************************************/
@@ -92,9 +98,8 @@ typedef void (* dvbpsi_message_cb)(dvbpsi_t *handle,
  */
 struct dvbpsi_s
 {
-    void                         *p_private;            /*!< private pointer to
-                                                          specific decoder or
-                                                          encoder */
+    dvbpsi_decoder_t             *p_decoder;          /*!< private pointer to
+                                                          specific decoder */
     /* Messages callback */
     dvbpsi_message_cb             pf_message;           /*!< Log message callback */
     enum dvbpsi_msg_level         i_msg_level;          /*!< Log level */
@@ -162,12 +167,6 @@ bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data);
 typedef struct dvbpsi_psi_section_s dvbpsi_psi_section_t;
 
 /*!
- * \typedef struct dvbpsi_decoder_s dvbpsi_decoder_t
- * \brief dvbpsi_decoder_t type definition.
- */
-typedef struct dvbpsi_decoder_s dvbpsi_decoder_t;
-
-/*!
  * \def DVBPSI_DECODER(x)
  * \brief Helper macro for casting a private decoder into a dvbpsi_decoder_t
  */
@@ -195,7 +194,7 @@ typedef void (* dvbpsi_callback_gather_t)(dvbpsi_t *p_dvbpsi,  /*!< pointer to d
  * decoder.
  */
 #define DVBPSI_DECODER_COMMON                                                     \
-    dvbpsi_callback_gather_t  pf_gather;/*!< PSI decoder's callback */                 \
+    dvbpsi_callback_gather_t  pf_gather;/*!< PSI decoder's callback */            \
     int      i_section_max_size;   /*!< Max size of a section for this decoder */ \
     uint8_t  i_continuity_counter; /*!< Continuity counter */                     \
     bool     b_discontinuity;      /*!< Discontinuity flag */                     \

@@ -59,9 +59,9 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
                       dvbpsi_tot_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
+    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_decoder;
 
     i_extension = 0; /* NOTE: force to 0 when handling TDT/TOT */
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
@@ -109,9 +109,9 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                       uint16_t i_extension)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *)p_dvbpsi->p_decoder;
     dvbpsi_demux_subdec_t* p_subdec;
 
     i_extension = 0; /* NOTE: force to 0 when handling TDT/TOT */
@@ -308,7 +308,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
                               dvbpsi_psi_section_t* p_section)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     const uint8_t i_table_id = ((p_section->i_table_id == 0x70 ||  /* TDT */
                                  p_section->i_table_id == 0x73)) ? /* TOT */

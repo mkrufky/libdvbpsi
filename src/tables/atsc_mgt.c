@@ -88,9 +88,9 @@ bool dvbpsi_atsc_AttachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
                            dvbpsi_atsc_mgt_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_decoder;
 
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension))
     {
@@ -101,7 +101,8 @@ bool dvbpsi_atsc_AttachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     }
 
     dvbpsi_atsc_mgt_decoder_t*  p_mgt_decoder;
-    p_mgt_decoder = (dvbpsi_atsc_mgt_decoder_t*)malloc(sizeof(dvbpsi_atsc_mgt_decoder_t));
+    p_mgt_decoder = (dvbpsi_atsc_mgt_decoder_t*) dvbpsi_NewDecoder(NULL,
+                                                  0, true, sizeof(dvbpsi_atsc_mgt_decoder_t));
     if(p_mgt_decoder == NULL)
         return false;
 
@@ -110,7 +111,7 @@ bool dvbpsi_atsc_AttachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
                                          dvbpsi_atsc_GatherMGTSections, DVBPSI_DECODER(p_mgt_decoder));
     if (p_subdec == NULL)
     {
-        free(p_mgt_decoder);
+        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_mgt_decoder));
         return false;
     }
 
@@ -133,9 +134,9 @@ bool dvbpsi_atsc_AttachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
 void dvbpsi_atsc_DetachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
 
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
@@ -404,7 +405,7 @@ static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
                               dvbpsi_psi_section_t * p_section)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0xC7, "ATSC MGT decoder"))
     {
@@ -413,7 +414,7 @@ static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
     }
 
     /* We have a valid MGT section */
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
     dvbpsi_atsc_mgt_decoder_t * p_mgt_decoder = (dvbpsi_atsc_mgt_decoder_t*)p_decoder;
     if (!p_mgt_decoder)
     {

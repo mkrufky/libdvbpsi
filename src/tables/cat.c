@@ -58,7 +58,7 @@ bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
                       void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private == NULL);
+    assert(p_dvbpsi->p_decoder == NULL);
 
     dvbpsi_cat_decoder_t* p_cat_decoder;
     p_cat_decoder = (dvbpsi_cat_decoder_t*) dvbpsi_NewDecoder(&dvbpsi_GatherCATSections,
@@ -71,7 +71,7 @@ bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
     p_cat_decoder->p_cb_data = p_cb_data;
     p_cat_decoder->p_building_cat = NULL;
 
-    p_dvbpsi->p_private = p_cat_decoder;
+    p_dvbpsi->p_decoder = DVBPSI_DECODER(p_cat_decoder);
     return true;
 }
 
@@ -83,16 +83,16 @@ bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
 void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     dvbpsi_cat_decoder_t* p_cat_decoder
-                        = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_private;
+                        = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_decoder;
     if (p_cat_decoder->p_building_cat)
         dvbpsi_DeleteCAT(p_cat_decoder->p_building_cat);
     p_cat_decoder->p_building_cat = NULL;
 
-    dvbpsi_DeleteDecoder(p_dvbpsi->p_private);
-    p_dvbpsi->p_private = NULL;
+    dvbpsi_DeleteDecoder(p_dvbpsi->p_decoder);
+    p_dvbpsi->p_decoder = NULL;
 }
 
 /*****************************************************************************
@@ -188,10 +188,10 @@ static void dvbpsi_ReInitCAT(dvbpsi_cat_decoder_t* p_decoder, const bool b_force
 static bool dvbpsi_CheckCAT(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
 {
     bool b_reinit = false;
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     dvbpsi_cat_decoder_t* p_cat_decoder;
-    p_cat_decoder = (dvbpsi_cat_decoder_t *)p_dvbpsi->p_private;
+    p_cat_decoder = (dvbpsi_cat_decoder_t *)p_dvbpsi->p_decoder;
 
     /* Perform a few sanity checks */
 #if 0
@@ -260,7 +260,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
                               dvbpsi_psi_section_t* p_section)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0x01, "CAT decoder"))
     {
@@ -270,7 +270,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
 
     /* */
     dvbpsi_cat_decoder_t* p_cat_decoder
-                          = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_private;
+                          = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_decoder;
 
     /* TS discontinuity check */
     if (p_cat_decoder->b_discontinuity)

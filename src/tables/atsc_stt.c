@@ -74,9 +74,9 @@ bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
                            dvbpsi_atsc_stt_callback pf_stt_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_private;
+    dvbpsi_demux_t* p_demux = (dvbpsi_demux_t*)p_dvbpsi->p_decoder;
     if (dvbpsi_demuxGetSubDec(p_demux, i_table_id, 0))
     {
         dvbpsi_error(p_dvbpsi, "ATSC STT decoder",
@@ -86,7 +86,8 @@ bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     }
 
     dvbpsi_atsc_stt_decoder_t*  p_stt_decoder;
-    p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)malloc(sizeof(dvbpsi_atsc_stt_decoder_t));
+    p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*) dvbpsi_NewDecoder(NULL,
+                                                  0, true, sizeof(dvbpsi_atsc_stt_decoder_t));
     if (p_stt_decoder == NULL)
         return false;
 
@@ -96,7 +97,7 @@ bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
                                          dvbpsi_atsc_GatherSTTSections, DVBPSI_DECODER(p_stt_decoder));
     if (p_subdec == NULL)
     {
-        free(p_stt_decoder);
+        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_stt_decoder));
         return false;
     }
 
@@ -119,9 +120,9 @@ bool dvbpsi_atsc_AttachSTT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
 void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
 
     i_extension = 0;
     dvbpsi_demux_subdec_t* p_subdec;
@@ -304,7 +305,7 @@ static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t *p_dvbpsi,
                                           dvbpsi_psi_section_t * p_section)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0xCD, "ATSC STT decoder"))
     {
@@ -313,7 +314,7 @@ static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* */
-    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_private;
+    dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
     dvbpsi_atsc_stt_decoder_t *p_stt_decoder = (dvbpsi_atsc_stt_decoder_t*)p_decoder;
     if (!p_stt_decoder)
     {

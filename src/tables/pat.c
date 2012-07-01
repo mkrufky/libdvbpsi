@@ -54,7 +54,7 @@ bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
                       void* p_cb_data)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private == NULL);
+    assert(p_dvbpsi->p_decoder == NULL);
 
     /* PSI decoder configuration and initial state */
     dvbpsi_pat_decoder_t *p_pat_decoder;
@@ -68,7 +68,7 @@ bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
     p_pat_decoder->p_cb_data = p_cb_data;
     p_pat_decoder->p_building_pat = NULL;
 
-    p_dvbpsi->p_private = (void *)p_pat_decoder;
+    p_dvbpsi->p_decoder = DVBPSI_DECODER(p_pat_decoder);
     return true;
 }
 
@@ -80,15 +80,15 @@ bool dvbpsi_AttachPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_callback pf_callback,
 void dvbpsi_DetachPAT(dvbpsi_t *p_dvbpsi)
 {
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
-    dvbpsi_pat_decoder_t* p_pat_decoder = (dvbpsi_pat_decoder_t*)p_dvbpsi->p_private;
+    dvbpsi_pat_decoder_t* p_pat_decoder = (dvbpsi_pat_decoder_t*)p_dvbpsi->p_decoder;
     if (p_pat_decoder->p_building_pat)
         dvbpsi_DeletePAT(p_pat_decoder->p_building_pat);
     p_pat_decoder->p_building_pat = NULL;
 
-    dvbpsi_DeleteDecoder(p_dvbpsi->p_private);
-    p_dvbpsi->p_private = NULL;
+    dvbpsi_DeleteDecoder(p_dvbpsi->p_decoder);
+    p_dvbpsi->p_decoder = NULL;
 }
 
 /*****************************************************************************
@@ -202,10 +202,10 @@ static void dvbpsi_ReInitPAT(dvbpsi_pat_decoder_t* p_decoder, const bool b_force
 static bool dvbpsi_CheckPAT(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section)
 {
     bool b_reinit = false;
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     dvbpsi_pat_decoder_t* p_pat_decoder;
-    p_pat_decoder = (dvbpsi_pat_decoder_t *)p_dvbpsi->p_private;
+    p_pat_decoder = (dvbpsi_pat_decoder_t *)p_dvbpsi->p_decoder;
 
     /* Perform a few sanity checks */
     if (p_pat_decoder->p_building_pat->i_ts_id != p_section->i_extension)
@@ -271,7 +271,7 @@ void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sectio
     dvbpsi_pat_decoder_t* p_pat_decoder;
 
     assert(p_dvbpsi);
-    assert(p_dvbpsi->p_private);
+    assert(p_dvbpsi->p_decoder);
 
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0x00, "PAT decoder"))
     {
@@ -280,7 +280,7 @@ void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sectio
     }
 
     /* Now we have a valid PAT section */
-    p_pat_decoder = (dvbpsi_pat_decoder_t *)p_dvbpsi->p_private;
+    p_pat_decoder = (dvbpsi_pat_decoder_t *)p_dvbpsi->p_decoder;
 
     /* TS discontinuity check */
     if (p_pat_decoder->b_discontinuity)
