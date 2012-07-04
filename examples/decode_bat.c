@@ -191,7 +191,7 @@ static void DumpBAT(void* p_zero, dvbpsi_bat_t* p_bat)
       DumpBAT_verbose(p_zero,p_bat);
       printf("\n");
   }
-  dvbpsi_DeleteBAT(p_bat);
+  dvbpsi_bat_delete(p_bat);
 }
 
 
@@ -203,7 +203,7 @@ static void NewSubtableBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
 {
   if(i_table_id == 0x4a)
   {
-    if (!dvbpsi_AttachBAT(p_dvbpsi, i_table_id, i_extension, DumpBAT, NULL))
+    if (!dvbpsi_bat_attach(p_dvbpsi, i_table_id, i_extension, DumpBAT, NULL))
         fprintf(stderr, "failed to attach BAT subdecoder\n");
   }
 }
@@ -238,7 +238,7 @@ int main(int i_argc, char* pa_argv[])
   if (i_fd < 0)
       return 1;
 
-  p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  p_dvbpsi = dvbpsi_new(&message, DVBPSI_MSG_DEBUG);
   if (p_dvbpsi == NULL)
       goto out;
   if (!dvbpsi_AttachDemux(p_dvbpsi, NewSubtableBAT, NULL))
@@ -250,7 +250,7 @@ int main(int i_argc, char* pa_argv[])
   {
     uint16_t i_pid = ((uint16_t)(data[1] & 0x1f) << 8) + data[2];
     if(i_pid == 0x11)
-      dvbpsi_PushPacket(p_dvbpsi, data);
+      dvbpsi_packet_push(p_dvbpsi, data);
     b_ok = ReadPacket(i_fd, data);
   }
 
@@ -258,7 +258,7 @@ out:
   if (p_dvbpsi)
   {
     dvbpsi_DetachDemux(p_dvbpsi);
-    dvbpsi_DeleteHandle(p_dvbpsi);
+    dvbpsi_delete(p_dvbpsi);
   }
   close(i_fd);
   return 0;

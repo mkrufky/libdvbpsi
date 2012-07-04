@@ -48,18 +48,18 @@
 #include "pmt_private.h"
 
 /*****************************************************************************
- * dvbpsi_AttachPMT
+ * dvbpsi_pmt_attach
  *****************************************************************************
  * Initialize a PMT decoder and return a handle on it.
  *****************************************************************************/
-bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
+bool dvbpsi_pmt_attach(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
                       dvbpsi_pmt_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder == NULL);
 
     dvbpsi_pmt_decoder_t* p_pmt_decoder;
-    p_pmt_decoder = (dvbpsi_pmt_decoder_t*) dvbpsi_NewDecoder(&dvbpsi_GatherPMTSections,
+    p_pmt_decoder = (dvbpsi_pmt_decoder_t*) dvbpsi_decoder_new(&dvbpsi_pmt_sections_gather,
                                             1024, true, sizeof(dvbpsi_pmt_decoder_t));
     if (p_pmt_decoder == NULL)
         return false;
@@ -76,11 +76,11 @@ bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
 }
 
 /*****************************************************************************
- * dvbpsi_DetachPMT
+ * dvbpsi_pmt_detach
  *****************************************************************************
  * Close a PMT decoder. The handle isn't valid any more.
  *****************************************************************************/
-void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
+void dvbpsi_pmt_detach(dvbpsi_t *p_dvbpsi)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
@@ -88,19 +88,19 @@ void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
     dvbpsi_pmt_decoder_t* p_pmt_decoder;
     p_pmt_decoder = (dvbpsi_pmt_decoder_t*)p_dvbpsi->p_decoder;
     if (p_pmt_decoder->p_building_pmt)
-        dvbpsi_DeletePMT(p_pmt_decoder->p_building_pmt);
+        dvbpsi_pmt_delete(p_pmt_decoder->p_building_pmt);
     p_pmt_decoder->p_building_pmt = NULL;
 
-    dvbpsi_DeleteDecoder(p_dvbpsi->p_decoder);
+    dvbpsi_decoder_delete(p_dvbpsi->p_decoder);
     p_dvbpsi->p_decoder = NULL;
 }
 
 /*****************************************************************************
- * dvbpsi_InitPMT
+ * dvbpsi_pmt_init
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_pmt_t structure.
  *****************************************************************************/
-void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
+void dvbpsi_pmt_init(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
                     uint8_t i_version, bool b_current_next, uint16_t i_pcr_pid)
 {
     assert(p_pmt);
@@ -114,26 +114,26 @@ void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
 }
 
 /*****************************************************************************
- * dvbpsi_NewPMT
+ * dvbpsi_pmt_new
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_pmt_t structure.
  *****************************************************************************/
-dvbpsi_pmt_t* dvbpsi_NewPMT(uint16_t i_program_number, uint8_t i_version,
+dvbpsi_pmt_t* dvbpsi_pmt_new(uint16_t i_program_number, uint8_t i_version,
                             bool b_current_next, uint16_t i_pcr_pid)
 {
     dvbpsi_pmt_t *p_pmt = (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));
     if(p_pmt != NULL)
-        dvbpsi_InitPMT(p_pmt, i_program_number, i_version,
+        dvbpsi_pmt_init(p_pmt, i_program_number, i_version,
                        b_current_next, i_pcr_pid);
     return p_pmt;
 }
 
 /*****************************************************************************
- * dvbpsi_EmptyPMT
+ * dvbpsi_pmt_empty
  *****************************************************************************
  * Clean a dvbpsi_pmt_t structure.
  *****************************************************************************/
-void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt)
+void dvbpsi_pmt_empty(dvbpsi_pmt_t* p_pmt)
 {
     dvbpsi_pmt_es_t* p_es = p_pmt->p_first_es;
 
@@ -152,25 +152,25 @@ void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt)
 }
 
 /*****************************************************************************
- * dvbpsi_DeletePMT
+ * dvbpsi_pmt_delete
  *****************************************************************************
  * Clean a dvbpsi_pmt_t structure.
  *****************************************************************************/
-void dvbpsi_DeletePMT(dvbpsi_pmt_t* p_pmt)
+void dvbpsi_pmt_delete(dvbpsi_pmt_t* p_pmt)
 {
     if (p_pmt)
-        dvbpsi_EmptyPMT(p_pmt);
+        dvbpsi_pmt_empty(p_pmt);
     free(p_pmt);
 }
 
 /*****************************************************************************
- * dvbpsi_PMTAddDescriptor
+ * dvbpsi_pmt_descriptor_add
  *****************************************************************************
  * Add a descriptor in the PMT.
  *****************************************************************************/
-dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
-                                             uint8_t i_tag, uint8_t i_length,
-                                             uint8_t* p_data)
+dvbpsi_descriptor_t* dvbpsi_pmt_descriptor_add(dvbpsi_pmt_t* p_pmt,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t* p_data)
 {
     dvbpsi_descriptor_t* p_descriptor;
     p_descriptor = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
@@ -187,12 +187,12 @@ dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
 }
 
 /*****************************************************************************
- * dvbpsi_PMTAddES
+ * dvbpsi_pmt_es_add
  *****************************************************************************
  * Add an ES in the PMT.
  *****************************************************************************/
-dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
-                                 uint8_t i_type, uint16_t i_pid)
+dvbpsi_pmt_es_t* dvbpsi_pmt_es_add(dvbpsi_pmt_t* p_pmt,
+                                   uint8_t i_type, uint16_t i_pid)
 {
     dvbpsi_pmt_es_t* p_es = (dvbpsi_pmt_es_t*)malloc(sizeof(dvbpsi_pmt_es_t));
     if (p_es == NULL)
@@ -216,11 +216,11 @@ dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
 }
 
 /*****************************************************************************
- * dvbpsi_PMTESAddDescriptor
+ * dvbpsi_pmt_es_descriptor_add
  *****************************************************************************
  * Add a descriptor in the PMT ES.
  *****************************************************************************/
-dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
+dvbpsi_descriptor_t* dvbpsi_pmt_es_descriptor_add(dvbpsi_pmt_es_t* p_es,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data)
 {
@@ -246,14 +246,14 @@ static void dvbpsi_ReInitPMT(dvbpsi_pmt_decoder_t* p_decoder, const bool b_force
 {
     assert(p_decoder);
 
-    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+    dvbpsi_decoder_reset(DVBPSI_DECODER(p_decoder), b_force);
 
     /* Force redecoding */
     if (b_force)
     {
         /* Free structures */
         if (p_decoder->p_building_pmt)
-            dvbpsi_DeletePMT(p_decoder->p_building_pmt);
+            dvbpsi_pmt_delete(p_decoder->p_building_pmt);
     }
     p_decoder->p_building_pmt = NULL;
 }
@@ -296,7 +296,7 @@ static bool dvbpsi_AddSectionPMT(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_decoder_t *p_pmt
     /* Initialize the structures if it's the first section received */
     if (p_pmt_decoder->p_building_pmt == NULL)
     {
-        p_pmt_decoder->p_building_pmt = dvbpsi_NewPMT(p_pmt_decoder->i_program_number,
+        p_pmt_decoder->p_building_pmt = dvbpsi_pmt_new(p_pmt_decoder->i_program_number,
                               p_section->i_version, p_section->b_current_next,
                               ((uint16_t)(p_section->p_payload_start[0] & 0x1f) << 8)
                                           | p_section->p_payload_start[1]);
@@ -307,7 +307,7 @@ static bool dvbpsi_AddSectionPMT(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_decoder_t *p_pmt
     }
 
     /* Fill the section array */
-    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_pmt_decoder), p_section))
+    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_pmt_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "PMT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -319,7 +319,7 @@ static bool dvbpsi_AddSectionPMT(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_decoder_t *p_pmt
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
+void dvbpsi_pmt_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
@@ -383,7 +383,7 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
         return;
     }
 
-    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_pmt_decoder)))
+    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_pmt_decoder)))
     {
         assert(p_pmt_decoder->pf_pmt_callback);
 
@@ -391,10 +391,10 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
         p_pmt_decoder->current_pmt = *p_pmt_decoder->p_building_pmt;
         p_pmt_decoder->b_current_valid = true;
         /* Chain the sections */
-        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_pmt_decoder));
+        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_pmt_decoder));
         /* Decode the sections */
-        dvbpsi_DecodePMTSections(p_pmt_decoder->p_building_pmt,
-                                 p_pmt_decoder->ap_sections[0]);
+        dvbpsi_pmt_sections_decode(p_pmt_decoder->p_building_pmt,
+                                   p_pmt_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_pmt_decoder->ap_sections[0]);
         p_pmt_decoder->ap_sections[0] = NULL;
@@ -407,12 +407,12 @@ void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sectio
 }
 
 /*****************************************************************************
- * dvbpsi_DecodePMTSections
+ * dvbpsi_pmt_sections_decode
  *****************************************************************************
  * PMT decoder.
  *****************************************************************************/
-void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
-                              dvbpsi_psi_section_t* p_section)
+void dvbpsi_pmt_sections_decode(dvbpsi_pmt_t* p_pmt,
+                                dvbpsi_psi_section_t* p_section)
 {
     uint8_t* p_byte, * p_end;
 
@@ -427,7 +427,7 @@ void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
             uint8_t i_tag = p_byte[0];
             uint8_t i_length = p_byte[1];
             if (i_length + 2 <= p_end - p_byte)
-                dvbpsi_PMTAddDescriptor(p_pmt, i_tag, i_length, p_byte + 2);
+                dvbpsi_pmt_descriptor_add(p_pmt, i_tag, i_length, p_byte + 2);
             p_byte += 2 + i_length;
         }
 
@@ -437,7 +437,7 @@ void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
             uint8_t i_type = p_byte[0];
             uint16_t i_pid = ((uint16_t)(p_byte[1] & 0x1f) << 8) | p_byte[2];
             uint16_t i_es_length = ((uint16_t)(p_byte[3] & 0x0f) << 8) | p_byte[4];
-            dvbpsi_pmt_es_t* p_es = dvbpsi_PMTAddES(p_pmt, i_type, i_pid);
+            dvbpsi_pmt_es_t* p_es = dvbpsi_pmt_es_add(p_pmt, i_type, i_pid);
             /* - ES descriptors */
             p_byte += 5;
             p_end = p_byte + i_es_length;
@@ -450,7 +450,7 @@ void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
                 uint8_t i_tag = p_byte[0];
                 uint8_t i_length = p_byte[1];
                 if (i_length + 2 <= p_end - p_byte)
-                    dvbpsi_PMTESAddDescriptor(p_es, i_tag, i_length, p_byte + 2);
+                    dvbpsi_pmt_es_descriptor_add(p_es, i_tag, i_length, p_byte + 2);
                 p_byte += 2 + i_length;
             }
         }
@@ -458,13 +458,12 @@ void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
     }
 }
 
-
 /*****************************************************************************
- * dvbpsi_GenPMTSections
+ * dvbpsi_pmt_sections_generate
  *****************************************************************************
  * Generate PMT sections based on the dvbpsi_pmt_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_t* p_pmt)
+dvbpsi_psi_section_t* dvbpsi_pmt_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_t* p_pmt)
 {
     dvbpsi_psi_section_t* p_result = dvbpsi_NewPSISection(1024);
     dvbpsi_psi_section_t* p_current = p_result;

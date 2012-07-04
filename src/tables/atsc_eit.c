@@ -97,7 +97,7 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     }
 
     dvbpsi_atsc_eit_decoder_t* p_eit_decoder;
-    p_eit_decoder = (dvbpsi_atsc_eit_decoder_t*) dvbpsi_NewDecoder(NULL,
+    p_eit_decoder = (dvbpsi_atsc_eit_decoder_t*) dvbpsi_decoder_new(NULL,
                                                     0, true, sizeof(dvbpsi_atsc_eit_decoder_t));
     if (p_eit_decoder == NULL)
         return false;
@@ -107,7 +107,7 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
                                          dvbpsi_atsc_GatherEITSections, DVBPSI_DECODER(p_eit_decoder));
     if (p_subdec == NULL)
     {
-        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_eit_decoder));
+        dvbpsi_decoder_delete(DVBPSI_DECODER(p_eit_decoder));
         return false;
     }
 
@@ -290,7 +290,7 @@ static void dvbpsi_ReInitEIT(dvbpsi_atsc_eit_decoder_t *p_decoder, const bool b_
 {
     assert(p_decoder);
 
-    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+    dvbpsi_decoder_reset(DVBPSI_DECODER(p_decoder), b_force);
 
     /* Force redecoding */
     if (b_force)
@@ -359,7 +359,7 @@ static bool dvbpsi_AddSectionEIT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_eit_decoder_t *
     }
 
     /* Fill the section array */
-    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_decoder), p_section))
+    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "ATSC EIT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -458,7 +458,7 @@ static void dvbpsi_atsc_GatherEITSections(dvbpsi_t * p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_eit_decoder)))
+    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_eit_decoder)))
     {
         assert(p_eit_decoder->pf_eit_callback);
 
@@ -466,7 +466,7 @@ static void dvbpsi_atsc_GatherEITSections(dvbpsi_t * p_dvbpsi,
         p_eit_decoder->current_eit = *p_eit_decoder->p_building_eit;
         p_eit_decoder->b_current_valid = true;
         /* Chain the sections */
-        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_eit_decoder));
+        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_eit_decoder));
         /* Decode the sections */
         dvbpsi_atsc_DecodeEITSections(p_eit_decoder->p_building_eit,
                                       p_eit_decoder->ap_sections[0]);

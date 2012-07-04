@@ -51,12 +51,12 @@
 #include "tot_private.h"
 
 /*****************************************************************************
- * dvbpsi_AttachTOT
+ * dvbpsi_tot_attach
  *****************************************************************************
  * Initialize a TDT/TOT subtable decoder.
  *****************************************************************************/
-bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
-                      dvbpsi_tot_callback pf_callback, void* p_cb_data)
+bool dvbpsi_tot_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                       dvbpsi_tot_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
@@ -74,18 +74,18 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     }
 
     dvbpsi_tot_decoder_t *p_tot_decoder;
-    p_tot_decoder = (dvbpsi_tot_decoder_t *) dvbpsi_NewDecoder(NULL,
+    p_tot_decoder = (dvbpsi_tot_decoder_t *) dvbpsi_decoder_new(NULL,
                                                 0, true, sizeof(dvbpsi_tot_decoder_t));
     if (p_tot_decoder == NULL)
         return false;
 
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
-    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachTOT,
-                                         dvbpsi_GatherTOTSections, DVBPSI_DECODER(p_tot_decoder));
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_tot_detach,
+                                         dvbpsi_tot_sections_gather, DVBPSI_DECODER(p_tot_decoder));
     if (p_subdec == NULL)
     {
-        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_tot_decoder));
+        dvbpsi_decoder_delete(DVBPSI_DECODER(p_tot_decoder));
         return false;
     }
 
@@ -101,11 +101,11 @@ bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
 }
 
 /*****************************************************************************
- * dvbpsi_DetachTOT
+ * dvbpsi_tot_detach
  *****************************************************************************
  * Close a TDT/TOT decoder.
  *****************************************************************************/
-void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
+void dvbpsi_tot_detach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                       uint16_t i_extension)
 {
     assert(p_dvbpsi);
@@ -130,7 +130,7 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
     dvbpsi_tot_decoder_t* p_tot_decoder;
     p_tot_decoder = (dvbpsi_tot_decoder_t*)p_subdec->p_decoder;
     if (p_tot_decoder->p_building_tot)
-        dvbpsi_DeleteTOT(p_tot_decoder->p_building_tot);
+        dvbpsi_tot_delete(p_tot_decoder->p_building_tot);
     p_tot_decoder->p_building_tot = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
@@ -138,11 +138,11 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
 }
 
 /*****************************************************************************
- * dvbpsi_InitTOT
+ * dvbpsi_tot_init
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_tot_t structure.
  *****************************************************************************/
-void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
+void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next, uint64_t i_utc_time)
 {
     assert(p_tot);
@@ -157,50 +157,50 @@ void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
 }
 
 /*****************************************************************************
- * dvbpsi_NewTOT
+ * dvbpsi_tot_new
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_tot_t structure.
  *****************************************************************************/
-dvbpsi_tot_t *dvbpsi_NewTOT(uint16_t i_ts_id, uint8_t i_version,
+dvbpsi_tot_t *dvbpsi_tot_new(uint16_t i_ts_id, uint8_t i_version,
                             bool b_current_next, uint64_t i_utc_time)
 {
   dvbpsi_tot_t *p_tot = (dvbpsi_tot_t*)malloc(sizeof(dvbpsi_tot_t));
   if (p_tot != NULL)
-        dvbpsi_InitTOT(p_tot, i_ts_id, i_version, b_current_next, i_utc_time);
+        dvbpsi_tot_init(p_tot, i_ts_id, i_version, b_current_next, i_utc_time);
   return p_tot;
 }
 
 /*****************************************************************************
- * dvbpsi_EmptyTOT
+ * dvbpsi_tot_empty
  *****************************************************************************
  * Clean a dvbpsi_tot_t structure.
  *****************************************************************************/
-void dvbpsi_EmptyTOT(dvbpsi_tot_t* p_tot)
+void dvbpsi_tot_empty(dvbpsi_tot_t* p_tot)
 {
     dvbpsi_DeleteDescriptors(p_tot->p_first_descriptor);
     p_tot->p_first_descriptor = NULL;
 }
 
 /*****************************************************************************
- * dvbpsi_NewTOT
+ * dvbpsi_tot_delete
  *****************************************************************************
  * Clean and Delete dvbpsi_tot_t structure.
  *****************************************************************************/
-void dvbpsi_DeleteTOT(dvbpsi_tot_t* p_tot)
+void dvbpsi_tot_delete(dvbpsi_tot_t* p_tot)
 {
     if (p_tot)
-        dvbpsi_EmptyTOT(p_tot);
+        dvbpsi_tot_empty(p_tot);
     free(p_tot);
 }
 
 /*****************************************************************************
- * dvbpsi_TOTAddDescriptor
+ * dvbpsi_tot_descriptor_add
  *****************************************************************************
  * Add a descriptor in the TOT.
  *****************************************************************************/
-dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
-                                             uint8_t i_tag, uint8_t i_length,
-                                             uint8_t* p_data)
+dvbpsi_descriptor_t* dvbpsi_tot_descriptor_add(dvbpsi_tot_t* p_tot,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t* p_data)
 {
     dvbpsi_descriptor_t* p_descriptor
                         = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
@@ -221,14 +221,14 @@ static void dvbpsi_ReInitTOT(dvbpsi_tot_decoder_t* p_decoder, const bool b_force
 {
     assert(p_decoder);
 
-    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+    dvbpsi_decoder_reset(DVBPSI_DECODER(p_decoder), b_force);
 
     /* Force redecoding */
     if (b_force)
     {
         /* Free structures */
         if (p_decoder->p_building_tot)
-            dvbpsi_DeleteTOT(p_decoder->p_building_tot);
+            dvbpsi_tot_delete(p_decoder->p_building_tot);
     }
     p_decoder->p_building_tot = NULL;
 }
@@ -278,7 +278,7 @@ static bool dvbpsi_AddSectionTOT(dvbpsi_t *p_dvbpsi, dvbpsi_tot_decoder_t *p_tot
     /* Initialize the structures if it's the first section received */
     if (!p_tot_decoder->p_building_tot)
     {
-        p_tot_decoder->p_building_tot = dvbpsi_NewTOT(p_section->i_extension,
+        p_tot_decoder->p_building_tot = dvbpsi_tot_new(p_section->i_extension,
                              p_section->i_version, p_section->b_current_next,
                              ((uint64_t)p_section->p_payload_start[0] << 32)
                            | ((uint64_t)p_section->p_payload_start[1] << 24)
@@ -291,7 +291,7 @@ static bool dvbpsi_AddSectionTOT(dvbpsi_t *p_dvbpsi, dvbpsi_tot_decoder_t *p_tot
     }
 
     /* Fill the section array */
-    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_tot_decoder), p_section))
+    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_tot_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "TOT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -299,13 +299,13 @@ static bool dvbpsi_AddSectionTOT(dvbpsi_t *p_dvbpsi, dvbpsi_tot_decoder_t *p_tot
 }
 
 /*****************************************************************************
- * dvbpsi_GatherTOTSections
+ * dvbpsi_tot_sections_gather
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
-                              dvbpsi_decoder_t* p_decoder,
-                              dvbpsi_psi_section_t* p_section)
+void dvbpsi_tot_sections_gather(dvbpsi_t* p_dvbpsi,
+                                dvbpsi_decoder_t* p_decoder,
+                                dvbpsi_psi_section_t* p_section)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
@@ -370,7 +370,7 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_tot_decoder)))
+    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_tot_decoder)))
     {
         assert(p_tot_decoder->pf_tot_callback);
 
@@ -378,9 +378,9 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
         p_tot_decoder->current_tot = *p_tot_decoder->p_building_tot;
         p_tot_decoder->b_current_valid = true;
         /* Chain the sections */
-        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_tot_decoder));
+        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_tot_decoder));
         /* Decode the sections */
-        dvbpsi_DecodeTOTSections(p_dvbpsi, p_tot_decoder->p_building_tot,
+        dvbpsi_tot_sections_decode(p_dvbpsi, p_tot_decoder->p_building_tot,
                                  p_tot_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_tot_decoder->ap_sections[0]);
@@ -394,11 +394,11 @@ void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
 }
 
 /*****************************************************************************
- * dvbpsi_ValidTOTSection
+ * dvbpsi_tot_section_valid
  *****************************************************************************
  * Check the CRC_32 if the section has b_syntax_indicator set.
  *****************************************************************************/
-static bool dvbpsi_ValidTOTSection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
+static bool dvbpsi_tot_section_valid(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
     if (p_section->i_table_id == 0x70)
     {
@@ -425,18 +425,18 @@ static bool dvbpsi_ValidTOTSection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_s
 }
 
 /*****************************************************************************
- * dvbpsi_DecodeTOTSections
+ * dvbpsi_tot_sections_decode
  *****************************************************************************
  * TDT/TOT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeTOTSections(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot,
+void dvbpsi_tot_sections_decode(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot,
                               dvbpsi_psi_section_t* p_section)
 {
     if (p_section)
     {
         uint8_t* p_byte;
 
-        if (!dvbpsi_ValidTOTSection(p_dvbpsi, p_section))
+        if (!dvbpsi_tot_section_valid(p_dvbpsi, p_section))
             return;
 
         p_byte = p_section->p_payload_start;
@@ -463,7 +463,7 @@ void dvbpsi_DecodeTOTSections(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot,
                 uint8_t i_tag = p_byte[0];
                 uint8_t i_length = p_byte[1];
                 if (i_length + 2 <= p_section->p_payload_end - p_byte)
-                    dvbpsi_TOTAddDescriptor(p_tot, i_tag, i_length, p_byte + 2);
+                    dvbpsi_tot_descriptor_add(p_tot, i_tag, i_length, p_byte + 2);
                 p_byte += 2 + i_length;
             }
         }
@@ -471,11 +471,11 @@ void dvbpsi_DecodeTOTSections(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot,
 }
 
 /*****************************************************************************
- * dvbpsi_GenTOTSections
+ * dvbpsi_tot_sections_generate
  *****************************************************************************
  * Generate TDT/TOT sections based on the dvbpsi_tot_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t *p_dvbpsi, dvbpsi_tot_t* p_tot)
+dvbpsi_psi_section_t* dvbpsi_tot_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_tot_t* p_tot)
 {
     dvbpsi_psi_section_t* p_result;
     dvbpsi_descriptor_t* p_descriptor = p_tot->p_first_descriptor;
@@ -562,7 +562,7 @@ dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t *p_dvbpsi, dvbpsi_tot_t* p_
         p_byte[3] = p_tot->i_crc & 0xff;
     }
 
-    if (!dvbpsi_ValidTOTSection(p_dvbpsi, p_result))
+    if (!dvbpsi_tot_section_valid(p_dvbpsi, p_result))
     {
         dvbpsi_error(p_dvbpsi, "TDT/TOT generator", "********************************************");
         dvbpsi_error(p_dvbpsi, "TDT/TOT generator", "*  Generated TDT/TOT section is invalid.   *");

@@ -109,7 +109,7 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_atsc_eit_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
- * dvbpsi_DetachEIT
+ * dvbpsi_eit_detach
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_atsc_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,

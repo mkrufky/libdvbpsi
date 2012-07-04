@@ -74,10 +74,10 @@ typedef struct dvbpsi_cat_s
 typedef void (* dvbpsi_cat_callback)(void* p_cb_data, dvbpsi_cat_t* p_new_cat);
 
 /*****************************************************************************
- * dvbpsi_AttachCAT
+ * dvbpsi_cat_attach
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi,
+ * \fn bool dvbpsi_cat_attach(dvbpsi_t *p_dvbpsi,
                             dvbpsi_cat_callback pf_callback, void* p_cb_data)
  * \brief Creation and initialization of a CAT decoder. It will be attached to p_dvbpsi
  * \param p_dvbpsi is a pointer to dvbpsi_t which holds a pointer to the decoder
@@ -85,14 +85,14 @@ typedef void (* dvbpsi_cat_callback)(void* p_cb_data, dvbpsi_cat_t* p_new_cat);
  * \param p_cb_data private data given in argument to the callback
  * \return true on success, false on failure
  */
-bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
+bool dvbpsi_cat_attach(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
                       void* p_cb_data);
 
 /*****************************************************************************
- * dvbpsi_DetachCAT
+ * dvbpsi_cat_detach
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
+ * \fn void dvbpsi_cat_detach(dvbpsi_t *p_dvbpsi)
  * \brief Destroy a CAT decoder.
  * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_dvbpsi handle holds the decoder pointer
@@ -100,13 +100,13 @@ bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
  *
  * The handle isn't valid any more.
  */
-void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi);
+void dvbpsi_cat_detach(dvbpsi_t *p_dvbpsi);
 
 /*****************************************************************************
- * dvbpsi_InitCAT/dvbpsi_NewCAT
+ * dvbpsi_cat_init/dvbpsi_cat_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat,
+ * \fn void dvbpsi_cat_init(dvbpsi_cat_t* p_cat,
                            uint8_t i_version, bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_cat_t structure.
  * \param p_cat pointer to the CAT structure
@@ -114,46 +114,46 @@ void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi);
  * \param b_current_next current next indicator
  * \return nothing.
  */
-void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat,
+void dvbpsi_cat_init(dvbpsi_cat_t* p_cat,
                     uint8_t i_version, bool b_current_next);
 
 /*!
- * \fn dvbpsi_cat_t *dvbpsi_NewCAT(uint8_t i_version,
+ * \fn dvbpsi_cat_t *dvbpsi_cat_new(uint8_t i_version,
  *                                  bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_cat_t structure.
  * \param i_version CAT version
  * \param b_current_next current next indicator
  * \return p_cat pointer to the CAT structure
  */
-dvbpsi_cat_t *dvbpsi_NewCAT(uint8_t i_version, bool b_current_next);
+dvbpsi_cat_t *dvbpsi_cat_new(uint8_t i_version, bool b_current_next);
 
 /*****************************************************************************
- * dvbpsi_EmptyCAT/dvbpsi_DeleteCAT
+ * dvbpsi_cat_empty/dvbpsi_cat_delete
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_EmptyCAT(dvbpsi_cat_t* p_cat)
+ * \fn void dvbpsi_cat_empty(dvbpsi_cat_t* p_cat)
  * \brief Clean a dvbpsi_cat_t structure.
  * \param p_cat pointer to the CAT structure
  * \return nothing.
  */
-void dvbpsi_EmptyCAT(dvbpsi_cat_t* p_cat);
+void dvbpsi_cat_empty(dvbpsi_cat_t* p_cat);
 
 /*!
- * \fn void dvbpsi_DeleteCAT(dvbpsi_cat_t *p_cat)
+ * \fn void dvbpsi_cat_delete(dvbpsi_cat_t *p_cat)
  * \brief Clean and free a dvbpsi_cat_t structure.
  * \param p_cat pointer to the CAT structure
  * \return nothing.
  */
-void dvbpsi_DeleteCAT(dvbpsi_cat_t *p_cat);
+void dvbpsi_cat_delete(dvbpsi_cat_t *p_cat);
 
 /*****************************************************************************
- * dvbpsi_CATAddDescriptor
+ * dvbpsi_cat_descriptor_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
-                                                    uint8_t i_tag,
-                                                    uint8_t i_length,
-                                                    uint8_t* p_data)
+ * \fn dvbpsi_descriptor_t* dvbpsi_cat_descriptor_add(dvbpsi_cat_t* p_cat,
+                                                      uint8_t i_tag,
+                                                      uint8_t i_length,
+                                                      uint8_t* p_data)
  * \brief Add a descriptor in the CAT.
  * \param p_cat pointer to the CAT structure
  * \param i_tag descriptor's tag
@@ -161,15 +161,15 @@ void dvbpsi_DeleteCAT(dvbpsi_cat_t *p_cat);
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
-                                             uint8_t i_tag, uint8_t i_length,
-                                             uint8_t* p_data);
+dvbpsi_descriptor_t* dvbpsi_cat_descriptor_add(dvbpsi_cat_t* p_cat,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t* p_data);
 
 /*****************************************************************************
- * dvbpsi_GenCATSections
+ * dvbpsi_cat_sections_generate
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_t *p_dvbpsi, dvbpsi_cat_t* p_cat)
+ * \fn dvbpsi_psi_section_t* dvbpsi_cat_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_cat_t* p_cat)
  * \brief CAT generator
  * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_cat CAT structure
@@ -177,7 +177,28 @@ dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
  *
  * Generate CAT sections based on the dvbpsi_cat_t structure.
  */
-dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_t *p_dvbpsi, dvbpsi_cat_t* p_cat);
+dvbpsi_psi_section_t* dvbpsi_cat_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_cat_t* p_cat);
+
+/*****************************************************************************
+ * deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+dvbpsi_handle dvbpsi_AttachCAT(dvbpsi_cat_callback pf_callback,
+                               void* p_cb_data);
+__attribute__((deprecated))
+void dvbpsi_DetachCAT(dvbpsi_handle h_dvbpsi);
+__attribute__((deprecated))
+void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat,
+                    uint8_t i_version, int b_current_next);
+__attribute__((deprecated))
+void dvbpsi_EmptyCAT(dvbpsi_cat_t* p_cat);
+__attribute__((deprecated))
+dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
+                                             uint8_t i_tag, uint8_t i_length,
+                                             uint8_t* p_data);
+__attribute__((deprecated))
+dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_cat_t* p_cat);
+
 
 #ifdef __cplusplus
 };

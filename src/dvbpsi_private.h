@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dvbpsi_private.h: main private header
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2010 VideoLAN
+ * Copyright (C) 2001-2012 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -42,7 +42,7 @@ extern uint32_t dvbpsi_crc32_table[];
  *****************************************************************************/
 
 #ifdef HAVE_VARIADIC_MACROS
-void message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...);
+void dvbpsi_message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...);
 
 #  define dvbpsi_error(hnd, src, str, x...)                             \
         message(hnd, DVBPSI_MSG_ERROR, "libdvbpsi error ("src"): " str, ##x)

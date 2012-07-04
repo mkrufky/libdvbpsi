@@ -48,17 +48,26 @@ typedef struct dvbpsi_cat_decoder_s
 } dvbpsi_cat_decoder_t;
 
 /*****************************************************************************
- * dvbpsi_GatherCATSections
+ * dvbpsi_cat_sections_gather
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherCATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
+void dvbpsi_cat_sections_gather(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
- * dvbpsi_DecodeCATSections
+ * dvbpsi_cat_sections_decode
  *****************************************************************************
  * CAT decoder.
  *****************************************************************************/
+void dvbpsi_cat_sections_decode(dvbpsi_cat_t* p_cat,
+                                dvbpsi_psi_section_t* p_section);
+
+/*****************************************************************************
+ * Deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+void dvbpsi_GatherCATSections(dvbpsi_handle* p_dvbpsi, dvbpsi_psi_section_t* p_section);
+__attribute__((deprecated))
 void dvbpsi_DecodeCATSections(dvbpsi_cat_t* p_cat,
                               dvbpsi_psi_section_t* p_section);
 

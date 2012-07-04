@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dvbpsi.c: conversion from TS packets to PSI sections
  *----------------------------------------------------------------------------
- * Copyright (C) 2001-2011 VideoLAN
+ * Copyright (C) 2001-2012 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -142,35 +142,36 @@ uint32_t dvbpsi_crc32_table[256] =
 };
 
 /*****************************************************************************
- * dvbpsi_NewHandle
+ * dvbpsi_new
  *****************************************************************************/
-dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, enum dvbpsi_msg_level level)
+dvbpsi_t *dvbpsi_new(dvbpsi_message_cb callback, enum dvbpsi_msg_level level)
 {
     dvbpsi_t *p_dvbpsi = calloc(1, sizeof(dvbpsi_t));
-    if (p_dvbpsi != NULL)
-    {
-        p_dvbpsi->p_decoder  = NULL;
-        p_dvbpsi->pf_message = callback;
-        p_dvbpsi->i_msg_level = level;
-    }
+    if (p_dvbpsi == NULL)
+        return NULL;
+
+    p_dvbpsi->p_decoder  = NULL;
+    p_dvbpsi->pf_message = callback;
+    p_dvbpsi->i_msg_level = level;
     return p_dvbpsi;
 }
 
 /*****************************************************************************
- * dvbpsi_DeleteHandle
+ * dvbpsi_delete
  *****************************************************************************/
-void dvbpsi_DeleteHandle(dvbpsi_t *p_dvbpsi)
+void dvbpsi_delete(dvbpsi_t *p_dvbpsi)
 {
     assert(p_dvbpsi->p_decoder == NULL);
-    p_dvbpsi->pf_message = NULL;
+    if (p_dvbpsi)
+        p_dvbpsi->pf_message = NULL;
     free(p_dvbpsi);
 }
 
 /*****************************************************************************
- * dvbpsi_NewDecoder
+ * dvbpsi_decoder_new
  *****************************************************************************/
 #define DVBPSI_INVALID_CC (0xFF)
-dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
+dvbpsi_decoder_t *dvbpsi_decoder_new(dvbpsi_callback_gather_t pf_gather,
     const int i_section_max_size, const bool b_discontinuity, const size_t psi_size)
 {
     assert(psi_size >= sizeof(dvbpsi_decoder_t));
@@ -197,9 +198,9 @@ dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
 }
 
 /*****************************************************************************
- * dvbpsi_ReinitDecoder
+ * dvbpsi_decoder_reset
  *****************************************************************************/
-void dvbpsi_ReInitDecoder(dvbpsi_decoder_t* p_decoder, const bool b_force)
+void dvbpsi_decoder_reset(dvbpsi_decoder_t* p_decoder, const bool b_force)
 {
     assert(p_decoder);
 
@@ -219,9 +220,9 @@ void dvbpsi_ReInitDecoder(dvbpsi_decoder_t* p_decoder, const bool b_force)
 }
 
 /*****************************************************************************
- * dvbpsi_SectionsCompleteDecoder
+ * dvbpsi_decoder_sections_completed
  *****************************************************************************/
-bool dvbpsi_SectionsCompleteDecoder(dvbpsi_decoder_t* p_decoder)
+bool dvbpsi_decoder_sections_completed(dvbpsi_decoder_t* p_decoder)
 {
     assert(p_decoder);
     assert(p_decoder->i_last_section_number <= 255);
@@ -241,9 +242,9 @@ bool dvbpsi_SectionsCompleteDecoder(dvbpsi_decoder_t* p_decoder)
 }
 
 /*****************************************************************************
- * dvbpsi_ChainSectionsDecoder
+ * dvbpsi_decoder_sections_chain
  *****************************************************************************/
-void dvbpsi_ChainSectionsDecoder(dvbpsi_decoder_t *p_decoder)
+void dvbpsi_decoder_sections_chain(dvbpsi_decoder_t *p_decoder)
 {
     assert(p_decoder);
     assert(p_decoder->i_last_section_number <= 255);
@@ -257,9 +258,9 @@ void dvbpsi_ChainSectionsDecoder(dvbpsi_decoder_t *p_decoder)
 }
 
 /*****************************************************************************
- * dvbpsi_AddSectionDecoder
+ * dvbpsi_decoder_section_add
  *****************************************************************************/
-bool dvbpsi_AddSectionDecoder(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section)
+bool dvbpsi_decoder_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section)
 {
     assert(p_decoder);
     assert(p_section);
@@ -277,9 +278,9 @@ bool dvbpsi_AddSectionDecoder(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t 
 }
 
 /*****************************************************************************
- * dvbpsi_DeleteDecoder
+ * dvbpsi_decoder_delete
  *****************************************************************************/
-void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder)
+void dvbpsi_decoder_delete(dvbpsi_decoder_t *p_decoder)
 {
     assert(p_decoder);
 
@@ -295,9 +296,9 @@ void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder)
 }
 
 /*****************************************************************************
- * dvbpsi_HasDecoder
+ * dvbpsi_decoder_present
  *****************************************************************************/
-bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi)
+bool dvbpsi_decoder_present(dvbpsi_t *p_dvbpsi)
 {
     if (p_dvbpsi && p_dvbpsi->p_decoder)
         return true;
@@ -306,11 +307,11 @@ bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi)
 }
 
 /*****************************************************************************
- * dvbpsi_PushPacket
+ * dvbpsi_packet_push
  *****************************************************************************
  * Injection of a TS packet into a PSI decoder.
  *****************************************************************************/
-bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
+bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
 {
     uint8_t i_expected_counter;           /* Expected continuity counter */
     dvbpsi_psi_section_t* p_section;      /* Current section */
@@ -431,7 +432,7 @@ bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
                 p_decoder->b_complete_header = true;
                 /* Compute p_section->i_length and update p_decoder->i_need */
                 p_decoder->i_need = p_section->i_length
-                                 =   ((uint16_t)(p_section->p_data[1] & 0xf)) << 8
+                                  = ((uint16_t)(p_section->p_data[1] & 0xf)) << 8
                                        | p_section->p_data[2];
                 /* Check that the section isn't too long */
                 if (p_decoder->i_need > p_decoder->i_section_max_size - 3)
@@ -476,7 +477,7 @@ bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
                     p_section->i_table_id = p_section->p_data[0];
                     if (p_section->b_syntax_indicator)
                     {
-                        p_section->i_extension =   (p_section->p_data[3] << 8)
+                        p_section->i_extension =  (p_section->p_data[3] << 8)
                                                  | p_section->p_data[4];
                         p_section->i_version = (p_section->p_data[5] & 0x3e) >> 1;
                         p_section->b_current_next = p_section->p_data[5] & 0x1;
@@ -565,7 +566,7 @@ bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
 #define DVBPSI_MSG_FORMAT "libdvbpsi (%s): %s"
 
 #ifdef HAVE_VARIADIC_MACROS
-void message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char *fmt, ...)
+void dvbpsi_message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char *fmt, ...)
 {
     if ((dvbpsi->i_msg_level > DVBPSI_MSG_NONE) &&
         (level <= dvbpsi->i_msg_level))

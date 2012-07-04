@@ -111,7 +111,7 @@ typedef void (* dvbpsi_eit_callback)(void* p_cb_data, dvbpsi_eit_t* p_new_eit);
  * dvbpsi_AttachEIT
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+ * \fn bool dvbpsi_eit_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_eit_callback pf_callback,
                                void* p_cb_data)
  * \brief Creation and initialization of a EIT decoder.
@@ -122,14 +122,14 @@ typedef void (* dvbpsi_eit_callback)(void* p_cb_data, dvbpsi_eit_t* p_new_eit);
  * \param p_cb_data private data given in argument to the callback.
  * \return true on success, false on failure
  */
-bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+bool dvbpsi_eit_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_eit_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
- * dvbpsi_DetachEIT
+ * dvbpsi_eit_detach
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+ * \fn void dvbpsi_eit_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension)
  * \brief Destroy a EIT decoder.
  * \param p_dvbpsi dvbpsi handle pointing to Subtable demultiplexor to which the
@@ -138,13 +138,13 @@ bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * \param i_extension Table ID extension, here service ID.
  * \return nothing.
  */
-void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
+void dvbpsi_eit_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
 
 /*****************************************************************************
- * dvbpsi_InitEIT/dvbpsi_NewEIT
+ * dvbpsi_eit_init/dvbpsi_eit_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id,
+ * \fn void dvbpsi_eit_init(dvbpsi_eit_t* p_eit, uint16_t i_service_id,
           uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
           uint16_t i_network_id, uint8_t i_segment_last_section_number,
           uint8_t i_last_table_id)
@@ -159,13 +159,13 @@ void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \param i_last_table_id i_last_table_id
  * \return nothing.
  */
-void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
+void dvbpsi_eit_init(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
                     bool b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
                     uint8_t i_segment_last_section_number,
                     uint8_t i_last_table_id);
 
 /*!
- * \fn dvbpsi_eit_t* dvbpsi_NewEIT(uint16_t i_service_id,
+ * \fn dvbpsi_eit_t* dvbpsi_eit_new(uint16_t i_service_id,
           uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
           uint16_t i_network_id, uint8_t i_segment_last_section_number,
           uint8_t i_last_table_id)
@@ -179,35 +179,35 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
  * \param i_last_table_id i_last_table_id
  * \return p_eit pointer to the EIT structure
  */
-dvbpsi_eit_t* dvbpsi_NewEIT(uint16_t i_service_id,
+dvbpsi_eit_t* dvbpsi_eit_new(uint16_t i_service_id,
           uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
           uint16_t i_network_id, uint8_t i_segment_last_section_number,
           uint8_t i_last_table_id);
 
 /*****************************************************************************
- * dvbpsi_EmptyEIT/dvbpsi_DeleteEIT
+ * dvbpsi_eit_empty/dvbpsi_eit_delete
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit)
+ * \fn void dvbpsi_eit_empty(dvbpsi_eit_t* p_eit)
  * \brief Clean a dvbpsi_eit_t structure.
  * \param p_eit pointer to the EIT structure
  * \return nothing.
  */
-void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit);
+void dvbpsi_eit_empty(dvbpsi_eit_t* p_eit);
 
 /*!
- * \fn void dvbpsi_DeleteEIT(dvbpsi_eit_t *p_eit)
+ * \fn void dvbpsi_eit_delete(dvbpsi_eit_t *p_eit)
  * \brief Clean and free a dvbpsi_eit_t structure.
  * \param p_eit pointer to the EIT structure
  * \return nothing.
  */
-void dvbpsi_DeleteEIT(dvbpsi_eit_t* p_eit);
+void dvbpsi_eit_delete(dvbpsi_eit_t* p_eit);
 
 /*****************************************************************************
- * dvbpsi_EITAddEvent
+ * dvbpsi_eit_event_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
+ * \fn dvbpsi_eit_event_t* dvbpsi_eit_event_add(dvbpsi_eit_t* p_eit,
                                               uint16_t i_event_id,
                                               uint64_t i_start_time,
                                               uint32_t i_duration,
@@ -222,15 +222,15 @@ void dvbpsi_DeleteEIT(dvbpsi_eit_t* p_eit);
  * \param b_free_ca Free CA flag
  * \return a pointer to the added service description.
  */
-dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
+dvbpsi_eit_event_t* dvbpsi_eit_event_add(dvbpsi_eit_t* p_eit,
     uint16_t i_event_id, uint64_t i_start_time, uint32_t i_duration,
     uint8_t i_running_status, bool b_free_ca);
 
 /*****************************************************************************
- * dvbpsi_EITEventAddDescriptor
+ * dvbpsi_eit_event_descriptor_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(
+ * \fn dvbpsi_descriptor_t* dvbpsi_eit_event_descriptor_add(
                                                dvbpsi_eit_event_t* p_event,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data)
@@ -241,18 +241,18 @@ dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(
+dvbpsi_descriptor_t* dvbpsi_eit_event_descriptor_add(
                                                dvbpsi_eit_event_t* p_event,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data);
 
 /*****************************************************************************
- * dvbpsi_GenEITSections
+ * dvbpsi_eit_sections_generate
  *****************************************************************************
  * Generate EIT sections based on the dvbpsi_eit_t structure.
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t *dvbpsi_GenEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_eit_t *p_eit,
+ * \fn dvbpsi_psi_section_t *dvbpsi_eit_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_eit_t *p_eit,
  *                                                 uint8_t i_table_id);
  * \brief Generate a EIT section based on the information provided in p_eit.
  * \param p_dvbpsi pointer to Subtable demultiplexor to which the EIT decoder is attached.
@@ -260,8 +260,33 @@ dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(
  * \param i_table_id the EIT table id to use
  * \return a pointer to a new PSI section
  */
-dvbpsi_psi_section_t *dvbpsi_GenEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_eit_t *p_eit,
+dvbpsi_psi_section_t *dvbpsi_eit_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_eit_t *p_eit,
                                             uint8_t i_table_id);
+
+/*****************************************************************************
+ * deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+int dvbpsi_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+          uint16_t i_extension, dvbpsi_eit_callback pf_callback,
+                               void* p_cb_data);
+__attribute__((deprecated))
+void dvbpsi_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+          uint16_t i_extension);
+__attribute__((deprecated))
+void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
+                    int b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
+                    uint8_t i_segment_last_section_number,
+                    uint8_t i_last_table_id);
+__attribute__((deprecated)) void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit);
+__attribute__((deprecated))
+dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(dvbpsi_eit_event_t* p_event,
+                                                  uint8_t i_tag, uint8_t i_length,
+                                                  uint8_t* p_data);
+__attribute__((deprecated))
+dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
+    uint16_t i_event_id, uint64_t i_start_time, uint32_t i_duration,
+    uint8_t i_running_status, int b_free_ca);
 
 #ifdef __cplusplus
 };

@@ -107,10 +107,10 @@ typedef struct dvbpsi_sdt_s
 typedef void (* dvbpsi_sdt_callback)(void* p_cb_data, dvbpsi_sdt_t* p_new_sdt);
 
 /*****************************************************************************
- * dvbpsi_AttachSDT
+ * dvbpsi_sdt_attach
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+ * \fn bool dvbpsi_sdt_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sdt_callback pf_callback,
                                void* p_cb_data)
  * \brief Creation and initialization of a SDT decoder. It is attached to p_dvbpsi.
@@ -121,14 +121,14 @@ typedef void (* dvbpsi_sdt_callback)(void* p_cb_data, dvbpsi_sdt_t* p_new_sdt);
  * \param p_cb_data private data given in argument to the callback.
  * \return true on success, false on failure
  */
-bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+bool dvbpsi_sdt_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
                       dvbpsi_sdt_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
- * dvbpsi_DetachSDT
+ * dvbpsi_sdt_detach
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+ * \fn void dvbpsi_sdt_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
                              uint16_t i_extension)
  * \brief Destroy a SDT decoder.
  * \param p_dvbpsi pointer holding decoder/demuxer structure
@@ -136,13 +136,13 @@ bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \param i_extension Table ID extension, here TS ID.
  * \return nothing.
  */
-void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
+void dvbpsi_sdt_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
 
 /*****************************************************************************
- * dvbpsi_InitSDT/dvbpsi_NewSDT
+ * dvbpsi_sdt_init/dvbpsi_NewSDT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_InitSDT(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id,
+ * \fn void dvbpsi_sdt_init(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id,
           uint8_t i_version, bool b_current_next, uint16_t i_network_id)
  * \brief Initialize a user-allocated dvbpsi_sdt_t structure.
  * \param p_sdt pointer to the SDT structure
@@ -152,11 +152,11 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \param i_network_id original network id
  * \return nothing.
  */
-void dvbpsi_InitSDT(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
+void dvbpsi_sdt_init(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next, uint16_t i_network_id);
 
 /*!
- * \fn dvbpsi_sdt_t *dvbpsi_NewSDT(uint16_t i_ts_id, uint8_t i_version,
+ * \fn dvbpsi_sdt_t *dvbpsi_sdt_new(uint16_t i_ts_id, uint8_t i_version,
                                     bool b_current_next, uint16_t i_network_id)
  * \brief Allocate and initialize a new dvbpsi_sdt_t structure.
  * \param i_ts_id transport stream ID
@@ -165,33 +165,33 @@ void dvbpsi_InitSDT(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
  * \param i_network_id original network id
  * \return p_sdt pointer to the SDT structure
  */
-dvbpsi_sdt_t *dvbpsi_NewSDT(uint16_t i_ts_id, uint8_t i_version,
+dvbpsi_sdt_t *dvbpsi_sdt_new(uint16_t i_ts_id, uint8_t i_version,
                              bool b_current_next, uint16_t i_network_id);
 
 /*****************************************************************************
- * dvbpsi_EmptySDT/dvbpsi_DeleteSDT
+ * dvbpsi_sdt_empty/dvbpsi_sdt_delete
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_EmptySDT(dvbpsi_sdt_t* p_sdt)
+ * \fn void dvbpsi_sdt_empty(dvbpsi_sdt_t* p_sdt)
  * \brief Clean a dvbpsi_sdt_t structure.
  * \param p_sdt pointer to the SDT structure
  * \return nothing.
  */
-void dvbpsi_EmptySDT(dvbpsi_sdt_t *p_sdt);
+void dvbpsi_sdt_empty(dvbpsi_sdt_t *p_sdt);
 
 /*!
- * \fn void dvbpsi_DeleteSDT(dvbpsi_sdt_t *p_sdt)
+ * \fn dvbpsi_sdt_delete(dvbpsi_sdt_t *p_sdt)
  * \brief Clean and free a dvbpsi_sdt_t structure.
  * \param p_sdt pointer to the SDT structure
  * \return nothing.
  */
-void dvbpsi_DeleteSDT(dvbpsi_sdt_t *p_sdt);
+void dvbpsi_sdt_delete(dvbpsi_sdt_t *p_sdt);
 
 /*****************************************************************************
- * dvbpsi_SDTAddService
+ * dvbpsi_sdt_service_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_sdt_service_t* dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
+ * \fn dvbpsi_sdt_service_t* dvbpsi_sdt_service_add(dvbpsi_sdt_t* p_sdt,
                                                   uint16_t i_service_id,
                                                   bool b_eit_schedule,
                                                   bool b_eit_present,
@@ -206,15 +206,15 @@ void dvbpsi_DeleteSDT(dvbpsi_sdt_t *p_sdt);
  * \param b_free_ca Free CA flag
  * \return a pointer to the added service description.
  */
-dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
+dvbpsi_sdt_service_t *dvbpsi_sdt_service_add(dvbpsi_sdt_t* p_sdt,
     uint16_t i_service_id, bool b_eit_schedule, bool b_eit_present,
     uint8_t i_running_status, bool b_free_ca);
 
 /*****************************************************************************
- * dvbpsi_SDTServiceAddDescriptor
+ * dvbpsi_sdt_service_descriptor_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
+ * \fn dvbpsi_descriptor_t *dvbpsi_sdt_service_descriptor_add(
                                                dvbpsi_sdt_service_t *p_service,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data)
@@ -225,18 +225,18 @@ dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
+dvbpsi_descriptor_t *dvbpsi_sdt_service_descriptor_add(
                                                dvbpsi_sdt_service_t *p_service,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data);
 
 /*****************************************************************************
- * dvbpsi_GenSDTSections
+ * dvbpsi_sdt_sections_generate
  *****************************************************************************
  * Generate SDT sections based on the dvbpsi_sdt_t structure.
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenSDTSections(dvbpsi_t *p_dvbpsi,
+ * \fn dvbpsi_psi_section_t* dvbpsi_sdt_sections_generate(dvbpsi_t *p_dvbpsi,
                                                     dvbpsi_sdt_t * p_sdt)
  * \brief SDT generator
  * \param p_dvbpsi handle to dvbpsi with attached decoder
@@ -245,7 +245,33 @@ dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
  *
  * Generate SDT sections based on the dvbpsi_sdt_t structure.
  */
-dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_t * p_sdt);
+dvbpsi_psi_section_t *dvbpsi_sdt_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_t * p_sdt);
+
+/*****************************************************************************
+ * deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+int dvbpsi_AttachSDT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+          uint16_t i_extension, dvbpsi_sdt_callback pf_callback,
+                               void* p_cb_data);
+__attribute__((deprecated))
+void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+          uint16_t i_extension);
+__attribute__((deprecated))
+void dvbpsi_InitSDT(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
+                    int b_current_next, uint16_t i_network_id);
+__attribute__((deprecated)) void dvbpsi_EmptySDT(dvbpsi_sdt_t *p_sdt);
+__attribute__((deprecated))
+dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
+    uint16_t i_service_id, int b_eit_schedule, int b_eit_present,
+    uint8_t i_running_status, int b_free_ca);
+__attribute__((deprecated))
+dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
+                                               dvbpsi_sdt_service_t *p_service,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t *p_data);
+__attribute__((deprecated))
+dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t * p_sdt);
 
 #ifdef __cplusplus
 };

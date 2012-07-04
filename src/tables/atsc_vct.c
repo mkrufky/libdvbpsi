@@ -110,7 +110,7 @@ bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
     }
 
     dvbpsi_atsc_vct_decoder_t*  p_vct_decoder;
-    p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*) dvbpsi_NewDecoder(NULL,
+    p_vct_decoder = (dvbpsi_atsc_vct_decoder_t*) dvbpsi_decoder_new(NULL,
                                                   0, true, sizeof(dvbpsi_atsc_vct_decoder_t));
     if (p_vct_decoder == NULL)
         return false;
@@ -121,7 +121,7 @@ bool dvbpsi_atsc_AttachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
                                          dvbpsi_atsc_GatherVCTSections, DVBPSI_DECODER(p_vct_decoder));
     if (p_subdec == NULL)
     {
-        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_vct_decoder));
+        dvbpsi_decoder_delete(DVBPSI_DECODER(p_vct_decoder));
         return false;
     }
 
@@ -359,7 +359,7 @@ static void dvbpsi_ReInitVCT(dvbpsi_atsc_vct_decoder_t *p_decoder, const bool b_
 {
     assert(p_decoder);
 
-    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+    dvbpsi_decoder_reset(DVBPSI_DECODER(p_decoder), b_force);
 
     /* Force redecoding */
     if (b_force)
@@ -427,7 +427,7 @@ static bool dvbpsi_AddSectionVCT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_vct_decoder_t *
     }
 
     /* Fill the section array */
-    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_vct_decoder), p_section))
+    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_vct_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "ATSC VCT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -524,7 +524,7 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_vct_decoder)))
+    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_vct_decoder)))
     {
         assert(p_vct_decoder->pf_vct_callback);
 
@@ -533,7 +533,7 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
         p_vct_decoder->b_current_valid = true;
 
         /* Chain the sections */
-        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_vct_decoder));
+        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_vct_decoder));
         /* Decode the sections */
         dvbpsi_atsc_DecodeVCTSections(p_vct_decoder->p_building_vct,
                                       p_vct_decoder->ap_sections[0]);

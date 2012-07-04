@@ -236,7 +236,7 @@ static void DumpPMT(void* p_zero, dvbpsi_pmt_t* p_pmt)
     DumpDescriptors("    |  ]", p_es->p_first_descriptor);
     p_es = p_es->p_next;
   }
-  dvbpsi_DeletePMT(p_pmt);
+  dvbpsi_pmt_delete(p_pmt);
 }
 
 static void message(dvbpsi_t *handle, const dvbpsi_msg_level_t level, const char* msg)
@@ -273,11 +273,11 @@ int main(int i_argc, char* pa_argv[])
   i_program_number = atoi(pa_argv[2]);
   i_pmt_pid = atoi(pa_argv[3]);
 
-  p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  p_dvbpsi = dvbpsi_new(&message, DVBPSI_MSG_DEBUG);
   if (p_dvbpsi == NULL)
         goto out;
 
-  if (!dvbpsi_AttachPMT(p_dvbpsi, i_program_number, DumpPMT, NULL))
+  if (!dvbpsi_pmt_attach(p_dvbpsi, i_program_number, DumpPMT, NULL))
       goto out;
 
   b_ok = ReadPacket(i_fd, data);
@@ -286,15 +286,15 @@ int main(int i_argc, char* pa_argv[])
   {
     uint16_t i_pid = ((uint16_t)(data[1] & 0x1f) << 8) + data[2];
     if(i_pid == i_pmt_pid)
-      dvbpsi_PushPacket(p_dvbpsi, data);
+      dvbpsi_packet_push(p_dvbpsi, data);
     b_ok = ReadPacket(i_fd, data);
   }
 
 out:
   if (p_dvbpsi)
   {
-    dvbpsi_DetachPMT(p_dvbpsi);
-    dvbpsi_DeleteHandle(p_dvbpsi);
+    dvbpsi_pmt_detach(p_dvbpsi);
+    dvbpsi_delete(p_dvbpsi);
   }
   close(i_fd);
 

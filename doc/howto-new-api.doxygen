@@ -4,23 +4,23 @@
 needed some cleanup. The following issue are addressed in this version:</p>
 
 <ul>
-<li>explicit library handle allocation with <em>dvbpsi_NewHandle()</em> (delete with <em>dvbpsi_DeleteHandle()</em>)</li>
+<li>explicit library handle allocation with <em>dvbpsi_new()</em> (delete with <em>dvbpsi_delete()</em>)</li>
 <li>consistent API for table and descriptor decoder/encoders</li>
 <li>message callback function for easier intergrating libdvbpsi logging in applications</li>
 </ul>
 
 <p>The biggest change is the addition off an explicit dvbpsi_t pointer to
 ALL table decoder and encoder API's. This dvbpsi_t pointer is a dvbpsi handle
-which must be allocated using <em>dvbpsi_NewHandle()</em> and takes a callback function
-for logging. The handle must be deleted with <em>dvbpsi_DeleteHandle()</em> if it is no
+which must be allocated using <em>dvbpsi_new()</em> and takes a callback function
+for logging. The handle must be deleted with <em>dvbpsi_delete()</em> if it is no
 longer needed.
 </p>
 
-<code>dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, enum dvbpsi_msg_level level);</code>
+<code>dvbpsi_t *dvbpsi_new(dvbpsi_message_cb callback, enum dvbpsi_msg_level level);</code>
 
-<p>The dvbpsi_t pointer must be released by calling <em>dvbpsi_DeleteHandle()</em></p>
+<p>The dvbpsi_t pointer must be released by calling <em>dvbpsi_delete()</em></p>
 
-<code>void dvbpsi_DeleteHandle(dvbpsi_t *handle);</code>
+<code>void dvbpsi_delete(dvbpsi_t *handle);</code>
 
 <h2>Example</h2>
 
@@ -41,12 +41,12 @@ and especially to the file examples/dvbinfo/libdvbpsi.c from the dvbinfo applica
 <p>The same scheme is used for other PSI tables too, this translate to the following code sequence:</p>
 
 <code>
-&nbsp; dvbpsi_t *handle = dvbpsi_NewHandle(&dvbpsi_message, DVBPSI_MSG_DEBUG); <br />
+&nbsp; dvbpsi_t *handle = dvbpsi_new(&dvbpsi_message, DVBPSI_MSG_DEBUG); <br />
 &nbsp; if (handle == NULL) <br />
 &nbsp;&nbsp; goto error; <br />
-&nbsp; if (!dvbpsi_AttachPAT(handle, handle_PAT, data)) <br />
+&nbsp; if (!dvbpsi_pat_attach(handle, handle_PAT, data)) <br />
 &nbsp; { <br />
-&nbsp; &nbsp; dvbpsi_DeleteHandle(handle); <br />
+&nbsp; &nbsp; dvbpsi_delete(handle); <br />
 &nbsp; &nbsp; handle = NULL; <br />
 &nbsp; &nbsp; goto error; <br />
 &nbsp; } <br />
@@ -54,10 +54,10 @@ and especially to the file examples/dvbinfo/libdvbpsi.c from the dvbinfo applica
 &nbsp; return 0; <br />
 &nbsp; <br />
 error: <br />
-&nbsp; if (dvbpsi_HasDecoder(handle)) <br />
-&nbsp; &nbsp; dvbpsi_DetachPAT(andle); <br />
+&nbsp; if (dvbpsi_decoder_present(handle)) <br />
+&nbsp; &nbsp; dvbpsi_pat_detach(handle); <br />
 &nbsp; if (handle) <br />
-&nbsp; &nbsp;  dvbpsi_DeleteHandle(handle); <br />
+&nbsp; &nbsp;  dvbpsi_delete(handle); <br />
 &nbsp; return -1; <br />
 </code>
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
  * dvbpsi.h
- * Copyright (C) 2001-2011 VideoLAN
+ * Copyright (C) 2001-2012 VideoLAN
  * $Id$
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -25,6 +25,7 @@
 /*!
  * \file <dvbpsi.h>
  * \author Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *         Jean-Paul Saman <jpsaman@videolan.org>
  * \brief Application interface for all DVB/PSI decoders.
  *
  * Application interface for all DVB/PSI decoders. The generic decoder
@@ -76,11 +77,20 @@ typedef void (* dvbpsi_message_cb)(dvbpsi_t *handle,
                                    const dvbpsi_msg_level_t level,
                                    const char* msg);
 
+/*****************************************************************************
+ * dvbpsi_decoder_t
+ *****************************************************************************/
 /*!
  * \typedef struct dvbpsi_decoder_s dvbpsi_decoder_t
  * \brief dvbpsi_decoder_t type definition.
  */
 typedef struct dvbpsi_decoder_s dvbpsi_decoder_t;
+
+/*!
+ * \def DVBPSI_DECODER(x)
+ * \brief Helper macro for casting a private decoder into a dvbpsi_decoder_t
+ */
+#define DVBPSI_DECODER(x) ((dvbpsi_decoder_t *)(x))
 
 /*****************************************************************************
  * dvbpsi_t
@@ -112,10 +122,10 @@ struct dvbpsi_s
 };
 
 /*****************************************************************************
- * dvbpsi_NewHandle
+ * dvbpsi_new
  *****************************************************************************/
 /*!
- * \fn dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, enum dvbpsi_msg_level level)
+ * \fn dvbpsi_t *dvbpsi_new(dvbpsi_message_cb callback, enum dvbpsi_msg_level level)
  * \brief Create a new dvbpsi_t handle to be used by PSI decoders or encoders
  * \param callback message callback handler, if NULL then no errors, warnings
  *        or debug messages will be sent to the caller application
@@ -123,29 +133,29 @@ struct dvbpsi_s
  * \return pointer to dvbpsi_t malloced data
  *
  * Creates a handle to use with PSI decoder and encoder API functions. The
- * handle must be freed with dvbpsi_DeleteHandle().
+ * handle must be freed with dvbpsi_delete().
  */
-dvbpsi_t *dvbpsi_NewHandle(dvbpsi_message_cb callback, enum dvbpsi_msg_level level);
+dvbpsi_t *dvbpsi_new(dvbpsi_message_cb callback, enum dvbpsi_msg_level level);
 
 /*****************************************************************************
- * dvbpsi_DeleteHandle
+ * dvbpsi_delete
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DeleteHandle(dvbpsi_t *handle)
- * \brief Deletes a dvbpsi_t handle created with dvbpsi_NewHandle
- * \param handle pointer to dvbpsi_t malloced data
+ * \fn void dvbpsi_delete(dvbpsi_t *p_dvbpsi)
+ * \brief Deletes a dvbpsi_t handle created with dvbpsi_new
+ * \param p_dvbpsi pointer to dvbpsi_t malloced data
  * \return nothing
  *
  * Delets a dvbpsi_t handle by calling free(handle). Make sure to detach any
  * decoder of encoder before deleting the dvbpsi handle.
  */
-void dvbpsi_DeleteHandle(dvbpsi_t *handle);
+void dvbpsi_delete(dvbpsi_t *p_dvbpsi);
 
 /*****************************************************************************
- * dvbpsi_PushPacket
+ * dvbpsi_packet_push
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
+ * \fn bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
  * \brief Injection of a TS packet into a PSI decoder.
  * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_data pointer to a 188 bytes playload of a TS packet
@@ -153,11 +163,10 @@ void dvbpsi_DeleteHandle(dvbpsi_t *handle);
  *
  * Injection of a TS packet into a PSI decoder.
  */
-bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data);
+bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, uint8_t* p_data);
 
 /*****************************************************************************
- * The following definitions are just here to allow external decoders but
- * shouldn't be used for any other purpose.
+ * dvbpsi_psi_section_t
  *****************************************************************************/
 
 /*!
@@ -165,12 +174,6 @@ bool dvbpsi_PushPacket(dvbpsi_t *p_dvbpsi, uint8_t* p_data);
  * \brief dvbpsi_psi_section_t type definition.
  */
 typedef struct dvbpsi_psi_section_s dvbpsi_psi_section_t;
-
-/*!
- * \def DVBPSI_DECODER(x)
- * \brief Helper macro for casting a private decoder into a dvbpsi_decoder_t
- */
-#define DVBPSI_DECODER(x) ((dvbpsi_decoder_t *)(x))
 
 /*****************************************************************************
  * dvbpsi_callback_gather_t
@@ -184,7 +187,7 @@ typedef void (* dvbpsi_callback_gather_t)(dvbpsi_t *p_dvbpsi,  /*!< pointer to d
                             dvbpsi_psi_section_t* p_section);  /*!< pointer to psi section */
 
 /*****************************************************************************
- * dvbpsi_decoder_t
+ * struct dvbpsi_decoder_s
  *****************************************************************************/
 /*!
  * \struct dvbpsi_decoder_s
@@ -211,10 +214,10 @@ struct dvbpsi_decoder_s
 };
 
 /*****************************************************************************
- * dvbpsi_NewDecoder
+ * dvbpsi_decoder_new
  *****************************************************************************/
 /*!
- * \fn dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
+ * \fn dvbpsi_decoder_t *dvbpsi_decoder_new(dvbpsi_callback_gather_t pf_gather,
  *     const int i_section_max_size, const bool b_discontinuity, const size_t psi_size);
  * \brief Create a new dvbpsi_decoder_t.
  * \param pf_gather pointer to gather function for PSI decoder.
@@ -224,18 +227,18 @@ struct dvbpsi_decoder_s
  * \return pointer to dvbpsi_decoder_t
  *
  * Creates a dvbpsi_decoder_t pointer to struct dvbpsi_decoder_s. It should be
- * delete with @see dvbpsi_DeleteDecoder() function.
+ * delete with @see dvbpsi_decoder_delete() function.
  */
-dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
+dvbpsi_decoder_t *dvbpsi_decoder_new(dvbpsi_callback_gather_t pf_gather,
                                     const int i_section_max_size,
                                     const bool b_discontinuity,
                                     const size_t psi_size);
 
 /*****************************************************************************
- * dvbpsi_DeleteDecoder
+ * dvbpsi_decoder_delete
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder);
+ * \fn void dvbpsi_decoder_delete(dvbpsi_decoder_t *p_decoder);
  * \brief Deletes decoder struct and frees its memory
  * \param p_decoder pointer to dvbpsi_decoder_t with decoder
  * \return nothing
@@ -243,60 +246,60 @@ dvbpsi_decoder_t *dvbpsi_NewDecoder(dvbpsi_callback_gather_t pf_gather,
  * Delets a dvbpsi_t handle by calling free(handle). Make sure to detach any
  * decoder of encoder before deleting the dvbpsi handle.
  */
-void dvbpsi_DeleteDecoder(dvbpsi_decoder_t *p_decoder);
+void dvbpsi_decoder_delete(dvbpsi_decoder_t *p_decoder);
 
 /*****************************************************************************
- * dvbpsi_ReinitDecoder
+ * dvbpsi_decoder_reset
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_ReInitDecoder(dvbpsi_decoder_t* p_decoder, const bool b_force);
- * \brief Reinit a decoder.
+ * \fn void dvbpsi_decoder_reset(dvbpsi_decoder_t* p_decoder, const bool b_force);
+ * \brief Resets a decoder internal state.
  * \param p_decoder pointer to dvbpsi_decoder_t with decoder
  * \param b_force  If 'b_force' is true then dvbpsi_decoder_t::b_current_valid
  * is set to false, invalidating the current section.
  * \return nothing
  */
-void dvbpsi_ReInitDecoder(dvbpsi_decoder_t* p_decoder, const bool b_force);
+void dvbpsi_decoder_reset(dvbpsi_decoder_t* p_decoder, const bool b_force);
 
 /*****************************************************************************
- * dvbpsi_SectionsCompleteDecoder
+ * dvbpsi_decoder_sections_completed
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_SectionsCompleteDecoder(dvbpsi_decoder_t* p_decoder);
- * \brief Have all sections for this decoder been received.
+ * \fn bool dvbpsi_decoder_sections_completed(dvbpsi_decoder_t* p_decoder);
+ * \brief Have all sections for this decoder been received?
  * \param p_decoder pointer to dvbpsi_decoder_t with decoder
  * \return true when all PSI sections have been received, false otherwise
  */
-bool dvbpsi_SectionsCompleteDecoder(dvbpsi_decoder_t* p_decoder);
+bool dvbpsi_decoder_sections_completed(dvbpsi_decoder_t* p_decoder);
 
 /*****************************************************************************
- * dvbpsi_ChainSectionsDecoder
+ * dvbpsi_decoder_sections_chain
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_ChainSectionsDecoder(dvbpsi_decoder_t *p_decoder);
+ * \fn void dvbpsi_decoder_sections_chain(dvbpsi_decoder_t *p_decoder);
  * \brief Chain the sections if the last has been received.
  * \param p_decoder pointer to dvbpsi_decoder_t with decoder
  * \return nothing
  */
-void dvbpsi_ChainSectionsDecoder(dvbpsi_decoder_t *p_decoder);
+void dvbpsi_decoder_sections_chain(dvbpsi_decoder_t *p_decoder);
 
 /*****************************************************************************
- * dvbpsi_AddSectionDecoder
+ * dvbpsi_decoder_section_add
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_AddSectionDecoder(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section);
+ * \fn bool dvbpsi_decoder_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section);
  * \brief Add a section to the dvbpsi_decoder_t::ap_sections[] array.
  * \param p_decoder pointer to dvbpsi_decoder_t with decoder
  * \param p_section PSI section to add to dvbpsi_decoder_t::ap_sections[] array
  * \return true if it overwrites a earlier section, false otherwise
  */
-bool dvbpsi_AddSectionDecoder(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section);
+bool dvbpsi_decoder_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section);
 
 /*****************************************************************************
- * dvbpsi_HasDecoder
+ * dvbpsi_decoder_present
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi);
+ * \fn bool dvbpsi_decoder_present(dvbpsi_t *p_dvbpsi);
  * \brief Determines if a decoder has been attached to dvbpsi_t handle
  * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \return true when decoder is attached, else it will return false.
@@ -304,8 +307,17 @@ bool dvbpsi_AddSectionDecoder(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t 
  * Determines if a decoder is attached to this dvbpsi_t handle. When the dvbpsi
  * handle is invalid the fuction will return false.
  */
-bool dvbpsi_HasDecoder(dvbpsi_t *p_dvbpsi);
+bool dvbpsi_decoder_present(dvbpsi_t *p_dvbpsi);
 
+/*****************************************************************************
+ * deprecated API's
+ *****************************************************************************/
+typedef struct dvbpsi_decoder_s * dvbpsi_handle;// __attribute__((deprecated));
+
+/* dvbpsi.h */
+__attribute__((deprecated))
+void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data);
+#define dvbpsi_PushPacket(h,p)  dvbpsi_packet_push(h,p)dvbpsi_handle
 
 #ifdef __cplusplus
 };

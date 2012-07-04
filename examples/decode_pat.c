@@ -93,7 +93,7 @@ static void DumpPAT(void* p_zero, dvbpsi_pat_t* p_pat)
     p_program = p_program->p_next;
   }
   printf(  "  active              : %d\n", p_pat->b_current_next);
-  dvbpsi_DeletePAT(p_pat);
+  dvbpsi_pat_delete(p_pat);
 }
 
 static void message(dvbpsi_t *handle, const dvbpsi_msg_level_t level, const char* msg)
@@ -126,11 +126,11 @@ int main(int i_argc, char* pa_argv[])
   if (i_fd < 0)
       return 1;
 
-  p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  p_dvbpsi = dvbpsi_new(&message, DVBPSI_MSG_DEBUG);
   if (p_dvbpsi == NULL)
       goto out;
 
-  if (!dvbpsi_AttachPAT(p_dvbpsi, DumpPAT, NULL))
+  if (!dvbpsi_pat_attach(p_dvbpsi, DumpPAT, NULL))
       goto out;
 
   b_ok = ReadPacket(i_fd, data);
@@ -139,15 +139,15 @@ int main(int i_argc, char* pa_argv[])
   {
     uint16_t i_pid = ((uint16_t)(data[1] & 0x1f) << 8) + data[2];
     if(i_pid == 0x0)
-      dvbpsi_PushPacket(p_dvbpsi, data);
+      dvbpsi_packet_push(p_dvbpsi, data);
     b_ok = ReadPacket(i_fd, data);
   }
 
 out:
   if (p_dvbpsi)
   {
-    dvbpsi_DetachPAT(p_dvbpsi);
-    dvbpsi_DeleteHandle(p_dvbpsi);
+    dvbpsi_pat_detach(p_dvbpsi);
+    dvbpsi_delete(p_dvbpsi);
   }
   close(i_fd);
 

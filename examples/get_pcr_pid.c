@@ -93,7 +93,7 @@ static void PMTCallback( void *_unused, dvbpsi_pmt_t *p_pmt )
 {
     if ( p_pmt->i_program_number != i_program )
     {
-        dvbpsi_DeletePMT( p_pmt );
+        dvbpsi_pmt_delete( p_pmt );
         return;
     }
 
@@ -112,7 +112,7 @@ static void PATCallback( void *_unused, dvbpsi_pat_t *p_pat )
     if (i_nb_programs >= MAX_PROGRAMS)
     {
         fprintf(stderr, "Too many PMT programs\n");
-        dvbpsi_DeletePAT( p_pat );
+        dvbpsi_pat_delete( p_pat );
         return;
     }
 
@@ -123,17 +123,17 @@ static void PATCallback( void *_unused, dvbpsi_pat_t *p_pat )
              && (!i_program || i_program == p_program->i_number) )
         {
             pi_pmt_pids[i_nb_programs] = p_program->i_pid;
-            p_pmt_dvbpsi_fds[i_nb_programs] = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+            p_pmt_dvbpsi_fds[i_nb_programs] = dvbpsi_new(&message, DVBPSI_MSG_DEBUG);
             if (p_pmt_dvbpsi_fds[i_nb_programs])
             {
-                if (dvbpsi_AttachPMT(p_pmt_dvbpsi_fds[i_nb_programs],
+                if (dvbpsi_pmt_attach(p_pmt_dvbpsi_fds[i_nb_programs],
                                       p_program->i_number, PMTCallback, NULL))
                     i_nb_programs++;
             }
         }
     }
 
-    dvbpsi_DeletePAT( p_pat );
+    dvbpsi_pat_delete( p_pat );
 }
 
 /*****************************************************************************
@@ -163,13 +163,13 @@ static void TSHandle( uint8_t *p_ts )
 
     if ( i_pid == 0 && !i_nb_programs )
     {
-        dvbpsi_PushPacket( p_pat_dvbpsi_fd, p_ts );
+        dvbpsi_packet_push( p_pat_dvbpsi_fd, p_ts );
     }
 
     for ( i = 0; i < i_nb_programs; i++ )
     {
         if ( pi_pmt_pids[i] == i_pid )
-            dvbpsi_PushPacket( p_pmt_dvbpsi_fds[i], p_ts );
+            dvbpsi_packet_push( p_pmt_dvbpsi_fds[i], p_ts );
     }
 }
 
@@ -197,11 +197,11 @@ int main( int i_argc, char **pp_argv )
     if ( i_argc == 3 )
         i_program = strtol( pp_argv[2], NULL, 0 );
 
-    p_pat_dvbpsi_fd = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+    p_pat_dvbpsi_fd = dvbpsi_new(&message, DVBPSI_MSG_DEBUG);
     if (p_pat_dvbpsi_fd == NULL)
         goto out;
 
-    if (!dvbpsi_AttachPAT(p_pat_dvbpsi_fd, PATCallback, NULL ))
+    if (!dvbpsi_pat_attach(p_pat_dvbpsi_fd, PATCallback, NULL ))
         goto out;
 
     p_buffer = malloc( TS_SIZE * READ_ONCE );
@@ -236,8 +236,8 @@ int main( int i_argc, char **pp_argv )
     {
         if (p_pmt_dvbpsi_fds[i])
         {
-            dvbpsi_DetachPMT(p_pmt_dvbpsi_fds[i]);
-            dvbpsi_DeleteHandle(p_pmt_dvbpsi_fds[i]);
+            dvbpsi_pmt_detach(p_pmt_dvbpsi_fds[i]);
+            dvbpsi_delete(p_pmt_dvbpsi_fds[i]);
         }
         p_pmt_dvbpsi_fds[i] = NULL;
     }
@@ -246,8 +246,8 @@ int main( int i_argc, char **pp_argv )
 out:
     if (p_pat_dvbpsi_fd)
     {
-      dvbpsi_DetachPAT(p_pat_dvbpsi_fd);
-      dvbpsi_DeleteHandle(p_pat_dvbpsi_fd);
+      dvbpsi_pat_detach(p_pat_dvbpsi_fd);
+      dvbpsi_delete(p_pat_dvbpsi_fd);
     }
     close( i_fd );
 

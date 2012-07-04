@@ -50,18 +50,18 @@
 #include "cat_private.h"
 
 /*****************************************************************************
- * dvbpsi_AttachCAT
+ * dvbpsi_cat_attach
  *****************************************************************************
  * Initialize a CAT decoder and return a handle on it.
  *****************************************************************************/
-bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
+bool dvbpsi_cat_attach(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
                       void* p_cb_data)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder == NULL);
 
     dvbpsi_cat_decoder_t* p_cat_decoder;
-    p_cat_decoder = (dvbpsi_cat_decoder_t*) dvbpsi_NewDecoder(&dvbpsi_GatherCATSections,
+    p_cat_decoder = (dvbpsi_cat_decoder_t*) dvbpsi_decoder_new(&dvbpsi_cat_sections_gather,
                                                 1024, true, sizeof(dvbpsi_cat_decoder_t));
     if (p_cat_decoder == NULL)
         return false;
@@ -76,11 +76,11 @@ bool dvbpsi_AttachCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_callback pf_callback,
 }
 
 /*****************************************************************************
- * dvbpsi_DetachCAT
+ * dvbpsi_cat_detach
  *****************************************************************************
  * Close a CAT decoder. The handle isn't valid any more.
  *****************************************************************************/
-void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
+void dvbpsi_cat_detach(dvbpsi_t *p_dvbpsi)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
@@ -88,19 +88,19 @@ void dvbpsi_DetachCAT(dvbpsi_t *p_dvbpsi)
     dvbpsi_cat_decoder_t* p_cat_decoder
                         = (dvbpsi_cat_decoder_t*)p_dvbpsi->p_decoder;
     if (p_cat_decoder->p_building_cat)
-        dvbpsi_DeleteCAT(p_cat_decoder->p_building_cat);
+        dvbpsi_cat_delete(p_cat_decoder->p_building_cat);
     p_cat_decoder->p_building_cat = NULL;
 
-    dvbpsi_DeleteDecoder(p_dvbpsi->p_decoder);
+    dvbpsi_decoder_delete(p_dvbpsi->p_decoder);
     p_dvbpsi->p_decoder = NULL;
 }
 
 /*****************************************************************************
- * dvbpsi_InitCAT
+ * dvbpsi_cat_init
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_cat_t structure.
  *****************************************************************************/
-void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat, uint8_t i_version, bool b_current_next)
+void dvbpsi_cat_init(dvbpsi_cat_t* p_cat, uint8_t i_version, bool b_current_next)
 {
     assert(p_cat);
 
@@ -110,47 +110,47 @@ void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat, uint8_t i_version, bool b_current_next)
 }
 
 /*****************************************************************************
- * dvbpsi_NewCAT
+ * dvbpsi_cat_new
  *****************************************************************************
  * Allocate and Initialize a dvbpsi_cat_t structure.
  *****************************************************************************/
-dvbpsi_cat_t *dvbpsi_NewCAT(uint8_t i_version, bool b_current_next)
+dvbpsi_cat_t *dvbpsi_cat_new(uint8_t i_version, bool b_current_next)
 {
     dvbpsi_cat_t *p_cat = (dvbpsi_cat_t*)malloc(sizeof(dvbpsi_cat_t));
     if (p_cat != NULL)
-        dvbpsi_InitCAT(p_cat, i_version, b_current_next);
+        dvbpsi_cat_init(p_cat, i_version, b_current_next);
     return p_cat;
 }
 
 /*****************************************************************************
- * dvbpsi_EmptyCAT
+ * dvbpsi_cat_empty
  *****************************************************************************
  * Clean a dvbpsi_cat_t structure.
  *****************************************************************************/
-void dvbpsi_EmptyCAT(dvbpsi_cat_t* p_cat)
+void dvbpsi_cat_empty(dvbpsi_cat_t* p_cat)
 {
     dvbpsi_DeleteDescriptors(p_cat->p_first_descriptor);
     p_cat->p_first_descriptor = NULL;
 }
 
 /*****************************************************************************
- * dvbpsi_DeleteCAT
+ * dvbpsi_cat_delete
  *****************************************************************************
  * Clean a dvbpsi_cat_t structure.
  *****************************************************************************/
-void dvbpsi_DeleteCAT(dvbpsi_cat_t *p_cat)
+void dvbpsi_cat_delete(dvbpsi_cat_t *p_cat)
 {
     if (p_cat)
-        dvbpsi_EmptyCAT(p_cat);
+        dvbpsi_cat_empty(p_cat);
     free(p_cat);
 }
 
 /*****************************************************************************
- * dvbpsi_CATAddDescriptor
+ * dvbpsi_cat_descriptor_add
  *****************************************************************************
  * Add a descriptor in the CAT.
  *****************************************************************************/
-dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
+dvbpsi_descriptor_t* dvbpsi_cat_descriptor_add(dvbpsi_cat_t* p_cat,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data)
 {
@@ -173,14 +173,14 @@ static void dvbpsi_ReInitCAT(dvbpsi_cat_decoder_t* p_decoder, const bool b_force
 {
     assert(p_decoder);
 
-    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+    dvbpsi_decoder_reset(DVBPSI_DECODER(p_decoder), b_force);
 
     /* Force redecoding */
     if (b_force)
     {
         /* Free structures */
         if (p_decoder->p_building_cat)
-            dvbpsi_DeleteCAT(p_decoder->p_building_cat);
+            dvbpsi_cat_delete(p_decoder->p_building_cat);
     }
     p_decoder->p_building_cat = NULL;
 }
@@ -235,8 +235,8 @@ static bool dvbpsi_AddSectionCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_decoder_t *p_dec
     /* Initialize the structures if it's the first section received */
     if (p_decoder->p_building_cat == NULL)
     {
-        p_decoder->p_building_cat = dvbpsi_NewCAT(p_section->i_version,
-                                                  p_section->b_current_next);
+        p_decoder->p_building_cat = dvbpsi_cat_new(p_section->i_version,
+                                                   p_section->b_current_next);
         if (p_decoder->p_building_cat == NULL)
             return false;
 
@@ -244,7 +244,7 @@ static bool dvbpsi_AddSectionCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_decoder_t *p_dec
     }
 
     /* Fill the section array */
-    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_decoder), p_section))
+    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "CAT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -252,11 +252,11 @@ static bool dvbpsi_AddSectionCAT(dvbpsi_t *p_dvbpsi, dvbpsi_cat_decoder_t *p_dec
 }
 
 /*****************************************************************************
- * dvbpsi_GatherCATSections
+ * dvbpsi_cat_sections_gather
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
+void dvbpsi_cat_sections_gather(dvbpsi_t *p_dvbpsi,
                               dvbpsi_psi_section_t* p_section)
 {
     assert(p_dvbpsi);
@@ -313,7 +313,7 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_cat_decoder)))
+    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_cat_decoder)))
     {
         assert(p_cat_decoder->pf_cat_callback);
 
@@ -321,10 +321,10 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
         p_cat_decoder->current_cat = *p_cat_decoder->p_building_cat;
         p_cat_decoder->b_current_valid = true;
         /* Chain the sections */
-        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_cat_decoder));
+        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_cat_decoder));
         /* Decode the sections */
-        dvbpsi_DecodeCATSections(p_cat_decoder->p_building_cat,
-                                 p_cat_decoder->ap_sections[0]);
+        dvbpsi_cat_sections_decode(p_cat_decoder->p_building_cat,
+                                   p_cat_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_cat_decoder->ap_sections[0]);
         p_cat_decoder->ap_sections[0] = NULL;
@@ -337,12 +337,11 @@ void dvbpsi_GatherCATSections(dvbpsi_t *p_dvbpsi,
 }
 
 /*****************************************************************************
- * dvbpsi_DecodeCATSections
+ * dvbpsi_cat_sections_decode
  *****************************************************************************
  * CAT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeCATSections(dvbpsi_cat_t* p_cat,
-                              dvbpsi_psi_section_t* p_section)
+void dvbpsi_cat_sections_decode(dvbpsi_cat_t* p_cat, dvbpsi_psi_section_t* p_section)
 {
     uint8_t* p_byte;
 
@@ -355,7 +354,7 @@ void dvbpsi_DecodeCATSections(dvbpsi_cat_t* p_cat,
             uint8_t i_tag = p_byte[0];
             uint8_t i_length = p_byte[1];
             if (i_length + 2 <= p_section->p_payload_end - p_byte)
-                dvbpsi_CATAddDescriptor(p_cat, i_tag, i_length, p_byte + 2);
+                dvbpsi_cat_descriptor_add(p_cat, i_tag, i_length, p_byte + 2);
             p_byte += 2 + i_length;
         }
         p_section = p_section->p_next;
@@ -363,11 +362,11 @@ void dvbpsi_DecodeCATSections(dvbpsi_cat_t* p_cat,
 }
 
 /*****************************************************************************
- * dvbpsi_GenCATSections
+ * dvbpsi_cat_sections_generate
  *****************************************************************************
  * Generate CAT sections based on the dvbpsi_cat_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_t* p_dvbpsi, dvbpsi_cat_t* p_cat)
+dvbpsi_psi_section_t* dvbpsi_cat_sections_generate(dvbpsi_t* p_dvbpsi, dvbpsi_cat_t* p_cat)
 {
     dvbpsi_psi_section_t* p_result = dvbpsi_NewPSISection(1024);
     dvbpsi_psi_section_t* p_current = p_result;

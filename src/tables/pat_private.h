@@ -45,21 +45,29 @@ typedef struct dvbpsi_pat_decoder_s
 
 } dvbpsi_pat_decoder_t;
 
-
 /*****************************************************************************
- * dvbpsi_GatherPATSections
+ * dvbpsi_pat_sections_gather
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
+void dvbpsi_pat_sections_gather(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
  * dvbpsi_DecodePATSection
  *****************************************************************************
  * PAT decoder.
  *****************************************************************************/
-void dvbpsi_DecodePATSections(dvbpsi_pat_t* p_pat,
-                              dvbpsi_psi_section_t* p_section);
+void dvbpsi_pat_sections_decode(dvbpsi_pat_t* p_pat,
+                                dvbpsi_psi_section_t* p_section);
+
+/*****************************************************************************
+ * Deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+void dvbpsi_DecodePATSection(dvbpsi_pat_t* p_pat,
+                             dvbpsi_psi_section_t* p_section);
+__attribute__((deprecated))
+void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
 
 #else
 #error "Multiple inclusions of pat_private.h"

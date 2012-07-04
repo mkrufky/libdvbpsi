@@ -344,10 +344,10 @@ typedef struct dvbpsi_sis_cmd_bandwidth_reservation_s
 typedef void (* dvbpsi_sis_callback)(void* p_cb_data, dvbpsi_sis_t* p_new_sis);
 
 /*****************************************************************************
- * dvbpsi_AttachSIS
+ * dvbpsi_sis_attach
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_AttachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+ * \fn bool dvbpsi_sis_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_sis_callback pf_callback,
                                void* p_cb_data)
  * \brief Creation and initialization of a SIS decoder. It is attached to p_dvbpsi.
@@ -358,14 +358,14 @@ typedef void (* dvbpsi_sis_callback)(void* p_cb_data, dvbpsi_sis_t* p_new_sis);
  * \param p_cb_data private data given in argument to the callback.
  * \return true on success, false on failure
  */
-bool dvbpsi_AttachSIS(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+bool dvbpsi_sis_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
                       dvbpsi_sis_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
- * dvbpsi_DetachSIS
+ * dvbpsi_sis_detach
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+ * \fn void dvbpsi_sis_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
                              uint16_t i_extension)
  * \brief Destroy a SIS decoder.
  * \param p_dvbpsi pointer to dvbpsi to hold decoder/demuxer structure
@@ -373,13 +373,13 @@ bool dvbpsi_AttachSIS(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \param i_extension Table ID extension, here TS ID.
  * \return nothing.
  */
-void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
+void dvbpsi_sis_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
 
 /*****************************************************************************
- * dvbpsi_InitSIS/dvbpsi_NewSIS
+ * dvbpsi_sis_init/dvbpsi_sis_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_InitSIS(dvbpsi_sis_t* p_sis, uint8_t i_protocol_version)
+ * \fn void dvbpsi_sis_init(dvbpsi_sis_t* p_sis, uint8_t i_protocol_version)
  * \brief Initialize a user-allocated dvbpsi_sis_t structure.
  * \param p_sis pointer to the SIS structure
  * \param i_ts_id transport stream ID
@@ -388,11 +388,11 @@ void dvbpsi_DetachSIS(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
  * \param i_protocol_version SIS protocol version (currently 0)
  * \return nothing.
  */
-void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
+void dvbpsi_sis_init(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next, uint8_t i_protocol_version);
 
 /*!
- * \fn dvbpsi_sis_t* dvbpsi_NewSIS(uint8_t i_protocol_version)
+ * \fn dvbpsi_sis_t* dvbpsi_sis_new(uint8_t i_protocol_version)
  * \brief Allocate and initialize a new dvbpsi_sis_t structure.
  * \param i_ts_id transport stream ID
  * \param i_version SIS version
@@ -400,33 +400,33 @@ void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
  * \param i_protocol_version SIS protocol version (currently 0)
  * \return p_sis pointer to the SIS structure
  */
-dvbpsi_sis_t* dvbpsi_NewSIS(uint16_t i_ts_id, uint8_t i_version,
+dvbpsi_sis_t* dvbpsi_sis_new(uint16_t i_ts_id, uint8_t i_version,
                             bool b_current_next, uint8_t i_protocol_version);
 
 /*****************************************************************************
- * dvbpsi_EmptySIS/dvbpsi_DeleteSIS
+ * dvbpsi_sis_empty/dvbpsi_sis_delete
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_EmptySIS(dvbpsi_sis_t* p_sis)
+ * \fn void dvbpsi_sis_empty(dvbpsi_sis_t* p_sis)
  * \brief Clean a dvbpsi_sis_t structure.
  * \param p_sis pointer to the SIS structure
  * \return nothing.
  */
-void dvbpsi_EmptySIS(dvbpsi_sis_t *p_sis);
+void dvbpsi_sis_empty(dvbpsi_sis_t *p_sis);
 
 /*!
- * \fn void  dvbpsi_DeleteSIS(dvbpsi_sis_t *p_sis)
+ * \fn void dvbpsi_sis_delete(dvbpsi_sis_t *p_sis)
  * \brief Clean and free a dvbpsi_sis_t structure.
  * \param p_sis pointer to the SIS structure
  * \return nothing.
  */
-void dvbpsi_DeleteSIS(dvbpsi_sis_t *p_sis);
+void dvbpsi_sis_delete(dvbpsi_sis_t *p_sis);
 
 /*****************************************************************************
- * dvbpsi_SISAddDescriptor
+ * dvbpsi_sis_descriptor_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor(dvbpsi_sis_t *p_sis,
+ * \fn dvbpsi_descriptor_t *dvbpsi_sis_descriptor_add(dvbpsi_sis_t *p_sis,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data)
  * \brief Add a descriptor in the SIS service.
@@ -436,17 +436,17 @@ void dvbpsi_DeleteSIS(dvbpsi_sis_t *p_sis);
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor(dvbpsi_sis_t *p_sis,
+dvbpsi_descriptor_t *dvbpsi_sis_descriptor_add(dvbpsi_sis_t *p_sis,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t *p_data);
 
 /*****************************************************************************
- * dvbpsi_GenSISSections
+ * dvbpsi_sis_sections_generate
  *****************************************************************************
  * Generate SIS sections based on the dvbpsi_sis_t structure.
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t * p_sis);
+ * \fn dvbpsi_psi_section_t *dvbpsi_sis_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t * p_sis);
  * \brief SIS generator
  * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_sis SIS structure
@@ -454,7 +454,27 @@ dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor(dvbpsi_sis_t *p_sis,
  *
  * Generate SIS sections based on the dvbpsi_sis_t structure.
  */
-dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t * p_sis);
+dvbpsi_psi_section_t *dvbpsi_sis_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t * p_sis);
+
+/*****************************************************************************
+ * deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+int dvbpsi_AttachSIS(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+          uint16_t i_extension, dvbpsi_sis_callback pf_callback,
+                               void* p_cb_data);
+__attribute__((deprecated))
+void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+          uint16_t i_extension);
+__attribute__((deprecated))
+void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version);
+__attribute__((deprecated)) void dvbpsi_EmptySIS(dvbpsi_sis_t *p_sis);
+__attribute__((deprecated))
+dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor( dvbpsi_sis_t *p_sis,
+                                              uint8_t i_tag, uint8_t i_length,
+                                              uint8_t *p_data);
+__attribute__((deprecated))
+dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_sis_t * p_sis);
 
 #ifdef __cplusplus
 };

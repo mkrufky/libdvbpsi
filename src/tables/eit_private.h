@@ -48,19 +48,30 @@ typedef struct dvbpsi_eit_decoder_s
 } dvbpsi_eit_decoder_t;
 
 /*****************************************************************************
- * dvbpsi_GatherEITSections
+ * dvbpsi_eit_sections_gather
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi,
+void dvbpsi_eit_sections_gather(dvbpsi_t *p_dvbpsi,
                               dvbpsi_decoder_t *p_private_decoder,
                               dvbpsi_psi_section_t *p_section);
 
 /*****************************************************************************
- * dvbpsi_DecodeEITSection
+ * dvbpsi_eit_sections_decode
  *****************************************************************************
  * EIT decoder.
  *****************************************************************************/
+void dvbpsi_eit_sections_decode(dvbpsi_eit_t* p_eit,
+                                dvbpsi_psi_section_t* p_section);
+
+/*****************************************************************************
+ * Deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+void dvbpsi_GatherEITSections(dvbpsi_handle *p_dvbpsi,
+                              dvbpsi_decoder_t *p_private_decoder,
+                              dvbpsi_psi_section_t *p_section);
+__attribute__((deprecated))
 void dvbpsi_DecodeEITSections(dvbpsi_eit_t* p_eit,
                               dvbpsi_psi_section_t* p_section);
 

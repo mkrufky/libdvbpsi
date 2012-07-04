@@ -50,27 +50,31 @@ typedef struct dvbpsi_tot_decoder_s
 
 
 /*****************************************************************************
- * dvbpsi_GatherTOTSections
+ * dvbpsi_tot_sections_gather
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherTOTSections(dvbpsi_t* p_dvbpsi,
+void dvbpsi_tot_sections_gather(dvbpsi_t* p_dvbpsi,
                               dvbpsi_decoder_t* p_decoder,
                               dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
- * dvbpsi_ValidTOTSection
- *****************************************************************************
- * Check the CRC_32 if the section has b_syntax_indicator set.
- *****************************************************************************/
-static bool dvbpsi_ValidTOTSection(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
-
-/*****************************************************************************
- * dvbpsi_DecodeTOTSections
+ * dvbpsi_tot_sections_decode
  *****************************************************************************
  * TDT/TOT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeTOTSections(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot,
+void dvbpsi_tot_sections_decode(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot,
+                              dvbpsi_psi_section_t* p_section);
+
+/*****************************************************************************
+ * Deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+void dvbpsi_GatherTOTSections(dvbpsi_handle* p_dvbpsi,
+                              dvbpsi_decoder_t* p_decoder,
+                              dvbpsi_psi_section_t* p_section);
+__attribute__((deprecated))
+void dvbpsi_DecodeTOTSections(dvbpsi_handle* p_dvbpsi, dvbpsi_tot_t* p_tot,
                               dvbpsi_psi_section_t* p_section);
 
 #else

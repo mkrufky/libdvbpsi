@@ -317,8 +317,8 @@ static void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
     if (p_stream->pmt.handle)
     {
         fprintf(stderr, "freeing old PMT\n");
-        dvbpsi_DetachPMT(p_stream->pmt.handle);
-        dvbpsi_DeleteHandle(p_stream->pmt.handle);
+        dvbpsi_pmt_detach(p_stream->pmt.handle);
+        dvbpsi_delete(p_stream->pmt.handle);
         p_stream->pmt.handle = NULL;
     }
 
@@ -334,23 +334,23 @@ static void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
     {
             if (p_stream->pmt.handle)
             {
-                dvbpsi_DetachPMT(p_stream->pmt.handle);
-                dvbpsi_DeleteHandle(p_stream->pmt.handle);
+                dvbpsi_pmt_detach(p_stream->pmt.handle);
+                dvbpsi_delete(p_stream->pmt.handle);
                 p_stream->pmt.handle = NULL;
             }
             p_stream->i_pmt++;
             p_stream->pmt.i_number = p_program->i_number;
             p_stream->pmt.pid_pmt = &p_stream->pid[p_program->i_pid];
             p_stream->pmt.pid_pmt->i_pid = p_program->i_pid;
-            p_stream->pmt.handle  = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+            p_stream->pmt.handle  = dvbpsi_new(&message, DVBPSI_MSG_DEBUG);
             if (p_stream->pmt.handle == NULL)
             {
                 fprintf(stderr, "could not allocate new dvbpsi_t handle\n");
                 break;
             }
-            if (!dvbpsi_AttachPMT(p_stream->pmt.handle, p_program->i_number, DumpPMT, p_stream ))
+            if (!dvbpsi_pmt_attach(p_stream->pmt.handle, p_program->i_number, DumpPMT, p_stream ))
             {
-                dvbpsi_DeleteHandle(p_stream->pmt.handle);
+                dvbpsi_delete(p_stream->pmt.handle);
                 fprintf(stderr, "could not attach PMT\n");
                 break;
             }
@@ -359,7 +359,7 @@ static void DumpPAT(void* p_data, dvbpsi_pat_t* p_pat)
             p_program = p_program->p_next;
     }
     fprintf( stderr, "  active              : %d\n", p_pat->b_current_next);
-    dvbpsi_DeletePAT(p_pat);
+    dvbpsi_pat_delete(p_pat);
 }
 
 /*****************************************************************************
@@ -515,7 +515,7 @@ static void DumpPMT(void* p_data, dvbpsi_pmt_t* p_pmt)
         DumpDescriptors("    |  ]", p_es->p_first_descriptor);
         p_es = p_es->p_next;
     }
-    dvbpsi_DeletePMT(p_pmt);
+    dvbpsi_pmt_delete(p_pmt);
 }
 
 /*****************************************************************************
@@ -681,10 +681,10 @@ int main(int i_argc, char* pa_argv[])
     report_Header( i_report );
 #endif
 
-    p_stream->pat.handle = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+    p_stream->pat.handle = dvbpsi_new(&message, DVBPSI_MSG_DEBUG);
     if (p_stream->pat.handle == NULL)
         goto dvbpsi_out;
-    if (!dvbpsi_AttachPAT(p_stream->pat.handle, DumpPAT, p_stream))
+    if (!dvbpsi_pat_attach(p_stream->pat.handle, DumpPAT, p_stream))
         goto dvbpsi_out;
 
     /* Enter infinite loop */
@@ -723,9 +723,9 @@ int main(int i_argc, char* pa_argv[])
                 continue;
 
             if( i_pid == 0x0 )
-                dvbpsi_PushPacket(p_stream->pat.handle, p_tmp);
+                dvbpsi_packet_push(p_stream->pat.handle, p_tmp);
             else if( p_stream->pmt.pid_pmt && i_pid == p_stream->pmt.pid_pmt->i_pid )
-                dvbpsi_PushPacket(p_stream->pmt.handle, p_tmp);
+                dvbpsi_packet_push(p_stream->pmt.handle, p_tmp);
 
             /* Remember PID */
             if( !p_stream->pid[i_pid].b_seen )
@@ -818,13 +818,13 @@ int main(int i_argc, char* pa_argv[])
     }
     if( p_stream->pmt.handle )
     {
-        dvbpsi_DetachPMT( p_stream->pmt.handle );
-        dvbpsi_DeleteHandle( p_stream->pmt.handle );
+        dvbpsi_pmt_detach( p_stream->pmt.handle );
+        dvbpsi_delete( p_stream->pmt.handle );
     }
     if( p_stream->pat.handle )
     {
-        dvbpsi_DetachPAT( p_stream->pat.handle );
-        dvbpsi_DeleteHandle( p_stream->pat.handle );
+        dvbpsi_pat_detach( p_stream->pat.handle );
+        dvbpsi_delete( p_stream->pat.handle );
     }
 
     /* clean up */
@@ -851,8 +851,8 @@ out_of_memory:
 dvbpsi_out:
     if( p_stream->pat.handle )
     {
-        dvbpsi_DetachPAT( p_stream->pat.handle );
-        dvbpsi_DeleteHandle( p_stream->pat.handle );
+        dvbpsi_pat_detach( p_stream->pat.handle );
+        dvbpsi_delete( p_stream->pat.handle );
     }
 
 error:

@@ -124,39 +124,39 @@ int main(int i_argc, char* pa_argv[])
   dvbpsi_psi_section_t* p_section3, * p_section4;
   dvbpsi_psi_section_t* p_section5, * p_section6;
 
-  dvbpsi_t *p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  dvbpsi_t *p_dvbpsi = dvbpsi_new(&message, DVBPSI_MSG_DEBUG);
   if (p_dvbpsi == NULL)
       return 1;
 
   /* PMT generation */
-  dvbpsi_InitPMT(&pmt, 12, 0, 0, 42);
-  dvbpsi_PMTAddDescriptor(&pmt, 12, 26, data);
-  dvbpsi_PMTAddDescriptor(&pmt, 42, 12, data + 12);
-  dvbpsi_PMTAddDescriptor(&pmt, 2, 1, data + 4);
-  dvbpsi_PMTAddDescriptor(&pmt, 0, 4, data + 7);
-  p_es = dvbpsi_PMTAddES(&pmt, 12, 42);
-  dvbpsi_PMTESAddDescriptor(p_es, 12, 26, data);
-  dvbpsi_PMTESAddDescriptor(p_es, 42, 12, data + 12);
-  dvbpsi_PMTESAddDescriptor(p_es, 2, 1, data + 4);
-  dvbpsi_PMTESAddDescriptor(p_es, 0, 4, data + 7);
+  dvbpsi_pmt_init(&pmt, 12, 0, 0, 42);
+  dvbpsi_pmt_descriptor_add(&pmt, 12, 26, data);
+  dvbpsi_pmt_descriptor_add(&pmt, 42, 12, data + 12);
+  dvbpsi_pmt_descriptor_add(&pmt, 2, 1, data + 4);
+  dvbpsi_pmt_descriptor_add(&pmt, 0, 4, data + 7);
+  p_es = dvbpsi_pmt_es_add(&pmt, 12, 42);
+  dvbpsi_pmt_es_descriptor_add(p_es, 12, 26, data);
+  dvbpsi_pmt_es_descriptor_add(p_es, 42, 12, data + 12);
+  dvbpsi_pmt_es_descriptor_add(p_es, 2, 1, data + 4);
+  dvbpsi_pmt_es_descriptor_add(p_es, 0, 4, data + 7);
 
-  p_section1 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
+  p_section1 = dvbpsi_pmt_sections_generate(p_dvbpsi, &pmt);
   pmt.b_current_next = 1;
-  p_section2 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
+  p_section2 = dvbpsi_pmt_sections_generate(p_dvbpsi, &pmt);
 
   pmt.i_version = 1;
 
   pmt.b_current_next = 0;
-  p_section3 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
+  p_section3 = dvbpsi_pmt_sections_generate(p_dvbpsi, &pmt);
   pmt.b_current_next = 1;
-  p_section4 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
+  p_section4 = dvbpsi_pmt_sections_generate(p_dvbpsi, &pmt);
 
   pmt.i_version = 2;
 
   pmt.b_current_next = 0;
-  p_section5 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
+  p_section5 = dvbpsi_pmt_sections_generate(p_dvbpsi, &pmt);
   pmt.b_current_next = 1;
-  p_section6 = dvbpsi_GenPMTSections(p_dvbpsi, &pmt);
+  p_section6 = dvbpsi_pmt_sections_generate(p_dvbpsi, &pmt);
 
   /* TS packets generation */
   packet[0] = 0x47;
@@ -179,8 +179,8 @@ int main(int i_argc, char* pa_argv[])
   dvbpsi_DeletePSISections(p_section5);
   dvbpsi_DeletePSISections(p_section6);
 
-  dvbpsi_EmptyPMT(&pmt);
-  dvbpsi_DeleteHandle(p_dvbpsi);
+  dvbpsi_pmt_empty(&pmt);
+  dvbpsi_delete(p_dvbpsi);
   return 0;
 }
 

@@ -49,11 +49,11 @@
 #include "sdt_private.h"
 
 /*****************************************************************************
- * dvbpsi_AttachSDT
+ * dvbpsi_sdt_attach
  *****************************************************************************
  * Initialize a SDT subtable decoder.
  *****************************************************************************/
-bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+bool dvbpsi_sdt_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
                       dvbpsi_sdt_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
@@ -71,18 +71,18 @@ bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     }
 
     dvbpsi_sdt_decoder_t*  p_sdt_decoder;
-    p_sdt_decoder = (dvbpsi_sdt_decoder_t*) dvbpsi_NewDecoder(NULL,
+    p_sdt_decoder = (dvbpsi_sdt_decoder_t*) dvbpsi_decoder_new(NULL,
                                              0, true, sizeof(dvbpsi_sdt_decoder_t));
     if (p_sdt_decoder == NULL)
         return false;
 
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
-    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachSDT,
-                                         dvbpsi_GatherSDTSections, DVBPSI_DECODER(p_sdt_decoder));
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_sdt_detach,
+                                         dvbpsi_sdt_sections_gather, DVBPSI_DECODER(p_sdt_decoder));
     if (p_subdec == NULL)
     {
-        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_sdt_decoder));
+        dvbpsi_decoder_delete(DVBPSI_DECODER(p_sdt_decoder));
         return false;
     }
 
@@ -98,11 +98,11 @@ bool dvbpsi_AttachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
 }
 
 /*****************************************************************************
- * dvbpsi_DetachSDT
+ * dvbpsi_sdt_detach
  *****************************************************************************
  * Close a SDT decoder.
  *****************************************************************************/
-void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
+void dvbpsi_sdt_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
@@ -125,7 +125,7 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     dvbpsi_sdt_decoder_t* p_sdt_decoder;
     p_sdt_decoder = (dvbpsi_sdt_decoder_t*)p_subdec->p_decoder;
     if (p_sdt_decoder->p_building_sdt)
-        dvbpsi_DeleteSDT(p_sdt_decoder->p_building_sdt);
+        dvbpsi_sdt_delete(p_sdt_decoder->p_building_sdt);
     p_sdt_decoder->p_building_sdt = NULL;
 
     /* Free sub table decoder */
@@ -134,11 +134,11 @@ void dvbpsi_DetachSDT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
 }
 
 /*****************************************************************************
- * dvbpsi_InitSDT
+ * dvbpsi_sdt_init
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_sdt_t structure.
  *****************************************************************************/
-void dvbpsi_InitSDT(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id, uint8_t i_version,
+void dvbpsi_sdt_init(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next, uint16_t i_network_id)
 {
     assert(p_sdt);
@@ -151,25 +151,25 @@ void dvbpsi_InitSDT(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id, uint8_t i_version,
 }
 
 /*****************************************************************************
- * dvbpsi_NewSDT
+ * dvbpsi_sdt_new
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_sdt_t structure.
  *****************************************************************************/
-dvbpsi_sdt_t *dvbpsi_NewSDT(uint16_t i_ts_id, uint8_t i_version,
+dvbpsi_sdt_t *dvbpsi_sdt_new(uint16_t i_ts_id, uint8_t i_version,
                              bool b_current_next, uint16_t i_network_id)
 {
     dvbpsi_sdt_t *p_sdt = (dvbpsi_sdt_t*)malloc(sizeof(dvbpsi_sdt_t));
     if (p_sdt != NULL)
-        dvbpsi_InitSDT(p_sdt, i_ts_id, i_version, b_current_next, i_network_id);
+        dvbpsi_sdt_init(p_sdt, i_ts_id, i_version, b_current_next, i_network_id);
     return p_sdt;
 }
 
 /*****************************************************************************
- * dvbpsi_EmptySDT
+ * dvbpsi_sdt_empty
  *****************************************************************************
  * Clean a dvbpsi_sdt_t structure.
  *****************************************************************************/
-void dvbpsi_EmptySDT(dvbpsi_sdt_t* p_sdt)
+void dvbpsi_sdt_empty(dvbpsi_sdt_t* p_sdt)
 {
     dvbpsi_sdt_service_t* p_service = p_sdt->p_first_service;
 
@@ -184,23 +184,23 @@ void dvbpsi_EmptySDT(dvbpsi_sdt_t* p_sdt)
 }
 
 /*****************************************************************************
- * dvbpsi_DeleteSDT
+ * dvbpsi_sdt_delete
  *****************************************************************************
  * Clean and Delete dvbpsi_sdt_t structure.
  *****************************************************************************/
-void dvbpsi_DeleteSDT(dvbpsi_sdt_t *p_sdt)
+void dvbpsi_sdt_delete(dvbpsi_sdt_t *p_sdt)
 {
     if (p_sdt)
-        dvbpsi_EmptySDT(p_sdt);
+        dvbpsi_sdt_empty(p_sdt);
     free(p_sdt);
 }
 
 /*****************************************************************************
- * dvbpsi_SDTAddService
+ * dvbpsi_sdt_service_add
  *****************************************************************************
  * Add a service description at the end of the SDT.
  *****************************************************************************/
-dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
+dvbpsi_sdt_service_t *dvbpsi_sdt_service_add(dvbpsi_sdt_t* p_sdt,
                                            uint16_t i_service_id,
                                            bool b_eit_schedule,
                                            bool b_eit_present,
@@ -234,11 +234,11 @@ dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
 }
 
 /*****************************************************************************
- * dvbpsi_SDTServiceAddDescriptor
+ * dvbpsi_sdt_service_descriptor_add
  *****************************************************************************
  * Add a descriptor in the SDT service description.
  *****************************************************************************/
-dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
+dvbpsi_descriptor_t *dvbpsi_sdt_service_descriptor_add(
                                                dvbpsi_sdt_service_t *p_service,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data)
@@ -262,14 +262,14 @@ static void dvbpsi_ReInitSDT(dvbpsi_sdt_decoder_t* p_decoder, const bool b_force
 {
     assert(p_decoder);
 
-    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+    dvbpsi_decoder_reset(DVBPSI_DECODER(p_decoder), b_force);
 
     /* Force redecoding */
     if (b_force)
     {
         /* Free structures */
         if (p_decoder->p_building_sdt)
-            dvbpsi_DeleteSDT(p_decoder->p_building_sdt);
+            dvbpsi_sdt_delete(p_decoder->p_building_sdt);
     }
     p_decoder->p_building_sdt = NULL;
 }
@@ -319,7 +319,7 @@ static bool dvbpsi_AddSectionSDT(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_decoder_t *p_sdt
     /* Initialize the structures if it's the first section received */
     if (!p_sdt_decoder->p_building_sdt)
     {
-        p_sdt_decoder->p_building_sdt = dvbpsi_NewSDT(p_section->i_extension,
+        p_sdt_decoder->p_building_sdt = dvbpsi_sdt_new(p_section->i_extension,
                              p_section->i_version, p_section->b_current_next,
                              ((uint16_t)(p_section->p_payload_start[0]) << 8)
                                          | p_section->p_payload_start[1]);
@@ -329,7 +329,7 @@ static bool dvbpsi_AddSectionSDT(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_decoder_t *p_sdt
     }
 
     /* Fill the section array */
-    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_sdt_decoder), p_section))
+    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_sdt_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "SDT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -337,13 +337,13 @@ static bool dvbpsi_AddSectionSDT(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_decoder_t *p_sdt
 }
 
 /*****************************************************************************
- * dvbpsi_GatherSDTSections
+ * dvbpsi_sdt_sections_gather
  *****************************************************************************
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
-void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
-                              dvbpsi_decoder_t *p_private_decoder,
-                              dvbpsi_psi_section_t * p_section)
+void dvbpsi_sdt_sections_gather(dvbpsi_t *p_dvbpsi,
+                                dvbpsi_decoder_t *p_private_decoder,
+                                dvbpsi_psi_section_t * p_section)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
@@ -400,7 +400,7 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_sdt_decoder)))
+    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_sdt_decoder)))
     {
         assert(p_sdt_decoder->pf_sdt_callback);
 
@@ -408,10 +408,10 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
         p_sdt_decoder->current_sdt = *p_sdt_decoder->p_building_sdt;
         p_sdt_decoder->b_current_valid = true;
         /* Chain the sections */
-        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_sdt_decoder));
+        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_sdt_decoder));
         /* Decode the sections */
-        dvbpsi_DecodeSDTSections(p_sdt_decoder->p_building_sdt,
-                                 p_sdt_decoder->ap_sections[0]);
+        dvbpsi_sdt_sections_decode(p_sdt_decoder->p_building_sdt,
+                                   p_sdt_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_sdt_decoder->ap_sections[0]);
         p_sdt_decoder->ap_sections[0] = NULL;
@@ -424,12 +424,12 @@ void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
 }
 
 /*****************************************************************************
- * dvbpsi_DecodeSDTSection
+ * dvbpsi_sdt_sections_decode
  *****************************************************************************
  * SDT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
-                              dvbpsi_psi_section_t* p_section)
+void dvbpsi_sdt_sections_decode(dvbpsi_sdt_t* p_sdt,
+                                dvbpsi_psi_section_t* p_section)
 {
     uint8_t *p_byte, *p_end;
 
@@ -444,7 +444,7 @@ void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
             uint8_t i_running_status = (uint8_t)(p_byte[3]) >> 5;
             bool b_free_ca = ((p_byte[3] & 0x10) >> 4);
             uint16_t i_srv_length = ((uint16_t)(p_byte[3] & 0xf) <<8) | p_byte[4];
-            dvbpsi_sdt_service_t* p_service = dvbpsi_SDTAddService(p_sdt,
+            dvbpsi_sdt_service_t* p_service = dvbpsi_sdt_service_add(p_sdt,
                     i_service_id, b_eit_schedule, b_eit_present,
                     i_running_status, b_free_ca);
 
@@ -458,7 +458,7 @@ void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
                 uint8_t i_tag = p_byte[0];
                 uint8_t i_length = p_byte[1];
                 if (i_length + 2 <= p_end - p_byte)
-                    dvbpsi_SDTServiceAddDescriptor(p_service, i_tag, i_length, p_byte + 2);
+                    dvbpsi_sdt_service_descriptor_add(p_service, i_tag, i_length, p_byte + 2);
                 p_byte += 2 + i_length;
             }
         }
@@ -467,11 +467,11 @@ void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
 }
 
 /*****************************************************************************
- * dvbpsi_GenSDTSections
+ * dvbpsi_sdt_sections_generate
  *****************************************************************************
  * Generate SDT sections based on the dvbpsi_sdt_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_t* p_sdt)
+dvbpsi_psi_section_t *dvbpsi_sdt_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_t* p_sdt)
 {
     dvbpsi_psi_section_t *p_result = dvbpsi_NewPSISection(1024);
     dvbpsi_psi_section_t *p_current = p_result;

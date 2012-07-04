@@ -51,11 +51,11 @@
 #include "bat_private.h"
 
 /*****************************************************************************
- * dvbpsi_AttachBAT
+ * dvbpsi_bat_attach
  *****************************************************************************
  * Initialize a BAT subtable decoder.
  *****************************************************************************/
-bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+bool dvbpsi_bat_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension, dvbpsi_bat_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
@@ -72,18 +72,18 @@ bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     }
 
     dvbpsi_bat_decoder_t*  p_bat_decoder;
-    p_bat_decoder = (dvbpsi_bat_decoder_t*) dvbpsi_NewDecoder(NULL,
+    p_bat_decoder = (dvbpsi_bat_decoder_t*) dvbpsi_decoder_new(NULL,
                                              0, true, sizeof(dvbpsi_bat_decoder_t));
     if (p_bat_decoder == NULL)
         return false;
 
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
-    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachBAT,
-                                         dvbpsi_GatherBATSections, DVBPSI_DECODER(p_bat_decoder));
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_bat_detach,
+                                         dvbpsi_bat_sections_gather, DVBPSI_DECODER(p_bat_decoder));
     if (p_subdec == NULL)
     {
-        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_bat_decoder));
+        dvbpsi_decoder_delete(DVBPSI_DECODER(p_bat_decoder));
         return false;
     }
 
@@ -99,11 +99,11 @@ bool dvbpsi_AttachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
 }
 
 /*****************************************************************************
- * dvbpsi_DetachBAT
+ * dvbpsi_bat_detach
  *****************************************************************************
  * Close a BAT decoder.
  *****************************************************************************/
-void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
+void dvbpsi_bat_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
@@ -124,7 +124,7 @@ void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     dvbpsi_bat_decoder_t* p_bat_decoder;
     p_bat_decoder = (dvbpsi_bat_decoder_t*)p_subdec->p_decoder;
     if (p_bat_decoder->p_building_bat)
-        dvbpsi_DeleteBAT(p_bat_decoder->p_building_bat);
+        dvbpsi_bat_delete(p_bat_decoder->p_building_bat);
     p_bat_decoder->p_building_bat = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
@@ -132,11 +132,11 @@ void dvbpsi_DetachBAT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
 }
 
 /*****************************************************************************
- * dvbpsi_InitBAT
+ * dvbpsi_bat_init
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_bat_t structure.
  *****************************************************************************/
-void dvbpsi_InitBAT(dvbpsi_bat_t* p_bat, uint16_t i_bouquet_id, uint8_t i_version,
+void dvbpsi_bat_init(dvbpsi_bat_t* p_bat, uint16_t i_bouquet_id, uint8_t i_version,
                     bool b_current_next)
 {
     assert(p_bat);
@@ -148,25 +148,25 @@ void dvbpsi_InitBAT(dvbpsi_bat_t* p_bat, uint16_t i_bouquet_id, uint8_t i_versio
 }
 
 /*****************************************************************************
- * dvbpsi_NewBAT
+ * dvbpsi_bat_new
  *****************************************************************************
  * Allocate and initialize a dvbpsi_bat_t structure.
  *****************************************************************************/
-dvbpsi_bat_t *dvbpsi_NewBAT(uint16_t i_bouquet_id, uint8_t i_version,
+dvbpsi_bat_t *dvbpsi_bat_new(uint16_t i_bouquet_id, uint8_t i_version,
                             bool b_current_next)
 {
     dvbpsi_bat_t *p_bat = (dvbpsi_bat_t*)malloc(sizeof(dvbpsi_bat_t));
     if(p_bat != NULL)
-        dvbpsi_InitBAT(p_bat, i_bouquet_id, i_version, b_current_next);
+        dvbpsi_bat_init(p_bat, i_bouquet_id, i_version, b_current_next);
     return p_bat;
 }
 
 /*****************************************************************************
- * dvbpsi_EmptyBAT
+ * dvbpsi_bat_empty
  *****************************************************************************
  * Clean a dvbpsi_bat_t structure.
  *****************************************************************************/
-void dvbpsi_EmptyBAT(dvbpsi_bat_t* p_bat)
+void dvbpsi_bat_empty(dvbpsi_bat_t* p_bat)
 {
     dvbpsi_bat_ts_t* p_ts = p_bat->p_first_ts;
 
@@ -184,23 +184,23 @@ void dvbpsi_EmptyBAT(dvbpsi_bat_t* p_bat)
 }
 
 /*****************************************************************************
- * dvbpsi_DeleteBAT
+ * dvbpsi_bat_delete
  *****************************************************************************
  * Empty and Delere a dvbpsi_bat_t structure.
  *****************************************************************************/
-void dvbpsi_DeleteBAT(dvbpsi_bat_t *p_bat)
+void dvbpsi_bat_delete(dvbpsi_bat_t *p_bat)
 {
     if (p_bat)
-        dvbpsi_EmptyBAT(p_bat);
+        dvbpsi_bat_empty(p_bat);
     free(p_bat);
 }
 
 /*****************************************************************************
- * dvbpsi_BATAddTS
+ * dvbpsi_bat_ts_add
  *****************************************************************************
  * Add a TS description at the end of the BAT.
  *****************************************************************************/
-dvbpsi_bat_ts_t *dvbpsi_BATAddTS(dvbpsi_bat_t* p_bat,
+dvbpsi_bat_ts_t *dvbpsi_bat_ts_add(dvbpsi_bat_t* p_bat,
                                  uint16_t i_ts_id, uint16_t i_orig_network_id)
 {
     dvbpsi_bat_ts_t * p_ts
@@ -227,12 +227,12 @@ dvbpsi_bat_ts_t *dvbpsi_BATAddTS(dvbpsi_bat_t* p_bat,
 }
 
 /*****************************************************************************
- * dvbpsi_BATBouquetAddDescriptor
+ * dvbpsi_bat_bouquet_descriptor_add
  *****************************************************************************
  * Add a descriptor in the BAT Bouquet descriptors (the first loop description),
  *  which is in the first loop of BAT.
  *****************************************************************************/
-dvbpsi_descriptor_t *dvbpsi_BATBouquetAddDescriptor(
+dvbpsi_descriptor_t *dvbpsi_bat_bouquet_descriptor_add(
                                                dvbpsi_bat_t *p_bat,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data)
@@ -252,12 +252,11 @@ dvbpsi_descriptor_t *dvbpsi_BATBouquetAddDescriptor(
 }
 
 /*****************************************************************************
- * dvbpsi_BATTSAddDescriptor
+ * dvbpsi_bat_ts_descriptor_add
  *****************************************************************************
  * Add a descriptor in the BAT TS descriptors, which is in the second loop of BAT.
  *****************************************************************************/
-dvbpsi_descriptor_t *dvbpsi_BATTSAddDescriptor(
-                                               dvbpsi_bat_ts_t *p_ts,
+dvbpsi_descriptor_t *dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_ts,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data)
 {
@@ -283,14 +282,14 @@ static void dvbpsi_ReInitBAT(dvbpsi_bat_decoder_t* p_decoder, const bool b_force
 {
     assert(p_decoder);
 
-    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+    dvbpsi_decoder_reset(DVBPSI_DECODER(p_decoder), b_force);
 
     /* Force redecoding */
     if (b_force)
     {
         /* Free structures */
         if (p_decoder->p_building_bat)
-            dvbpsi_DeleteBAT(p_decoder->p_building_bat);
+            dvbpsi_bat_delete(p_decoder->p_building_bat);
     }
     p_decoder->p_building_bat = NULL;
 }
@@ -339,7 +338,7 @@ static bool dvbpsi_AddSectionBAT(dvbpsi_t *p_dvbpsi, dvbpsi_bat_decoder_t *p_bat
     /* Initialize the structures if it's the first section received */
     if (!p_bat_decoder->p_building_bat)
     {
-        p_bat_decoder->p_building_bat = dvbpsi_NewBAT(p_section->i_extension,
+        p_bat_decoder->p_building_bat = dvbpsi_bat_new(p_section->i_extension,
                               p_section->i_version, p_section->b_current_next);
         if (p_bat_decoder->p_building_bat)
             return false;
@@ -348,7 +347,7 @@ static bool dvbpsi_AddSectionBAT(dvbpsi_t *p_dvbpsi, dvbpsi_bat_decoder_t *p_bat
     }
 
     /* Fill the section array */
-    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_bat_decoder), p_section))
+    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_bat_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "BAT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -356,11 +355,11 @@ static bool dvbpsi_AddSectionBAT(dvbpsi_t *p_dvbpsi, dvbpsi_bat_decoder_t *p_bat
 }
 
 /*****************************************************************************
- * dvbpsi_GatherBATSections
+ * dvbpsi_bat_sections_gather
  *****************************************************************************
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
-void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
+void dvbpsi_bat_sections_gather(dvbpsi_t *p_dvbpsi,
                               dvbpsi_decoder_t *p_decoder,
                               dvbpsi_psi_section_t * p_section)
 {
@@ -436,7 +435,7 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_bat_decoder)))
+    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_bat_decoder)))
     {
         assert(p_bat_decoder->pf_bat_callback);
 
@@ -444,9 +443,9 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
         p_bat_decoder->current_bat = *p_bat_decoder->p_building_bat;
         p_bat_decoder->b_current_valid = true;
         /* Chain the sections */
-        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_bat_decoder));
+        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_bat_decoder));
         /* Decode the sections */
-        dvbpsi_DecodeBATSections(p_bat_decoder->p_building_bat,
+        dvbpsi_bat_sections_decode(p_bat_decoder->p_building_bat,
                                  p_bat_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_bat_decoder->ap_sections[0]);
@@ -467,7 +466,7 @@ void dvbpsi_GatherBATSections(dvbpsi_t *p_dvbpsi,
  * p_section as the input parameter
  * similar to dvbpsi_DecodeNITSection
  *****************************************************************************/
-void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
+void dvbpsi_bat_sections_decode(dvbpsi_bat_t* p_bat,
                               dvbpsi_psi_section_t* p_section)
 {
   uint8_t* p_byte, * p_end, * p_end2;
@@ -484,7 +483,7 @@ void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
       uint8_t i_tag = p_byte[0];
       uint8_t i_length = p_byte[1];
       if(i_length + 2 <= p_end - p_byte)
-        dvbpsi_BATBouquetAddDescriptor(p_bat, i_tag, i_length, p_byte + 2);
+        dvbpsi_bat_bouquet_descriptor_add(p_bat, i_tag, i_length, p_byte + 2);
       p_byte += 2 + i_length;
     }
 
@@ -502,7 +501,7 @@ void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
       uint16_t i_ts_id = ((uint16_t)p_byte[0] << 8) | p_byte[1];
       uint16_t i_orig_network_id = ((uint16_t)p_byte[2] << 8) | p_byte[3];
       uint16_t i_transport_descriptors_length = ((uint16_t)(p_byte[4] & 0x0f) << 8) | p_byte[5];
-      dvbpsi_bat_ts_t* p_ts = dvbpsi_BATAddTS(p_bat, i_ts_id, i_orig_network_id);
+      dvbpsi_bat_ts_t* p_ts = dvbpsi_bat_ts_add(p_bat, i_ts_id, i_orig_network_id);
       /* - TS descriptors */
       p_byte += 6;
       p_end2 = p_byte + i_transport_descriptors_length;
@@ -515,7 +514,7 @@ void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
         uint8_t i_tag = p_byte[0];
         uint8_t i_length = p_byte[1];
         if(i_length + 2 <= p_end2 - p_byte)
-          dvbpsi_BATTSAddDescriptor(p_ts, i_tag, i_length, p_byte + 2);
+          dvbpsi_bat_ts_descriptor_add(p_ts, i_tag, i_length, p_byte + 2);
         p_byte += 2 + i_length;
       }
     }
@@ -525,12 +524,12 @@ void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
 }
 
 /*****************************************************************************
- * dvbpsi_GenBATSections
+ * dvbpsi_bat_sections_generate
  *****************************************************************************
  * Generate BAT sections based on the dvbpsi_bat_t structure.
- * similar to dvbpsi_GenNITSections
+ * similar to dvbpsi_nit_sections_generate
  *****************************************************************************/
-dvbpsi_psi_section_t* dvbpsi_GenBATSections(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_bat)
+dvbpsi_psi_section_t* dvbpsi_bat_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t* p_bat)
 {
     dvbpsi_psi_section_t* p_result = dvbpsi_NewPSISection(1024);
     dvbpsi_psi_section_t* p_current = p_result;

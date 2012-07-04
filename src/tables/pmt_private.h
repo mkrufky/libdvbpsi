@@ -48,18 +48,28 @@ typedef struct dvbpsi_pmt_decoder_s
 } dvbpsi_pmt_decoder_t;
 
 /*****************************************************************************
- * dvbpsi_GatherPMTSections
+ * dvbpsi_pmt_sections_gather
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherPMTSections(dvbpsi_t *p_dvbpsi,
+void dvbpsi_pmt_sections_gather(dvbpsi_t *p_dvbpsi,
                               dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
- * dvbpsi_DecodePMTSections
+ * dvbpsi_pmt_sections_decode
  *****************************************************************************
  * PMT decoder.
  *****************************************************************************/
+void dvbpsi_pmt_sections_decode(dvbpsi_pmt_t* p_pmt,
+                                dvbpsi_psi_section_t* p_section);
+
+/*****************************************************************************
+ * Deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+void dvbpsi_GatherPMTSections(dvbpsi_handle *handle,
+                              dvbpsi_psi_section_t* p_section);
+__attribute__((deprecated))
 void dvbpsi_DecodePMTSections(dvbpsi_pmt_t* p_pmt,
                               dvbpsi_psi_section_t* p_section);
 

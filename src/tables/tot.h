@@ -80,10 +80,10 @@ typedef struct dvbpsi_tot_s
 typedef void (* dvbpsi_tot_callback)(void* p_cb_data, dvbpsi_tot_t* p_new_tot);
 
 /*****************************************************************************
- * dvbpsi_AttachTOT
+ * dvbpsi_tot_attach
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+ * \fn bool dvbpsi_tot_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
                             dvbpsi_tot_callback pf_callback, void* p_cb_data)
  * \brief Creation and initialization of a TDT/TOT decoder.
  * \param p_dvbpsi dvbpsi handle pointing to Subtable demultiplexor to which the decoder is attached.
@@ -93,28 +93,28 @@ typedef void (* dvbpsi_tot_callback)(void* p_cb_data, dvbpsi_tot_t* p_new_tot);
  * \param p_cb_data private data given in argument to the callback.
  * \return true on success, false on failure
  */
-bool dvbpsi_AttachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+bool dvbpsi_tot_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
                       dvbpsi_tot_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
- * dvbpsi_DetachTOT
+ * dvbpsi_tot_detach
  *****************************************************************************/
 /*!
- * \fn int dvbpsi_DetachTOT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
+ * \fn int dvbpsi_tot_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
  * \brief Destroy a TDT/TOT decoder.
  * \param p_dvbpsi Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, usually 0x70
  * \param i_extension Table ID extension, unused in the TDT/TOT
  * \return nothing.
  */
-void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
+void dvbpsi_tot_detach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                       uint16_t i_extension);
 
 /*****************************************************************************
- * dvbpsi_InitTOT/dvbpsi_NewTOT
+ * dvbpsi_tot_init/dvbpsi_tot_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time)
+ * \fn void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint64_t i_utc_time)
  * \brief Initialize a user-allocated dvbpsi_tot_t structure.
  * \param p_tot pointer to the TDT/TOT structure
  * \param i_ts_id transport stream ID
@@ -123,11 +123,11 @@ void dvbpsi_DetachTOT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * \param i_utc_time the time in UTC
  * \return nothing.
  */
-void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
+void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next, uint64_t i_utc_time);
 
 /*!
- * \fn dvbpsi_tot_t *dvbpsi_NewTOT(uint64_t i_utc_time)
+ * \fn dvbpsi_tot_t *dvbpsi_tot_new(uint64_t i_utc_time)
  * \brief Allocate and initialize a new dvbpsi_tot_t structure.
  * \param i_ts_id transport stream ID
  * \param i_version SDT version
@@ -135,36 +135,36 @@ void dvbpsi_InitTOT(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
  * \param i_utc_time the time in UTC
  * \return p_tot pointer to the TDT/TOT structure
  */
-dvbpsi_tot_t *dvbpsi_NewTOT(uint16_t i_ts_id, uint8_t i_version,
+dvbpsi_tot_t *dvbpsi_tot_new(uint16_t i_ts_id, uint8_t i_version,
                             bool b_current_next, uint64_t i_utc_time);
 
 /*****************************************************************************
- * dvbpsi_EmptyTOT/dvbpsi_DeleteTOT
+ * dvbpsi_tot_empty/dvbpsi_tot_delete
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_EmptyTOT(dvbpsi_tot_t* p_tot)
+ * \fn void dvbpsi_tot_empty(dvbpsi_tot_t* p_tot)
  * \brief Clean a dvbpsi_tot_t structure.
  * \param p_tot pointer to the TDT/TOT structure
  * \return nothing.
  */
-void dvbpsi_EmptyTOT(dvbpsi_tot_t* p_tot);
+void dvbpsi_tot_empty(dvbpsi_tot_t* p_tot);
 
 /*!
- * \fn dvbpsi_DeleteTOT(dvbpsi_tot_t* p_tot)
+ * \fn dvbpsi_tot_delete(dvbpsi_tot_t* p_tot)
  * \brief Clean and free a dvbpsi_tot_t structure.
  * \param p_tot pointer to the TDT/TOT structure
  * \return nothing.
  */
-void dvbpsi_DeleteTOT(dvbpsi_tot_t* p_tot);
+void dvbpsi_tot_delete(dvbpsi_tot_t* p_tot);
 
 /*****************************************************************************
- * dvbpsi_TOTAddDescriptor
+ * dvbpsi_tot_descriptor_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
-                                                    uint8_t i_tag,
-                                                    uint8_t i_length,
-                                                    uint8_t* p_data)
+ * \fn dvbpsi_descriptor_t* dvbpsi_tot_descriptor_add(dvbpsi_tot_t* p_tot,
+                                                      uint8_t i_tag,
+                                                      uint8_t i_length,
+                                                      uint8_t* p_data)
  * \brief Add a descriptor in the TOT.
  * \param p_tot pointer to the TOT structure
  * \param i_tag descriptor's tag
@@ -172,15 +172,15 @@ void dvbpsi_DeleteTOT(dvbpsi_tot_t* p_tot);
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
-                                             uint8_t i_tag, uint8_t i_length,
-                                             uint8_t* p_data);
+dvbpsi_descriptor_t* dvbpsi_tot_descriptor_add(dvbpsi_tot_t* p_tot,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t* p_data);
 
 /*****************************************************************************
- * dvbpsi_GenTOTSections
+ * dvbpsi_tot_sections_generate
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t *p_dvbpsi, dvbpsi_tot_t* p_tot)
+ * \fn dvbpsi_psi_section_t* dvbpsi_tot_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_tot_t* p_tot)
  * \brief TDT/TOT generator
  * \param p_dvbpsi handle to dvbpsi with attached decoder
  * \param p_tot TDT/TOT structure
@@ -188,7 +188,27 @@ dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
  *
  * Generate TDT/TOT sections based on the dvbpsi_tot_t structure.
  */
-dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot);
+dvbpsi_psi_section_t* dvbpsi_tot_sections_generate(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot);
+
+/*****************************************************************************
+ * deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+int dvbpsi_AttachTOT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
+                     uint16_t i_extension,
+                     dvbpsi_tot_callback pf_callback, void* p_cb_data);
+__attribute__((deprecated))
+void dvbpsi_DetachTOT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
+                      uint16_t i_extension);
+__attribute__((deprecated))
+void dvbpsi_NewTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time);
+__attribute__((deprecated)) void dvbpsi_DeleteTOT(dvbpsi_tot_t* p_tot);
+__attribute__((deprecated))
+dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
+                                             uint8_t i_tag, uint8_t i_length,
+                                             uint8_t* p_data);
+__attribute__((deprecated))
+dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_tot_t* p_tot);
 
 #ifdef __cplusplus
 };
@@ -197,4 +217,3 @@ dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_
 #else
 #error "Multiple inclusions of tot.h"
 #endif
-

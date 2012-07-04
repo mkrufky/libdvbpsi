@@ -50,11 +50,11 @@
 #include "eit_private.h"
 
 /*****************************************************************************
- * dvbpsi_AttachEIT
+ * dvbpsi_eit_attach
  *****************************************************************************
  * Initialize a EIT subtable decoder.
  *****************************************************************************/
-bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+bool dvbpsi_eit_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
                            dvbpsi_eit_callback pf_callback, void* p_cb_data)
 {
     assert(p_dvbpsi);
@@ -72,18 +72,18 @@ bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
     }
 
     dvbpsi_eit_decoder_t*  p_eit_decoder;
-    p_eit_decoder = (dvbpsi_eit_decoder_t*) dvbpsi_NewDecoder(NULL,
+    p_eit_decoder = (dvbpsi_eit_decoder_t*) dvbpsi_decoder_new(NULL,
                                              0, true, sizeof(dvbpsi_eit_decoder_t));
     if (p_eit_decoder == NULL)
         return false;
 
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
-    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachEIT,
-                                         dvbpsi_GatherEITSections, DVBPSI_DECODER(p_eit_decoder));
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_eit_detach,
+                                         dvbpsi_eit_sections_gather, DVBPSI_DECODER(p_eit_decoder));
     if (p_subdec == NULL)
     {
-        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_eit_decoder));
+        dvbpsi_decoder_delete(DVBPSI_DECODER(p_eit_decoder));
         return false;
     }
 
@@ -99,11 +99,11 @@ bool dvbpsi_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extensi
 }
 
 /*****************************************************************************
- * dvbpsi_DetachEIT
+ * dvbpsi_eit_detach
  *****************************************************************************
  * Close a EIT decoder.
  *****************************************************************************/
-void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
+void dvbpsi_eit_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
           uint16_t i_extension)
 {
     assert(p_dvbpsi);
@@ -125,7 +125,7 @@ void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     dvbpsi_eit_decoder_t* p_eit_decoder;
     p_eit_decoder = (dvbpsi_eit_decoder_t*)p_subdec->p_decoder;
     if (p_eit_decoder->p_building_eit)
-        dvbpsi_DeleteEIT(p_eit_decoder->p_building_eit);
+        dvbpsi_eit_delete(p_eit_decoder->p_building_eit);
     p_eit_decoder->p_building_eit = NULL;
 
     dvbpsi_DetachDemuxSubDecoder(p_demux, p_subdec);
@@ -133,11 +133,11 @@ void dvbpsi_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
 }
 
 /*****************************************************************************
- * dvbpsi_InitEIT
+ * dvbpsi_eit_init
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_eit_t structure.
  *****************************************************************************/
-void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
+void dvbpsi_eit_init(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
                     bool b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
                     uint8_t i_segment_last_section_number,
                     uint8_t i_last_table_id)
@@ -153,28 +153,28 @@ void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versio
 }
 
 /*****************************************************************************
- * dvbpsi_NewEIT
+ * dvbpsi_eit_new
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_eit_t structure.
  *****************************************************************************/
-dvbpsi_eit_t* dvbpsi_NewEIT(uint16_t i_service_id, uint8_t i_version,
+dvbpsi_eit_t* dvbpsi_eit_new(uint16_t i_service_id, uint8_t i_version,
                              bool b_current_next, uint16_t i_ts_id,
                              uint16_t i_network_id, uint8_t i_segment_last_section_number,
                              uint8_t i_last_table_id)
 {
     dvbpsi_eit_t *p_eit = (dvbpsi_eit_t*)malloc(sizeof(dvbpsi_eit_t));
     if (p_eit != NULL)
-        dvbpsi_InitEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id,
+        dvbpsi_eit_init(p_eit, i_service_id, i_version, b_current_next, i_ts_id,
                        i_network_id, i_segment_last_section_number, i_last_table_id);
     return p_eit;
 }
 
 /*****************************************************************************
- * dvbpsi_EmptyEIT
+ * dvbpsi_eit_empty
  *****************************************************************************
  * Clean a dvbpsi_eit_t structure.
  *****************************************************************************/
-void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit)
+void dvbpsi_eit_empty(dvbpsi_eit_t* p_eit)
 {
     dvbpsi_eit_event_t* p_event = p_eit->p_first_event;
 
@@ -189,23 +189,23 @@ void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit)
 }
 
 /*****************************************************************************
- * dvbpsi_DeleteEIT
+ * dvbpsi_eit_delete
  *****************************************************************************
  * Clean a dvbpsi_eit_t structure.
  *****************************************************************************/
-void dvbpsi_DeleteEIT(dvbpsi_eit_t* p_eit)
+void dvbpsi_eit_delete(dvbpsi_eit_t* p_eit)
 {
     if (p_eit)
-        dvbpsi_EmptyEIT(p_eit);
+        dvbpsi_eit_empty(p_eit);
     free(p_eit);
 }
 
 /*****************************************************************************
- * dvbpsi_EITAddEvent
+ * dvbpsi_eit_event_add
  *****************************************************************************
  * Add an event description at the end of the EIT.
  *****************************************************************************/
-dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
+dvbpsi_eit_event_t* dvbpsi_eit_event_add(dvbpsi_eit_t* p_eit,
     uint16_t i_event_id, uint64_t i_start_time, uint32_t i_duration,
     uint8_t i_running_status, bool b_free_ca)
 {
@@ -235,11 +235,11 @@ dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
 }
 
 /*****************************************************************************
- * dvbpsi_EITEventAddDescriptor
+ * dvbpsi_eit_event_descriptor_add
  *****************************************************************************
  * Add a descriptor in the EIT event description.
  *****************************************************************************/
-dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(dvbpsi_eit_event_t* p_event,
+dvbpsi_descriptor_t* dvbpsi_eit_event_descriptor_add(dvbpsi_eit_event_t* p_event,
     uint8_t i_tag, uint8_t i_length, uint8_t* p_data)
 {
     dvbpsi_descriptor_t* p_descriptor;
@@ -261,13 +261,13 @@ static void dvbpsi_ReInitEIT(dvbpsi_eit_decoder_t* p_decoder, const bool b_force
 {
     assert(p_decoder);
 
-    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+    dvbpsi_decoder_reset(DVBPSI_DECODER(p_decoder), b_force);
 
     if (b_force)
     {
         /* Free structures */
         if (p_decoder->p_building_eit)
-            dvbpsi_DeleteEIT(p_decoder->p_building_eit);
+            dvbpsi_eit_delete(p_decoder->p_building_eit);
     }
     p_decoder->p_building_eit = NULL;
 }
@@ -369,7 +369,7 @@ static bool dvbpsi_AddSectionEIT(dvbpsi_t *p_dvbpsi, dvbpsi_eit_decoder_t *p_eit
     /* Initialize the structures if it's the first section received */
     if (!p_eit_decoder->p_building_eit)
     {
-        p_eit_decoder->p_building_eit = dvbpsi_NewEIT(p_section->i_extension,
+        p_eit_decoder->p_building_eit = dvbpsi_eit_new(p_section->i_extension,
                                 p_section->i_version,
                                 p_section->b_current_next,
                                 ((uint16_t)(p_section->p_payload_start[0]) << 8)
@@ -388,7 +388,7 @@ static bool dvbpsi_AddSectionEIT(dvbpsi_t *p_dvbpsi, dvbpsi_eit_decoder_t *p_eit
     }
 
     /* Fill the section array */
-    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_eit_decoder), p_section))
+    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_eit_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "EIT decoder",
                      "overwrite section number %d", p_section->i_number);
 
@@ -396,12 +396,12 @@ static bool dvbpsi_AddSectionEIT(dvbpsi_t *p_dvbpsi, dvbpsi_eit_decoder_t *p_eit
 }
 
 /*****************************************************************************
- * dvbpsi_GatherEITSections
+ * dvbpsi_eit_sections_gather
  *****************************************************************************
  * Callback for the subtable demultiplexor.
  *****************************************************************************/
-void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_decoder,
-                              dvbpsi_psi_section_t *p_section)
+void dvbpsi_eit_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_decoder,
+                               dvbpsi_psi_section_t *p_section)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
@@ -474,10 +474,10 @@ void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_de
         p_eit_decoder->b_current_valid = true;
 
         /* Chain the sections */
-        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_eit_decoder));
+        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_eit_decoder));
 
         /* Decode the sections */
-        dvbpsi_DecodeEITSections(p_eit_decoder->p_building_eit, p_eit_decoder->ap_sections[0]);
+        dvbpsi_eit_sections_decode(p_eit_decoder->p_building_eit, p_eit_decoder->ap_sections[0]);
 
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[0]);
@@ -494,12 +494,12 @@ void dvbpsi_GatherEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_de
 }
 
 /*****************************************************************************
- * dvbpsi_DecodeEITSections
+ * dvbpsi_eit_sections_decode
  *****************************************************************************
  * EIT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeEITSections(dvbpsi_eit_t* p_eit,
-                              dvbpsi_psi_section_t* p_section)
+void dvbpsi_eit_sections_decode(dvbpsi_eit_t* p_eit,
+                                dvbpsi_psi_section_t* p_section)
 {
     uint8_t* p_byte, * p_end;
 
@@ -518,7 +518,7 @@ void dvbpsi_DecodeEITSections(dvbpsi_eit_t* p_eit,
             uint8_t i_running_status = (uint8_t)(p_byte[10]) >> 5;
             bool b_free_ca = (int)(p_byte[10] & 0x10) >> 4;
             uint16_t i_ev_length = ((uint16_t)(p_byte[10] & 0xf) << 8) | p_byte[11];
-            dvbpsi_eit_event_t* p_event = dvbpsi_EITAddEvent(p_eit,
+            dvbpsi_eit_event_t* p_event = dvbpsi_eit_event_add(p_eit,
                                                 i_event_id, i_start_time, i_duration,
                                                 i_running_status, b_free_ca);
             /* Event descriptors */
@@ -529,7 +529,7 @@ void dvbpsi_DecodeEITSections(dvbpsi_eit_t* p_eit,
                 uint8_t i_tag = p_byte[0];
                 uint8_t i_length = p_byte[1];
                 if (i_length + 2 <= p_end - p_byte)
-                    dvbpsi_EITEventAddDescriptor(p_event, i_tag, i_length, p_byte + 2);
+                    dvbpsi_eit_event_descriptor_add(p_event, i_tag, i_length, p_byte + 2);
                 p_byte += 2 + i_length;
             }
         }
@@ -609,11 +609,11 @@ static inline void EncodeEventHeaders(dvbpsi_eit_event_t *p_event, uint8_t *buf)
 }
 
 /*****************************************************************************
- * dvbpsi_GenEITSections
+ * dvbpsi_eit_sections_generate
  *****************************************************************************
  * Generate EIT sections based on the dvbpsi_eit_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t* dvbpsi_GenEITSections(dvbpsi_t *p_dvbpsi, dvbpsi_eit_t *p_eit,
+dvbpsi_psi_section_t* dvbpsi_eit_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_eit_t *p_eit,
                                             uint8_t i_table_id)
 {
   dvbpsi_psi_section_t *p_result = NewEITSection (p_eit, i_table_id, 0);

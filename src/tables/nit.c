@@ -51,11 +51,11 @@
 #include "nit_private.h"
 
 /*****************************************************************************
- * dvbpsi_AttachNIT
+ * dvbpsi_nit_attach
  *****************************************************************************
  * Initialize a NIT subtable decoder.
  *****************************************************************************/
-bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
+bool dvbpsi_nit_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
                       uint16_t i_extension, dvbpsi_nit_callback pf_callback,
                       void* p_cb_data)
 {
@@ -74,18 +74,18 @@ bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
     }
 
     dvbpsi_nit_decoder_t*  p_nit_decoder;
-    p_nit_decoder = (dvbpsi_nit_decoder_t*) dvbpsi_NewDecoder(NULL,
+    p_nit_decoder = (dvbpsi_nit_decoder_t*) dvbpsi_decoder_new(NULL,
                                              0, true, sizeof(dvbpsi_nit_decoder_t));
     if (p_nit_decoder == NULL)
         return false;
 
     /* subtable decoder configuration */
     dvbpsi_demux_subdec_t* p_subdec;
-    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_DetachNIT,
-                                         dvbpsi_GatherNITSections, DVBPSI_DECODER(p_nit_decoder));
+    p_subdec = dvbpsi_NewDemuxSubDecoder(i_table_id, i_extension, dvbpsi_nit_detach,
+                                         dvbpsi_nit_sections_gather, DVBPSI_DECODER(p_nit_decoder));
     if (p_subdec == NULL)
     {
-        dvbpsi_DeleteDecoder(DVBPSI_DECODER(p_nit_decoder));
+        dvbpsi_decoder_delete(DVBPSI_DECODER(p_nit_decoder));
         return false;
     }
 
@@ -102,11 +102,11 @@ bool dvbpsi_AttachNIT(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
 }
 
 /*****************************************************************************
- * dvbpsi_DetachNIT
+ * dvbpsi_nit_detach
  *****************************************************************************
  * Close a NIT decoder.
  *****************************************************************************/
-void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
+void dvbpsi_nit_detach(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
                       uint16_t i_extension)
 {
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
@@ -125,7 +125,7 @@ void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
     dvbpsi_nit_decoder_t* p_nit_decoder;
     p_nit_decoder = (dvbpsi_nit_decoder_t*)p_subdec->p_decoder;
     if (p_nit_decoder->p_building_nit)
-        dvbpsi_DeleteNIT(p_nit_decoder->p_building_nit);
+        dvbpsi_nit_delete(p_nit_decoder->p_building_nit);
     p_nit_decoder->p_building_nit = NULL;
 
     /* Free demux sub table decoder */
@@ -134,11 +134,11 @@ void dvbpsi_DetachNIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
 }
 
 /****************************************************************************
- * dvbpsi_InitNIT
+ * dvbpsi_nit_init
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_nit_t structure.
  *****************************************************************************/
-void dvbpsi_InitNIT(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
+void dvbpsi_nit_init(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
                     uint8_t i_version, bool b_current_next)
 {
     p_nit->i_network_id = i_network_id;
@@ -149,25 +149,25 @@ void dvbpsi_InitNIT(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
 }
 
 /****************************************************************************
- * dvbpsi_NewNIT
+ * dvbpsi_nit_new
  *****************************************************************************
  * Allocate and initialize a dvbpsi_nit_t structure.
  *****************************************************************************/
-dvbpsi_nit_t *dvbpsi_NewNIT(uint16_t i_network_id, uint8_t i_version,
+dvbpsi_nit_t *dvbpsi_nit_new(uint16_t i_network_id, uint8_t i_version,
                             bool b_current_next)
 {
     dvbpsi_nit_t*p_nit = (dvbpsi_nit_t*)malloc(sizeof(dvbpsi_nit_t));
     if (p_nit != NULL)
-       dvbpsi_InitNIT(p_nit, i_network_id, i_version, b_current_next);
+       dvbpsi_nit_init(p_nit, i_network_id, i_version, b_current_next);
     return p_nit;
 }
 
 /*****************************************************************************
- * dvbpsi_EmptyNIT
+ * dvbpsi_nit_empty
  *****************************************************************************
  * Clean a dvbpsi_nit_t structure.
  *****************************************************************************/
-void dvbpsi_EmptyNIT(dvbpsi_nit_t* p_nit)
+void dvbpsi_nit_empty(dvbpsi_nit_t* p_nit)
 {
     dvbpsi_nit_ts_t* p_ts = p_nit->p_first_ts;
 
@@ -186,25 +186,25 @@ void dvbpsi_EmptyNIT(dvbpsi_nit_t* p_nit)
 }
 
 /****************************************************************************
- * dvbpsi_DeleteNIT
+ * dvbpsi_nit_delete
  *****************************************************************************
  * Clean and delete a dvbpsi_nit_t structure.
  *****************************************************************************/
-void dvbpsi_DeleteNIT(dvbpsi_nit_t *p_nit)
+void dvbpsi_nit_delete(dvbpsi_nit_t *p_nit)
 {
     if (p_nit)
-        dvbpsi_EmptyNIT(p_nit);
+        dvbpsi_nit_empty(p_nit);
     free(p_nit);
 }
 
 /*****************************************************************************
- * dvbpsi_NITAddDescriptor
+ * dvbpsi_nit_descriptor_add
  *****************************************************************************
  * Add a descriptor in the NIT.
  *****************************************************************************/
-dvbpsi_descriptor_t* dvbpsi_NITAddDescriptor(dvbpsi_nit_t* p_nit,
-                                             uint8_t i_tag, uint8_t i_length,
-                                             uint8_t* p_data)
+dvbpsi_descriptor_t* dvbpsi_nit_descriptor_add(dvbpsi_nit_t* p_nit,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t* p_data)
 {
     dvbpsi_descriptor_t* p_descriptor
                         = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
@@ -224,12 +224,12 @@ dvbpsi_descriptor_t* dvbpsi_NITAddDescriptor(dvbpsi_nit_t* p_nit,
 }
 
 /*****************************************************************************
- * dvbpsi_NITAddTS
+ * dvbpsi_nit_ts_add
  *****************************************************************************
  * Add an TS in the NIT.
  *****************************************************************************/
-dvbpsi_nit_ts_t* dvbpsi_NITAddTS(dvbpsi_nit_t* p_nit,
-                                 uint16_t i_ts_id, uint16_t i_orig_network_id)
+dvbpsi_nit_ts_t* dvbpsi_nit_ts_add(dvbpsi_nit_t* p_nit,
+                                   uint16_t i_ts_id, uint16_t i_orig_network_id)
 {
     dvbpsi_nit_ts_t* p_ts = (dvbpsi_nit_ts_t*)malloc(sizeof(dvbpsi_nit_ts_t));
     if (p_ts == NULL)
@@ -253,13 +253,13 @@ dvbpsi_nit_ts_t* dvbpsi_NITAddTS(dvbpsi_nit_t* p_nit,
 }
 
 /*****************************************************************************
- * dvbpsi_NITTSAddDescriptor
+ * dvbpsi_nit_ts_descriptor_add
  *****************************************************************************
  * Add a descriptor in the NIT TS.
  *****************************************************************************/
-dvbpsi_descriptor_t* dvbpsi_NITTSAddDescriptor(dvbpsi_nit_ts_t* p_ts,
-                                               uint8_t i_tag, uint8_t i_length,
-                                               uint8_t* p_data)
+dvbpsi_descriptor_t* dvbpsi_nit_ts_descriptor_add(dvbpsi_nit_ts_t* p_ts,
+                                                  uint8_t i_tag, uint8_t i_length,
+                                                  uint8_t* p_data)
 {
     dvbpsi_descriptor_t* p_descriptor
                         = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
@@ -280,14 +280,14 @@ static void dvbpsi_ReInitNIT(dvbpsi_nit_decoder_t* p_decoder, const bool b_force
 {
     assert(p_decoder);
 
-    dvbpsi_ReInitDecoder(DVBPSI_DECODER(p_decoder), b_force);
+    dvbpsi_decoder_reset(DVBPSI_DECODER(p_decoder), b_force);
 
     /* Force redecoding */
     if (b_force)
     {
         /* Free structures */
         if (p_decoder->p_building_nit)
-            dvbpsi_DeleteNIT(p_decoder->p_building_nit);
+            dvbpsi_nit_delete(p_decoder->p_building_nit);
     }
     p_decoder->p_building_nit = NULL;
 }
@@ -331,7 +331,7 @@ static bool dvbpsi_AddSectionNIT(dvbpsi_t *p_dvbpsi, dvbpsi_nit_decoder_t *p_nit
     /* Initialize the structures if it's the first section received */
     if (p_nit_decoder->p_building_nit == NULL)
     {
-        p_nit_decoder->p_building_nit = dvbpsi_NewNIT(p_nit_decoder->i_network_id,
+        p_nit_decoder->p_building_nit = dvbpsi_nit_new(p_nit_decoder->i_network_id,
                                   p_section->i_version, p_section->b_current_next);
         if (p_nit_decoder->p_building_nit == NULL)
             return false;
@@ -339,7 +339,7 @@ static bool dvbpsi_AddSectionNIT(dvbpsi_t *p_dvbpsi, dvbpsi_nit_decoder_t *p_nit
     }
 
     /* Fill the section array */
-    if (dvbpsi_AddSectionDecoder(DVBPSI_DECODER(p_nit_decoder), p_section))
+    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_nit_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "NIT decoder", "overwrite section number %d",
                                p_section->i_number);
 
@@ -347,13 +347,13 @@ static bool dvbpsi_AddSectionNIT(dvbpsi_t *p_dvbpsi, dvbpsi_nit_decoder_t *p_nit
 }
 
 /*****************************************************************************
- * dvbpsi_GatherNITSections
+ * dvbpsi_nit_sections_gather
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
-                              dvbpsi_decoder_t *p_private_decoder,
-                              dvbpsi_psi_section_t *p_section)
+void dvbpsi_nit_sections_gather(dvbpsi_t *p_dvbpsi,
+                                dvbpsi_decoder_t *p_private_decoder,
+                                dvbpsi_psi_section_t *p_section)
 {
     assert(p_dvbpsi);
 
@@ -420,7 +420,7 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_SectionsCompleteDecoder(DVBPSI_DECODER(p_nit_decoder)))
+    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_nit_decoder)))
     {
         assert(p_nit_decoder->pf_nit_callback);
 
@@ -429,11 +429,11 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
         p_nit_decoder->b_current_valid = true;
 
         /* Chain the sections */
-        dvbpsi_ChainSectionsDecoder(DVBPSI_DECODER(p_nit_decoder));
+        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_nit_decoder));
 
         /* Decode the sections */
-        dvbpsi_DecodeNITSections(p_nit_decoder->p_building_nit,
-                                 p_nit_decoder->ap_sections[0]);
+        dvbpsi_nit_sections_decode(p_nit_decoder->p_building_nit,
+                                   p_nit_decoder->ap_sections[0]);
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[0]);
         p_nit_decoder->ap_sections[0] = NULL;
@@ -446,12 +446,12 @@ void dvbpsi_GatherNITSections(dvbpsi_t *p_dvbpsi,
 }
 
 /*****************************************************************************
- * dvbpsi_DecodeNITSections
+ * dvbpsi_nit_sections_decode
  *****************************************************************************
  * NIT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeNITSections(dvbpsi_nit_t* p_nit,
-                              dvbpsi_psi_section_t* p_section)
+void dvbpsi_nit_sections_decode(dvbpsi_nit_t* p_nit,
+                                dvbpsi_psi_section_t* p_section)
 {
     uint8_t* p_byte, * p_end, * p_end2;
 
@@ -467,7 +467,7 @@ void dvbpsi_DecodeNITSections(dvbpsi_nit_t* p_nit,
             uint8_t i_tag = p_byte[0];
             uint8_t i_length = p_byte[1];
             if (i_length + 2 <= p_end - p_byte)
-                dvbpsi_NITAddDescriptor(p_nit, i_tag, i_length, p_byte + 2);
+                dvbpsi_nit_descriptor_add(p_nit, i_tag, i_length, p_byte + 2);
             p_byte += 2 + i_length;
         }
 
@@ -485,7 +485,7 @@ void dvbpsi_DecodeNITSections(dvbpsi_nit_t* p_nit,
             uint16_t i_ts_id = ((uint16_t)p_byte[0] << 8) | p_byte[1];
             uint16_t i_orig_network_id = ((uint16_t)p_byte[2] << 8) | p_byte[3];
             uint16_t i_ts_length = ((uint16_t)(p_byte[4] & 0x0f) << 8) | p_byte[5];
-            dvbpsi_nit_ts_t* p_ts = dvbpsi_NITAddTS(p_nit, i_ts_id, i_orig_network_id);
+            dvbpsi_nit_ts_t* p_ts = dvbpsi_nit_ts_add(p_nit, i_ts_id, i_orig_network_id);
             /* - TS descriptors */
             p_byte += 6;
             p_end2 = p_byte + i_ts_length;
@@ -498,7 +498,7 @@ void dvbpsi_DecodeNITSections(dvbpsi_nit_t* p_nit,
                 uint8_t i_tag = p_byte[0];
                 uint8_t i_length = p_byte[1];
                 if (i_length + 2 <= p_end2 - p_byte)
-                    dvbpsi_NITTSAddDescriptor(p_ts, i_tag, i_length, p_byte + 2);
+                    dvbpsi_nit_ts_descriptor_add(p_ts, i_tag, i_length, p_byte + 2);
                 p_byte += 2 + i_length;
             }
         }
@@ -507,11 +507,11 @@ void dvbpsi_DecodeNITSections(dvbpsi_nit_t* p_nit,
 }
 
 /*****************************************************************************
- * dvbpsi_GenNITSections
+ * dvbpsi_nit_sections_generate
  *****************************************************************************
  * Generate NIT sections based on the dvbpsi_nit_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t* dvbpsi_GenNITSections(dvbpsi_t *p_dvbpsi,
+dvbpsi_psi_section_t* dvbpsi_nit_sections_generate(dvbpsi_t *p_dvbpsi,
                                             dvbpsi_nit_t* p_nit, uint8_t i_table_id)
 {
     dvbpsi_psi_section_t* p_result = dvbpsi_NewPSISection(1024);

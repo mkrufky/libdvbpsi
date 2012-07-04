@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dvbpsi.c: DVB PSI Information
  *****************************************************************************
- * Copyright (C) 2010-2011 M2X BV
+ * Copyright (C) 2010-2012 M2X BV
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
  *
@@ -543,11 +543,11 @@ static void handle_subtable(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_e
 #endif
         case 0x40: // NIT network_information_section - actual_network
         case 0x41: // NIT network_information_section - other_network
-            if (!dvbpsi_AttachNIT(p_dvbpsi, i_table_id, i_extension, handle_NIT, p_data))
+            if (!dvbpsi_nit_attach(p_dvbpsi, i_table_id, i_extension, handle_NIT, p_data))
                     fprintf(stderr, "dvbinfo: Failed to attach NIT subdecoder\n");
             break;
         case 0x42:
-            if (!dvbpsi_AttachSDT(p_dvbpsi, i_table_id, i_extension, handle_SDT, p_data))
+            if (!dvbpsi_sdt_attach(p_dvbpsi, i_table_id, i_extension, handle_SDT, p_data))
                     fprintf(stderr, "dvbinfo: Failed to attach SDT subdecoder\n");
             break;
 #if 0
@@ -556,7 +556,7 @@ static void handle_subtable(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_e
         //0x47 to 0x49 reserved for future use
 #endif
         case 0x4A: // BAT bouquet_association_section
-            if (!dvbpsi_AttachBAT(p_dvbpsi, i_table_id, i_extension, handle_BAT, p_data))
+            if (!dvbpsi_bat_attach(p_dvbpsi, i_table_id, i_extension, handle_BAT, p_data))
                     fprintf(stderr, "dvbinfo: Failed to attach BAT subdecoder\n");
             break;
         //0x4B to 0x4D reserved for future use
@@ -596,12 +596,12 @@ static void handle_subtable(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_e
         case 0x6D:
         case 0x6E:
         case 0x6F:
-            if (!dvbpsi_AttachEIT(p_dvbpsi, i_table_id, i_extension, handle_EIT, p_data))
+            if (!dvbpsi_eit_attach(p_dvbpsi, i_table_id, i_extension, handle_EIT, p_data))
                     fprintf(stderr, "dvbinfo: Failed to attach EIT subdecoder\n");
             break;
         case 0x70:
         case 0x73: /* TOT only */
-            if (!dvbpsi_AttachTOT(p_dvbpsi, i_table_id, i_extension, handle_TOT, p_data))
+            if (!dvbpsi_tot_attach(p_dvbpsi, i_table_id, i_extension, handle_TOT, p_data))
                     fprintf(stderr, "dvbinfo: Failed to attach TOT subdecoder\n");
             break;
 #if 0
@@ -616,7 +616,7 @@ static void handle_subtable(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_e
 #endif
 #ifdef TS_USE_SCTE_SIS
         case 0xFC:
-            if (!dvbpsi_AttachSIS(p_dvbpsi, i_table_id, i_extension, handle_SIS, p_data))
+            if (!dvbpsi_sis_attach(p_dvbpsi, i_table_id, i_extension, handle_SIS, p_data))
                     fprintf(stderr, "dvbinfo: Failed to attach SIS subdecoder\n");
             break;
 #endif
@@ -646,8 +646,8 @@ static void handle_PAT(void* p_data, dvbpsi_pat_t* p_pat)
     while (p_program)
     {
         /* Remove old PMT table decoder */
-        if (dvbpsi_HasDecoder(p_stream->pmt.handle))
-            dvbpsi_DetachPMT(p_stream->pmt.handle);
+        if (dvbpsi_decoder_present(p_stream->pmt.handle))
+            dvbpsi_pmt_detach(p_stream->pmt.handle);
 
         /* Attach new PMT decoder */
         p_stream->i_pmt++;
@@ -655,7 +655,7 @@ static void handle_PAT(void* p_data, dvbpsi_pat_t* p_pat)
         p_stream->pmt.pid_pmt = &p_stream->pid[p_program->i_pid];
         p_stream->pmt.pid_pmt->i_pid = p_program->i_pid;
 
-        if (!dvbpsi_AttachPMT(p_stream->pmt.handle, p_program->i_number, handle_PMT, p_stream))
+        if (!dvbpsi_pmt_attach(p_stream->pmt.handle, p_program->i_number, handle_PMT, p_stream))
         {
              fprintf(stderr, "dvbinfo: Failed to attach new pmt decoder\n");
              break;
@@ -665,7 +665,7 @@ static void handle_PAT(void* p_data, dvbpsi_pat_t* p_pat)
         p_program = p_program->p_next;
     }
     printf("\tActive         : %s\n", p_pat->b_current_next ? "yes" : "no");
-    dvbpsi_DeletePAT(p_pat);
+    dvbpsi_pat_delete(p_pat);
 }
 
 /*****************************************************************************
@@ -1028,7 +1028,7 @@ static void handle_SIS(void* p_data, dvbpsi_sis_t* p_sis)
     }
     printf("\n");
     DumpSISDescriptors("\t   ]", p_sis->p_first_descriptor);
-    dvbpsi_DeleteSIS(p_sis);
+    dvbpsi_sis_delete(p_sis);
 }
 #endif
 
@@ -1115,7 +1115,7 @@ static void handle_SDT(void* p_data, dvbpsi_sdt_t* p_sdt)
         DumpDescriptors("\t  |  ]", p_service->p_first_descriptor);
         p_service = p_service->p_next;
     }
-    dvbpsi_DeleteSDT(p_sdt);
+    dvbpsi_sdt_delete(p_sdt);
 }
 
 static void DumpEITEventDescriptors(dvbpsi_eit_event_t *p_eit_event)
@@ -1152,7 +1152,7 @@ static void handle_EIT(void* p_data, dvbpsi_eit_t* p_eit)
 
     DumpEITEventDescriptors(p_eit->p_first_event);
 
-    dvbpsi_DeleteEIT(p_eit);
+    dvbpsi_eit_delete(p_eit);
 }
 
 static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot)
@@ -1174,7 +1174,7 @@ static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot)
     if (table_id == 0x73) /* TOT */
         printf("\tCRC 32         : %d\n", p_tot->i_crc);
     DumpDescriptors("\t  |  ]", p_tot->p_first_descriptor);
-    dvbpsi_DeleteTOT(p_tot);
+    dvbpsi_tot_delete(p_tot);
 }
 
 /*****************************************************************************
@@ -1204,7 +1204,7 @@ static void handle_NIT(void* p_data, dvbpsi_nit_t* p_nit)
     printf("\tCurrent next   : %s\n", p_nit->b_current_next ? "yes" : "no");
     DumpDescriptors("\t  |  ]", p_nit->p_first_descriptor);
     DumpTSDescriptorsNIT(p_nit->p_first_ts);
-    dvbpsi_DeleteNIT(p_nit);
+    dvbpsi_nit_delete(p_nit);
 }
 
 /*****************************************************************************
@@ -1234,7 +1234,7 @@ static void handle_BAT(void* p_data, dvbpsi_bat_t* p_bat)
     printf("\tCurrent next   : %s\n", p_bat->b_current_next ? "yes" : "no");
     DumpDescriptors("\t  |  ]", p_bat->p_first_descriptor);
     DumpTSDescriptorsBAT(p_bat->p_first_ts);
-    dvbpsi_DeleteBAT(p_bat);
+    dvbpsi_bat_delete(p_bat);
 }
 
 /*****************************************************************************
@@ -1265,7 +1265,7 @@ static void handle_PMT(void* p_data, dvbpsi_pmt_t* p_pmt)
         DumpDescriptors("\t|  ]", p_es->p_first_descriptor);
         p_es = p_es->p_next;
     }
-    dvbpsi_DeletePMT(p_pmt);
+    dvbpsi_pmt_delete(p_pmt);
 }
 
 /*****************************************************************************
@@ -1283,7 +1283,7 @@ static void handle_CAT(void *p_data, dvbpsi_cat_t *p_cat)
     printf("\tCurrent next   : %s\n", p_cat->b_current_next ? "yes" : "no");
     DumpDescriptors("\t   ]", p_cat->p_first_descriptor);
     printf("\n");
-    dvbpsi_DeleteCAT(p_cat);
+    dvbpsi_cat_delete(p_cat);
 }
 
 /*****************************************************************************
@@ -1311,56 +1311,56 @@ ts_stream_t *libdvbpsi_init(int debug, ts_stream_log_cb pf_log, void *cb_data)
     }
 
     /* PAT */
-    stream->pat.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
+    stream->pat.handle = dvbpsi_new(&dvbpsi_message, stream->level);
     if (stream->pat.handle == NULL)
         goto error;
-    if (!dvbpsi_AttachPAT(stream->pat.handle, handle_PAT, stream))
+    if (!dvbpsi_pat_attach(stream->pat.handle, handle_PAT, stream))
     {
-        dvbpsi_DeleteHandle(stream->pat.handle);
+        dvbpsi_delete(stream->pat.handle);
         stream->pat.handle = NULL;
         goto error;
     }
     /* PMT */
-    stream->pmt.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
+    stream->pmt.handle = dvbpsi_new(&dvbpsi_message, stream->level);
     if (stream->pmt.handle == NULL)
         goto error;
     /* CAT */
-    stream->cat.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
+    stream->cat.handle = dvbpsi_new(&dvbpsi_message, stream->level);
     if (stream->cat.handle == NULL)
         goto error;
-    if (!dvbpsi_AttachCAT(stream->cat.handle, handle_CAT, stream))
+    if (!dvbpsi_cat_attach(stream->cat.handle, handle_CAT, stream))
     {
-        dvbpsi_DeleteHandle(stream->cat.handle);
+        dvbpsi_delete(stream->cat.handle);
         stream->cat.handle = NULL;
         goto error;
     }
     /* SDT demuxer */
-    stream->sdt.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
+    stream->sdt.handle = dvbpsi_new(&dvbpsi_message, stream->level);
     if (stream->sdt.handle == NULL)
         goto error;
     if (!dvbpsi_AttachDemux(stream->sdt.handle, handle_subtable, stream))
     {
-        dvbpsi_DeleteHandle(stream->sdt.handle);
+        dvbpsi_delete(stream->sdt.handle);
         stream->sdt.handle = NULL;
         goto error;
     }
     /* EIT demuxer */
-    stream->eit.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
+    stream->eit.handle = dvbpsi_new(&dvbpsi_message, stream->level);
     if (stream->eit.handle == NULL)
         goto error;
     if (!dvbpsi_AttachDemux(stream->eit.handle, handle_subtable, stream))
     {
-        dvbpsi_DeleteHandle(stream->eit.handle);
+        dvbpsi_delete(stream->eit.handle);
         stream->eit.handle = NULL;
         goto error;
     }
     /* TDT demuxer */
-    stream->tdt.handle = dvbpsi_NewHandle(&dvbpsi_message, stream->level);
+    stream->tdt.handle = dvbpsi_new(&dvbpsi_message, stream->level);
     if (stream->tdt.handle == NULL)
         goto error;
     if (!dvbpsi_AttachDemux(stream->tdt.handle, handle_subtable, stream))
     {
-        dvbpsi_DeleteHandle(stream->tdt.handle);
+        dvbpsi_delete(stream->tdt.handle);
         stream->tdt.handle = NULL;
         goto error;
     }
@@ -1378,29 +1378,29 @@ ts_stream_t *libdvbpsi_init(int debug, ts_stream_log_cb pf_log, void *cb_data)
     return stream;
 
 error:
-    if (dvbpsi_HasDecoder(stream->pat.handle))
-        dvbpsi_DetachPAT(stream->pat.handle);
-    if (dvbpsi_HasDecoder(stream->cat.handle))
-        dvbpsi_DetachCAT(stream->cat.handle);
-    if (dvbpsi_HasDecoder(stream->sdt.handle))
+    if (dvbpsi_decoder_present(stream->pat.handle))
+        dvbpsi_pat_detach(stream->pat.handle);
+    if (dvbpsi_decoder_present(stream->cat.handle))
+        dvbpsi_cat_detach(stream->cat.handle);
+    if (dvbpsi_decoder_present(stream->sdt.handle))
         dvbpsi_DetachDemux(stream->sdt.handle);
-    if (dvbpsi_HasDecoder(stream->eit.handle))
+    if (dvbpsi_decoder_present(stream->eit.handle))
         dvbpsi_DetachDemux(stream->eit.handle);
-    if (dvbpsi_HasDecoder(stream->tdt.handle))
+    if (dvbpsi_decoder_present(stream->tdt.handle))
         dvbpsi_DetachDemux(stream->tdt.handle);
 
     if (stream->pat.handle)
-        dvbpsi_DeleteHandle(stream->pat.handle);
+        dvbpsi_delete(stream->pat.handle);
     if (stream->pmt.handle)
-        dvbpsi_DeleteHandle(stream->pmt.handle);
+        dvbpsi_delete(stream->pmt.handle);
     if (stream->cat.handle)
-        dvbpsi_DeleteHandle(stream->cat.handle);
+        dvbpsi_delete(stream->cat.handle);
     if (stream->sdt.handle)
-        dvbpsi_DeleteHandle(stream->sdt.handle);
+        dvbpsi_delete(stream->sdt.handle);
     if (stream->eit.handle)
-        dvbpsi_DeleteHandle(stream->eit.handle);
+        dvbpsi_delete(stream->eit.handle);
     if (stream->tdt.handle)
-        dvbpsi_DeleteHandle(stream->tdt.handle);
+        dvbpsi_delete(stream->tdt.handle);
 
     free(stream);
     return NULL;
@@ -1410,31 +1410,31 @@ void libdvbpsi_exit(ts_stream_t *stream)
 {
    summary(stdout, stream);
 
-   if (dvbpsi_HasDecoder(stream->pat.handle))
-       dvbpsi_DetachPAT(stream->pat.handle);
-   if (dvbpsi_HasDecoder(stream->pmt.handle))
-       dvbpsi_DetachPMT(stream->pmt.handle);
-   if (dvbpsi_HasDecoder(stream->cat.handle))
-       dvbpsi_DetachCAT(stream->cat.handle);
-   if (dvbpsi_HasDecoder(stream->sdt.handle))
+   if (dvbpsi_decoder_present(stream->pat.handle))
+       dvbpsi_pat_detach(stream->pat.handle);
+   if (dvbpsi_decoder_present(stream->pmt.handle))
+       dvbpsi_pmt_detach(stream->pmt.handle);
+   if (dvbpsi_decoder_present(stream->cat.handle))
+       dvbpsi_cat_detach(stream->cat.handle);
+   if (dvbpsi_decoder_present(stream->sdt.handle))
        dvbpsi_DetachDemux(stream->sdt.handle);
-   if (dvbpsi_HasDecoder(stream->eit.handle))
+   if (dvbpsi_decoder_present(stream->eit.handle))
        dvbpsi_DetachDemux(stream->eit.handle);
-   if (dvbpsi_HasDecoder(stream->tdt.handle))
+   if (dvbpsi_decoder_present(stream->tdt.handle))
        dvbpsi_DetachDemux(stream->tdt.handle);
 
    if (stream->pat.handle)
-       dvbpsi_DeleteHandle(stream->pat.handle);
+       dvbpsi_delete(stream->pat.handle);
    if (stream->pmt.handle)
-       dvbpsi_DeleteHandle(stream->pmt.handle);
+       dvbpsi_delete(stream->pmt.handle);
    if (stream->cat.handle)
-       dvbpsi_DeleteHandle(stream->cat.handle);
+       dvbpsi_delete(stream->cat.handle);
    if (stream->sdt.handle)
-       dvbpsi_DeleteHandle(stream->sdt.handle);
+       dvbpsi_delete(stream->sdt.handle);
    if (stream->eit.handle)
-       dvbpsi_DeleteHandle(stream->eit.handle);
+       dvbpsi_delete(stream->eit.handle);
    if (stream->tdt.handle)
-       dvbpsi_DeleteHandle(stream->tdt.handle);
+       dvbpsi_delete(stream->tdt.handle);
 
    free(stream);
    stream = NULL;
@@ -1498,23 +1498,23 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
                            date, stream->i_packets, i_pid, i_pid, i_cc);
 
         if (i_pid == 0x0) /* PAT */
-            dvbpsi_PushPacket(stream->pat.handle, p_tmp);
+            dvbpsi_packet_push(stream->pat.handle, p_tmp);
         else if (i_pid == 0x01) /* CAT */
-            dvbpsi_PushPacket(stream->cat.handle, p_tmp);
+            dvbpsi_packet_push(stream->cat.handle, p_tmp);
         else if (i_pid == 0x02) /* Transport Stream Description Table */
-            dvbpsi_PushPacket(stream->tdt.handle, p_tmp);
+            dvbpsi_packet_push(stream->tdt.handle, p_tmp);
 #if 0
         else if (i_pid == 0x03) /* IPMP Control Information Table */
-            dvbpsi_PushPacket(stream->ipmp.handle, p_tmp);
+            dvbpsi_packet_push(stream->ipmp.handle, p_tmp);
 #endif
         else if (i_pid == 0x11) /* SDT/BAT/NIT */
-            dvbpsi_PushPacket(stream->sdt.handle, p_tmp);
+            dvbpsi_packet_push(stream->sdt.handle, p_tmp);
         else if (i_pid == 0x12) /* EIT */
-            dvbpsi_PushPacket(stream->eit.handle, p_tmp);
+            dvbpsi_packet_push(stream->eit.handle, p_tmp);
         else if (i_pid == 0x14) /* TDT/TOT */
-            dvbpsi_PushPacket(stream->tdt.handle, p_tmp);
+            dvbpsi_packet_push(stream->tdt.handle, p_tmp);
         else if (stream->pmt.pid_pmt && i_pid == stream->pmt.pid_pmt->i_pid)
-            dvbpsi_PushPacket(stream->pmt.handle, p_tmp);
+            dvbpsi_packet_push(stream->pmt.handle, p_tmp);
 
         /* Remember PID */
         if (!stream->pid[i_pid].b_seen)

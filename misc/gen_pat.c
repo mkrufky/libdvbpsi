@@ -120,36 +120,36 @@ int main(int i_argc, char* pa_argv[])
   dvbpsi_psi_section_t* p_section5, * p_section6;
   int i;
 
-  dvbpsi_t *p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  dvbpsi_t *p_dvbpsi = dvbpsi_new(&message, DVBPSI_MSG_DEBUG);
   if (p_dvbpsi == NULL)
       return 1;
 
   /* PAT generation */
-  dvbpsi_InitPAT(&pat, 1, 0, 0);
-  dvbpsi_PATAddProgram(&pat, 0, 0x12);
-  dvbpsi_PATAddProgram(&pat, 1, 0x42);
-  dvbpsi_PATAddProgram(&pat, 2, 0x21);
-  dvbpsi_PATAddProgram(&pat, 3, 0x24);
+  dvbpsi_pat_init(&pat, 1, 0, 0);
+  dvbpsi_pat_program_add(&pat, 0, 0x12);
+  dvbpsi_pat_program_add(&pat, 1, 0x42);
+  dvbpsi_pat_program_add(&pat, 2, 0x21);
+  dvbpsi_pat_program_add(&pat, 3, 0x24);
   for(i = 4; i < 43; i++)
-    dvbpsi_PATAddProgram(&pat, i, i);
+    dvbpsi_pat_program_add(&pat, i, i);
 
-  p_section1 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 4);
+  p_section1 = dvbpsi_pat_sections_generate(p_dvbpsi, &pat, 4);
   pat.b_current_next = 1;
-  p_section2 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 8);
+  p_section2 = dvbpsi_pat_sections_generate(p_dvbpsi, &pat, 8);
 
   pat.i_version = 1;
 
   pat.b_current_next = 0;
-  p_section3 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 16);
+  p_section3 = dvbpsi_pat_sections_generate(p_dvbpsi, &pat, 16);
   pat.b_current_next = 1;
-  p_section4 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 300);
+  p_section4 = dvbpsi_pat_sections_generate(p_dvbpsi, &pat, 300);
 
   pat.i_version = 2;
 
   pat.b_current_next = 0;
-  p_section5 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 16);
+  p_section5 = dvbpsi_pat_sections_generate(p_dvbpsi, &pat, 16);
   pat.b_current_next = 1;
-  p_section6 = dvbpsi_GenPATSections(p_dvbpsi, &pat, 16);
+  p_section6 = dvbpsi_pat_sections_generate(p_dvbpsi, &pat, 16);
 
   /* TS packets generation */
   packet[0] = 0x47;
@@ -170,9 +170,9 @@ int main(int i_argc, char* pa_argv[])
   dvbpsi_DeletePSISections(p_section5);
   dvbpsi_DeletePSISections(p_section6);
 
-  dvbpsi_EmptyPAT(&pat);
+  dvbpsi_pat_empty(&pat);
 
-  dvbpsi_DeleteHandle(p_dvbpsi);
+  dvbpsi_delete(p_dvbpsi);
   return 0;
 }
 

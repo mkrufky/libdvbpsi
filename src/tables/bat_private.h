@@ -47,50 +47,70 @@ typedef struct dvbpsi_bat_decoder_s
 } dvbpsi_bat_decoder_t;
 
 /*****************************************************************************
- * dvbpsi_GatherBATSections
+ * dvbpsi_bat_sections_gather
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherBATSections(dvbpsi_t* p_dvbpsi, dvbpsi_decoder_t* p_decoder,
+void dvbpsi_bat_sections_gather(dvbpsi_t* p_dvbpsi, dvbpsi_decoder_t* p_decoder,
                               dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
- * dvbpsi_DecodeBATSections
+ * dvbpsi_bat_sections_decode
  *****************************************************************************
  * BAT decoder.
  *****************************************************************************/
-void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
+void dvbpsi_bat_sections_decode(dvbpsi_bat_t* p_bat,
                               dvbpsi_psi_section_t* p_section);
 
 /*****************************************************************************
- * dvbpsi_BATAddTS
+ * dvbpsi_bat_ts_add
  *****************************************************************************
  * Add a TS description at the end of the BAT.
  *****************************************************************************/
-dvbpsi_bat_ts_t *dvbpsi_BATAddTS(dvbpsi_bat_t* p_bat,
+dvbpsi_bat_ts_t *dvbpsi_bat_ts_add(dvbpsi_bat_t* p_bat,
                                  uint16_t i_ts_id, uint16_t i_orig_network_id);
 
 /*****************************************************************************
- * dvbpsi_BATBouquetAddDescriptor
+ * dvbpsi_bat_bouquet_descriptor_add
  *****************************************************************************
  * Add a descriptor in the BAT Bouquet descriptors (the first loop description),
  *  which is in the first loop of BAT.
  *****************************************************************************/
-dvbpsi_descriptor_t *dvbpsi_BATBouquetAddDescriptor(
-                                               dvbpsi_bat_t *p_bat,
+dvbpsi_descriptor_t *dvbpsi_bat_bouquet_descriptor_add(dvbpsi_bat_t *p_bat,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data);
 
 /*****************************************************************************
- * dvbpsi_BATTSAddDescriptor
+ * dvbpsi_bat_ts_descriptor_add
  *****************************************************************************
  * Add a descriptor in the BAT TS descriptors, which is in the second loop of BAT.
  *****************************************************************************/
+dvbpsi_descriptor_t *dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_ts,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t *p_data);
+
+/*****************************************************************************
+ * Deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+void dvbpsi_GatherBATSections(dvbpsi_t* p_dvbpsi, dvbpsi_decoder_t* p_decoder,
+                              dvbpsi_psi_section_t* p_section);
+__attribute__((deprecated))
+void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
+                              dvbpsi_psi_section_t* p_section);
+__attribute__((deprecated))
+dvbpsi_bat_ts_t *dvbpsi_BATAddTS(dvbpsi_bat_t* p_bat,
+                                 uint16_t i_ts_id, uint16_t i_orig_network_id);
+__attribute__((deprecated))
+dvbpsi_descriptor_t *dvbpsi_BATBouquetAddDescriptor(
+                                               dvbpsi_bat_t *p_bat,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t *p_data);
+__attribute__((deprecated))
 dvbpsi_descriptor_t *dvbpsi_BATTSAddDescriptor(
                                                dvbpsi_bat_ts_t *p_ts,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data);
-
 #else
 #error "Multiple inclusions of bat_private.h"
 #endif

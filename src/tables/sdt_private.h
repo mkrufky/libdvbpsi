@@ -46,19 +46,30 @@ typedef struct dvbpsi_sdt_decoder_s
 } dvbpsi_sdt_decoder_t;
 
 /*****************************************************************************
- * dvbpsi_GatherSDTSections
+ * dvbpsi_sdt_sections_gather
  *****************************************************************************
  * Callback for the PSI decoder.
  *****************************************************************************/
-void dvbpsi_GatherSDTSections(dvbpsi_t *p_dvbpsi,
-                              dvbpsi_decoder_t *p_private_decoder,
-                              dvbpsi_psi_section_t *p_section);
+void dvbpsi_sdt_sections_gather(dvbpsi_t *p_dvbpsi,
+                                dvbpsi_decoder_t *p_private_decoder,
+                                dvbpsi_psi_section_t *p_section);
 
 /*****************************************************************************
- * dvbpsi_DecodeSDTSection
+ * dvbpsi_sdt_sections_decode
  *****************************************************************************
  * SDT decoder.
  *****************************************************************************/
+void dvbpsi_sdt_sections_decode(dvbpsi_sdt_t* p_sdt,
+                                dvbpsi_psi_section_t* p_section);
+
+/*****************************************************************************
+ * Deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+void dvbpsi_GatherSDTSections(dvbpsi_handle *p_dvbpsi,
+                              dvbpsi_decoder_t *p_private_decoder,
+                              dvbpsi_psi_section_t *p_section);
+__attribute__((deprecated))
 void dvbpsi_DecodeSDTSections(dvbpsi_sdt_t* p_sdt,
                               dvbpsi_psi_section_t* p_section);
 

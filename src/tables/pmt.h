@@ -103,10 +103,10 @@ typedef struct dvbpsi_pmt_s
 typedef void (* dvbpsi_pmt_callback)(void* p_cb_data, dvbpsi_pmt_t* p_new_pmt);
 
 /*****************************************************************************
- * dvbpsi_AttachPMT
+ * dvbpsi_pmt_attach
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi,
+ * \fn bool dvbpsi_pmt_attach(dvbpsi_t *p_dvbpsi,
                              uint16_t i_program_number,
                              dvbpsi_pmt_callback pf_callback,
                              void* p_cb_data)
@@ -118,27 +118,27 @@ typedef void (* dvbpsi_pmt_callback)(void* p_cb_data, dvbpsi_pmt_t* p_new_pmt);
  * \param p_cb_data private data given in argument to the callback
  * \return true on success, false on failure
  */
-bool dvbpsi_AttachPMT(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
+bool dvbpsi_pmt_attach(dvbpsi_t *p_dvbpsi, uint16_t i_program_number,
                       dvbpsi_pmt_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
- * dvbpsi_DetachPMT
+ * dvbpsi_pmt_detach
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi)
+ * \fn void dvbpsi_pmt_detach(dvbpsi_t *p_dvbpsi)
  * \brief Destroy a PMT decoder.
  * \param p_dvbpsi handle
  * \return nothing.
  *
  * The handle isn't valid any more.
  */
-void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi);
+void dvbpsi_pmt_detach(dvbpsi_t *p_dvbpsi);
 
 /*****************************************************************************
- * dvbpsi_InitPMT/dvbpsi_NewPMT
+ * dvbpsi_pmt_init/dvbpsi_pmt_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
+ * \fn void dvbpsi_pmt_init(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
                            uint8_t i_version, bool b_current_next,
                            uint16_t i_pcr_pid)
  * \brief Initialize a user-allocated dvbpsi_pmt_t structure.
@@ -149,11 +149,11 @@ void dvbpsi_DetachPMT(dvbpsi_t *p_dvbpsi);
  * \param i_pcr_pid PCR_PID
  * \return nothing.
  */
-void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
+void dvbpsi_pmt_init(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
                     uint8_t i_version, bool b_current_next, uint16_t i_pcr_pid);
 
 /*!
- * \fn dvbpsi_pmt_t* dvbpsi_NewPMT(uint16_t i_program_number,
+ * \fn dvbpsi_pmt_t* dvbpsi_pmt_new(uint16_t i_program_number,
                            uint8_t i_version, bool b_current_next,
                            uint16_t i_pcr_pid)
  * \brief Allocate and initialize a new dvbpsi_pmt_t structure.
@@ -163,19 +163,19 @@ void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
  * \param i_pcr_pid PCR_PID
  * \return p_pmt pointer to the PMT structure
  */
-dvbpsi_pmt_t* dvbpsi_NewPMT(uint16_t i_program_number, uint8_t i_version,
+dvbpsi_pmt_t* dvbpsi_pmt_new(uint16_t i_program_number, uint8_t i_version,
                             bool b_current_next, uint16_t i_pcr_pid);
 
 /*****************************************************************************
- * dvbpsi_EmptyPMT/dvbpsi_DeletePMT
+ * dvbpsi_pmt_empty/dvbpsi_pmt_delete
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt)
+ * \fn void dvbpsi_pmt_empty(dvbpsi_pmt_t* p_pmt)
  * \brief Clean a dvbpsi_pmt_t structure.
  * \param p_pmt pointer to the PMT structure
  * \return nothing.
  */
-void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt);
+void dvbpsi_pmt_empty(dvbpsi_pmt_t* p_pmt);
 
 /*!
  * \fn void dvbpsi_DeletePMT(dvbpsi_pmt_t* p_pmt)
@@ -183,13 +183,13 @@ void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt);
  * \param p_pmt pointer to the PMT structure
  * \return nothing.
  */
-void dvbpsi_DeletePMT(dvbpsi_pmt_t* p_pmt);
+void dvbpsi_pmt_delete(dvbpsi_pmt_t* p_pmt);
 
 /*****************************************************************************
- * dvbpsi_PMTAddDescriptor
+ * dvbpsi_pmt_descriptor_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
+ * \fn dvbpsi_descriptor_t* dvbpsi_pmt_descriptor_add(dvbpsi_pmt_t* p_pmt,
                                                     uint8_t i_tag,
                                                     uint8_t i_length,
                                                     uint8_t* p_data)
@@ -200,15 +200,15 @@ void dvbpsi_DeletePMT(dvbpsi_pmt_t* p_pmt);
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
+dvbpsi_descriptor_t* dvbpsi_pmt_descriptor_add(dvbpsi_pmt_t* p_pmt,
                                              uint8_t i_tag, uint8_t i_length,
                                              uint8_t* p_data);
 
 /*****************************************************************************
- * dvbpsi_PMTAddES
+ * dvbpsi_pmt_es_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
+ * \fn dvbpsi_pmt_es_t* dvbpsi_pmt_es_add(dvbpsi_pmt_t* p_pmt,
                                         uint8_t i_type, uint16_t i_pid)
  * \brief Add an ES in the PMT.
  * \param p_pmt pointer to the PMT structure
@@ -216,14 +216,14 @@ dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
  * \param i_pid PID of the ES
  * \return a pointer to the added ES.
  */
-dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
+dvbpsi_pmt_es_t* dvbpsi_pmt_es_add(dvbpsi_pmt_t* p_pmt,
                                  uint8_t i_type, uint16_t i_pid);
 
 /*****************************************************************************
- * dvbpsi_PMTESAddDescriptor
+ * dvbpsi_pmt_es_descriptor_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
+ * \fn dvbpsi_descriptor_t* dvbpsi_pmt_es_descriptor_add(dvbpsi_pmt_es_t* p_es,
                                                       uint8_t i_tag,
                                                       uint8_t i_length,
                                                       uint8_t* p_data)
@@ -234,15 +234,15 @@ dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
  * \param p_data descriptor's data
  * \return a pointer to the added descriptor.
  */
-dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
+dvbpsi_descriptor_t* dvbpsi_pmt_es_descriptor_add(dvbpsi_pmt_es_t* p_es,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t* p_data);
 
 /*****************************************************************************
- * dvbpsi_GenPMTSections
+ * dvbpsi_pmt_sections_generate
  *****************************************************************************/
 /*!
- * \fn dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_t *p_dvbpsi,
+ * \fn dvbpsi_psi_section_t* dvbpsi_pmt_sections_generate(dvbpsi_t *p_dvbpsi,
                                                    dvbpsi_pmt_t* p_pmt)
  * \brief PMT generator
  * \param p_dvbpsi handle to dvbpsi with attached decoder
@@ -251,7 +251,33 @@ dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
  *
  * Generate PMT sections based on the dvbpsi_pmt_t structure.
  */
-dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_t* p_pmt);
+dvbpsi_psi_section_t* dvbpsi_pmt_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_t* p_pmt);
+
+/*****************************************************************************
+ * deprecated API's
+ *****************************************************************************/
+__attribute__((deprecated))
+dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
+                               dvbpsi_pmt_callback pf_callback,
+                               void* p_cb_data);
+__attribute__((deprecated)) void dvbpsi_DetachPMT(dvbpsi_handle h_dvbpsi);
+__attribute__((deprecated))
+void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
+                    uint8_t i_version, int b_current_next, uint16_t i_pcr_pid);
+__attribute__((deprecated)) void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt);
+__attribute__((deprecated))
+dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
+                                             uint8_t i_tag, uint8_t i_length,
+                                             uint8_t* p_data);
+__attribute__((deprecated))
+dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
+                                 uint8_t i_type, uint16_t i_pid);
+__attribute__((deprecated))
+dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t* p_data);
+__attribute__((deprecated))
+dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt);
 
 #ifdef __cplusplus
 };

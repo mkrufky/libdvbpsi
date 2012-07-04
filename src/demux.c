@@ -57,8 +57,8 @@ bool dvbpsi_AttachDemux(dvbpsi_t *            p_dvbpsi,
     assert(p_dvbpsi->p_decoder == NULL);
 
     dvbpsi_demux_t *p_demux;
-    p_demux = (dvbpsi_demux_t*) dvbpsi_NewDecoder(&dvbpsi_Demux, 4096, true,
-                                                  sizeof(dvbpsi_demux_t));
+    p_demux = (dvbpsi_demux_t*) dvbpsi_decoder_new(&dvbpsi_Demux, 4096, true,
+                                                   sizeof(dvbpsi_demux_t));
     if (p_demux == NULL)
         return false;
 
@@ -149,7 +149,7 @@ void dvbpsi_DetachDemux(dvbpsi_t *p_dvbpsi)
         else free(p_subdec_temp);
     }
 
-    dvbpsi_DeleteDecoder(p_dvbpsi->p_decoder);
+    dvbpsi_decoder_delete(p_dvbpsi->p_decoder);
     p_dvbpsi->p_decoder = NULL;
 }
 
@@ -194,7 +194,7 @@ void dvbpsi_DeleteDemuxSubDecoder(dvbpsi_demux_subdec_t *p_subdec)
     if (!p_subdec)
         return;
     /* FIXME: find a saner way to release private decoder resources */
-    dvbpsi_DeleteDecoder(p_subdec->p_decoder);
+    dvbpsi_decoder_delete(p_subdec->p_decoder);
     free(p_subdec);
     p_subdec = NULL;
 }

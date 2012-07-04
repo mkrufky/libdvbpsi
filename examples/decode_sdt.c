@@ -119,7 +119,7 @@ static void DumpSDT(void* p_zero, dvbpsi_sdt_t* p_sdt)
     DumpDescriptors("    |  ]", p_service->p_first_descriptor);
     p_service = p_service->p_next;
   }
-  dvbpsi_DeleteSDT(p_sdt);
+  dvbpsi_sdt_delete(p_sdt);
 }
 
 /*****************************************************************************
@@ -146,7 +146,7 @@ static void NewSubtable(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_exten
 {
   if(i_table_id == 0x42)
   {
-     if (!dvbpsi_AttachSDT(p_dvbpsi, i_table_id, i_extension, DumpSDT, NULL))
+     if (!dvbpsi_sdt_attach(p_dvbpsi, i_table_id, i_extension, DumpSDT, NULL))
          fprintf(stderr, "Failed to attach SDT subdecoder\n");
   }
 }
@@ -168,7 +168,7 @@ int main(int i_argc, char* pa_argv[])
   if (i_fd < 0)
       return 1;
 
-  p_dvbpsi = dvbpsi_NewHandle(&message, DVBPSI_MSG_DEBUG);
+  p_dvbpsi = dvbpsi_new(&message, DVBPSI_MSG_DEBUG);
   if (p_dvbpsi == NULL)
       goto out;
 
@@ -181,7 +181,7 @@ int main(int i_argc, char* pa_argv[])
   {
     uint16_t i_pid = ((uint16_t)(data[1] & 0x1f) << 8) + data[2];
     if(i_pid == 0x11)
-      dvbpsi_PushPacket(p_dvbpsi, data);
+      dvbpsi_packet_push(p_dvbpsi, data);
     b_ok = ReadPacket(i_fd, data);
   }
 
@@ -189,7 +189,7 @@ out:
   if (p_dvbpsi)
   {
     dvbpsi_DetachDemux(p_dvbpsi);
-    dvbpsi_DeleteHandle(p_dvbpsi);
+    dvbpsi_delete(p_dvbpsi);
   }
   close(i_fd);
   return 0;
