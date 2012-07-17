@@ -443,7 +443,7 @@ void dvbpsi_eit_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_
                 && (p_eit_decoder->current_eit.b_current_next == p_section->b_current_next))
             {
                 /* Don't decode since this version is already decoded */
-                dvbpsi_debug(p_dvbpsi, "SDT decoder",
+                dvbpsi_debug(p_dvbpsi, "EIT decoder",
                              "ignoring already decoded section %d",
                              p_section->i_number);
                 dvbpsi_DeletePSISections(p_section);
