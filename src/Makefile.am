@@ -16,7 +16,7 @@ libdvbpsi_la_LDFLAGS = -version-info 8:0:0 -no-undefined
 pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      tables/pat.h tables/pmt.h tables/sdt.h tables/eit.h \
                      tables/cat.h tables/nit.h tables/tot.h tables/sis.h \
-		     tables/bat.h \
+		     tables/bat.h tables/rst.h \
 		     tables/atsc_vct.h tables/atsc_stt.h \
 		     tables/atsc_eit.h tables/atsc_mgt.h \
 		     tables/atsc_ett.h \
@@ -114,6 +114,7 @@ tables_src = tables/pat.c tables/pat_private.h \
              tables/tot.c tables/tot_private.h \
              tables/sis.c tables/sis_private.h \
 	     tables/bat.c tables/bat_private.h \
+	     tables/rst.c tables/rst_private.h \
 	     tables/atsc_vct.c tables/atsc_vct.h \
 	     tables/atsc_stt.c tables/atsc_stt.h \
 	     tables/atsc_eit.c tables/atsc_eit.h \

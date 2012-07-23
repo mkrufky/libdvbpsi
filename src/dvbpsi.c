@@ -470,8 +470,8 @@ bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
                 if (p_section->b_syntax_indicator)
                     p_section->p_payload_end -= 4;
 
-                if ((p_section->p_data[0] == 0x70) /* TDT (has no CRC 32) */ ||
-                    (p_section->p_data[0] != 0x72 && dvbpsi_ValidPSISection(p_section)))
+                if ((p_section->p_data[0] == 0x70) /* TDT (has no CRC 32) */ || (p_section->p_data[0] == 0x71) /* RST (has no CRC 32) */
+                    || (p_section->p_data[0] != 0x72 && dvbpsi_ValidPSISection(p_section)))
                 {
                     /* PSI section is valid */
                     p_section->i_table_id = p_section->p_data[0];
