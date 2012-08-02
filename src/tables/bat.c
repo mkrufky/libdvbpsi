@@ -196,6 +196,29 @@ void dvbpsi_bat_delete(dvbpsi_bat_t *p_bat)
 }
 
 /*****************************************************************************
+ * dvbpsi_bat_bouquet_descriptor_add
+ *****************************************************************************
+ * Add a descriptor in the BAT.
+ *****************************************************************************/
+dvbpsi_descriptor_t* dvbpsi_bat_bouquet_descriptor_add(dvbpsi_bat_t* p_bat,
+                                                       uint8_t i_tag, uint8_t i_length,
+                                                       uint8_t* p_data)
+{
+    dvbpsi_descriptor_t* p_descriptor
+                        = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
+    if (p_descriptor == NULL)
+        return NULL;
+
+    p_bat->p_first_descriptor = dvbpsi_AddDescriptor(p_bat->p_first_descriptor,
+                                                     p_descriptor);
+    assert(p_bat->p_first_descriptor);
+    if (p_bat->p_first_descriptor == NULL)
+        return NULL;
+
+    return p_descriptor;
+}
+
+/*****************************************************************************
  * dvbpsi_bat_ts_add
  *****************************************************************************
  * Add a TS description at the end of the BAT.
@@ -226,30 +249,6 @@ dvbpsi_bat_ts_t *dvbpsi_bat_ts_add(dvbpsi_bat_t* p_bat,
     return p_ts;
 }
 
-/*****************************************************************************
- * dvbpsi_bat_bouquet_descriptor_add
- *****************************************************************************
- * Add a descriptor in the BAT Bouquet descriptors (the first loop description),
- *  which is in the first loop of BAT.
- *****************************************************************************/
-dvbpsi_descriptor_t *dvbpsi_bat_bouquet_descriptor_add(
-                                               dvbpsi_bat_t *p_bat,
-                                               uint8_t i_tag, uint8_t i_length,
-                                               uint8_t *p_data)
-{
-    dvbpsi_descriptor_t * p_descriptor
-                        = dvbpsi_NewDescriptor(i_tag, i_length, p_data);
-    if (p_descriptor == NULL)
-        return NULL;
-
-    p_bat->p_first_descriptor = dvbpsi_AddDescriptor(p_bat->p_first_descriptor,
-                                                     p_descriptor);
-    assert(p_bat->p_first_descriptor);
-    if (p_bat->p_first_descriptor == NULL)
-        return NULL;
-
-    return p_descriptor;
-}
 
 /*****************************************************************************
  * dvbpsi_bat_ts_descriptor_add

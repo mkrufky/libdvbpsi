@@ -193,6 +193,59 @@ void dvbpsi_bat_empty(dvbpsi_bat_t *p_bat);
 void dvbpsi_bat_delete(dvbpsi_bat_t *p_bat);
 
 /*****************************************************************************
+ * dvbpsi_bat_descriptor_add
+ *****************************************************************************/
+/*!
+ * \fn dvbpsi_descriptor_t* dvbpsi_bat_bouquet_descriptor_add(dvbpsi_bat_t* p_bat,
+                                                              uint8_t i_tag,
+                                                              uint8_t i_length,
+                                                              uint8_t* p_data)
+ * \brief Add a descriptor in the BAT.
+ * \param p_bat pointer to the BAT structure
+ * \param i_tag descriptor's tag
+ * \param i_length descriptor's length
+ * \param p_data descriptor's data
+ * \return a pointer to the added descriptor.
+ */
+dvbpsi_descriptor_t* dvbpsi_bat_bouquet_descriptor_add(dvbpsi_bat_t* p_bat,
+                                                       uint8_t i_tag, uint8_t i_length,
+                                                       uint8_t* p_data);
+
+/*****************************************************************************
+ * dvbpsi_bat_ts_add
+ *****************************************************************************/
+/*!
+ * \fn dvbpsi_descriptor_t* dvbpsi_bat_ts_add(dvbpsi_bat_t* p_bat,
+                                              uint16_t i_ts_id,
+                                              uint16_t i_orig_network_id)
+ * \brief Add a TS description at the end of the BAT.
+ * \param p_bat pointer to the BAT structure
+ * \param i_ts_id descriptor's transport stream id
+ * \param i_orig_network_id descriptor's original network id
+ * \return a pointer to the added descriptor.
+ */
+
+dvbpsi_bat_ts_t *dvbpsi_bat_ts_add(dvbpsi_bat_t* p_bat,
+                                 uint16_t i_ts_id, uint16_t i_orig_network_id);
+
+/*****************************************************************************
+ * dvbpsi_bat_ts_descriptor_add
+ *****************************************************************************/
+/*!
+ * \fn dvbpsi_descriptor_t* dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_ts,
+                                                         uint8_t i_tag,
+                                                         uint8_t i_length,
+                                                         uint8_t *p_data)
+ * \brief Add a descriptor in the BAT TS descriptors.
+ * \param p_bat pointer to the BAT structure
+ * \param i_ts_id descriptor's transport stream id
+ * \param i_orig_network_id descriptor's original network id
+ * \return a pointer to the added descriptor.
+ */
+dvbpsi_descriptor_t *dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_ts,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t *p_data);
+/*****************************************************************************
  * dvbpsi_bat_sections_generate
  *****************************************************************************/
 /*!
@@ -223,6 +276,19 @@ __attribute__((deprecated))
 void dvbpsi_EmptyBAT(dvbpsi_bat_t *p_bat);
 __attribute__((deprecated))
 dvbpsi_psi_section_t *dvbpsi_GenBATSections(dvbpsi_bat_t *p_bat);
+__attribute__((deprecated))
+dvbpsi_bat_ts_t *dvbpsi_BATAddTS(dvbpsi_bat_t* p_bat,
+                                 uint16_t i_ts_id, uint16_t i_orig_network_id);
+__attribute__((deprecated))
+dvbpsi_descriptor_t *dvbpsi_BATBouquetAddDescriptor(
+                                               dvbpsi_bat_t *p_bat,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t *p_data);
+__attribute__((deprecated))
+dvbpsi_descriptor_t *dvbpsi_BATTSAddDescriptor(
+                                               dvbpsi_bat_ts_t *p_ts,
+                                               uint8_t i_tag, uint8_t i_length,
+                                               uint8_t *p_data);
 
 #ifdef __cplusplus
 };
