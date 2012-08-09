@@ -361,6 +361,13 @@ void dvbpsi_rst_sections_gather(dvbpsi_t *p_dvbpsi,
     dvbpsi_rst_decoder_t* p_rst_decoder
                           = (dvbpsi_rst_decoder_t*)p_dvbpsi->p_decoder;
 
+    /* TS discontinuity check */
+    if (p_rst_decoder->b_discontinuity)
+    {
+    	dvbpsi_rst_reset(p_rst_decoder, true);
+        p_rst_decoder->b_discontinuity = false;
+    }
+
     /* Add section to RST */
     if (!dvbpsi_rst_section_add(p_dvbpsi, p_rst_decoder, p_section))
     {
