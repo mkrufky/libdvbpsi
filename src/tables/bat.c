@@ -339,7 +339,7 @@ static bool dvbpsi_AddSectionBAT(dvbpsi_t *p_dvbpsi, dvbpsi_bat_decoder_t *p_bat
     {
         p_bat_decoder->p_building_bat = dvbpsi_bat_new(p_section->i_extension,
                               p_section->i_version, p_section->b_current_next);
-        if (p_bat_decoder->p_building_bat)
+        if (!p_bat_decoder->p_building_bat)
             return false;
 
         p_bat_decoder->i_last_section_number = p_section->i_last_number;
@@ -492,11 +492,12 @@ void dvbpsi_bat_sections_decode(dvbpsi_bat_t* p_bat,
     {
         p_end = p_section->p_payload_end;
     }
-    p_byte += 2;
 
     /* - TSs */
     for(; p_byte + 6 <= p_end;)
     {
+      p_byte += 2;
+
       uint16_t i_ts_id = ((uint16_t)p_byte[0] << 8) | p_byte[1];
       uint16_t i_orig_network_id = ((uint16_t)p_byte[2] << 8) | p_byte[3];
       uint16_t i_transport_descriptors_length = ((uint16_t)(p_byte[4] & 0x0f) << 8) | p_byte[5];
