@@ -68,3 +68,5 @@ D: BAT decoder and generator
 N: Roberto Corno
 E: corno.roberto@gmail.com
 D: Descriptors 0x40, 0x41, 0x49 and 0x4a
+D: BAT improvements
+D: RST table support
