@@ -196,7 +196,8 @@ dvbpsi_rst_event_t* dvbpsi_rst_event_add(dvbpsi_rst_t* p_rst,
  *****************************************************************************
  * Generate RST sections based on the dvbpsi_rst_t structure.
  *****************************************************************************/
-dvbpsi_psi_section_t* dvbpsi_rst_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_rst_t* p_rst) {
+dvbpsi_psi_section_t* dvbpsi_rst_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_rst_t* p_rst)
+{
     dvbpsi_psi_section_t* p_result = dvbpsi_NewPSISection(1024);
     dvbpsi_psi_section_t* p_current = p_result;
     dvbpsi_psi_section_t* p_prev;
@@ -224,7 +225,7 @@ dvbpsi_psi_section_t* dvbpsi_rst_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_rs
     while (p_event != NULL)
     {
         /* The section_length shall not exceed 1 021 so that the entire section has a maximum length of 1 024 bytes */
-        if(   (p_current->p_payload_end - p_current->p_data) < 1021)
+        if((p_current->p_payload_end - p_current->p_data) < 1021)
         {
         	p_current->p_data[0+i_count] = (p_event->i_ts_id >> 8);
         	p_current->p_data[1+i_count] = (p_event->i_ts_id & 0xFF);
