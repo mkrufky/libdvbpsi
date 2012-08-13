@@ -255,7 +255,7 @@ static bool dvbpsi_AddSectionPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_decoder_t *p_pat
     }
 
     /* Fill the section array */
-    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_pat_decoder), p_section))
+    if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_pat_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "PAT decoder", "overwrite section number %d",
                      p_section->i_number);
     return true;
@@ -330,16 +330,13 @@ void dvbpsi_pat_sections_gather(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sect
         p_pat_decoder->current_pat = *p_pat_decoder->p_building_pat;
         p_pat_decoder->b_current_valid = true;
 
-        /* Chain the sections */
-        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_pat_decoder));
-
         /* Decode the sections */
         dvbpsi_pat_sections_decode(p_pat_decoder->p_building_pat,
-                                   p_pat_decoder->ap_sections[0]);
+                                   p_pat_decoder->p_sections);
 
         /* Delete the sections */
-        dvbpsi_DeletePSISections(p_pat_decoder->ap_sections[0]);
-        p_pat_decoder->ap_sections[0] = NULL;
+        dvbpsi_DeletePSISections(p_pat_decoder->p_sections);
+        p_pat_decoder->p_sections = NULL;
 
         /* signal the new PAT */
         p_pat_decoder->pf_pat_callback(p_pat_decoder->p_cb_data,

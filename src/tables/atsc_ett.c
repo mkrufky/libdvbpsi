@@ -303,7 +303,7 @@ static bool dvbpsi_AddSectionETT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_ett_decoder_t *
     }
 
     /* Fill the section array */
-    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_decoder), p_section))
+    if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "ATSC ETT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -387,14 +387,12 @@ static void dvbpsi_atsc_GatherETTSections(dvbpsi_t* p_dvbpsi,
         /* Save the current information */
         p_ett_decoder->current_ett = *p_ett_decoder->p_building_ett;
         p_ett_decoder->b_current_valid = true;
-        /* Chain the sections */
-        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_ett_decoder));
         /* Decode the sections */
         dvbpsi_atsc_DecodeETTSections(p_ett_decoder->p_building_ett,
-                                      p_ett_decoder->ap_sections[0]);
+                                      p_ett_decoder->p_sections);
         /* Delete the sections */
-        dvbpsi_DeletePSISections(p_ett_decoder->ap_sections[0]);
-        p_ett_decoder->ap_sections[0] = NULL;
+        dvbpsi_DeletePSISections(p_ett_decoder->p_sections);
+        p_ett_decoder->p_sections = NULL;
         /* signal the new ETT */
         p_ett_decoder->pf_ett_callback(p_ett_decoder->p_cb_data,
                                        p_ett_decoder->p_building_ett);

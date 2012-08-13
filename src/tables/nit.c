@@ -339,7 +339,7 @@ static bool dvbpsi_AddSectionNIT(dvbpsi_t *p_dvbpsi, dvbpsi_nit_decoder_t *p_nit
     }
 
     /* Fill the section array */
-    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_nit_decoder), p_section))
+    if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_nit_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "NIT decoder", "overwrite section number %d",
                                p_section->i_number);
 
@@ -428,15 +428,12 @@ void dvbpsi_nit_sections_gather(dvbpsi_t *p_dvbpsi,
         p_nit_decoder->current_nit = *p_nit_decoder->p_building_nit;
         p_nit_decoder->b_current_valid = true;
 
-        /* Chain the sections */
-        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_nit_decoder));
-
         /* Decode the sections */
         dvbpsi_nit_sections_decode(p_nit_decoder->p_building_nit,
-                                   p_nit_decoder->ap_sections[0]);
+                                   p_nit_decoder->p_sections);
         /* Delete the sections */
-        dvbpsi_DeletePSISections(p_nit_decoder->ap_sections[0]);
-        p_nit_decoder->ap_sections[0] = NULL;
+        dvbpsi_DeletePSISections(p_nit_decoder->p_sections);
+        p_nit_decoder->p_sections = NULL;
         /* signal the new NIT */
         p_nit_decoder->pf_nit_callback(p_nit_decoder->p_cb_data,
                                        p_nit_decoder->p_building_nit);

@@ -307,7 +307,7 @@ static bool dvbpsi_AddSectionPMT(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_decoder_t *p_pmt
     }
 
     /* Fill the section array */
-    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_pmt_decoder), p_section))
+    if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_pmt_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "PMT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -390,14 +390,12 @@ void dvbpsi_pmt_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sect
         /* Save the current information */
         p_pmt_decoder->current_pmt = *p_pmt_decoder->p_building_pmt;
         p_pmt_decoder->b_current_valid = true;
-        /* Chain the sections */
-        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_pmt_decoder));
         /* Decode the sections */
         dvbpsi_pmt_sections_decode(p_pmt_decoder->p_building_pmt,
-                                   p_pmt_decoder->ap_sections[0]);
+                                   p_pmt_decoder->p_sections);
         /* Delete the sections */
-        dvbpsi_DeletePSISections(p_pmt_decoder->ap_sections[0]);
-        p_pmt_decoder->ap_sections[0] = NULL;
+        dvbpsi_DeletePSISections(p_pmt_decoder->p_sections);
+        p_pmt_decoder->p_sections = NULL;
         /* signal the new PMT */
         p_pmt_decoder->pf_pmt_callback(p_pmt_decoder->p_cb_data,
                                        p_pmt_decoder->p_building_pmt);

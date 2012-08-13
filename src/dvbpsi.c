@@ -45,7 +45,6 @@
 #include "dvbpsi_private.h"
 #include "psi.h"
 
-
 /*****************************************************************************
  * dvbpsi_crc32_table
  *****************************************************************************
@@ -189,9 +188,7 @@ dvbpsi_decoder_t *dvbpsi_decoder_new(dvbpsi_callback_gather_t pf_gather,
     p_decoder->b_current_valid = false;
 
     p_decoder->i_last_section_number = 0;
-    for (unsigned int i = 0; i <= 255; i++)
-        p_decoder->ap_sections[i] = NULL;
-
+    p_decoder->p_sections = NULL;
     p_decoder->b_complete_header = false;
 
     return p_decoder;
@@ -209,14 +206,8 @@ void dvbpsi_decoder_reset(dvbpsi_decoder_t* p_decoder, const bool b_force)
         p_decoder->b_current_valid = false;
 
     /* Clear the section array */
-    for (unsigned int i = 0; i <= 255; i++)
-    {
-        if (p_decoder->ap_sections[i] != NULL)
-        {
-            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
-            p_decoder->ap_sections[i] = NULL;
-        }
-    }
+    dvbpsi_DeletePSISections(p_decoder->p_sections);
+    p_decoder->p_sections = NULL;
 }
 
 /*****************************************************************************
@@ -229,50 +220,65 @@ bool dvbpsi_decoder_sections_completed(dvbpsi_decoder_t* p_decoder)
 
     bool b_complete = false;
 
-    for (unsigned int i = 0; i <= p_decoder->i_last_section_number &&
-                             i <= 255; i++)
+    dvbpsi_psi_section_t *p = p_decoder->p_sections;
+    while (p)
     {
-        if (!p_decoder->ap_sections[i])
-            break;
-        if (i == p_decoder->i_last_section_number)
+        if (p_decoder->i_last_section_number == p->i_number)
             b_complete = true;
+        p = p->p_next;
     }
 
     return b_complete;
 }
 
 /*****************************************************************************
- * dvbpsi_decoder_sections_chain
+ * dvbpsi_decoder_psi_section_add
  *****************************************************************************/
-void dvbpsi_decoder_sections_chain(dvbpsi_decoder_t *p_decoder)
-{
-    assert(p_decoder);
-    assert(p_decoder->i_last_section_number <= 255);
-
-    if (p_decoder->i_last_section_number)
-    {
-        for (uint8_t i = 0; i <= p_decoder->i_last_section_number - 1 &&
-                            i <= 255; i++)
-            p_decoder->ap_sections[i]->p_next = p_decoder->ap_sections[i + 1];
-    }
-}
-
-/*****************************************************************************
- * dvbpsi_decoder_section_add
- *****************************************************************************/
-bool dvbpsi_decoder_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section)
+bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section)
 {
     assert(p_decoder);
     assert(p_section);
 
+    if (!p_decoder->p_sections)
+    {
+        p_decoder->p_sections = p_section;
+        return false;
+    }
+
+    /* Insert in right place */
+    dvbpsi_psi_section_t *p = p_decoder->p_sections;
+    dvbpsi_psi_section_t *p_prev = p;
     bool b_overwrite = false;
 
-    if (p_decoder->ap_sections[p_section->i_number] != NULL)
+    while (p)
     {
-        dvbpsi_DeletePSISections(p_decoder->ap_sections[p_section->i_number]);
-        b_overwrite = true;
+        if (p->i_number == p_section->i_number)
+        {
+            /* Replace */
+            p_prev->p_next = p_section;
+            p_section->p_next = p->p_next;
+            p->p_next = NULL;
+            dvbpsi_DeletePSISections(p);
+            b_overwrite = true;
+            break;
+        }
+        else if (p->i_number > p_section->i_number)
+        {
+            /* Insert */
+            p_prev->p_next = p_section;
+            p_section->p_next = p;
+            break;
+        }
+
+        p_prev = p;
+        p = p->p_next;
     }
-    p_decoder->ap_sections[p_section->i_number] = p_section;
+
+    /* Add to end of list */
+    if (p_prev->i_number < p_section->i_number)
+    {
+        p_prev->p_next = p_section;
+    }
 
     return b_overwrite;
 }
@@ -284,11 +290,10 @@ void dvbpsi_decoder_delete(dvbpsi_decoder_t *p_decoder)
 {
     assert(p_decoder);
 
-    for (unsigned int i = 0; i <= 255; i++)
+    if (p_decoder->p_sections)
     {
-        if (p_decoder->ap_sections[i])
-            dvbpsi_DeletePSISections(p_decoder->ap_sections[i]);
-        p_decoder->ap_sections[i] = NULL;
+        dvbpsi_DeletePSISections(p_decoder->p_sections);
+        p_decoder->p_sections = NULL;
     }
 
     dvbpsi_DeletePSISections(p_decoder->p_current_section);

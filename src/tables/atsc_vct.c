@@ -427,7 +427,7 @@ static bool dvbpsi_AddSectionVCT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_vct_decoder_t *
     }
 
     /* Fill the section array */
-    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_vct_decoder), p_section))
+    if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_vct_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "ATSC VCT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -531,15 +531,12 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
         /* Save the current information */
         p_vct_decoder->current_vct = *p_vct_decoder->p_building_vct;
         p_vct_decoder->b_current_valid = true;
-
-        /* Chain the sections */
-        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_vct_decoder));
         /* Decode the sections */
         dvbpsi_atsc_DecodeVCTSections(p_vct_decoder->p_building_vct,
-                                      p_vct_decoder->ap_sections[0]);
+                                      p_vct_decoder->p_sections);
         /* Delete the sections */
-        dvbpsi_DeletePSISections(p_vct_decoder->ap_sections[0]);
-        p_vct_decoder->ap_sections[0] = NULL;
+        dvbpsi_DeletePSISections(p_vct_decoder->p_sections);
+        p_vct_decoder->p_sections = NULL;
         /* signal the new VCT */
         p_vct_decoder->pf_vct_callback(p_vct_decoder->p_cb_data,
                                        p_vct_decoder->p_building_vct);

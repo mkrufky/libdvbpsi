@@ -204,7 +204,7 @@ typedef void (* dvbpsi_callback_gather_t)(dvbpsi_t *p_dvbpsi,  /*!< pointer to d
     dvbpsi_psi_section_t *p_current_section; /*!< Current section */              \
     bool     b_current_valid;      /*!< Current valid indicator */                \
     uint8_t  i_last_section_number;/*!< Last received section number */           \
-    dvbpsi_psi_section_t *ap_sections[256]; /*!< Array of received PSI sections */ \
+    dvbpsi_psi_section_t *p_sections; /*!< List of received PSI sections */       \
     int      i_need;               /*!< Bytes needed */                           \
     bool     b_complete_header;    /*!< Flag for header completion */
 
@@ -273,27 +273,16 @@ void dvbpsi_decoder_reset(dvbpsi_decoder_t* p_decoder, const bool b_force);
 bool dvbpsi_decoder_sections_completed(dvbpsi_decoder_t* p_decoder);
 
 /*****************************************************************************
- * dvbpsi_decoder_sections_chain
+ * dvbpsi_decoder_psi_section_add
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_decoder_sections_chain(dvbpsi_decoder_t *p_decoder);
- * \brief Chain the sections if the last has been received.
+ * \fn bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section);
+ * \brief Add a section to the dvbpsi_decoder_t::p_sections list.
  * \param p_decoder pointer to dvbpsi_decoder_t with decoder
- * \return nothing
- */
-void dvbpsi_decoder_sections_chain(dvbpsi_decoder_t *p_decoder);
-
-/*****************************************************************************
- * dvbpsi_decoder_section_add
- *****************************************************************************/
-/*!
- * \fn bool dvbpsi_decoder_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section);
- * \brief Add a section to the dvbpsi_decoder_t::ap_sections[] array.
- * \param p_decoder pointer to dvbpsi_decoder_t with decoder
- * \param p_section PSI section to add to dvbpsi_decoder_t::ap_sections[] array
+ * \param p_section PSI section to add to dvbpsi_decoder_t::p_sections list
  * \return true if it overwrites a earlier section, false otherwise
  */
-bool dvbpsi_decoder_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section);
+bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_section_t *p_section);
 
 /*****************************************************************************
  * dvbpsi_decoder_present

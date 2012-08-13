@@ -290,7 +290,7 @@ static bool dvbpsi_rst_section_add(dvbpsi_t *p_dvbpsi, dvbpsi_rst_decoder_t *p_d
     }
 
     /* Fill the section array */
-    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_decoder), p_section))
+    if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "RST decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -385,14 +385,12 @@ void dvbpsi_rst_sections_gather(dvbpsi_t *p_dvbpsi,
         /* Save the current information */
         p_rst_decoder->current_rst = *p_rst_decoder->p_building_rst;
         p_rst_decoder->b_current_valid = true;
-        /* Chain the sections */
-        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_rst_decoder));
         /* Decode the sections */
         dvbpsi_rst_sections_decode(p_rst_decoder->p_building_rst,
-                                 p_rst_decoder->ap_sections[0]);
+                                   p_rst_decoder->p_sections);
         /* Delete the sections */
-        dvbpsi_DeletePSISections(p_rst_decoder->ap_sections[0]);
-        p_rst_decoder->ap_sections[0] = NULL;
+        dvbpsi_DeletePSISections(p_rst_decoder->p_sections);
+        p_rst_decoder->p_sections = NULL;
         /* signal the new CAT */
         p_rst_decoder->pf_rst_callback(p_rst_decoder->p_cb_data,
                                        p_rst_decoder->p_building_rst);

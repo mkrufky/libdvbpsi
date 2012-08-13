@@ -291,7 +291,7 @@ static bool dvbpsi_AddSectionTOT(dvbpsi_t *p_dvbpsi, dvbpsi_tot_decoder_t *p_tot
     }
 
     /* Fill the section array */
-    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_tot_decoder), p_section))
+    if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_tot_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "TOT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -377,14 +377,13 @@ void dvbpsi_tot_sections_gather(dvbpsi_t* p_dvbpsi,
         /* Save the current information */
         p_tot_decoder->current_tot = *p_tot_decoder->p_building_tot;
         p_tot_decoder->b_current_valid = true;
-        /* Chain the sections */
-        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_tot_decoder));
+
         /* Decode the sections */
         dvbpsi_tot_sections_decode(p_dvbpsi, p_tot_decoder->p_building_tot,
-                                 p_tot_decoder->ap_sections[0]);
+                                   p_tot_decoder->p_sections);
         /* Delete the sections */
-        dvbpsi_DeletePSISections(p_tot_decoder->ap_sections[0]);
-        p_tot_decoder->ap_sections[0] = NULL;
+        dvbpsi_DeletePSISections(p_tot_decoder->p_sections);
+        p_tot_decoder->p_sections = NULL;
         /* signal the new TOT */
         p_tot_decoder->pf_tot_callback(p_tot_decoder->p_cb_data,
                                        p_tot_decoder->p_building_tot);

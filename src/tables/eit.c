@@ -327,12 +327,10 @@ static bool dvbpsi_IsCompleteEIT(dvbpsi_eit_decoder_t* p_eit_decoder, dvbpsi_psi
         (p_eit_decoder->i_first_received_section_number == 0 &&
          p_section->i_number == p_eit_decoder->i_last_section_number))
     {
-        for (unsigned int i = 0; i <= p_eit_decoder->i_last_section_number; i++)
+        dvbpsi_psi_section_t *p = p_eit_decoder->p_sections;
+        while (p)
         {
-            if (!p_eit_decoder->ap_sections[i])
-                break;
-
-            if (i == p_eit_decoder->i_last_section_number)
+            if (p->i_number == p_eit_decoder->i_last_section_number)
             {
                 b_complete = true;
                 break;
@@ -345,14 +343,16 @@ static bool dvbpsi_IsCompleteEIT(dvbpsi_eit_decoder_t* p_eit_decoder, dvbpsi_psi
              * the end of a segment (indicated by
              * section_number == segment_last_section_number)
              * we have to search for the beginning of the next segment) */
-            if (i == p_eit_decoder->ap_sections[i]->p_payload_start[4])
+            if (p->i_number == p->p_payload_start[4])
             {
-                while (!p_eit_decoder->ap_sections[i + 1] &&
-                      (i + 1 < p_eit_decoder->i_last_section_number))
+                while (!p->p_next &&
+                      (p->p_next->i_number < p_eit_decoder->i_last_section_number))
                 {
-                    i++;
+                    p = p->p_next;
                 }
             }
+
+            p = p->p_next;
         }
     }
 
@@ -388,7 +388,7 @@ static bool dvbpsi_AddSectionEIT(dvbpsi_t *p_dvbpsi, dvbpsi_eit_decoder_t *p_eit
     }
 
     /* Fill the section array */
-    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_eit_decoder), p_section))
+    if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_eit_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "EIT decoder",
                      "overwrite section number %d", p_section->i_number);
 
@@ -473,23 +473,19 @@ void dvbpsi_eit_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_
         p_eit_decoder->current_eit = *p_eit_decoder->p_building_eit;
         p_eit_decoder->b_current_valid = true;
 
-        /* Chain the sections */
-        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_eit_decoder));
-
         /* Decode the sections */
-        dvbpsi_eit_sections_decode(p_eit_decoder->p_building_eit, p_eit_decoder->ap_sections[0]);
+        dvbpsi_eit_sections_decode(p_eit_decoder->p_building_eit,
+                                   p_eit_decoder->p_sections);
 
         /* Delete the sections */
-        dvbpsi_DeletePSISections(p_eit_decoder->ap_sections[0]);
-        p_eit_decoder->ap_sections[0] = NULL;
+        dvbpsi_DeletePSISections(p_eit_decoder->p_sections);
+        p_eit_decoder->p_sections = NULL;
 
         /* signal the new EIT */
         p_eit_decoder->pf_eit_callback(p_eit_decoder->p_cb_data, p_eit_decoder->p_building_eit);
 
         /* Reinitialize the structures */
         p_eit_decoder->p_building_eit = NULL;
-        for (unsigned int i = 0; i <= p_eit_decoder->i_last_section_number; i++)
-            p_eit_decoder->ap_sections[i] = NULL;
     }
 }
 

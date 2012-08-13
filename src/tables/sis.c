@@ -313,7 +313,7 @@ static bool dvbpsi_AddSectionSIS(dvbpsi_t *p_dvbpsi, dvbpsi_sis_decoder_t *p_sis
     }
 
     /* Fill the section array */
-    if (dvbpsi_decoder_section_add(DVBPSI_DECODER(p_sis_decoder), p_section))
+    if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_sis_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "SDT decoder", "overwrite section number %d",
                      p_section->i_number);
 
@@ -399,14 +399,12 @@ void dvbpsi_sis_sections_gather(dvbpsi_t *p_dvbpsi,
         /* Save the current information */
         p_sis_decoder->current_sis = *p_sis_decoder->p_building_sis;
         p_sis_decoder->b_current_valid = true;
-        /* Chain the sections */
-        dvbpsi_decoder_sections_chain(DVBPSI_DECODER(p_sis_decoder));
         /* Decode the sections */
         dvbpsi_sis_sections_decode(p_dvbpsi, p_sis_decoder->p_building_sis,
-                                   p_sis_decoder->ap_sections[0]);
+                                   p_sis_decoder->p_sections);
         /* Delete the sections */
-        dvbpsi_DeletePSISections(p_sis_decoder->ap_sections[0]);
-        p_sis_decoder->ap_sections[0] = NULL;
+        dvbpsi_DeletePSISections(p_sis_decoder->p_sections);
+        p_sis_decoder->p_sections = NULL;
         /* signal the new SDT */
         p_sis_decoder->pf_sis_callback(p_sis_decoder->p_cb_data,
                                        p_sis_decoder->p_building_sis);
