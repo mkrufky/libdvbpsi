@@ -345,7 +345,7 @@ static bool dvbpsi_IsCompleteEIT(dvbpsi_eit_decoder_t* p_eit_decoder, dvbpsi_psi
              * we have to search for the beginning of the next segment) */
             if (p->i_number == p->p_payload_start[4])
             {
-                while (!p->p_next &&
+                while (p->p_next &&
                       (p->p_next->i_number < p_eit_decoder->i_last_section_number))
                 {
                     p = p->p_next;
