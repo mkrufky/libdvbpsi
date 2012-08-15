@@ -254,7 +254,7 @@ static bool dvbpsi_AddSectionPAT(dvbpsi_t *p_dvbpsi, dvbpsi_pat_decoder_t *p_pat
         p_pat_decoder->i_last_section_number = p_section->i_last_number;
     }
 
-    /* Fill the section array */
+    /* Add to linked list of sections */
     if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_pat_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "PAT decoder", "overwrite section number %d",
                      p_section->i_number);

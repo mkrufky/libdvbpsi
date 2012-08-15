@@ -426,7 +426,7 @@ static bool dvbpsi_AddSectionVCT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_vct_decoder_t *
         p_vct_decoder->i_last_section_number = p_section->i_last_number;
     }
 
-    /* Fill the section array */
+    /* Add to linked list of sections */
     if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_vct_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "ATSC VCT decoder", "overwrite section number %d",
                      p_section->i_number);

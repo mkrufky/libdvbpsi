@@ -306,7 +306,7 @@ static bool dvbpsi_AddSectionPMT(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_decoder_t *p_pmt
         p_pmt_decoder->i_last_section_number = p_section->i_last_number;
     }
 
-    /* Fill the section array */
+    /* Add to linked list of sections */
     if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_pmt_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "PMT decoder", "overwrite section number %d",
                      p_section->i_number);

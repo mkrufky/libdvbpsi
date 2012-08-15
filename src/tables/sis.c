@@ -312,7 +312,7 @@ static bool dvbpsi_AddSectionSIS(dvbpsi_t *p_dvbpsi, dvbpsi_sis_decoder_t *p_sis
         p_sis_decoder->i_last_section_number = p_section->i_last_number;
     }
 
-    /* Fill the section array */
+    /* Add to linked list of sections */
     if (dvbpsi_decoder_psi_section_add(DVBPSI_DECODER(p_sis_decoder), p_section))
         dvbpsi_debug(p_dvbpsi, "SDT decoder", "overwrite section number %d",
                      p_section->i_number);
