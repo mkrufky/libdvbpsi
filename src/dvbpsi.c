@@ -238,16 +238,19 @@ bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_sect
 {
     assert(p_decoder);
     assert(p_section);
+    assert(p_section->p_next == NULL);
 
+    /* Empty list */
     if (!p_decoder->p_sections)
     {
         p_decoder->p_sections = p_section;
+        p_section->p_next = NULL;
         return false;
     }
 
     /* Insert in right place */
     dvbpsi_psi_section_t *p = p_decoder->p_sections;
-    dvbpsi_psi_section_t *p_prev = p;
+    dvbpsi_psi_section_t *p_prev = NULL;
     bool b_overwrite = false;
 
     while (p)
@@ -260,14 +263,22 @@ bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_sect
             p->p_next = NULL;
             dvbpsi_DeletePSISections(p);
             b_overwrite = true;
-            break;
+            goto out;
         }
         else if (p->i_number > p_section->i_number)
         {
-            /* Insert */
-            p_prev->p_next = p_section;
-            p_section->p_next = p;
-            break;
+            /* Insert before p */
+            if (p_prev)
+            {
+                p_prev->p_next = p_section;
+                p_section->p_next = p;
+            }
+            else
+            {
+                p_section->p_next = p;
+                p_decoder->p_sections = p_section;
+            }
+            goto out;
         }
 
         p_prev = p;
@@ -278,8 +289,10 @@ bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_sect
     if (p_prev->i_number < p_section->i_number)
     {
         p_prev->p_next = p_section;
+        p_section->p_next = NULL;
     }
 
+out:
     return b_overwrite;
 }
 
