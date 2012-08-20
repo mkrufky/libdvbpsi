@@ -118,8 +118,6 @@ bool dvbpsi_CheckPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section,
         goto error;
     }
 
-    /* FIXME: Do we need to check the CRC for ALL tables? */
-
     dvbpsi_debug(p_dvbpsi, psz_table_name,
                    "Table version %2d, " "i_extension %5d, "
                    "section %3d up to %3d, " "current %1d",
