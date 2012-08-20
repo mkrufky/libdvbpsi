@@ -458,7 +458,7 @@ static void dvbpsi_atsc_GatherEITSections(dvbpsi_t * p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_eit_decoder)))
+    if (dvbpsi_decoder_psi_sections_completed(DVBPSI_DECODER(p_eit_decoder)))
     {
         assert(p_eit_decoder->pf_eit_callback);
 

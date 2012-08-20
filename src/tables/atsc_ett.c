@@ -380,7 +380,7 @@ static void dvbpsi_atsc_GatherETTSections(dvbpsi_t* p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_ett_decoder)))
+    if (dvbpsi_decoder_psi_sections_completed(DVBPSI_DECODER(p_ett_decoder)))
     {
         assert(p_ett_decoder->pf_ett_callback);
 

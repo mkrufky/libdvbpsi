@@ -211,9 +211,9 @@ void dvbpsi_decoder_reset(dvbpsi_decoder_t* p_decoder, const bool b_force)
 }
 
 /*****************************************************************************
- * dvbpsi_decoder_sections_completed
+ * dvbpsi_decoder_psi_sections_completed
  *****************************************************************************/
-bool dvbpsi_decoder_sections_completed(dvbpsi_decoder_t* p_decoder)
+bool dvbpsi_decoder_psi_sections_completed(dvbpsi_decoder_t* p_decoder)
 {
     assert(p_decoder);
     assert(p_decoder->i_last_section_number <= 255);

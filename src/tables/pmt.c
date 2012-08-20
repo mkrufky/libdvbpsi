@@ -383,7 +383,7 @@ void dvbpsi_pmt_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sect
         return;
     }
 
-    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_pmt_decoder)))
+    if (dvbpsi_decoder_psi_sections_completed(DVBPSI_DECODER(p_pmt_decoder)))
     {
         assert(p_pmt_decoder->pf_pmt_callback);
 

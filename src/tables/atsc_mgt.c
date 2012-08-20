@@ -487,7 +487,7 @@ static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_mgt_decoder)))
+    if (dvbpsi_decoder_psi_sections_completed(DVBPSI_DECODER(p_mgt_decoder)))
     {
         assert(p_mgt_decoder->pf_mgt_callback);
 

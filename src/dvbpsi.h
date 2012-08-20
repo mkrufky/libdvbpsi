@@ -262,15 +262,15 @@ void dvbpsi_decoder_delete(dvbpsi_decoder_t *p_decoder);
 void dvbpsi_decoder_reset(dvbpsi_decoder_t* p_decoder, const bool b_force);
 
 /*****************************************************************************
- * dvbpsi_decoder_sections_completed
+ * dvbpsi_decoder_psi_sections_completed
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_decoder_sections_completed(dvbpsi_decoder_t* p_decoder);
+ * \fn bool dvbpsi_decoder_psi_sections_completed(dvbpsi_decoder_t* p_decoder);
  * \brief Have all sections for this decoder been received?
  * \param p_decoder pointer to dvbpsi_decoder_t with decoder
  * \return true when all PSI sections have been received, false otherwise
  */
-bool dvbpsi_decoder_sections_completed(dvbpsi_decoder_t* p_decoder);
+bool dvbpsi_decoder_psi_sections_completed(dvbpsi_decoder_t* p_decoder);
 
 /*****************************************************************************
  * dvbpsi_decoder_psi_section_add

@@ -420,7 +420,7 @@ void dvbpsi_nit_sections_gather(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_nit_decoder)))
+    if (dvbpsi_decoder_psi_sections_completed(DVBPSI_DECODER(p_nit_decoder)))
     {
         assert(p_nit_decoder->pf_nit_callback);
 

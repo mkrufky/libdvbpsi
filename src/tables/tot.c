@@ -370,7 +370,7 @@ void dvbpsi_tot_sections_gather(dvbpsi_t* p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_tot_decoder)))
+    if (dvbpsi_decoder_psi_sections_completed(DVBPSI_DECODER(p_tot_decoder)))
     {
         assert(p_tot_decoder->pf_tot_callback);
 

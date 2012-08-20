@@ -378,7 +378,7 @@ void dvbpsi_rst_sections_gather(dvbpsi_t *p_dvbpsi,
     }
 
     /* Check if we have all the sections */
-    if (dvbpsi_decoder_sections_completed(DVBPSI_DECODER(p_rst_decoder)))
+    if (dvbpsi_decoder_psi_sections_completed(DVBPSI_DECODER(p_rst_decoder)))
     {
         assert(p_rst_decoder->pf_rst_callback);
 
