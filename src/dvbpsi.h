@@ -306,7 +306,7 @@ typedef struct dvbpsi_decoder_s * dvbpsi_handle;// __attribute__((deprecated));
 /* dvbpsi.h */
 __attribute__((deprecated))
 void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data);
-#define dvbpsi_PushPacket(h,p)  dvbpsi_packet_push(h,p)dvbpsi_handle
+#define dvbpsi_PushPacket(h,p)  dvbpsi_packet_push(h,p)
 
 #ifdef __cplusplus
 };
