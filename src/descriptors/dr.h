@@ -46,6 +46,8 @@
 #include "dr_0d.h"
 #include "dr_0e.h"
 #include "dr_0f.h"
+#include "dr_13.h"
+#include "dr_14.h"
 #include "dr_40.h"
 #include "dr_41.h"
 #include "dr_42.h"
@@ -64,7 +66,12 @@
 #include "dr_58.h"
 #include "dr_59.h"
 #include "dr_5a.h"
+#include "dr_62.h"
+#include "dr_66.h"
 #include "dr_69.h"
+#include "dr_73.h"
+#include "dr_76.h"
+#include "dr_83.h"
 #include "dr_8a.h"
 
 #else
