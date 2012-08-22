@@ -157,7 +157,7 @@ void dvbpsi_DeleteDescriptors(dvbpsi_descriptor_t* p_descriptor)
 /*****************************************************************************
  * dvbpsi_DuplicateDecodedDescriptor
  *****************************************************************************
- * Destruction of a dvbpsi_descriptor_t structure.
+ * Generic function for duplicating a decoded descriptor structure.
  *****************************************************************************/
 void *dvbpsi_DuplicateDecodedDescriptor(void *p_decoded, ssize_t i_size)
 {
