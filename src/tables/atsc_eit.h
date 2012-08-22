@@ -17,9 +17,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 eit.h
 
-Decode PSIP Event Information Table.
-
 */
+
+/*!
+ * \file atsc_eit.h
+ * \author Adam Charrett
+ * \brief Decode PSIP Event Information Table (ATSC EIT).
+ */
+
 #ifndef _ATSC_EIT_H
 #define _ATSC_EIT_H
 
@@ -32,7 +37,7 @@ extern "C" {
  *****************************************************************************/
 /*!
  * \struct dvbpsi_atsc_eit_event_s
- * \brief EIT Event structure.
+ * \brief ATSC EIT Event structure.
  *
  * This structure is used to store decoded event information.
  */
@@ -60,7 +65,7 @@ typedef struct dvbpsi_atsc_eit_event_s
  *****************************************************************************/
 /*!
  * \struct dvbpsi_atsc_eit_s
- * \brief EIT structure.
+ * \brief ATSC EIT structure.
  *
  * This structure is used to store a decoded EIT.
  */

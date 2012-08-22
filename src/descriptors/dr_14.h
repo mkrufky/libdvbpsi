@@ -20,6 +20,13 @@ dr_14.h
 Decode Association Tag Descriptor.
 
 */
+
+/*!
+ * \file dr_14.h
+ * \author Adam Charrett
+ * \brief Decode Association Tag Descriptor.
+ */
+
 #ifndef _DR_14_H
 #define _DR_14_H
 

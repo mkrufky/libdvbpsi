@@ -4,7 +4,7 @@ Changes between 0.2.2 and 1.0.0:
  * new example application dvbinfo
  * updated documentation (new api howto)
  * add log callback (remove fprintf's)
- * make API more consistent
+ * make API more consistent, see doxygen "howto-new-api" section for converting your code:
    - introduces dvbpsi_t typedef
    - removed dvbpis_handle
  * EIT table generation

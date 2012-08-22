@@ -21,6 +21,13 @@ mgt.h
 Decode PSIP Master Guide Table.
 
 */
+
+/*!
+ * \file atsc_mgt.h
+ * \author Adam Charrett and Michael Krufky
+ * \brief Decode PSIP Master Guide Table (ATSC MGT).
+ */
+
 #ifndef _ATSC_MGT_H
 #define _ATSC_MGT_H
 

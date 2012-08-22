@@ -21,6 +21,12 @@ Decode Default Authority Descriptor.
 
 */
 
+/*!
+ * \file dr_73.h
+ * \author Adam Charrett
+ * \brief Decode Default Authority Descriptor.
+ */
+
 #ifndef _DR_73_H
 #define _DR_73_H
 

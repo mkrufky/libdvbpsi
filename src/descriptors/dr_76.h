@@ -21,6 +21,12 @@ Decode Content Identifier Descriptor.
 
 */
 
+/*!
+ * \file dr_76.h
+ * \author Adam Charrett
+ * \brief Decode Content Identifier Descriptor
+ */
+
 #ifndef _DR_76_H
 #define _DR_76_H
 

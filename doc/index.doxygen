@@ -26,18 +26,24 @@ describes how to use it and the "C" API.</p>
 <p>libdvbpsi was originally released under the GPLv2 and later relicensed under the LGPLv2. All versions prior to version 0.2.0 are GPLv2, versions 0.2.0 and later are LGPLv2.1.<p>
 
 <h2>Tables and Descriptors</h2>
-<p>libdvbpsi supports the following PSI tables and many descriptors regularly found in MPEG/DVB Transport streams</p>
+<p>libdvbpsi supports the following PSI tables and many descriptors regularly found in MPEG/DVB/ATSC Transport streams</p>
 
 <ul>
   <li>Bouquet Association Table (<em>BAT</em>)</li>
   <li>Conditional Access Table (<em>CAT</em>)</li>
-  <li>EPG Information Table (<em>EIT</em>)</li>
+  <li>Event Information Table (<em>EIT</em>)</li>
   <li>Network Information Table (<em>NIT</em>)</li>
   <li>Program Association Table (<em>PAT</em>)</li>
   <li>Program Map Table (<em>PMT</em>)</li>
+  <li>Running Status Table(<em>RST</em></li>
   <li>Section Description Table (<em>SDT</em>)</li>
   <li>Splice Information Section Table (<em>SIS</em>)</li>
   <li>TOT/TDT Table (<em>TOT</em>)</li>
+  <li>PSIP Event Information Table(<em>ATSC EIT</em>)</li>
+  <li>PSIP Extended Text Table(<em>ATSC ETT</em>)</li>
+  <li>PSIP Master Guide Table(<em>ATSC MGT</em>)</li>
+  <li>PSIP System Time Table(<em>ATSC STT</em>)</li>
+  <li>PSIP Virtual Channel Table(<em>ATSC VCT</em>)</li>
 </ul>
 
 <h2>Usage</h2>

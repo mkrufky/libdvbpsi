@@ -17,9 +17,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 ett.h
 
-Decode PSIP Extended Text Table.
-
 */
+
+/*!
+ * \file atsc_ett.h
+ * \author Adam Charrett
+ * \brief Decode PSIP Extented Text Table (ATSC ETT).
+ */
+
 #ifndef _ATSC_ETT_H
 #define _ATSC_ETT_H
 
@@ -32,7 +37,7 @@ extern "C" {
  *****************************************************************************/
 /*!
  * \struct dvbpsi_atsc_ett_s
- * \brief ETT structure.
+ * \brief ATSC ETT structure.
  *
  * The Extended Text Table (ETT) contains Extended Text Message (ETM) streams. They
  * provide detailed descriptions of virtual channels (channel ETM) and (event ETM).

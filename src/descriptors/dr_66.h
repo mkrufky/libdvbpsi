@@ -20,6 +20,13 @@ dr_66.h
 Decode Data Broadcast id Descriptor.
 
 */
+
+/*!
+ * \file dr_66.h
+ * \author Adam Charrett
+ * \brief Decode Data Broadcast id Descriptor.
+ */
+
 #ifndef _DR_66_H
 #define _DR_66_H
 

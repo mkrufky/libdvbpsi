@@ -17,9 +17,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 stt.h
 
-Decode PSIP System Time Table.
-
 */
+
+/*!
+ * \file atsc_stt.h
+ * \author Adam Charrett
+ * \brief Decode PSIP System Time Table (ATSC STT).
+ */
+
 #ifndef _ATSC_STT_H
 #define _ATSC_STT_H
 

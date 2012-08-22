@@ -21,6 +21,12 @@ Decode Frequency List Descriptor.
 
 */
 
+/*!
+ * \file dr_62.h
+ * \author Adam Charrett
+ * \brief Decode Frequency List Descriptor.
+ */
+
 #ifndef _DR_62_H
 #define _DR_62_H
 

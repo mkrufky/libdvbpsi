@@ -20,6 +20,13 @@ vct.h
 Decode PSIP Virtual Channel Table.
 
 */
+
+/*!
+ * \file atsc_vct.h
+ * \author Adam Charrett
+ * \brief Decode PSIP Virtual Channel Table. (ATSC VCT).
+ */
+
 #ifndef _ATSC_VCT_H
 #define _ATSC_VCT_H
 

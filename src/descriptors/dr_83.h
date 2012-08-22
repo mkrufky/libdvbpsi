@@ -21,6 +21,12 @@ Decode Logical Channel Number Descriptor.
 
 */
 
+/*!
+ * \file dr_83.h
+ * \author Adam Charrett
+ * \brief Decode Logical Channel Number Descriptor.
+ */
+
 #ifndef _DR_83_H
 #define _DR_83_H
 

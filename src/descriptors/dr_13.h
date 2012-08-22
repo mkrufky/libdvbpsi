@@ -20,6 +20,13 @@ dr_13.h
 Decode Carousel id Descriptor.
 
 */
+
+/*!
+ * \file dr_13.h
+ * \author Adam Charrett
+ * \brief Decode Carousel id Descriptor.
+ */
+
 #ifndef _DR_13_H
 #define _DR_13_H
 
