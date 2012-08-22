@@ -41,12 +41,9 @@ extern "C" {
  * dvbpsi_aac_dr_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_aac_dr_s
- * \brief "AAC Audio" descriptor structure.
- *
- * The AAC Audio descriptor is used to label the PIDs that carry AAC audio data.
+ * \enum dvbpsi_aac_profile_and_level_s
+ * \brief enumeration of AAC profile and levels as specified in ISO/IEC 13818-1:2007 table 2.71
  */
-
 /*!
  * \typedef enum dvbpsi_aac_profile_and_level_s dvbpsi_aac_profile_and_level_t
  * \brief AAC profile and level as specified in ISO/IEC 13818-1:2007 table 2.71
@@ -172,6 +169,13 @@ typedef enum dvbpsi_aac_profile_and_level_s
 } dvbpsi_aac_profile_and_level_t;
 
 /*!
+ * \enum dvbpsi_aac_type_s
+ * \brief AAC type information as described in table 26, page 41 where column
+ *
+ * The AAC Audio descriptor is used to label the PIDs that carry AAC audio data.
+ * 'stream_content' has value 0x06 as specified in ISO/IEC 13818-1:2007.
+ */
+/*!
  * \typedef enum dvbpsi_aac_type_s dvbpsi_aac_type_t
  * \brief   AAC type information as descripted in table 26, page 41 where column
  * 'stream_content' has value 0x06. The following values are excepted:
@@ -233,6 +237,12 @@ typedef enum dvbpsi_aac_type_s
     DVBPSI_AAC_RESERVED5 = 0xFF /*!< reserved for future use */
 } dvbpsi_aac_type_t;
 
+/*!
+ * \struct dvbpsi_aac_dr_s
+ * \brief "AAC Audio" descriptor structure.
+ *
+ * The AAC Audio descriptor is used to label the PIDs that carry AAC audio data.
+ */
 /*!
  * \typedef struct dvbpsi_aac_dr_s dvbpsi_aac_dr_t
  * \brief dvbpsi_aac_dr_t type definition.

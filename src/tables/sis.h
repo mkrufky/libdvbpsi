@@ -379,7 +379,8 @@ void dvbpsi_sis_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extens
  * dvbpsi_sis_init/dvbpsi_sis_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_sis_init(dvbpsi_sis_t* p_sis, uint8_t i_protocol_version)
+ * \fn void dvbpsi_sis_init(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
+                    bool b_current_next, uint8_t i_protocol_version);
  * \brief Initialize a user-allocated dvbpsi_sis_t structure.
  * \param p_sis pointer to the SIS structure
  * \param i_ts_id transport stream ID
@@ -392,7 +393,8 @@ void dvbpsi_sis_init(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next, uint8_t i_protocol_version);
 
 /*!
- * \fn dvbpsi_sis_t* dvbpsi_sis_new(uint8_t i_protocol_version)
+ * \fn dvbpsi_sis_t* dvbpsi_sis_new(uint16_t i_ts_id, uint8_t i_version,
+                            bool b_current_next, uint8_t i_protocol_version);
  * \brief Allocate and initialize a new dvbpsi_sis_t structure.
  * \param i_ts_id transport stream ID
  * \param i_version SIS version

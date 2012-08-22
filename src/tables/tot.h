@@ -114,7 +114,8 @@ void dvbpsi_tot_detach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_tot_init/dvbpsi_tot_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint64_t i_utc_time)
+ * \fn void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
+                    bool b_current_next, uint64_t i_utc_time);
  * \brief Initialize a user-allocated dvbpsi_tot_t structure.
  * \param p_tot pointer to the TDT/TOT structure
  * \param i_ts_id transport stream ID
@@ -127,7 +128,8 @@ void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
                     bool b_current_next, uint64_t i_utc_time);
 
 /*!
- * \fn dvbpsi_tot_t *dvbpsi_tot_new(uint64_t i_utc_time)
+ * \fn dvbpsi_tot_t *dvbpsi_tot_new(uint16_t i_ts_id, uint8_t i_version,
+                            bool b_current_next, uint64_t i_utc_time);
  * \brief Allocate and initialize a new dvbpsi_tot_t structure.
  * \param i_ts_id transport stream ID
  * \param i_version SDT version

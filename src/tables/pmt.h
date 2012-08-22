@@ -178,7 +178,7 @@ dvbpsi_pmt_t* dvbpsi_pmt_new(uint16_t i_program_number, uint8_t i_version,
 void dvbpsi_pmt_empty(dvbpsi_pmt_t* p_pmt);
 
 /*!
- * \fn void dvbpsi_DeletePMT(dvbpsi_pmt_t* p_pmt)
+ * \fn void dvbpsi_pmt_delete(dvbpsi_pmt_t* p_pmt)
  * \brief Clean and free a dvbpsi_pmt_t structure.
  * \param p_pmt pointer to the PMT structure
  * \return nothing.

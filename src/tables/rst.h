@@ -68,7 +68,7 @@ typedef struct dvbpsi_rst_event_s
  * dvbpsi_rst_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_rst_t
+ * \struct dvbpsi_rst_s
  * \brief RST structure.
  *
  * This structure is used to store a decoded RST service description.
@@ -127,8 +127,7 @@ void dvbpsi_rst_detach(dvbpsi_t *p_dvbpsi);
  * dvbpsi_rst_init/dvbpsi_rst_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_rst_init(dvbpsi_rst_t* p_rst,
-                           uint8_t i_version, bool b_current_next)
+ * \fn void dvbpsi_rst_init(dvbpsi_rst_t* p_rst)
  * \brief Initialize a user-allocated dvbpsi_cat_t structure.
  * \param p_rst pointer to the RST structure
  * \return nothing.
@@ -136,8 +135,7 @@ void dvbpsi_rst_detach(dvbpsi_t *p_dvbpsi);
 void dvbpsi_rst_init(dvbpsi_rst_t* p_rst);
 
 /*!
- * \fn dvbpsi_rst_t *dvbpsi_rst_new(uint8_t i_version,
- *                                  bool b_current_next)
+ * \fn dvbpsi_rst_t *dvbpsi_rst_new(void)
  * \brief Allocate and initialize a new dvbpsi_rst_t structure.
  * \return p_rst pointer to the RST structure
  */
