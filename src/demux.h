@@ -49,8 +49,8 @@ extern "C" {
  * \brief Callback used in case of a new subtable detected.
  */
 typedef void (*dvbpsi_demux_new_cb_t) (dvbpsi_t *p_dvbpsi,  /*!< pointer to dvbpsi handle */
-                                       uint8_t  i_table_id, /*!< table id to detach */
-                                       uint16_t i_extension,/*!< table extention to detach */
+                                       uint8_t  i_table_id, /*!< table id to attach */
+                                       uint16_t i_extension,/*!< table extention to attach */
                                        void *   p_cb_data); /*!< pointer to callback data */
 
 /*!
