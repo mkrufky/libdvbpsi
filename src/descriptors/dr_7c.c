@@ -299,8 +299,7 @@ dvbpsi_descriptor_t *dvbpsi_GenAACDr(dvbpsi_aac_dr_t *p_decoded, bool b_duplicat
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
-                                                  sizeof(dvbpsi_aac_dr_t));
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded, sizeof(dvbpsi_aac_dr_t));
     }
 
     return p_descriptor;

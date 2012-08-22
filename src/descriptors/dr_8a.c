@@ -96,7 +96,7 @@ dvbpsi_descriptor_t * dvbpsi_GenCUEIDr(dvbpsi_cuei_dr_t * p_decoded, bool b_dupl
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_cuei_dr_t));
     }
 

@@ -86,7 +86,7 @@ dvbpsi_cable_deliv_sys_dr_t* dvbpsi_DecodeCableDelivSysDr(
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenCableDelivSysDr(
-                        dvbpsi_cable_deliv_sys_dr_t * p_decoded, int b_duplicate)
+                        dvbpsi_cable_deliv_sys_dr_t * p_decoded, bool b_duplicate)
  * \brief cable delivery system descriptor generator.
  * \param p_decoded pointer to a decoded cable delivery system descriptor
  * descriptor structure
@@ -96,7 +96,7 @@ dvbpsi_cable_deliv_sys_dr_t* dvbpsi_DecodeCableDelivSysDr(
  */
 dvbpsi_descriptor_t * dvbpsi_GenCableDelivSysDr(
                                         dvbpsi_cable_deliv_sys_dr_t * p_decoded,
-                                        int b_duplicate);
+                                        bool b_duplicate);
 
 
 #ifdef __cplusplus

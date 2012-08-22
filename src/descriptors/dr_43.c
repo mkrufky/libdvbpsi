@@ -120,7 +120,7 @@ dvbpsi_descriptor_t * dvbpsi_GenSatDelivSysDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_sat_deliv_sys_dr_t));
     }
 

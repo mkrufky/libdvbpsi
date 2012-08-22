@@ -112,7 +112,7 @@ dvbpsi_descriptor_t * dvbpsi_GenServiceListDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-               dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+               dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                        sizeof(dvbpsi_service_list_dr_t));
     }
 

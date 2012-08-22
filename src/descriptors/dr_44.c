@@ -86,7 +86,7 @@ dvbpsi_cable_deliv_sys_dr_t * dvbpsi_DecodeCableDelivSysDr(
  *****************************************************************************/
 dvbpsi_descriptor_t * dvbpsi_GenCableDelivSysDr(
                                         dvbpsi_cable_deliv_sys_dr_t * p_decoded,
-                                        int b_duplicate)
+                                        bool b_duplicate)
 {
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
@@ -111,7 +111,7 @@ dvbpsi_descriptor_t * dvbpsi_GenCableDelivSysDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_cable_deliv_sys_dr_t));
     }
 

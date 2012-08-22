@@ -138,7 +138,7 @@ dvbpsi_descriptor_t * dvbpsi_GenLocalTimeOffsetDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_local_time_offset_dr_t));
     }
 

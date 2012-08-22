@@ -115,7 +115,7 @@ dvbpsi_descriptor_t * dvbpsi_GenCountryAvailabilityDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-               dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+               dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                       sizeof(dvbpsi_country_availability_dr_t));
     }
 

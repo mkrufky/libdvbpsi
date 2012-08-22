@@ -97,7 +97,7 @@ dvbpsi_descriptor_t * dvbpsi_GenNetworkNameDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_network_name_dr_t));
     }
 

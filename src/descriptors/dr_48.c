@@ -102,9 +102,8 @@ dvbpsi_service_dr_t * dvbpsi_DecodeServiceDr(
 /*****************************************************************************
  * dvbpsi_GenServiceDr
  *****************************************************************************/
-dvbpsi_descriptor_t * dvbpsi_GenServiceDr(
-                                        dvbpsi_service_dr_t * p_decoded,
-                                        bool b_duplicate)
+dvbpsi_descriptor_t * dvbpsi_GenServiceDr(dvbpsi_service_dr_t * p_decoded,
+                                          bool b_duplicate)
 {
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
@@ -131,7 +130,7 @@ dvbpsi_descriptor_t * dvbpsi_GenServiceDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_service_dr_t));
     }
 

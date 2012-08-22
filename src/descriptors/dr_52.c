@@ -91,7 +91,7 @@ dvbpsi_descriptor_t * dvbpsi_GenStreamIdentifierDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_stream_identifier_dr_t));
     }
 

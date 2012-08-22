@@ -78,9 +78,8 @@ dvbpsi_max_bitrate_dr_t * dvbpsi_DecodeMaxBitrateDr(
 /*****************************************************************************
  * dvbpsi_GenMaxBitrateDr
  *****************************************************************************/
-dvbpsi_descriptor_t * dvbpsi_GenMaxBitrateDr(
-                                        dvbpsi_max_bitrate_dr_t * p_decoded,
-                                        bool b_duplicate)
+dvbpsi_descriptor_t * dvbpsi_GenMaxBitrateDr(dvbpsi_max_bitrate_dr_t * p_decoded,
+                                             bool b_duplicate)
 {
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x0e, 3, NULL);
@@ -96,7 +95,7 @@ dvbpsi_descriptor_t * dvbpsi_GenMaxBitrateDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_max_bitrate_dr_t));
     }
 

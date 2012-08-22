@@ -98,10 +98,9 @@ dvbpsi_descriptor_t * dvbpsi_GenPrivateDataDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_private_data_dr_t));
     }
 
     return p_descriptor;
 }
-

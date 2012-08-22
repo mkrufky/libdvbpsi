@@ -90,7 +90,7 @@ dvbpsi_descriptor_t * dvbpsi_GenTerrDelivSysDr(
                                         dvbpsi_terr_deliv_sys_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-      /* Create the descriptor */
+    /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x5a, 11, NULL);
     if (!p_descriptor)
         return NULL;
@@ -121,7 +121,7 @@ dvbpsi_descriptor_t * dvbpsi_GenTerrDelivSysDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_terr_deliv_sys_dr_t));
     }
 

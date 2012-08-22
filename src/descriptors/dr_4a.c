@@ -215,7 +215,7 @@ dvbpsi_descriptor_t * dvbpsi_GenLinkageDr(dvbpsi_linkage_dr_t * p_decoded,
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-               dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+               dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                       sizeof(dvbpsi_linkage_dr_t));
     }
 

@@ -116,10 +116,9 @@ dvbpsi_descriptor_t * dvbpsi_GenParentalRatingDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_parental_rating_dr_t));
     }
 
     return p_descriptor;
 }
-

@@ -79,8 +79,7 @@ dvbpsi_bouquet_name_dr_t * dvbpsi_DecodeBouquetNameDr(
 /*****************************************************************************
  * dvbpsi_GenBouquetNameDr
  *****************************************************************************/
-dvbpsi_descriptor_t * dvbpsi_GenBouquetNameDr(
-                                        dvbpsi_bouquet_name_dr_t * p_decoded,
+dvbpsi_descriptor_t * dvbpsi_GenBouquetNameDr(dvbpsi_bouquet_name_dr_t *p_decoded,
                                         bool b_duplicate)
 {
     /* Create the descriptor */
@@ -99,7 +98,7 @@ dvbpsi_descriptor_t * dvbpsi_GenBouquetNameDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_bouquet_name_dr_t));
     }
 

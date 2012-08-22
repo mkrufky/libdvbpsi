@@ -101,7 +101,7 @@ dvbpsi_descriptor_t * dvbpsi_GenPDCDr(dvbpsi_PDC_dr_t * p_decoded,
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_PDC_dr_t));
     }
 

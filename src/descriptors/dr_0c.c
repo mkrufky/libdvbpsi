@@ -101,7 +101,7 @@ dvbpsi_descriptor_t * dvbpsi_GenMxBuffUtilizationDr(
     {
         /* Duplicate decoded data */
         p_descriptor->p_decoded =
-                dvbpsi_DuplicateDecodedDescriptor(p_descriptor->p_decoded,
+                dvbpsi_DuplicateDecodedDescriptor(p_decoded,
                                                   sizeof(dvbpsi_mx_buff_utilization_dr_t));
     }
 
