@@ -888,6 +888,143 @@ static void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor
 }
 
 /*****************************************************************************
+ * DumpAACDescriptor
+ *****************************************************************************/
+static void DumpAACDescriptor(dvbpsi_aac_dr_t *p_aac_descriptor)
+{
+    printf("AAC audio descriptor\n");
+    printf("\tprofile and level: ");
+    switch(p_aac_descriptor->i_profile_and_level)
+    {
+        /* 0x00-0x0F Reserved */
+    case DVBPSI_AAC_PROFILE_MAIN_LEVEL_1: printf("Main profile, level 1\n"); break;
+    case DVBPSI_AAC_PROFILE_MAIN_LEVEL_2: printf("Main profile, level 2\n"); break;
+    case DVBPSI_AAC_PROFILE_MAIN_LEVEL_3: printf("Main profile, level 3\n"); break;
+    case DVBPSI_AAC_PROFILE_MAIN_LEVEL_4: printf("Main profile, level 4\n"); break;
+        /* 0x14-0x17 Reserved */
+    case DVBPSI_AAC_PROFILE_SCALABLE_LEVEL_1: printf("Scalable Profile, level 1\n"); break;
+    case DVBPSI_AAC_PROFILE_SCALABLE_LEVEL_2: printf("Scalable Profile, level 2\n"); break;
+    case DVBPSI_AAC_PROFILE_SCALABLE_LEVEL_3: printf("Scalable Profile, level 3\n"); break;
+    case DVBPSI_AAC_PROFILE_SCALABLE_LEVEL_4: printf("Scalable Profile, level 4\n"); break;
+        /* 0x1C-0x1F Reserved */
+    case DVBPSI_AAC_PROFILE_SPEECH_LEVEL_1: printf("Speech profile, level 1\n"); break;
+    case DVBPSI_AAC_PROFILE_SPEECH_LEVEL_2: printf("Speech profile, level 2\n"); break;
+        /* 0x22-0x27 Reserved */
+    case DVBPSI_AAC_PROFILE_SYNTHESIS_LEVEL_1: printf("Synthesis profile, level 1\n"); break;
+    case DVBPSI_AAC_PROFILE_SYNTHESIS_LEVEL_2: printf("Synthesis profile, level 2\n"); break;
+    case DVBPSI_AAC_PROFILE_SYNTHESIS_LEVEL_3: printf("Synthesis profile, level 3\n"); break;
+        /* 0x2B-0x2F Reserved */
+    case DVBPSI_AAC_PROFILE_HQ_LEVEL_1: printf("High quality audio profile, level 1\n"); break;
+    case DVBPSI_AAC_PROFILE_HQ_LEVEL_2: printf("High quality audio profile, level 2\n"); break;
+    case DVBPSI_AAC_PROFILE_HQ_LEVEL_3: printf("High quality audio profile, level 3\n"); break;
+    case DVBPSI_AAC_PROFILE_HQ_LEVEL_4: printf("High quality audio profile, level 4\n"); break;
+    case DVBPSI_AAC_PROFILE_HQ_LEVEL_5: printf("High quality audio profile, level 5\n"); break;
+    case DVBPSI_AAC_PROFILE_HQ_LEVEL_6: printf("High quality audio profile, level 6\n"); break;
+    case DVBPSI_AAC_PROFILE_HQ_LEVEL_7: printf("High quality audio profile, level 7\n"); break;
+    case DVBPSI_AAC_PROFILE_HQ_LEVEL_8: printf("High quality audio profile, level 8\n"); break;
+
+    case DVBPSI_AAC_PROFILE_LOW_DELAY_LEVEL_1: printf("Low delay audio profile, level 1\n"); break;
+    case DVBPSI_AAC_PROFILE_LOW_DELAY_LEVEL_2: printf("Low delay audio profile, level 2\n"); break;
+    case DVBPSI_AAC_PROFILE_LOW_DELAY_LEVEL_3: printf("Low delay audio profile, level 3\n"); break;
+    case DVBPSI_AAC_PROFILE_LOW_DELAY_LEVEL_4: printf("Low delay audio profile, level 4\n"); break;
+    case DVBPSI_AAC_PROFILE_LOW_DELAY_LEVEL_5: printf("Low delay audio profile, level 5\n"); break;
+    case DVBPSI_AAC_PROFILE_LOW_DELAY_LEVEL_6: printf("Low delay audio profile, level 6\n"); break;
+    case DVBPSI_AAC_PROFILE_LOW_DELAY_LEVEL_7: printf("Low delay audio profile, level 7\n"); break;
+    case DVBPSI_AAC_PROFILE_LOW_DELAY_LEVEL_8: printf("Low delay audio profile, level 8\n"); break;
+
+    case DVBPSI_AAC_PROFILE_NATURAL_LEVEL_1: printf("Natural audio profile, level 1\n"); break;
+    case DVBPSI_AAC_PROFILE_NATURAL_LEVEL_2: printf("Natural audio profile, level 2\n"); break;
+    case DVBPSI_AAC_PROFILE_NATURAL_LEVEL_3: printf("Natural audio profile, level 3\n"); break;
+    case DVBPSI_AAC_PROFILE_NATURAL_LEVEL_4: printf("Natural audio profile, level 4\n"); break;
+        /* 0x44-0x47 Reserved */
+    case DVBPSI_AAC_PROFILE_MOBILE_LEVEL_1: printf("Mobile audio internetworking profile, level 1\n"); break;
+    case DVBPSI_AAC_PROFILE_MOBILE_LEVEL_2: printf("Mobile audio internetworking profile, level 2\n"); break;
+    case DVBPSI_AAC_PROFILE_MOBILE_LEVEL_3: printf("Mobile audio internetworking profile, level 3\n"); break;
+    case DVBPSI_AAC_PROFILE_MOBILE_LEVEL_4: printf("Mobile audio internetworking profile, level 4\n"); break;
+    case DVBPSI_AAC_PROFILE_MOBILE_LEVEL_5: printf("Mobile audio internetworking profile, level 5\n"); break;
+    case DVBPSI_AAC_PROFILE_MOBILE_LEVEL_6: printf("Mobile audio internetworking profile, level 6\n"); break;
+        /* 0x4E-0x4F Reserved */
+    case DVBPSI_AAC_PROFILE_LEVEL_1: printf("AAC profile, level 1\n"); break;
+    case DVBPSI_AAC_PROFILE_LEVEL_2: printf("AAC profile, level 2\n"); break;
+    case DVBPSI_AAC_PROFILE_LEVEL_4: printf("AAC profile, level 4\n"); break;
+    case DVBPSI_AAC_PROFILE_LEVEL_5: printf("AAC profile, level 5\n"); break;
+        /* 0x54-0x57 RESERVED */
+    case DVBPSI_HE_AAC_PROFILE_LEVEL_2: printf("High efficiency AAC profile, level 2\n"); break;
+    case DVBPSI_HE_AAC_PROFILE_LEVEL_3: printf("High efficiency AAC profile, level 3\n"); break;
+    case DVBPSI_HE_AAC_PROFILE_LEVEL_4: printf("High efficiency AAC profile, level 4\n"); break;
+    case DVBPSI_HE_AAC_PROFILE_LEVEL_5: printf("High efficiency AAC profile, level 5\n"); break;
+        /* RESERVED */
+    case DVBPSI_AAC_PROFILE_RESERVED:
+    default: printf("reserved\n"); break;
+    }
+
+    if (p_aac_descriptor->b_type)
+    {
+        printf("\ttype: ");
+        switch(p_aac_descriptor->i_type)
+        {
+        case DVBPSI_AAC_RESERVED0:
+            printf("reserved\n");
+            break;
+        case DVBPSI_HE_AAC_MONO:
+            printf("HE-AAC audio, single mono channel\n");
+            break;
+        case DVBPSI_AAC_RESERVED1:
+            printf("reserved\n");
+            break;
+        case DVBPSI_HE_AAC_STEREO:
+            printf("HE-AAC audio, stereo\n");
+            break;
+        case DVBPSI_AAC_RESERVED2:
+            printf("reserved\n");
+            break;
+        case DVBPSI_HE_AAC_SURROUND:
+            printf("HE-AAC audio, surround sound\n");
+            break;
+
+        case DVBPSI_HE_AAC_IMPAIRED:
+            printf("HE-AAC audio description for the visually impaired\n");
+            break;
+        case DVBPSI_HE_AAC_HEARING:
+            printf("HE-AAC audio for the hard of hearing\n");
+            break;
+        case DVBPSI_HE_AAC_MIXED:
+            printf("HE-AAC receiver-mixed supplementary audio as per annex E of TS 101 154\n");
+            break;
+        case DVBPSI_HE_AAC_V2_STEREO:
+            printf("HE-AAC v2 audio, stereo\n");
+            break;
+        case DVBPSI_HE_AAC_V2_IMPAIRED:
+            printf("HE-AAC v2 audio description for the visually impaired\n");
+            break;
+        case DVBPSI_HE_AAC_V2_HEARING:
+            printf("HE-AAC v2 audio for the hard of hearing\n");
+            break;
+        case DVBPSI_HE_AAC_V2_MIXED:
+            printf("HE-AAC v2 receiver-mixed supplementary audio as per annex E of TS 101 154\n");
+            break;
+        case DVBPSI_HE_AAC_MIXED_IMPAIRED:
+            printf("HE-AAC receiver mix audio description for the visually impaired\n");
+            break;
+        case DVBPSI_HE_AAC_BROADCAST_MIXED_IMPAIRED:
+            printf("HE-AAC broadcaster mix audio description for the visually impaired\n");
+            break;
+        case DVBPSI_HE_AAC_V2_MIXED_IMPAIRED:
+            printf("HE-AAC v2 receiver mix audio description for the visually impaired\n");
+            break;
+        case DVBPSI_HE_AAC_V2_BROADCAST_MIXED_IMPAIRED:
+            printf("HE-AAC v2 broadcaster mix audio description for the visually impaired\n");
+            break;
+
+        default:
+            printf("reserved\n");
+            break;
+        }
+    }
+    printf("\tadditional info bytes: %d\n", p_aac_descriptor->i_additional_info_length);
+}
+
+/*****************************************************************************
  * DumpCUEIdentifierDescriptor
  *****************************************************************************/
 #ifdef TS_USE_DVB_CUEI
@@ -1063,6 +1200,9 @@ static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
                 break;
             case 0x6a:
                 printf("\"a52\" (%s)\n", GetDescriptorName(p_descriptor->i_tag));
+                break;
+            case 0x7c:
+                DumpAACDescriptor(dvbpsi_DecodeAACDr(p_descriptor));
                 break;
             case 0x08:
                 DumpSystemClockDescriptor(dvbpsi_DecodeSystemClockDr(p_descriptor));
