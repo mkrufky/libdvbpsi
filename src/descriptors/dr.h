@@ -61,6 +61,7 @@
 #include "dr_4b.h"
 #include "dr_4d.h"
 #include "dr_4e.h"
+#include "dr_4f.h"
 #include "dr_52.h"
 #include "dr_55.h"
 #include "dr_56.h"
