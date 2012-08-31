@@ -66,8 +66,11 @@ dvbpsi_nvod_ref_dr_t* dvbpsi_DecodeNVODReferenceDr(dvbpsi_descriptor_t * p_descr
 
     /* Decode data */
     p_decoded->i_references = p_descriptor->i_length % 6;
+    if (p_decoded->i_references > 43)
+	p_decoded->i_references = 43;
 
-    for (int i = 0; i < p_decoded->i_references; i++) {
+    for (int i = 0; i < p_decoded->i_references; i++)
+    {
       int pos = i*6;
       p_decoded->p_nvod_refs[i].i_transport_stream_id = p_descriptor->p_data[pos] << 8
                                                       | p_descriptor->p_data[pos+1];
@@ -94,9 +97,13 @@ dvbpsi_descriptor_t * dvbpsi_GenNVODReferenceDr(dvbpsi_nvod_ref_dr_t * p_decoded
     if (!p_descriptor)
         return NULL;
 
+    if (p_decoded->i_references > 43)
+	p_decoded->i_references = 43;
+
     /* Encode data */
     int pos = 0;
-    for (int i = 0; i < p_decoded->i_references; i++ ) {
+    for (int i = 0; i < p_decoded->i_references; i++ )
+    {
     	p_descriptor->p_data[pos++] = p_decoded->p_nvod_refs[i].i_transport_stream_id >> 8;
         p_descriptor->p_data[pos++] = p_decoded->p_nvod_refs[i].i_transport_stream_id;
         p_descriptor->p_data[pos++] = p_decoded->p_nvod_refs[i].i_original_network_id >> 8;

@@ -44,8 +44,8 @@ extern "C" {
  * \struct dvbpsi_nvod_ref_t
  * \brief one "NVOD reference" structure.
  *
- * This structure is used since vbidata_t structure will contain several
- * of these structures
+ * This structure is used since dvbpsi_nvod_ref_dr_t structure will contain
+ * several of these structures
  */
 /*!
  * \typedef struct dvbpsi_nvod_ref_s dvbpsi_nvod_ref_t
