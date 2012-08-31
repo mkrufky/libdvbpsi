@@ -1,4 +1,4 @@
-Changes between 0.2.2 and 1.0.0:
+Changes between 0.2.2 and 1.0.0-pre1:
 --------------------------------
 
  * new example application dvbinfo
@@ -6,7 +6,9 @@ Changes between 0.2.2 and 1.0.0:
  * add log callback (remove fprintf's)
  * make API more consistent, see doxygen "howto-new-api" section for converting your code:
    - introduces dvbpsi_t typedef
-   - removed dvbpis_handle
+   - removed dvbpsi_handle
+   - changed argument order
+   - changed table functions prototypes
  * EIT table generation
  * RST table decoding and generation
  * new descriptor 0x40, 0x41, 0x49, 0x4a, 0x4b, 0x4f, 0x50 and 0x7c (decoder and generators)
