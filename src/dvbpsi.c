@@ -258,11 +258,22 @@ bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_sect
         if (p->i_number == p_section->i_number)
         {
             /* Replace */
-            p_prev->p_next = p_section;
-            p_section->p_next = p->p_next;
-            p->p_next = NULL;
-            dvbpsi_DeletePSISections(p);
-            b_overwrite = true;
+            if (p_prev)
+            {
+                p_prev->p_next = p_section;
+                p_section->p_next = p->p_next;
+                p->p_next = NULL;
+                dvbpsi_DeletePSISections(p);
+                b_overwrite = true;
+            }
+            else
+            {
+                p_section->p_next = p->p_next;
+                p->p_next = NULL;
+                dvbpsi_DeletePSISections(p);
+                p = p_section;
+                b_overwrite = true;
+            }
             goto out;
         }
         else if (p->i_number > p_section->i_number)
