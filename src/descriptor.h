@@ -53,6 +53,19 @@ extern "C" {
 /*!
  * \typedef struct dvbpsi_descriptor_s dvbpsi_descriptor_t
  * \brief dvbpsi_descriptor_t type definition.
+ *
+ * The common descriptor header and its payload is contained in this
+ * structure. The payload is the raw descriptor data and its interpretation
+ * depends on the the p_descriptor::i_tag value.
+ *
+ * After passing the descriptor to a dvbpsi_DecodeXXXXDr function the raw
+ * descriptor data is interpreted and decoded into a descriptor specific
+ * structure. This structure is stored in the p_descriptor::p_decoded member
+ * by the dvbpsi_DecodeXXXXDr function.
+ *
+ * NOTE: It is mandatory to add a decoded descriptor to the 'p_decoded' member
+ * of this struct. Failing to do so will result in memory leakage when
+ * deleting descriptor with @see dvbpsi_DeleteDescriptor.
  */
 typedef struct dvbpsi_descriptor_s
 {
@@ -90,7 +103,8 @@ dvbpsi_descriptor_t* dvbpsi_NewDescriptor(uint8_t i_tag, uint8_t i_length,
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_DeleteDescriptors(dvbpsi_descriptor_t* p_descriptor)
- * \brief Destruction of a dvbpsi_descriptor_t structure.
+ * \brief Destruction of a dvbpsi_descriptor_t structure together with the decoded
+ * descriptor, if present.
  * \param p_descriptor pointer to the first descriptor structure
  * \return nothing.
  */
