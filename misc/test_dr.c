@@ -13,6 +13,8 @@
 #include <stdint.h>
 #endif
 
+#include <sys/types.h>
+
 /* the libdvbpsi distribution defines DVBPSI_DIST */
 #ifdef DVBPSI_DIST
 #include "../src/dvbpsi.h"
