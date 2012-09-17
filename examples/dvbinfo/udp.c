@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
@@ -34,7 +35,9 @@
 #ifdef HAVE_SYS_SOCKET_H
 #   include <sys/socket.h>
 #   include <netinet/in.h>
-#   include <net/if.h>
+#   ifdef HAVE_NET_IF_H
+#       include <net/if.h>
+#   endif
 #   if defined(WIN32)
 #       include <netinet/if_ether.h>
 #   endif
@@ -46,9 +49,122 @@
 #   include <arpa/inet.h>
 #endif
 
+#include <assert.h>
+
 #include "udp.h"
 
 #ifdef HAVE_SYS_SOCKET_H
+static bool is_multicast(const struct sockaddr *addr, socklen_t len)
+{
+    switch(addr->sa_family)
+    {
+#if defined(IN_MULTICAST)
+        case AF_INET:
+        {
+            const struct sockaddr_in *ip = (const struct sockaddr_in *)addr;
+            if ((size_t)len < sizeof (*ip))
+                return false;
+            return IN_MULTICAST(ntohl(ip->sin_addr.s_addr)) != 0;
+        }
+#endif
+#if defined(IN6_IS_ADDR_MULTICAST)
+        case AF_INET6:
+        {
+            const struct sockaddr_in6 *ip6 = (const struct sockaddr_in6 *)addr;
+            if ((size_t)len < sizeof (*ip6))
+                return false;
+            return IN6_IS_ADDR_MULTICAST(&ip6->sin6_addr) != 0;
+        }
+#endif
+    }
+    return false;
+}
+
+static bool mcast_connect(int socket, const char *interface, const struct sockaddr *addr, socklen_t len)
+{
+    unsigned int ifindex = interface ? if_nametoindex(interface) : 0;
+
+#if defined(MCAST_JOIN_GROUP)
+    /* Source Specific Multicast Join */
+    struct group_req greq;
+    memset(&greq, 0, sizeof(greq));
+
+    if (ifindex == 0)
+        return false;
+
+    greq.gr_interface = ifindex;
+    assert(len <= sizeof(greq.gr_group));
+    memcpy(&greq.gr_group, addr, len);
+
+    switch(addr->sa_family)
+    {
+        case AF_INET6:
+        {
+            const struct sockaddr_in6 *sin6 = (const struct sockaddr_in6 *)addr;
+            assert(len >= sizeof (struct sockaddr_in6));
+            if (sin6->sin6_scope_id != 0)
+                greq.gr_interface = sin6->sin6_scope_id;
+            if (setsockopt(socket, SOL_IPV6, MCAST_JOIN_GROUP, &greq, sizeof(greq)) == 0)
+                return true;
+            break;
+        }
+        case AF_INET:
+            if (setsockopt(socket, SOL_IP, MCAST_JOIN_GROUP, &greq, sizeof(greq)) == 0)
+                return true;
+            break;
+        default:
+            return false;
+    }
+#else
+    switch(addr->sa_family)
+    {
+        case AF_INET6:
+        {
+            struct ipv6_mreq ipv6mr;
+            const struct sockaddr_in6 *ip6 = (const struct sockaddr_in6 *)addr;
+
+            memset(&ipv6mr, 0, sizeof (ipv6mr));
+            assert(len >= sizeof (struct sockaddr_in6));
+            ipv6mr.ipv6mr_multiaddr = ip6->sin6_addr;
+            ipv6mr.ipv6mr_interface = (ifindex > 0) ? ifindex : ip6->sin6_scope_id;
+# ifdef IPV6_JOIN_GROUP
+            if (setsockopt(socket, SOL_IPV6, IPV6_JOIN_GROUP, &ipv6mr, sizeof (ipv6mr)) == 0)
+# else
+            if (setsockopt(socket, SOL_IPV6, IPV6_ADD_MEMBERSHIP, &ipv6mr, sizeof (ipv6mr)) == 0)
+# endif
+                return true;
+            break;
+        }
+# ifdef IP_ADD_MEMBERSHIP
+        case AF_INET:
+        {
+            struct ip_mreq imr;
+
+            memset(&imr, 0, sizeof (imr));
+            assert(len >= sizeof (struct sockaddr_in));
+            imr.imr_multiaddr = ((const struct sockaddr_in *)addr)->sin_addr;
+#if 0       /* TODO: Source Specific Multicast Join */
+            if (ifaddr) /* Linux specific interface bound multicast address */
+               imr.imr_address.s_addr = if_addr;
+            if (ifindex > 0)
+                imr.imr_index = ifindex;
+#endif
+            if (setsockopt(socket, SOL_IP, IP_ADD_MEMBERSHIP, &imr, sizeof (imr)) == 0)
+                return true;
+            break;
+        }
+# endif
+    }
+#endif
+    return false;
+}
+
+static bool is_ipv6(const char *ipaddress)
+{
+    /* NOTE: we assume the address does not include the port number */
+    return (strchr(ipaddress, ':') != NULL);
+}
+
 int udp_close(int fd)
 {
     int result = 0;
@@ -59,7 +175,7 @@ int udp_close(int fd)
     return result;
 }
 
-int udp_open(const char *ipaddress, int port)
+int udp_open(const char *interface, const char *ipaddress, int port)
 {
     int s_ctl = -1;
     int result = -1;
@@ -79,7 +195,7 @@ int udp_open(const char *ipaddress, int port)
         return -1;
 
     memset (&hints, 0, sizeof (hints));
-    hints.ai_family = AF_INET; /* use AF_INET6 for ipv6 */
+    hints.ai_family = is_ipv6(ipaddress) ? AF_INET6: AF_INET;
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = IPPROTO_UDP | 0;
@@ -117,6 +233,16 @@ int udp_open(const char *ipaddress, int port)
             perror("udp bind error");
             continue;
         }
+
+        if (is_multicast(ptr->ai_addr, ptr->ai_addrlen) &&
+            mcast_connect(s_ctl, NULL, ptr->ai_addr, ptr->ai_addrlen))
+        {
+            close(s_ctl);
+            perror("mcast connect error");
+            continue;
+        }
+
+        break;
     }
 
     freeaddrinfo(addr);

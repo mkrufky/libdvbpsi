@@ -24,7 +24,7 @@
 #ifndef DVBINFO_UDP_H_
 #define DVBINFO_UDP_H_
 
-int udp_open(const char *ipaddress, int port);
+int udp_open(const char *interface, const char *ipaddress, int port);
 int udp_close(int fd);
 ssize_t udp_read(int fd, void *buf, size_t count);
 
