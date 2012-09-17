@@ -40,7 +40,11 @@ extern "C" {
 #endif
 
 #define DR_0A_API_VER 2                     /*!< descriptor 0a API version */
+
+#ifndef DVBPSI_ISO639_LANGUAGE_CODE_T
+#define DVBPSI_ISO639_LANGUAGE_CODE_T 1
 typedef uint8_t iso_639_language_code_t[3]; /*!< ISO639 three letter language codes */
+#endif
 
 /*****************************************************************************
  * dvbpsi_iso639_dr_t

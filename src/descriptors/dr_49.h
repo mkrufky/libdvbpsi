@@ -38,7 +38,10 @@
 extern "C" {
 #endif
 
+#ifndef DVBPSI_ISO639_LANGUAGE_CODE_T
+#define DVBPSI_ISO639_LANGUAGE_CODE_T 1
 typedef uint8_t iso_639_language_code_t[3]; /*!< ISO639 three letter language codes */
+#endif
 
 /*****************************************************************************
  * dvbpsi_country_availability_dr_t
