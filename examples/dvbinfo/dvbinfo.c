@@ -94,7 +94,7 @@ typedef struct dvbinfo_capture_s
 static void usage(void)
 {
 #ifdef HAVE_SYS_SOCKET_H
-    printf("Usage: dvbinfo [-h] [-d <debug>] [-f|-m| [[-u|-t] -i <ipaddress:port>] -o <outputfile>\n");
+    printf("Usage: dvbinfo [-h] [-d <debug>] [-f|-m| [[-u|-t] -a <mcast_interface> -i <ipaddress:port>] -o <outputfile>\n");
     printf("               [-s [bandwidth|table|packet] --summary-file <file> --summary-period <ms>]\n");
 #else
     printf("Usage: dvbinfo [-h] [-d <debug>] [-f|\n");
@@ -106,6 +106,7 @@ static void usage(void)
     printf(" -f | --file           : filename\n");
 #ifdef HAVE_SYS_SOCKET_H
     printf(" -i | --ipadddress     : hostname or ipaddress\n");
+    printf(" -a | --miface         : multicast interface to use\n");
     printf(" -t | --tcp            : tcp network transport\n");
     printf(" -u | --udp            : udp network transport\n");
     printf("\nOutputs: \n");
@@ -171,6 +172,7 @@ static params_t *params_init(void)
     param->fd_in = param->fd_out = -1;
     param->input = NULL;
     param->output = NULL;
+    param->mcast_interface = NULL;
 
     param->b_verbose = false;
     param->b_monitor = false;
@@ -190,6 +192,7 @@ static params_t *params_init(void)
 
 static void params_free(params_t *param)
 {
+    free(param->mcast_interface);
     free(param->input);
     free(param->output);
     free(param->summary.file);
@@ -223,7 +226,7 @@ static void dvbinfo_open(params_t *param)
     }
     if (param->input && param->b_udp)
     {
-        param->fd_in = udp_open(param->input, param->port);
+        param->fd_in = udp_open(param->mcast_interface, param->input, param->port);
         if (param->fd_in < 0)
             goto error;
     }
@@ -457,6 +460,7 @@ int main(int argc, char **pp_argv)
         { "file",      required_argument, NULL, 'f' },
 #ifdef HAVE_SYS_SOCKET_H
         { "ipaddress", required_argument, NULL, 'i' },
+        { "miface",    required_argument, NULL, 'a' },
         { "tcp",       no_argument,       NULL, 't' },
         { "udp",       no_argument,       NULL, 'u' },
         /* - outputs - */
@@ -471,7 +475,7 @@ int main(int argc, char **pp_argv)
         { NULL, 0, NULL, 0 }
     };
 #ifdef HAVE_SYS_SOCKET_H
-    while ((c = getopt_long(argc, pp_argv, "d:f:i:ho:ms:tu", long_options, NULL)) != -1)
+    while ((c = getopt_long(argc, pp_argv, "a:d:f:i:ho:ms:tu", long_options, NULL)) != -1)
 #else
     while ((c = getopt_long(argc, pp_argv, "d:f:h", long_options, NULL)) != -1)
 #endif
@@ -507,6 +511,17 @@ int main(int argc, char **pp_argv)
                 break;
 
 #ifdef HAVE_SYS_SOCKET_H
+            case 'a':
+            {
+                if (optarg)
+                {
+                    if (asprintf(&param->mcast_interface, "%s", optarg) < 0)
+                    {
+                        params_free(param);
+                        usage();
+                    }
+                }
+            }
             case 'i':
                 if (optarg)
                 {

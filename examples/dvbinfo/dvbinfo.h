@@ -37,7 +37,10 @@ typedef struct params_s
     /* parameters */
     char *output;
     char *input;
+
     int  port;
+    char *mcast_interface;
+
     bool b_udp;
     bool b_tcp;
     bool b_file;
