@@ -67,6 +67,12 @@ dnl AC_CHECK_FUNCS([gettimeofday])
 AC_CHECK_HEADERS(sys/socket.h, [ac_have_sys_socket_h=yes])
 AM_CONDITIONAL(HAVE_SYS_SOCKET_H, test "${ac_have_sys_socket_h}" = "yes")
 
+AC_CHECK_HEADERS([net/if.h], [], [],
+  [
+    #include <sys/types.h>
+    #include <sys/socket.h>
+  ])
+
 dnl Check for variadic macros
 AC_CACHE_CHECK([for variadic cpp macros],
     [ac_cv_cpp_variadic_macros],
