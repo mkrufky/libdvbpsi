@@ -352,12 +352,7 @@ static int dvbinfo_process(dvbinfo_capture_t *capture)
         /* Wait for data to arrive */
         buffer = fifo_pop(capture->fifo);
         if (buffer == NULL)
-        {
-            if (capture->b_alive)
-                continue;
-            else
-                break;
-        }
+            continue;
 
         if (param->output)
         {
@@ -417,6 +412,7 @@ static int dvbinfo_process(dvbinfo_capture_t *capture)
         }
     }
 
+    assert(fifo_count(capture->fifo) == 0);
     libdvbpsi_exit(stream);
     err = 0;
 
