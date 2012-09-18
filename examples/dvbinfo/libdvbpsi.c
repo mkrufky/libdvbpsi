@@ -149,7 +149,8 @@ typedef struct
     ts_pid_t    *pid;
 } ts_pat_t;
 
-typedef struct ts_pmt_s
+typedef struct ts_pmt_s ts_pmt_t;
+struct ts_pmt_s
 {
     dvbpsi_t    *handle;
 
@@ -157,7 +158,9 @@ typedef struct ts_pmt_s
     int         i_pmt_version;
     ts_pid_t    *pid_pmt;
     ts_pid_t    *pid_pcr;
-} ts_pmt_t;
+
+    ts_pmt_t    *p_next;
+};
 
 typedef struct ts_cat_s
 {
@@ -203,7 +206,7 @@ struct ts_stream_t
 
     /* Program Map Table */
     int         i_pmt;
-    ts_pmt_t    pmt;
+    ts_pmt_t    *pmt;
 
     /* Conditional Access Table */
     ts_cat_t    cat;
@@ -489,8 +492,13 @@ static void summary_table(FILE *fd, ts_stream_t *stream)
     if (stream->pat.handle)
         ts_header_dump(fd, stream->pat.pid);
     fprintf(fd, "\nTable: PMT\n");
-    if (stream->pmt.handle)
-        ts_header_dump(fd, stream->pmt.pid_pmt);
+    ts_pmt_t *p_pmt = stream->pmt;
+    while (p_pmt)
+    {
+        if (p_pmt->handle)
+            ts_header_dump(fd, p_pmt->pid_pmt);
+        p_pmt = p_pmt->p_next;
+    }
     fprintf(fd, "\nTable: CAT\n");
     if (stream->cat.handle)
         ts_header_dump(fd, stream->cat.pid );
@@ -645,21 +653,39 @@ static void handle_PAT(void* p_data, dvbpsi_pat_t* p_pat)
     printf("\t\t| program_number @ [NIT|PMT]_PID\n");
     while (p_program)
     {
-        /* Remove old PMT table decoder */
-        if (dvbpsi_decoder_present(p_stream->pmt.handle))
-            dvbpsi_pmt_detach(p_stream->pmt.handle);
-
         /* Attach new PMT decoder */
-        p_stream->i_pmt++;
-        p_stream->pmt.i_number = p_program->i_number;
-        p_stream->pmt.pid_pmt = &p_stream->pid[p_program->i_pid];
-        p_stream->pmt.pid_pmt->i_pid = p_program->i_pid;
-
-        if (!dvbpsi_pmt_attach(p_stream->pmt.handle, p_program->i_number, handle_PMT, p_stream))
+        ts_pmt_t *p_pmt = calloc(1, sizeof(ts_pmt_t));
+        if (p_pmt)
         {
-             fprintf(stderr, "dvbinfo: Failed to attach new pmt decoder\n");
-             break;
+            /* PMT */
+            p_pmt->handle = dvbpsi_new(&dvbpsi_message, p_stream->level);
+            if (p_pmt->handle == NULL)
+            {
+                fprintf(stderr, "dvbinfo: Failed attach new PMT decoder\n");
+                free(p_pmt);
+                break;
+            }
+
+            p_pmt->i_number = p_program->i_number;
+            p_pmt->pid_pmt = &p_stream->pid[p_program->i_pid];
+            p_pmt->pid_pmt->i_pid = p_program->i_pid;
+            p_pmt->p_next = NULL;
+
+            if (!dvbpsi_pmt_attach(p_pmt->handle, p_program->i_number, handle_PMT, p_stream))
+            {
+                 fprintf(stderr, "dvbinfo: Failed to attach new pmt decoder\n");
+                 break;
+            }
+
+            /* insert at start of list */
+            p_pmt->p_next = p_stream->pmt;
+            p_stream->pmt = p_pmt;
+            p_stream->i_pmt++;
+            assert(p_stream->pmt);
         }
+        else
+            fprintf(stderr, "dvbinfo: Failed create new PMT decoder\n");
+
         printf("\t\t| %14d @ pid: 0x%x (%d)\n",
                 p_program->i_number, p_program->i_pid, p_program->i_pid);
         p_program = p_program->p_next;
@@ -1385,8 +1411,18 @@ static void handle_PMT(void* p_data, dvbpsi_pmt_t* p_pmt)
     dvbpsi_pmt_es_t* p_es = p_pmt->p_first_es;
     ts_stream_t* p_stream = (ts_stream_t*) p_data;
 
-    p_stream->pmt.i_pmt_version = p_pmt->i_version;
-    p_stream->pmt.pid_pcr = &p_stream->pid[p_pmt->i_pcr_pid];
+    /* Find signalled PMT */
+    ts_pmt_t *p = p_stream->pmt;
+    while (p)
+    {
+        if (p->i_number == p_pmt->i_program_number)
+            break;
+        p = p->p_next;
+    }
+    assert(p);
+
+    p->i_pmt_version = p_pmt->i_version;
+    p->pid_pcr = &p_stream->pid[p_pmt->i_pcr_pid];
     p_stream->pid[p_pmt->i_pcr_pid].b_pcr = true;
 
     printf("\n");
@@ -1460,10 +1496,6 @@ ts_stream_t *libdvbpsi_init(int debug, ts_stream_log_cb pf_log, void *cb_data)
         stream->pat.handle = NULL;
         goto error;
     }
-    /* PMT */
-    stream->pmt.handle = dvbpsi_new(&dvbpsi_message, stream->level);
-    if (stream->pmt.handle == NULL)
-        goto error;
     /* CAT */
     stream->cat.handle = dvbpsi_new(&dvbpsi_message, stream->level);
     if (stream->cat.handle == NULL)
@@ -1531,8 +1563,6 @@ error:
 
     if (stream->pat.handle)
         dvbpsi_delete(stream->pat.handle);
-    if (stream->pmt.handle)
-        dvbpsi_delete(stream->pmt.handle);
     if (stream->cat.handle)
         dvbpsi_delete(stream->cat.handle);
     if (stream->sdt.handle)
@@ -1552,8 +1582,25 @@ void libdvbpsi_exit(ts_stream_t *stream)
 
    if (dvbpsi_decoder_present(stream->pat.handle))
        dvbpsi_pat_detach(stream->pat.handle);
-   if (dvbpsi_decoder_present(stream->pmt.handle))
-       dvbpsi_pmt_detach(stream->pmt.handle);
+
+   ts_pmt_t *p_pmt = stream->pmt;
+   ts_pmt_t *p_prev = NULL;
+   while(p_pmt)
+   {
+       dvbpsi_t *handle = p_pmt->handle;
+       if (dvbpsi_decoder_present(handle))
+       {
+            dvbpsi_pmt_detach(handle);
+            dvbpsi_delete(p_pmt->handle);
+       }
+       stream->i_pmt--;
+       p_prev = p_pmt;
+       p_pmt = p_pmt->p_next;
+       if (p_pmt)
+           p_pmt->p_next = NULL;
+       free(p_prev);
+   }
+
    if (dvbpsi_decoder_present(stream->cat.handle))
        dvbpsi_cat_detach(stream->cat.handle);
    if (dvbpsi_decoder_present(stream->sdt.handle))
@@ -1565,8 +1612,6 @@ void libdvbpsi_exit(ts_stream_t *stream)
 
    if (stream->pat.handle)
        dvbpsi_delete(stream->pat.handle);
-   if (stream->pmt.handle)
-       dvbpsi_delete(stream->pmt.handle);
    if (stream->cat.handle)
        dvbpsi_delete(stream->cat.handle);
    if (stream->sdt.handle)
@@ -1653,8 +1698,16 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
             dvbpsi_packet_push(stream->eit.handle, p_tmp);
         else if (i_pid == 0x14) /* TDT/TOT */
             dvbpsi_packet_push(stream->tdt.handle, p_tmp);
-        else if (stream->pmt.pid_pmt && i_pid == stream->pmt.pid_pmt->i_pid)
-            dvbpsi_packet_push(stream->pmt.handle, p_tmp);
+        else
+        {
+            ts_pmt_t *p = stream->pmt;
+            while(p)
+            {
+                if (p->pid_pmt->i_pid == i_pid)
+                    dvbpsi_packet_push(p->handle, p_tmp);
+                p = p->p_next;
+            }
+        }
 
         /* Remember PID */
         if (!stream->pid[i_pid].b_seen)
