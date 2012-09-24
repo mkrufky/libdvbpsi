@@ -32,13 +32,6 @@
 #ifndef _DVBPSI_DR_H_
 #define _DVBPSI_DR_H_
 
-/* common definitions */
-#ifndef DVBPSI_ISO639_LANGUAGE_CODE_T
-#define DVBPSI_ISO639_LANGUAGE_CODE_T 1
-typedef uint8_t iso_639_language_code_t[3]; /*!< ISO639 three letter language codes */
-#endif
-
-/* Descriptors */
 #include "dr_02.h"
 #include "dr_03.h"
 #include "dr_04.h"
