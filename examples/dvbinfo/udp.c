@@ -80,7 +80,7 @@ static bool is_multicast(const struct sockaddr *addr, socklen_t len)
     return false;
 }
 
-static bool mcast_connect(int socket, const char *interface, const struct sockaddr *addr, socklen_t len)
+static bool mcast_connect(int s, const char *interface, const struct sockaddr *addr, socklen_t len)
 {
     unsigned int ifindex = interface ? if_nametoindex(interface) : 0;
 
@@ -104,12 +104,12 @@ static bool mcast_connect(int socket, const char *interface, const struct sockad
             assert(len >= sizeof (struct sockaddr_in6));
             if (sin6->sin6_scope_id != 0)
                 greq.gr_interface = sin6->sin6_scope_id;
-            if (setsockopt(socket, SOL_IPV6, MCAST_JOIN_GROUP, &greq, sizeof(greq)) == 0)
+            if (setsockopt(s, SOL_IPV6, MCAST_JOIN_GROUP, &greq, sizeof(greq)) == 0)
                 return true;
             break;
         }
         case AF_INET:
-            if (setsockopt(socket, SOL_IP, MCAST_JOIN_GROUP, &greq, sizeof(greq)) == 0)
+            if (setsockopt(s, SOL_IP, MCAST_JOIN_GROUP, &greq, sizeof(greq)) == 0)
                 return true;
             break;
         default:
@@ -128,9 +128,9 @@ static bool mcast_connect(int socket, const char *interface, const struct sockad
             ipv6mr.ipv6mr_multiaddr = ip6->sin6_addr;
             ipv6mr.ipv6mr_interface = (ifindex > 0) ? ifindex : ip6->sin6_scope_id;
 # ifdef IPV6_JOIN_GROUP
-            if (setsockopt(socket, SOL_IPV6, IPV6_JOIN_GROUP, &ipv6mr, sizeof (ipv6mr)) == 0)
+            if (setsockopt(s, SOL_IPV6, IPV6_JOIN_GROUP, &ipv6mr, sizeof (ipv6mr)) == 0)
 # else
-            if (setsockopt(socket, SOL_IPV6, IPV6_ADD_MEMBERSHIP, &ipv6mr, sizeof (ipv6mr)) == 0)
+            if (setsockopt(s, SOL_IPV6, IPV6_ADD_MEMBERSHIP, &ipv6mr, sizeof (ipv6mr)) == 0)
 # endif
                 return true;
             break;
@@ -149,7 +149,7 @@ static bool mcast_connect(int socket, const char *interface, const struct sockad
             if (ifindex > 0)
                 imr.imr_index = ifindex;
 #endif
-            if (setsockopt(socket, SOL_IP, IP_ADD_MEMBERSHIP, &imr, sizeof (imr)) == 0)
+            if (setsockopt(s, SOL_IP, IP_ADD_MEMBERSHIP, &imr, sizeof (imr)) == 0)
                 return true;
             break;
         }
