@@ -38,7 +38,6 @@
 extern "C" {
 #endif
 
-typedef uint8_t iso_639_language_code_t[3]; /*!< ISO639 three letter language codes */
 
 /*****************************************************************************
  * dvbpsi_country_availability_dr_t
