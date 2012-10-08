@@ -1,7 +1,8 @@
-Changes between 0.2.2 and 1.0.0_pre2:
+Changes between 0.2.2 and 1.0.0_pre3:
 --------------------------------
 
  * new example application dvbinfo: use 'dvbinfo -h' for more information on commandline options
+ * misc examples: fixes to gen_pat, gen_pmt
  * updated documentation (new api howto)
  * add log callback (remove fprintf's)
  * make API more consistent, see doxygen "howto-new-api" section for converting your code:

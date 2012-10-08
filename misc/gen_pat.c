@@ -56,6 +56,7 @@ static void writePSI(uint8_t* p_packet, dvbpsi_psi_section_t* p_section)
 
   while(p_section)
   {
+    size_t i_bytes_written = 0;
     uint8_t* p_pos_in_ts;
     uint8_t* p_byte = p_section->p_data;
     uint8_t* p_end =   p_section->p_payload_end
@@ -71,8 +72,12 @@ static void writePSI(uint8_t* p_packet, dvbpsi_psi_section_t* p_section)
       *(p_pos_in_ts++) = *(p_byte++);
     while(p_pos_in_ts < p_packet + 188)
       *(p_pos_in_ts++) = 0xff;
-    fwrite(p_packet, 1, 188, stdout);
-
+    i_bytes_written = fwrite(p_packet, 1, 188, stdout);
+    if(i_bytes_written == 0)
+    {
+      fprintf(stderr,"eof detected ... aborting\n");
+      return;
+    }
     p_packet[3] = (p_packet[3] + 1) & 0x0f;
 
     while(p_byte < p_end)
@@ -86,8 +91,12 @@ static void writePSI(uint8_t* p_packet, dvbpsi_psi_section_t* p_section)
         *(p_pos_in_ts++) = *(p_byte++);
       while(p_pos_in_ts < p_packet + 188)
         *(p_pos_in_ts++) = 0xff;
-      fwrite(p_packet, 1, 188, stdout);
-
+      i_bytes_written = fwrite(p_packet, 1, 188, stdout);
+      if(i_bytes_written == 0)
+      {
+        fprintf(stderr,"eof detected ... aborting\n");
+        return;
+      }
       p_packet[3] = (p_packet[3] + 1) & 0x0f;
     }
 
