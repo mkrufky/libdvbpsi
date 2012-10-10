@@ -569,7 +569,7 @@ int main(int argc, char **pp_argv)
             {
                 param->b_summary = true;
                 ssize_t size = ARRAY_SIZE(psz_summary_mode);
-                for (unsigned int i = 0; i < size; i++)
+                for (ssize_t i = 0; i < size; i++)
                 {
                     printf("summary mode %s\n", psz_summary_mode[i]);
                     if (strncmp(optarg, psz_summary_mode[i], strlen(psz_summary_mode[i])) == 0)
