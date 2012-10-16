@@ -197,8 +197,8 @@ int udp_open(const char *interface, const char *ipaddress, int port)
     memset (&hints, 0, sizeof (hints));
     hints.ai_family = is_ipv6(ipaddress) ? AF_INET6: AF_INET;
     hints.ai_socktype = SOCK_DGRAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = IPPROTO_UDP | 0;
+    hints.ai_protocol = IPPROTO_UDP;
+    hints.ai_flags = AI_CANONNAME | 0;
 
     result = getaddrinfo(ipaddress, psz_service, &hints, &addr);
     if (result < 0)
