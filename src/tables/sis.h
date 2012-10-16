@@ -97,7 +97,7 @@ typedef struct dvbpsi_sis_s
   /* FIXME: alignment stuffing */
   uint32_t i_ecrc; /*!< CRC 32 of decrypted splice_info_section */
 
-} dvbpsi_sis_t;
+} __attribute__((packed)) dvbpsi_sis_t;
 
 /*****************************************************************************
  * Splice Commands

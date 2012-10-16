@@ -170,7 +170,7 @@ void dvbpsi_delete(dvbpsi_t *p_dvbpsi)
  * dvbpsi_decoder_new
  *****************************************************************************/
 #define DVBPSI_INVALID_CC (0xFF)
-dvbpsi_decoder_t *dvbpsi_decoder_new(dvbpsi_callback_gather_t pf_gather,
+void *dvbpsi_decoder_new(dvbpsi_callback_gather_t pf_gather,
     const int i_section_max_size, const bool b_discontinuity, const size_t psi_size)
 {
     assert(psi_size >= sizeof(dvbpsi_decoder_t));
@@ -179,6 +179,7 @@ dvbpsi_decoder_t *dvbpsi_decoder_new(dvbpsi_callback_gather_t pf_gather,
     if (p_decoder == NULL)
         return NULL;
 
+    memcpy(&p_decoder->i_magic[0], "psi", 3);
     p_decoder->pf_gather = pf_gather;
     p_decoder->p_current_section = NULL;
     p_decoder->i_section_max_size = i_section_max_size;

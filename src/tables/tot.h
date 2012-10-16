@@ -67,7 +67,7 @@ typedef struct dvbpsi_tot_s
 
     uint32_t      i_crc;                          /*!< CRC_32 (TOT only) */
 
-} dvbpsi_tot_t;
+} __attribute__((packed)) dvbpsi_tot_t;
 
 /*****************************************************************************
  * dvbpsi_tot_callback

@@ -39,13 +39,13 @@ typedef struct dvbpsi_nit_decoder_s
 {
     DVBPSI_DECODER_COMMON
 
-    uint16_t                      i_network_id;
-
     dvbpsi_nit_callback           pf_nit_callback;
     void *                        p_cb_data;
 
     dvbpsi_nit_t                  current_nit;
     dvbpsi_nit_t *                p_building_nit;
+
+    uint16_t                      i_network_id;
 
 } dvbpsi_nit_decoder_t;
 
