@@ -58,6 +58,7 @@
 #   include "../../src/tables/nit.h"
 #   include "../../src/tables/sdt.h"
 #   include "../../src/tables/tot.h"
+#   include "../../src/tables/rst.h"
 #   include "../../src/descriptors/dr.h"
 #else
 #   include <dvbpsi/dvbpsi.h>
@@ -72,6 +73,7 @@
 #   include <dvbpsi/nit.h>
 #   include <dvbpsi/sdt.h>
 #   include <dvbpsi/tot.h>
+#   include <dvbpsi/rst.h>
 #   include <dvbpsi/dr.h>
 #endif
 
@@ -187,6 +189,12 @@ typedef struct ts_sdt_s
     ts_pid_t    *pid;
 } ts_sdt_t;
 
+typedef struct ts_rst_s
+{
+    dvbpsi_t    *handle;
+    ts_pid_t    *pid;
+} ts_rst_t;
+
 typedef struct ts_eit_s
 {
     dvbpsi_t    *handle;
@@ -215,6 +223,8 @@ struct ts_stream_t
     /* Splice Information Section */
     ts_sis_t    sis;
 #endif
+
+    ts_rst_t    rst;
 
     /* Subbtables */
     ts_sdt_t    sdt;
@@ -247,6 +257,7 @@ static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot);
 static void handle_EIT(void* p_data, dvbpsi_eit_t* p_eit);
 static void handle_NIT(void* p_data, dvbpsi_nit_t* p_nit);
 static void handle_BAT(void* p_data, dvbpsi_bat_t* p_bat);
+static void handle_RST(void* p_data, dvbpsi_rst_t* p_rst);
 #ifdef TS_USE_SCTE_SIS
 static void handle_SIS(void* p_data, dvbpsi_sis_t* p_sis);
 #endif
@@ -1275,7 +1286,17 @@ static void handle_SDT(void* p_data, dvbpsi_sdt_t* p_sdt)
         printf("\t  | Service id   : 0x%02x \n", p_service->i_service_id);
         printf("\t  | EIT schedule : %s\n", p_service->b_eit_schedule ? "yes" : "no");
         printf("\t  | EIT present  : %s\n", p_service->b_eit_present ? "yes" : "no");
-        printf("\t  | Running      : %s\n", p_service->i_running_status ? "yes" : "no");
+        printf("\t  | Running      : %d ", p_service->i_running_status);
+        switch (p_service->i_running_status)
+        {
+            case 0x00: printf("(undefined)\n"); break;
+            case 0x01: printf("(not running)\n"); break;
+            case 0x02: printf("(starts in a few seconds (e.g. for video recording))\n"); break;
+            case 0x03: printf("(pausing)\n"); break;
+            case 0x04: printf("(running)\n"); break;
+            case 0x05: printf("(service off-air)\n"); break;
+            default: printf("(reserved for future use)\n"); break;
+        }
         printf("\t  | Free CA      : %s\n", p_service->b_free_ca ? "yes" : "no");
         printf("\t  | Descriptor loop length: %d\n", p_service->i_descriptors_length);
         DumpDescriptors("\t  |  ]", p_service->p_first_descriptor);
@@ -1341,6 +1362,40 @@ static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot)
         printf("\tCRC 32         : %d\n", p_tot->i_crc);
     DumpDescriptors("\t  |  ]", p_tot->p_first_descriptor);
     dvbpsi_tot_delete(p_tot);
+}
+
+static void DumpRSTEvents(const char* str, dvbpsi_rst_event_t* p_event)
+{
+    while (p_event)
+    {
+        printf("%s transport stream id: %d\n", str, p_event->i_ts_id);
+        printf("%s original network id: %d\n", str, p_event->i_orig_network_id);
+        printf("%s service id: %d\n", str, p_event->i_service_id);
+        printf("%s event id: %d\n", str, p_event->i_event_id);
+        printf("%s running status id: %d ", str, p_event->i_running_status);
+        switch (p_event->i_running_status)
+        {
+            case 0x00: printf("(undefined)\n"); break;
+            case 0x01: printf("(not running)\n"); break;
+            case 0x02: printf("(starts in a few seconds (e.g. for video recording))\n"); break;
+            case 0x03: printf("(pausing)\n"); break;
+            case 0x04: printf("(running)\n"); break;
+            case 0x05: printf("(service off-air)\n"); break;
+            default: printf("(reserved for future use)\n"); break;
+        }
+
+        p_event = p_event->p_next;
+    };
+}
+
+static void handle_RST(void* p_data, dvbpsi_rst_t* p_rst)
+{
+    //ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    printf("\n");
+    printf("  RST: Running Status Table\n");
+    DumpRSTEvents("\t  |  ]", p_rst->p_first_event);
+    dvbpsi_rst_delete(p_rst);
 }
 
 /*****************************************************************************
@@ -1516,6 +1571,16 @@ ts_stream_t *libdvbpsi_init(int debug, ts_stream_log_cb pf_log, void *cb_data)
         stream->sdt.handle = NULL;
         goto error;
     }
+    /* RST */
+    stream->rst.handle = dvbpsi_new(&dvbpsi_message, stream->level);
+    if (stream->rst.handle == NULL)
+        goto error;
+    if (!dvbpsi_rst_attach(stream->rst.handle, handle_RST, stream))
+    {
+        dvbpsi_delete(stream->rst.handle);
+        stream->rst.handle = NULL;
+        goto error;
+    }
     /* EIT demuxer */
     stream->eit.handle = dvbpsi_new(&dvbpsi_message, stream->level);
     if (stream->eit.handle == NULL)
@@ -1546,6 +1611,7 @@ ts_stream_t *libdvbpsi_init(int debug, ts_stream_log_cb pf_log, void *cb_data)
 #endif
     stream->sdt.pid = &stream->pid[0x11];
     stream->eit.pid = &stream->pid[0x12];
+    stream->rst.pid = &stream->pid[0x13];
     stream->tdt.pid = &stream->pid[0x14];
     return stream;
 
@@ -1558,6 +1624,8 @@ error:
         dvbpsi_DetachDemux(stream->sdt.handle);
     if (dvbpsi_decoder_present(stream->eit.handle))
         dvbpsi_DetachDemux(stream->eit.handle);
+    if (dvbpsi_decoder_present(stream->rst.handle))
+        dvbpsi_rst_detach(stream->rst.handle);
     if (dvbpsi_decoder_present(stream->tdt.handle))
         dvbpsi_DetachDemux(stream->tdt.handle);
 
@@ -1567,6 +1635,8 @@ error:
         dvbpsi_delete(stream->cat.handle);
     if (stream->sdt.handle)
         dvbpsi_delete(stream->sdt.handle);
+    if (stream->rst.handle)
+        dvbpsi_delete(stream->rst.handle);
     if (stream->eit.handle)
         dvbpsi_delete(stream->eit.handle);
     if (stream->tdt.handle)
@@ -1605,6 +1675,8 @@ void libdvbpsi_exit(ts_stream_t *stream)
        dvbpsi_cat_detach(stream->cat.handle);
    if (dvbpsi_decoder_present(stream->sdt.handle))
        dvbpsi_DetachDemux(stream->sdt.handle);
+   if (dvbpsi_decoder_present(stream->rst.handle))
+       dvbpsi_rst_detach(stream->rst.handle);
    if (dvbpsi_decoder_present(stream->eit.handle))
        dvbpsi_DetachDemux(stream->eit.handle);
    if (dvbpsi_decoder_present(stream->tdt.handle))
@@ -1616,6 +1688,8 @@ void libdvbpsi_exit(ts_stream_t *stream)
        dvbpsi_delete(stream->cat.handle);
    if (stream->sdt.handle)
        dvbpsi_delete(stream->sdt.handle);
+   if (stream->rst.handle)
+       dvbpsi_delete(stream->rst.handle);
    if (stream->eit.handle)
        dvbpsi_delete(stream->eit.handle);
    if (stream->tdt.handle)
@@ -1696,6 +1770,8 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
             dvbpsi_packet_push(stream->sdt.handle, p_tmp);
         else if (i_pid == 0x12) /* EIT */
             dvbpsi_packet_push(stream->eit.handle, p_tmp);
+        else if (i_pid == 0x13) /* RST */
+            dvbpsi_packet_push(stream->rst.handle, p_tmp);
         else if (i_pid == 0x14) /* TDT/TOT */
             dvbpsi_packet_push(stream->tdt.handle, p_tmp);
         else
