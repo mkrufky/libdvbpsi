@@ -61,8 +61,7 @@ dvbpsi_network_name_dr_t* dvbpsi_DecodeNetworkNameDr(
         return NULL;
 
     /* Decode data */
-    p_decoded->i_name_length = p_descriptor->i_length <= 255 ?
-                               p_descriptor->i_length : 255;
+    p_decoded->i_name_length = p_descriptor->i_length;
     if (p_decoded->i_name_length)
         memcpy(p_decoded->i_name_byte,
                p_descriptor->p_data,

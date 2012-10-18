@@ -58,9 +58,6 @@ dvbpsi_default_authority_dr_t *dvbpsi_DecodeDefaultAuthorityDr(dvbpsi_descriptor
     if (!p_decoded)
         return NULL;
 
-    if (p_descriptor->i_length > 255)
-        p_descriptor->i_length = 255;
-
     memcpy(&p_decoded->authority, p_descriptor->p_data, p_descriptor->i_length);
     p_decoded->authority[p_descriptor->i_length] = 0;
 
