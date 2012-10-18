@@ -46,7 +46,7 @@ extern "C" {
  * \typedef uint8_t iso_639_language_code_t[3]
  * \brief ISO639 three letter language codes
  */
-typedef uint8_t iso_639_language_code_t[3]; /*!<  */
+typedef uint8_t iso_639_language_code_t[3];
 
 /*****************************************************************************
  * dvbpsi_descriptor_t
