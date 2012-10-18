@@ -45,11 +45,11 @@ extern uint32_t dvbpsi_crc32_table[];
 void dvbpsi_message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...);
 
 #  define dvbpsi_error(hnd, src, str, x...)                             \
-        message(hnd, DVBPSI_MSG_ERROR, "libdvbpsi error ("src"): " str, ##x)
+        dvbpsi_message(hnd, DVBPSI_MSG_ERROR, "libdvbpsi error (%s): " str, src, ##x)
 #  define dvbpsi_warning(hnd, src, str, x...)                                \
-        message(hnd, DVBPSI_MSG_WARNING, "libdvbpsi warning ("src"): " str, ##x)
+        dvbpsi_message(hnd, DVBPSI_MSG_WARNING, "libdvbpsi warning (%s): " str, src, ##x)
 #  define dvbpsi_debug(hnd, src, str, x...)                                  \
-        message(hnd, DVBPSI_MSG_DEBUG, "libdvbpsi debug ("src"): " str, ##x)
+        dvbpsi_message(hnd, DVBPSI_MSG_DEBUG, "libdvbpsi debug (%s): " str, src, ##x)
 #else
 void dvbpsi_error(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...);
 void dvbpsi_warning(dvbpsi_t *dvbpsi, const char *src, const char *fmt, ...);
