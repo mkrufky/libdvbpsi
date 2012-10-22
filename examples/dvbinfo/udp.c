@@ -54,14 +54,16 @@
 #include "udp.h"
 
 #ifdef HAVE_SYS_SOCKET_H
-static bool is_multicast(const struct sockaddr *addr, socklen_t len)
+static bool is_multicast(const struct sockaddr_storage *saddr, socklen_t len)
 {
+    const struct sockaddr *addr = (const struct sockaddr *) saddr;
+
     switch(addr->sa_family)
     {
 #if defined(IN_MULTICAST)
         case AF_INET:
         {
-            const struct sockaddr_in *ip = (const struct sockaddr_in *)addr;
+            const struct sockaddr_in *ip = (const struct sockaddr_in *)saddr;
             if ((size_t)len < sizeof (*ip))
                 return false;
             return IN_MULTICAST(ntohl(ip->sin_addr.s_addr)) != 0;
@@ -70,7 +72,7 @@ static bool is_multicast(const struct sockaddr *addr, socklen_t len)
 #if defined(IN6_IS_ADDR_MULTICAST)
         case AF_INET6:
         {
-            const struct sockaddr_in6 *ip6 = (const struct sockaddr_in6 *)addr;
+            const struct sockaddr_in6 *ip6 = (const struct sockaddr_in6 *)saddr;
             if ((size_t)len < sizeof (*ip6))
                 return false;
             return IN6_IS_ADDR_MULTICAST(&ip6->sin6_addr) != 0;
@@ -80,9 +82,10 @@ static bool is_multicast(const struct sockaddr *addr, socklen_t len)
     return false;
 }
 
-static bool mcast_connect(int s, const char *interface, const struct sockaddr *addr, socklen_t len)
+static bool mcast_connect(int s, const char *interface, const struct sockaddr_storage *saddr, socklen_t len)
 {
     unsigned int ifindex = interface ? if_nametoindex(interface) : 0;
+    const struct sockaddr *addr = (const struct sockaddr *) saddr;
 
 #if defined(MCAST_JOIN_GROUP)
     /* Source Specific Multicast Join */
@@ -100,7 +103,7 @@ static bool mcast_connect(int s, const char *interface, const struct sockaddr *a
     {
         case AF_INET6:
         {
-            const struct sockaddr_in6 *sin6 = (const struct sockaddr_in6 *)addr;
+            const struct sockaddr_in6 *sin6 = (const struct sockaddr_in6 *)saddr;
             assert(len >= sizeof (struct sockaddr_in6));
             if (sin6->sin6_scope_id != 0)
                 greq.gr_interface = sin6->sin6_scope_id;
@@ -121,7 +124,7 @@ static bool mcast_connect(int s, const char *interface, const struct sockaddr *a
         case AF_INET6:
         {
             struct ipv6_mreq ipv6mr;
-            const struct sockaddr_in6 *ip6 = (const struct sockaddr_in6 *)addr;
+            const struct sockaddr_in6 *ip6 = (const struct sockaddr_in6 *)saddr;
 
             memset(&ipv6mr, 0, sizeof (ipv6mr));
             assert(len >= sizeof (struct sockaddr_in6));
@@ -142,7 +145,7 @@ static bool mcast_connect(int s, const char *interface, const struct sockaddr *a
 
             memset(&imr, 0, sizeof (imr));
             assert(len >= sizeof (struct sockaddr_in));
-            imr.imr_multiaddr = ((const struct sockaddr_in *)addr)->sin_addr;
+            imr.imr_multiaddr = ((const struct sockaddr_in *)saddr)->sin_addr;
 #if 0       /* TODO: Source Specific Multicast Join */
             if (ifaddr) /* Linux specific interface bound multicast address */
                imr.imr_address.s_addr = if_addr;
@@ -234,8 +237,9 @@ int udp_open(const char *interface, const char *ipaddress, int port)
             continue;
         }
 
-        if (is_multicast(ptr->ai_addr, ptr->ai_addrlen) &&
-            mcast_connect(s_ctl, NULL, ptr->ai_addr, ptr->ai_addrlen))
+        const struct sockaddr_storage *saddr = (const struct sockaddr_storage *)&ptr->ai_addr;
+        if (is_multicast(saddr, ptr->ai_addrlen) &&
+            mcast_connect(s_ctl, NULL, saddr, ptr->ai_addrlen))
         {
             close(s_ctl);
             perror("mcast connect error");
