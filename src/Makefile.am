@@ -8,12 +8,13 @@ libdvbpsi_la_SOURCES = dvbpsi.c dvbpsi_private.h \
                        psi.c \
                        demux.c \
                        descriptor.c \
+                       multi_string.c \
                        $(tables_src) \
                        $(descriptors_src)
 
 libdvbpsi_la_LDFLAGS = -version-info 11:0:0 -no-undefined
 
-pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
+pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h multi_string.h \
                      tables/pat.h tables/pmt.h tables/sdt.h tables/eit.h \
                      tables/cat.h tables/nit.h tables/tot.h tables/sis.h \
 		     tables/bat.h tables/rst.h \
