@@ -76,6 +76,7 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h multi_string.h \
 		     descriptors/dr_81.h \
 		     descriptors/dr_83.h \
 		     descriptors/dr_86.h \
+		     descriptors/dr_87.h \
 		     descriptors/dr_8a.h \
 		     descriptors/dr_a0.h \
 		     descriptors/dr_a1.h \
@@ -137,6 +138,7 @@ descriptors_src = descriptors/dr_02.c \
                   descriptors/dr_81.c \
                   descriptors/dr_83.c \
                   descriptors/dr_86.c \
+                  descriptors/dr_87.c \
 		  descriptors/dr_8a.c \
 		  descriptors/dr_a0.c \
 		  descriptors/dr_a1.c

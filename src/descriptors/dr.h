@@ -86,6 +86,7 @@
 #include "dr_81.h"
 #include "dr_83.h"
 #include "dr_86.h"
+#include "dr_87.h"
 #include "dr_8a.h"
 #include "dr_a0.h"
 #include "dr_a1.h"
