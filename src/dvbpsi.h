@@ -65,7 +65,6 @@ typedef struct dvbpsi_s dvbpsi_t;
  * \typedef enum dvbpsi_msg_level dvbpsi_msg_level_t
  * \brief DVBPSI message level enum
  */
-typedef enum dvbpsi_msg_level dvbpsi_msg_level_t;
 enum dvbpsi_msg_level
 {
     DVBPSI_MSG_NONE  = -1, /*!< No messages */
@@ -73,6 +72,7 @@ enum dvbpsi_msg_level
     DVBPSI_MSG_WARN  =  1, /*!< Error and Warning messages */
     DVBPSI_MSG_DEBUG =  2, /*!< Error, warning and debug messages */
 };
+typedef enum dvbpsi_msg_level dvbpsi_msg_level_t;
 
 /*****************************************************************************
  * dvbpsi_message_cb
