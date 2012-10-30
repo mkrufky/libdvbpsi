@@ -272,6 +272,7 @@ bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_sect
                 p->p_next = NULL;
                 dvbpsi_DeletePSISections(p);
                 p = p_section;
+                p_decoder->p_sections = p;
                 b_overwrite = true;
             }
             goto out;
