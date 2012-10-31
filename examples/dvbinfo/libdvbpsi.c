@@ -1666,8 +1666,8 @@ void libdvbpsi_exit(ts_stream_t *stream)
        stream->i_pmt--;
        p_prev = p_pmt;
        p_pmt = p_pmt->p_next;
-       if (p_pmt)
-           p_pmt->p_next = NULL;
+       if (p_prev)
+           p_prev->p_next = NULL;
        free(p_prev);
    }
 
