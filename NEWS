@@ -10,7 +10,7 @@ Changes between 0.2.2 and 1.0.0_pre3:
    - removed dvbpsi_handle
    - changed argument order
    - changed table functions prototypes
- * EIT table generation
+ * EIT table generation, and decoding fixes
  * RST table decoding and generation
  * new descriptor 0x40, 0x41, 0x49, 0x4a, 0x4b, 0x4f, 0x50 and 0x7c (decoder and generators)
  * descriptor 0x03: added variable_rate_audio_indicator
