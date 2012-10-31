@@ -498,35 +498,45 @@ void dvbpsi_eit_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_
 void dvbpsi_eit_sections_decode(dvbpsi_eit_t* p_eit,
                                 dvbpsi_psi_section_t* p_section)
 {
-    uint8_t* p_byte, * p_end;
+    uint8_t* p_byte, *p_end;
 
     while (p_section)
     {
-        for (p_byte = p_section->p_payload_start + 6;
-             p_byte < p_section->p_payload_end - 12;)
+        /* EIT Event Descriptions */
+        p_byte = p_section->p_payload_start + 6;
+        p_end  = p_section->p_payload_end;
+
+        while (p_byte < p_end)
         {
             uint16_t i_event_id = ((uint16_t)(p_byte[0]) << 8) | p_byte[1];
-            uint64_t i_start_time = ((uint64_t)(p_byte[2]) << 32)
-                                     | ((uint64_t)(p_byte[3]) << 24)
-                                     | ((uint64_t)(p_byte[4]) << 16)
-                                     | ((uint64_t)(p_byte[5]) << 8) | p_byte[6];
-            uint32_t i_duration = ((uint32_t)(p_byte[7]) << 16)
-                                     | ((uint32_t)(p_byte[8]) << 8) | p_byte[9];
+            uint64_t i_start_time = ((uint64_t)(p_byte[2]) << 32) |
+                                    ((uint64_t)(p_byte[3]) << 24) |
+                                    ((uint64_t)(p_byte[4]) << 16) |
+                                    ((uint64_t)(p_byte[5]) << 8)  |
+                                    ((uint64_t)(p_byte[6]));
+            uint32_t i_duration = ((uint32_t)(p_byte[7]) << 16) |
+                                  ((uint32_t)(p_byte[8]) << 8)  |
+                                              p_byte[9];
             uint8_t i_running_status = (uint8_t)(p_byte[10]) >> 5;
-            bool b_free_ca = (int)(p_byte[10] & 0x10) >> 4;
-            uint16_t i_ev_length = ((uint16_t)(p_byte[10] & 0xf) << 8) | p_byte[11];
-            dvbpsi_eit_event_t* p_event = dvbpsi_eit_event_add(p_eit,
+            bool b_free_ca = ((p_byte[10] & 0x8) == 0x8) ? false : true;
+            uint16_t i_ev_length = ((uint16_t)(p_byte[10] & 0xf) << 8) |
+                                               p_byte[11];
+            dvbpsi_eit_event_t *p_event = dvbpsi_eit_event_add(p_eit,
                                                 i_event_id, i_start_time, i_duration,
                                                 i_running_status, b_free_ca, i_ev_length);
+            if (!p_event)
+                break;
 
-            /* Event descriptors */
+            /* Event Descriptors */
             p_byte += 12;
-            p_end = p_byte + i_ev_length;
-            while (p_byte + 2 <= p_end)
+            uint8_t *p_ev_end = p_byte + i_ev_length;
+            if (p_ev_end > p_section->p_payload_end)
+                p_ev_end = p_section->p_payload_end;
+            while (p_byte < p_ev_end)
             {
                 uint8_t i_tag = p_byte[0];
                 uint8_t i_length = p_byte[1];
-                if (i_length + 2 <= p_end - p_byte)
+                if (i_length + 2 <= p_ev_end - p_byte)
                     dvbpsi_eit_event_descriptor_add(p_event, i_tag, i_length, p_byte + 2);
                 p_byte += 2 + i_length;
             }
