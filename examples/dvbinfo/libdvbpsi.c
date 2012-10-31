@@ -1316,7 +1316,7 @@ static void DumpEITEventDescriptors(dvbpsi_eit_event_t *p_eit_event)
         printf("\t  | Duration: %d\n", p_event->i_duration);
         printf("\t  | Running status: %d\n", p_event->i_running_status);
         printf("\t  | Free CA mode: %s\n", p_event->b_free_ca ? "yes" : "no");
-        printf("\t  | Descriptor loop length: %d\n", p_event->i_descriptors_length);
+        printf("\t  | Descriptor loop length: %d bytes\n", p_event->i_descriptors_length);
         DumpDescriptors("\t  |  ]", p_event->p_first_descriptor);
 
         p_event = p_event->p_next;

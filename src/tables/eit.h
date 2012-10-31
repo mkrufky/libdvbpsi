@@ -212,7 +212,8 @@ void dvbpsi_eit_delete(dvbpsi_eit_t* p_eit);
                                               uint64_t i_start_time,
                                               uint32_t i_duration,
                                               uint8_t i_running_status,
-                                              bool b_free_ca)
+                                              bool b_free_ca,
+                                              uint16_t i_event_descriptor_length)
  * \brief Add a service description at the end of the EIT.
  * \param p_eit pointer to the EIT structure
  * \param i_event_id Event ID
@@ -220,11 +221,14 @@ void dvbpsi_eit_delete(dvbpsi_eit_t* p_eit);
  * \param i_duration Duration
  * \param i_running_status Running status
  * \param b_free_ca Free CA flag
+ * \param i_event_descriptor_length The descriptors loop length in bytes of
+                                    all descriptors for this event.
  * \return a pointer to the added service description.
  */
 dvbpsi_eit_event_t* dvbpsi_eit_event_add(dvbpsi_eit_t* p_eit,
     uint16_t i_event_id, uint64_t i_start_time, uint32_t i_duration,
-    uint8_t i_running_status, bool b_free_ca);
+    uint8_t i_running_status, bool b_free_ca,
+    uint16_t i_event_descriptor_length);
 
 /*****************************************************************************
  * dvbpsi_eit_event_descriptor_add

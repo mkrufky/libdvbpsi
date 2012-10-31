@@ -207,7 +207,7 @@ void dvbpsi_eit_delete(dvbpsi_eit_t* p_eit)
  *****************************************************************************/
 dvbpsi_eit_event_t* dvbpsi_eit_event_add(dvbpsi_eit_t* p_eit,
     uint16_t i_event_id, uint64_t i_start_time, uint32_t i_duration,
-    uint8_t i_running_status, bool b_free_ca)
+    uint8_t i_running_status, bool b_free_ca, uint16_t i_event_descriptor_length)
 {
     dvbpsi_eit_event_t* p_event;
     p_event = (dvbpsi_eit_event_t*)calloc(1,sizeof(dvbpsi_eit_event_t));
@@ -220,6 +220,7 @@ dvbpsi_eit_event_t* dvbpsi_eit_event_add(dvbpsi_eit_t* p_eit,
     p_event->i_running_status = i_running_status;
     p_event->b_free_ca = b_free_ca;
     p_event->p_next = NULL;
+    p_event->i_descriptors_length = i_event_descriptor_length;
     p_event->p_first_descriptor = NULL;
 
     if (p_eit->p_first_event == NULL)
@@ -516,7 +517,8 @@ void dvbpsi_eit_sections_decode(dvbpsi_eit_t* p_eit,
             uint16_t i_ev_length = ((uint16_t)(p_byte[10] & 0xf) << 8) | p_byte[11];
             dvbpsi_eit_event_t* p_event = dvbpsi_eit_event_add(p_eit,
                                                 i_event_id, i_start_time, i_duration,
-                                                i_running_status, b_free_ca);
+                                                i_running_status, b_free_ca, i_ev_length);
+
             /* Event descriptors */
             p_byte += 12;
             p_end = p_byte + i_ev_length;
