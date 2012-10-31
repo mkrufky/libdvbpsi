@@ -196,6 +196,7 @@ static void params_free(params_t *param)
     free(param->input);
     free(param->output);
     free(param->summary.file);
+    param = NULL;
 }
 
 /* */
@@ -646,7 +647,6 @@ int main(int argc, char **pp_argv)
     if (param->input == NULL)
     {
         libdvbpsi_log(param, DVBINFO_LOG_ERROR, "No source given\n");
-        params_free(param);
 #ifdef HAVE_SYS_SOCKET_H
         if (param->b_monitor)
             closelog();
@@ -692,8 +692,6 @@ int main(int argc, char **pp_argv)
     dvbinfo_close(param);
 
     /* cleanup */
-    params_free(param);
-
     fifo_wake((&capture)->fifo);
     fifo_wake((&capture)->empty);
 
@@ -707,6 +705,8 @@ int main(int argc, char **pp_argv)
     if (param->b_monitor)
         closelog();
 #endif
+    params_free(param);
+
     if (err < 0)
         exit(EXIT_FAILURE);
     else
