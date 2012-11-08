@@ -106,8 +106,7 @@ bool dvbpsi_nit_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************
  * Close a NIT decoder.
  *****************************************************************************/
-void dvbpsi_nit_detach(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
-                      uint16_t i_extension)
+void dvbpsi_nit_detach(dvbpsi_t * p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
 {
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
 
@@ -138,9 +137,12 @@ void dvbpsi_nit_detach(dvbpsi_t * p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_nit_t structure.
  *****************************************************************************/
-void dvbpsi_nit_init(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
-                    uint8_t i_version, bool b_current_next)
+void dvbpsi_nit_init(dvbpsi_nit_t* p_nit, uint8_t i_table_id, uint16_t i_extension,
+                     uint16_t i_network_id, uint8_t i_version, bool b_current_next)
 {
+    p_nit->i_table_id = i_table_id;
+    p_nit->i_extension = i_extension;
+
     p_nit->i_network_id = i_network_id;
     p_nit->i_version = i_version;
     p_nit->b_current_next = b_current_next;
@@ -153,12 +155,14 @@ void dvbpsi_nit_init(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
  *****************************************************************************
  * Allocate and initialize a dvbpsi_nit_t structure.
  *****************************************************************************/
-dvbpsi_nit_t *dvbpsi_nit_new(uint16_t i_network_id, uint8_t i_version,
-                            bool b_current_next)
+dvbpsi_nit_t *dvbpsi_nit_new(uint8_t i_table_id, uint16_t i_extension,
+                             uint16_t i_network_id, uint8_t i_version,
+                             bool b_current_next)
 {
     dvbpsi_nit_t*p_nit = (dvbpsi_nit_t*)malloc(sizeof(dvbpsi_nit_t));
     if (p_nit != NULL)
-       dvbpsi_nit_init(p_nit, i_network_id, i_version, b_current_next);
+       dvbpsi_nit_init(p_nit, i_table_id, i_extension, i_network_id,
+                       i_version, b_current_next);
     return p_nit;
 }
 
@@ -331,8 +335,9 @@ static bool dvbpsi_AddSectionNIT(dvbpsi_t *p_dvbpsi, dvbpsi_nit_decoder_t *p_nit
     /* Initialize the structures if it's the first section received */
     if (p_nit_decoder->p_building_nit == NULL)
     {
-        p_nit_decoder->p_building_nit = dvbpsi_nit_new(p_nit_decoder->i_network_id,
-                                  p_section->i_version, p_section->b_current_next);
+        p_nit_decoder->p_building_nit = dvbpsi_nit_new(p_section->i_table_id,
+                p_section->i_extension, p_nit_decoder->i_network_id,
+                p_section->i_version, p_section->b_current_next);
         if (p_nit_decoder->p_building_nit == NULL)
             return false;
         p_nit_decoder->i_last_section_number = p_section->i_last_number;

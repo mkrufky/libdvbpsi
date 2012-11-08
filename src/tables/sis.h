@@ -54,6 +54,9 @@ extern "C" {
 typedef struct dvbpsi_sis_s
 {
   /* section */
+  uint8_t                   i_table_id;         /*!< table id */
+  uint16_t                  i_extension;        /*!< subtable id */
+
   uint16_t                  i_ts_id;            /*!< transport_stream_id */
   uint8_t                   i_version;          /*!< version_number */
   uint8_t                   i_protocol_version; /*!< Protocol version
@@ -353,7 +356,7 @@ typedef void (* dvbpsi_sis_callback)(void* p_cb_data, dvbpsi_sis_t* p_new_sis);
  * \brief Creation and initialization of a SIS decoder. It is attached to p_dvbpsi.
  * \param p_dvbpsi pointer to dvbpsi to hold decoder/demuxer structure
  * \param i_table_id Table ID, 0xFC.
- * \param i_extension Table ID extension, here TS ID.
+ * \param i_extension Table ID extension.
  * \param pf_callback function to call back on new SIS.
  * \param p_cb_data private data given in argument to the callback.
  * \return true on success, false on failure
@@ -379,31 +382,33 @@ void dvbpsi_sis_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extens
  * dvbpsi_sis_init/dvbpsi_sis_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_sis_init(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
-                    bool b_current_next, uint8_t i_protocol_version);
+ * \fn void dvbpsi_sis_init(dvbpsi_sis_t *p_sis, uint8_t i_table_id, uint16_t i_extension,
+                    uint8_t i_version, bool b_current_next, uint8_t i_protocol_version);
  * \brief Initialize a user-allocated dvbpsi_sis_t structure.
  * \param p_sis pointer to the SIS structure
- * \param i_ts_id transport stream ID
+ * \param i_table_id Table ID, 0xFC.
+ * \param i_extension Table ID extension.
  * \param i_version SIS version
  * \param b_current_next current next indicator
  * \param i_protocol_version SIS protocol version (currently 0)
  * \return nothing.
  */
-void dvbpsi_sis_init(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
-                    bool b_current_next, uint8_t i_protocol_version);
+void dvbpsi_sis_init(dvbpsi_sis_t *p_sis, uint8_t i_table_id, uint16_t i_extension,
+                     uint8_t i_version, bool b_current_next, uint8_t i_protocol_version);
 
 /*!
- * \fn dvbpsi_sis_t* dvbpsi_sis_new(uint16_t i_ts_id, uint8_t i_version,
-                            bool b_current_next, uint8_t i_protocol_version);
+ * \fn dvbpsi_sis_t* dvbpsi_sis_new(uint8_t i_table_id, uint16_t i_extension,
+            uint8_t i_version, bool b_current_next, uint8_t i_protocol_version);
  * \brief Allocate and initialize a new dvbpsi_sis_t structure.
- * \param i_ts_id transport stream ID
+ * \param i_table_id Table ID, 0xFC.
+ * \param i_extension Table ID extension.
  * \param i_version SIS version
  * \param b_current_next current next indicator
  * \param i_protocol_version SIS protocol version (currently 0)
  * \return p_sis pointer to the SIS structure
  */
-dvbpsi_sis_t* dvbpsi_sis_new(uint16_t i_ts_id, uint8_t i_version,
-                            bool b_current_next, uint8_t i_protocol_version);
+dvbpsi_sis_t* dvbpsi_sis_new(uint8_t i_table_id, uint16_t i_extension, uint8_t i_version,
+                             bool b_current_next, uint8_t i_protocol_version);
 
 /*****************************************************************************
  * dvbpsi_sis_empty/dvbpsi_sis_delete

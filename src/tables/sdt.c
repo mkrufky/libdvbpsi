@@ -138,12 +138,14 @@ void dvbpsi_sdt_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extens
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_sdt_t structure.
  *****************************************************************************/
-void dvbpsi_sdt_init(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id, uint8_t i_version,
-                    bool b_current_next, uint16_t i_network_id)
+void dvbpsi_sdt_init(dvbpsi_sdt_t* p_sdt, uint8_t i_table_id, uint16_t i_extension,
+                     uint8_t i_version, bool b_current_next, uint16_t i_network_id)
 {
     assert(p_sdt);
 
-    p_sdt->i_ts_id = i_ts_id;
+    p_sdt->i_table_id = i_table_id;
+    p_sdt->i_extension = i_extension;
+
     p_sdt->i_version = i_version;
     p_sdt->b_current_next = b_current_next;
     p_sdt->i_network_id = i_network_id;
@@ -155,12 +157,13 @@ void dvbpsi_sdt_init(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id, uint8_t i_version,
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_sdt_t structure.
  *****************************************************************************/
-dvbpsi_sdt_t *dvbpsi_sdt_new(uint16_t i_ts_id, uint8_t i_version,
+dvbpsi_sdt_t *dvbpsi_sdt_new(uint8_t i_table_id, uint16_t i_extension, uint8_t i_version,
                              bool b_current_next, uint16_t i_network_id)
 {
     dvbpsi_sdt_t *p_sdt = (dvbpsi_sdt_t*)malloc(sizeof(dvbpsi_sdt_t));
     if (p_sdt != NULL)
-        dvbpsi_sdt_init(p_sdt, i_ts_id, i_version, b_current_next, i_network_id);
+        dvbpsi_sdt_init(p_sdt, i_table_id, i_extension, i_version,
+                        b_current_next, i_network_id);
     return p_sdt;
 }
 
@@ -319,10 +322,12 @@ static bool dvbpsi_AddSectionSDT(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_decoder_t *p_sdt
     /* Initialize the structures if it's the first section received */
     if (!p_sdt_decoder->p_building_sdt)
     {
-        p_sdt_decoder->p_building_sdt = dvbpsi_sdt_new(p_section->i_extension,
+        p_sdt_decoder->p_building_sdt =
+                dvbpsi_sdt_new(p_section->i_table_id, p_section->i_extension,
                              p_section->i_version, p_section->b_current_next,
                              ((uint16_t)(p_section->p_payload_start[0]) << 8)
                                          | p_section->p_payload_start[1]);
+
         if (p_sdt_decoder->p_building_sdt == NULL)
             return false;
         p_sdt_decoder->i_last_section_number = p_section->i_last_number;

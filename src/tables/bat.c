@@ -136,11 +136,13 @@ void dvbpsi_bat_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extens
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_bat_t structure.
  *****************************************************************************/
-void dvbpsi_bat_init(dvbpsi_bat_t* p_bat, uint16_t i_bouquet_id, uint8_t i_version,
-                    bool b_current_next)
+void dvbpsi_bat_init(dvbpsi_bat_t* p_bat, uint8_t i_table_id, uint16_t i_extension,
+                     uint8_t i_version, bool b_current_next)
 {
     assert(p_bat);
-    p_bat->i_bouquet_id = i_bouquet_id;
+    p_bat->i_table_id = i_table_id;
+    p_bat->i_extension = i_extension;
+
     p_bat->i_version = i_version;
     p_bat->b_current_next = b_current_next;
     p_bat->p_first_ts = NULL;
@@ -152,12 +154,12 @@ void dvbpsi_bat_init(dvbpsi_bat_t* p_bat, uint16_t i_bouquet_id, uint8_t i_versi
  *****************************************************************************
  * Allocate and initialize a dvbpsi_bat_t structure.
  *****************************************************************************/
-dvbpsi_bat_t *dvbpsi_bat_new(uint16_t i_bouquet_id, uint8_t i_version,
-                            bool b_current_next)
+dvbpsi_bat_t *dvbpsi_bat_new(uint8_t i_table_id, uint16_t i_extension,
+                             uint8_t i_version, bool b_current_next)
 {
     dvbpsi_bat_t *p_bat = (dvbpsi_bat_t*)malloc(sizeof(dvbpsi_bat_t));
     if(p_bat != NULL)
-        dvbpsi_bat_init(p_bat, i_bouquet_id, i_version, b_current_next);
+        dvbpsi_bat_init(p_bat, i_table_id, i_extension, i_version, b_current_next);
     return p_bat;
 }
 
@@ -300,7 +302,7 @@ static bool dvbpsi_CheckBAT(dvbpsi_t *p_dvbpsi, dvbpsi_bat_decoder_t *p_bat_deco
     assert(p_dvbpsi);
     assert(p_bat_decoder);
 
-    if (p_bat_decoder->p_building_bat->i_bouquet_id != p_section->i_extension)
+    if (p_bat_decoder->p_building_bat->i_extension != p_section->i_extension)
     {
         /* bouquet_id */
         dvbpsi_error(p_dvbpsi, "BAT decoder", "'bouquet_id' differs"
@@ -337,7 +339,8 @@ static bool dvbpsi_AddSectionBAT(dvbpsi_t *p_dvbpsi, dvbpsi_bat_decoder_t *p_bat
     /* Initialize the structures if it's the first section received */
     if (!p_bat_decoder->p_building_bat)
     {
-        p_bat_decoder->p_building_bat = dvbpsi_bat_new(p_section->i_extension,
+        p_bat_decoder->p_building_bat = dvbpsi_bat_new(
+                              p_section->i_table_id, p_section->i_extension,
                               p_section->i_version, p_section->b_current_next);
         if (!p_bat_decoder->p_building_bat)
             return false;
@@ -547,7 +550,7 @@ dvbpsi_psi_section_t* dvbpsi_bat_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_ba
     p_current->b_syntax_indicator = true;
     p_current->b_private_indicator = true;
     p_current->i_length = 13;                     /* including CRC_32 */
-    p_current->i_extension = p_bat->i_bouquet_id;
+    p_current->i_extension = p_bat->i_extension;
     p_current->i_version = p_bat->i_version;
     p_current->b_current_next = p_bat->b_current_next;
     p_current->i_number = 0;
@@ -585,7 +588,7 @@ dvbpsi_psi_section_t* dvbpsi_bat_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_ba
             p_current->b_syntax_indicator = true;
             p_current->b_private_indicator = true;
             p_current->i_length = 13;                 /* including CRC_32 */
-            p_current->i_extension = p_bat->i_bouquet_id;
+            p_current->i_extension = p_bat->i_extension;
             p_current->i_version = p_bat->i_version;
             p_current->b_current_next = p_bat->b_current_next;
             p_current->i_number = p_prev->i_number + 1;
@@ -656,7 +659,7 @@ dvbpsi_psi_section_t* dvbpsi_bat_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_ba
             p_current->b_syntax_indicator = true;
             p_current->b_private_indicator = true;
             p_current->i_length = 13;                 /* including CRC_32 */
-            p_current->i_extension = p_bat->i_bouquet_id;
+            p_current->i_extension = p_bat->i_extension;
             p_current->i_version = p_bat->i_version;
             p_current->b_current_next = p_bat->b_current_next;
             p_current->i_number = p_prev->i_number + 1;

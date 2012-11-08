@@ -86,12 +86,17 @@ typedef struct dvbpsi_sdt_service_s
  */
 typedef struct dvbpsi_sdt_s
 {
-  uint16_t                  i_ts_id;            /*!< transport_stream_id */
-  uint8_t                   i_version;          /*!< version_number */
-  bool                      b_current_next;     /*!< current_next_indicator */
-  uint16_t                  i_network_id;       /*!< original network id */
+    /* PSI table members */
+    uint8_t                   i_table_id;         /*!< table id */
+    uint16_t                  i_extension;        /*!< subtable id */
 
-  dvbpsi_sdt_service_t *    p_first_service;    /*!< service description
+    /* Table specific */
+    uint16_t                  i_ts_id;            /*!< transport_stream_id */
+    uint8_t                   i_version;          /*!< version_number */
+    bool                      b_current_next;     /*!< current_next_indicator */
+    uint16_t                  i_network_id;       /*!< original network id */
+
+    dvbpsi_sdt_service_t *    p_first_service;    /*!< service description
                                                      list */
 
 } dvbpsi_sdt_t;
@@ -142,30 +147,33 @@ void dvbpsi_sdt_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extens
  * dvbpsi_sdt_init/dvbpsi_NewSDT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_sdt_init(dvbpsi_sdt_t* p_sdt, uint16_t i_ts_id,
-          uint8_t i_version, bool b_current_next, uint16_t i_network_id)
+ * \fn void dvbpsi_sdt_init(dvbpsi_sdt_t* p_sdt, uint8_t i_table_id, uint16_t i_extension,
+                            uint8_t i_version, bool b_current_next, uint16_t i_network_id)
  * \brief Initialize a user-allocated dvbpsi_sdt_t structure.
  * \param p_sdt pointer to the SDT structure
- * \param i_ts_id transport stream ID
+ * \param i_table_id Table ID, 0x42 or 0x46.
+ * \param i_extension Table ID extension, here TS ID.
  * \param i_version SDT version
  * \param b_current_next current next indicator
  * \param i_network_id original network id
  * \return nothing.
  */
-void dvbpsi_sdt_init(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
-                    bool b_current_next, uint16_t i_network_id);
+void dvbpsi_sdt_init(dvbpsi_sdt_t *p_sdt, uint8_t i_table_id, uint16_t i_extension,
+                     uint8_t i_version, bool b_current_next, uint16_t i_network_id);
 
 /*!
- * \fn dvbpsi_sdt_t *dvbpsi_sdt_new(uint16_t i_ts_id, uint8_t i_version,
+ * \fn dvbpsi_sdt_t *dvbpsi_sdt_new(uint8_t i_table_id, uint16_t i_extension, uint8_t i_version,
                                     bool b_current_next, uint16_t i_network_id)
  * \brief Allocate and initialize a new dvbpsi_sdt_t structure.
+ * \param i_table_id Table ID, 0x42 or 0x46.
+ * \param i_extension Table ID extension, here TS ID.
  * \param i_ts_id transport stream ID
  * \param i_version SDT version
  * \param b_current_next current next indicator
  * \param i_network_id original network id
  * \return p_sdt pointer to the SDT structure
  */
-dvbpsi_sdt_t *dvbpsi_sdt_new(uint16_t i_ts_id, uint8_t i_version,
+dvbpsi_sdt_t *dvbpsi_sdt_new(uint8_t i_table_id, uint16_t i_extension, uint8_t i_version,
                              bool b_current_next, uint16_t i_network_id);
 
 /*****************************************************************************

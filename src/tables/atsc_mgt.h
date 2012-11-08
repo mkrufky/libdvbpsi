@@ -75,6 +75,9 @@ typedef struct dvbpsi_atsc_mgt_table_s
  */
 typedef struct dvbpsi_atsc_mgt_s
 {
+    uint8_t                 i_table_id;         /*!< Table id */
+    uint16_t                i_extension;        /*!< Subtable id */
+
     uint8_t                 i_version;          /*!< version_number */
     bool                    b_current_next;     /*!< current_next_indicator */
     uint16_t                i_table_id_ext;     /*!< 0x0000 */
@@ -131,31 +134,33 @@ void dvbpsi_atsc_DetachMGT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id, uint16_t i_e
  * dvbpsi_atsc_InitMGT/dvbpsi_atsc_NewMGT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_InitMGT(dvbpsi_atsc_mgt_t* p_mgt, uint8_t i_version, uint8_t i_protocol,
-                         uint16_t i_table_id_extension, bool b_current_next);
+ * \fn void dvbpsi_atsc_InitMGT(dvbpsi_atsc_mgt_t* p_mgt, uint8_t i_table_id, uint16_t i_extension,
+                                uint8_t i_version, uint8_t i_protocol, bool b_current_next);
  * \brief Initialize a user-allocated dvbpsi_atsc_mgt_t structure.
  * \param p_mgt pointer to the MGT structure
+ * \param i_table_id Table ID, 0xC7.
+ * \param i_extension Table ID extension, here 0x0000.
  * \param i_version MGT version
  * \param i_protocol PSIP Protocol version.
- * \param i_table_id_extension 0x0000.
  * \param b_current_next current next indicator
  * \return nothing.
  */
-void dvbpsi_atsc_InitMGT(dvbpsi_atsc_mgt_t* p_mgt, uint8_t i_version, uint8_t i_protocol,
-                         uint16_t i_table_id_extension, bool b_current_next);
+void dvbpsi_atsc_InitMGT(dvbpsi_atsc_mgt_t* p_mgt, uint8_t i_table_id, uint16_t i_extension,
+                         uint8_t i_version, uint8_t i_protocol, bool b_current_next);
 
 /*!
- * \fn dvbpsi_atsc_mgt_t *dvbpsi_atsc_NewMGT(uint8_t i_version, uint8_t i_protocol,
-                        uint16_t i_table_id_extension, bool b_current_next);
+ * \fn dvbpsi_atsc_mgt_t *dvbpsi_atsc_NewMGT(uint8_t i_table_id, uint16_t i_extension,
+                        uint8_t i_version, uint8_t i_protocol, bool b_current_next);
  * \brief Allocate and initialize a new dvbpsi_mgt_t structure.
- * \param i_network_id network id
+ * \param i_table_id Table ID, 0xC7.
+ * \param i_extension Table ID extension, here 0x0000.
  * \param i_version MGT version
  * \param i_protocol PSIP Protocol version.
  * \param b_current_next current next indicator
  * \return p_mgt pointer to the MGT structure, or NULL on failure
  */
-dvbpsi_atsc_mgt_t *dvbpsi_atsc_NewMGT(uint8_t i_version, uint8_t i_protocol,
-                        uint16_t i_table_id_extension, bool b_current_next);
+dvbpsi_atsc_mgt_t *dvbpsi_atsc_NewMGT(uint8_t i_table_id, uint16_t i_extension,
+                        uint8_t i_version, uint8_t i_protocol, bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_atsc_EmptyMGT/dvbpsi_atsc_DeleteMGT

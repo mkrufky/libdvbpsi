@@ -82,13 +82,16 @@ typedef struct dvbpsi_nit_ts_s
  */
 typedef struct dvbpsi_nit_s
 {
-  uint16_t                  i_network_id;       /*!< network_id */
-  uint8_t                   i_version;          /*!< version_number */
-  bool                      b_current_next;     /*!< current_next_indicator */
+    uint8_t              i_table_id;        /*!< table id */
+    uint16_t             i_extension;       /*!< subtable id */
 
-  dvbpsi_descriptor_t *     p_first_descriptor; /*!< descriptor list */
+    uint16_t             i_network_id;       /*!< network_id */
+    uint8_t              i_version;          /*!< version_number */
+    bool                 b_current_next;     /*!< current_next_indicator */
 
-  dvbpsi_nit_ts_t *         p_first_ts;         /*!< TS list */
+    dvbpsi_descriptor_t *p_first_descriptor; /*!< descriptor list */
+
+    dvbpsi_nit_ts_t *    p_first_ts;         /*!< TS list */
 
 } dvbpsi_nit_t;
 
@@ -106,9 +109,8 @@ typedef void (* dvbpsi_nit_callback)(void* p_cb_data, dvbpsi_nit_t* p_new_nit);
  * dvbpsi_nit_attach
  *****************************************************************************/
 /*!
- * \fn bool dvbpsi_nit_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
-                             uint16_t i_extension, dvbpsi_nit_callback pf_callback,
-                             void* p_cb_data)
+ * \fn bool dvbpsi_nit_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                              dvbpsi_nit_callback pf_callback, void* p_cb_data)
  * \brief Creation and initialization of a NIT decoder. It is attached to p_dvbpsi.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0x4E, 0x4F, or 0x50-0x6F.
@@ -117,9 +119,8 @@ typedef void (* dvbpsi_nit_callback)(void* p_cb_data, dvbpsi_nit_t* p_new_nit);
  * \param p_cb_data private data given in argument to the callback.
  * \return true on success, false on failure
  */
-bool dvbpsi_nit_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
-                     uint16_t i_extension, dvbpsi_nit_callback pf_callback,
-                     void* p_cb_data);
+bool dvbpsi_nit_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                       dvbpsi_nit_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_nit_detach
@@ -140,28 +141,34 @@ void dvbpsi_nit_detach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_nit_init/dvbpsi_nit_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_nit_init(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
-                           uint8_t i_version, bool b_current_next)
+ * \fn void dvbpsi_nit_init(dvbpsi_nit_t* p_nit, uint8_t i_table_id, uint16_t i_extension,
+                            uint16_t i_network_id, uint8_t i_version, bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_nit_t structure.
+ * \param i_table_id Table ID, 0x4E, 0x4F, or 0x50-0x6F.
+ * \param i_extension Table ID extension, here service ID.
  * \param p_nit pointer to the NIT structure
  * \param i_network_id network id
  * \param i_version NIT version
  * \param b_current_next current next indicator
  * \return nothing.
  */
-void dvbpsi_nit_init(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
-                    uint8_t i_version, bool b_current_next);
+void dvbpsi_nit_init(dvbpsi_nit_t* p_nit, uint8_t i_table_id, uint16_t i_extension,
+                     uint16_t i_network_id, uint8_t i_version, bool b_current_next);
 
 /*!
- * \fn dvbpsi_nit_t *dvbpsi_nit_new(uint16_t i_network_id, uint8_t i_version,
- *                                 bool b_current_next);
+ * \fn dvbpsi_nit_t *dvbpsi_nit_new(uint8_t i_table_id, uint16_t i_extension,
+ *                                  uint16_t i_network_id, uint8_t i_version,
+ *                                  bool b_current_next);
  * \brief Allocate and initialize a new dvbpsi_nit_t structure.
+ * \param i_table_id Table ID, 0x4E, 0x4F, or 0x50-0x6F.
+ * \param i_extension Table ID extension, here service ID.
  * \param i_network_id network id
  * \param i_version NIT version
  * \param b_current_next current next indicator
  * \return p_nit pointer to the NIT structure
  */
-dvbpsi_nit_t *dvbpsi_nit_new(uint16_t i_network_id, uint8_t i_version,
+dvbpsi_nit_t *dvbpsi_nit_new(uint8_t i_table_id, uint16_t i_extension,
+                             uint16_t i_network_id, uint8_t i_version,
                              bool b_current_next);
 
 /*****************************************************************************

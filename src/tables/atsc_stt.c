@@ -154,11 +154,17 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_atsc_stt_t structure.
  *****************************************************************************/
-void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_version)
+void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_table_id,
+                         uint16_t i_extension, uint8_t i_version, bool b_current_next)
 {
     assert(p_stt);
 
+    p_stt->i_table_id = i_table_id;
+    p_stt->i_extension = i_extension;
+
     p_stt->i_version = i_version;
+    p_stt->b_current_next = b_current_next;
+
     p_stt->p_first_descriptor = NULL;
 }
 
@@ -167,12 +173,13 @@ void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_version)
  *****************************************************************************
  * Allocate and initialize a dvbpsi_atsc_stt_t structure.
  *****************************************************************************/
-dvbpsi_atsc_stt_t *dvbpsi_atsc_NewSTT(uint8_t i_version, bool b_current_next)
+dvbpsi_atsc_stt_t *dvbpsi_atsc_NewSTT(uint8_t i_table_id, uint16_t i_extension,
+                                      uint8_t i_version, bool b_current_next)
 {
     dvbpsi_atsc_stt_t *p_stt;
     p_stt = (dvbpsi_atsc_stt_t*)malloc(sizeof(dvbpsi_atsc_stt_t));
     if (p_stt != NULL)
-        dvbpsi_atsc_InitSTT(p_stt, i_version);
+        dvbpsi_atsc_InitSTT(p_stt, i_table_id, i_extension, i_version, b_current_next);
     return p_stt;
 }
 
@@ -279,8 +286,8 @@ static bool dvbpsi_AddSectionSTT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_stt_decoder_t *
     /* Initialize the structures if it's the first section received */
     if (!p_decoder->p_building_stt)
     {
-        p_decoder->p_building_stt = dvbpsi_atsc_NewSTT(p_section->i_version,
-                                                       p_section->b_current_next);
+        p_decoder->p_building_stt = dvbpsi_atsc_NewSTT(p_section->i_table_id, p_section->i_extension,
+                                                       p_section->i_version, p_section->b_current_next);
         if (p_decoder->p_building_stt)
             return false;
 

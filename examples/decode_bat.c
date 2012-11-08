@@ -175,7 +175,7 @@ static void DumpBAT(void* p_zero, dvbpsi_bat_t* p_bat)
       printf(  "\n");
       printf(  "New active BAT(binary dumped)\n");
       printf(  "  bouquet_id : %d\n",
-             p_bat->i_bouquet_id);
+             p_bat->i_extension);
       printf(  "  version_number : %d\n",
              p_bat->i_version);
       printf(  "    | ts_id \n");

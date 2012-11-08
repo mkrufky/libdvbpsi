@@ -142,12 +142,14 @@ void dvbpsi_tot_detach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_tot_t structure.
  *****************************************************************************/
-void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
-                    bool b_current_next, uint64_t i_utc_time)
+void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint8_t i_table_id, uint16_t i_extension,
+                     uint8_t i_version, bool b_current_next, uint64_t i_utc_time)
 {
     assert(p_tot);
 
-    p_tot->i_ts_id = i_ts_id;
+    p_tot->i_table_id = i_table_id;
+    p_tot->i_extension = i_extension;
+
     p_tot->i_version = i_version;
     p_tot->b_current_next = b_current_next;
 
@@ -161,12 +163,13 @@ void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_tot_t structure.
  *****************************************************************************/
-dvbpsi_tot_t *dvbpsi_tot_new(uint16_t i_ts_id, uint8_t i_version,
-                            bool b_current_next, uint64_t i_utc_time)
+dvbpsi_tot_t *dvbpsi_tot_new(uint8_t i_table_id, uint16_t i_extension, uint8_t i_version,
+                             bool b_current_next, uint64_t i_utc_time)
 {
   dvbpsi_tot_t *p_tot = (dvbpsi_tot_t*)malloc(sizeof(dvbpsi_tot_t));
   if (p_tot != NULL)
-        dvbpsi_tot_init(p_tot, i_ts_id, i_version, b_current_next, i_utc_time);
+        dvbpsi_tot_init(p_tot, i_table_id, i_extension, i_version,
+                        b_current_next, i_utc_time);
   return p_tot;
 }
 
@@ -240,7 +243,7 @@ static bool dvbpsi_CheckTOT(dvbpsi_t *p_dvbpsi, dvbpsi_tot_decoder_t *p_tot_deco
     assert(p_dvbpsi);
     assert(p_tot_decoder);
 
-    if (p_tot_decoder->p_building_tot->i_ts_id != p_section->i_extension)
+    if (p_tot_decoder->p_building_tot->i_extension != p_section->i_extension)
     {
         /* transport_stream_id */
         dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
@@ -278,7 +281,8 @@ static bool dvbpsi_AddSectionTOT(dvbpsi_t *p_dvbpsi, dvbpsi_tot_decoder_t *p_tot
     /* Initialize the structures if it's the first section received */
     if (!p_tot_decoder->p_building_tot)
     {
-        p_tot_decoder->p_building_tot = dvbpsi_tot_new(p_section->i_extension,
+        p_tot_decoder->p_building_tot = dvbpsi_tot_new(
+                             p_section->i_table_id, p_section->i_extension,
                              p_section->i_version, p_section->b_current_next,
                              ((uint64_t)p_section->p_payload_start[0] << 32)
                            | ((uint64_t)p_section->p_payload_start[1] << 24)

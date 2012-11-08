@@ -61,13 +61,12 @@ extern "C" {
  */
 typedef struct dvbpsi_bat_ts_s
 {
-  uint16_t                      i_ts_id;                /*!< transport stream id */
-  uint16_t                      i_orig_network_id;      /*!< original network id */
+    uint16_t                i_ts_id;            /*!< transport stream id */
+    uint16_t                i_orig_network_id;  /*!< original network id */
 
-  dvbpsi_descriptor_t *         p_first_descriptor;     /*!< descriptor list */
+    dvbpsi_descriptor_t    *p_first_descriptor; /*!< descriptor list */
 
-
-  struct dvbpsi_bat_ts_s * p_next;             /*!< next element of
+    struct dvbpsi_bat_ts_s *p_next;             /*!< next element of
                                                              the list */
 
 } dvbpsi_bat_ts_t;
@@ -89,17 +88,18 @@ typedef struct dvbpsi_bat_ts_s
  */
 typedef struct dvbpsi_bat_s
 {
-  uint16_t                  i_bouquet_id;       /*!< bouquet_id */
-  uint8_t                   i_version;          /*!< version_number */
-  bool                      b_current_next;     /*!< current_next_indicator */
+    uint8_t                 i_table_id;         /*!< table id */
+    uint16_t                i_extension;        /*!< subtable id (here bouquet id) */
 
-  dvbpsi_descriptor_t *     p_first_descriptor; /*!< descriptor list */
+    uint8_t                 i_version;          /*!< version_number */
+    bool                    b_current_next;     /*!< current_next_indicator */
 
-  dvbpsi_bat_ts_t *         p_first_ts;         /*!< transport stream
+    dvbpsi_descriptor_t *   p_first_descriptor; /*!< descriptor list */
+
+    dvbpsi_bat_ts_t *       p_first_ts;         /*!< transport stream
                                                      description list */
 
 } dvbpsi_bat_t;
-
 
 /*****************************************************************************
  * dvbpsi_bat_callback
@@ -116,8 +116,7 @@ typedef void (* dvbpsi_bat_callback)(void* p_cb_data, dvbpsi_bat_t* p_new_bat);
  *****************************************************************************/
 /*!
  * \fn bool dvbpsi_bat_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_bat_callback pf_callback,
-                               void* p_cb_data)
+          uint16_t i_extension, dvbpsi_bat_callback pf_callback, void* p_cb_data)
  * \brief Creation and initialization of a BAT decoder. It will be attached to p_dvbpsi.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0x4a.
@@ -126,9 +125,8 @@ typedef void (* dvbpsi_bat_callback)(void* p_cb_data, dvbpsi_bat_t* p_new_bat);
  * \param p_cb_data private data given in argument to the callback.
  * \return true on success, false on failure
  */
-bool dvbpsi_bat_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_bat_callback pf_callback,
-                               void* p_cb_data);
+bool dvbpsi_bat_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                       dvbpsi_bat_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_bat_detach
@@ -142,36 +140,37 @@ bool dvbpsi_bat_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * \param i_extension Table ID extension, here bouquet ID.
  * \return nothing.
  */
-void dvbpsi_bat_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension);
+void dvbpsi_bat_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
 
 /*****************************************************************************
  * dvbpsi_bat_init/dvbpsi_bat_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_bat_init(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_version,
-                    bool b_current_next)
+ * \fn void dvbpsi_bat_init(dvbpsi_bat_t *p_bat, uint8_t i_table_id, uint16_t i_extension,
+                            uint8_t i_version, bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_bat_t structure.
  * \param p_bat pointer to the BAT structure
- * \param i_bouquet_id bouquet ID
+ * \param i_table_id Table ID, 0x4a.
+ * \param i_extension Table ID extension, here bouquet ID.
  * \param i_version BAT version
  * \param b_current_next current next indicator
  * \return nothing.
  */
-void dvbpsi_bat_init(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_version,
-                    bool b_current_next);
+void dvbpsi_bat_init(dvbpsi_bat_t *p_bat, uint8_t i_table_id, uint16_t i_extension,
+                     uint8_t i_version, bool b_current_next);
 
 /*!
- * \fn dvbpsi_bat_t *dvbpsi_bat_new(uint16_t i_bouquet_id, uint8_t i_version,
- *                                 bool b_current_next)
+ * \fn dvbpsi_bat_t *dvbpsi_bat_new(uint8_t i_table_id, uint16_t i_extension,
+ *                                  uint8_t i_version, bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_bat_t structure.
- * \param i_bouquet_id bouquet ID
+ * \param i_table_id Table ID, 0x4a.
+ * \param i_extension Table ID extension, here bouquet ID.
  * \param i_version BAT version
  * \param b_current_next current next indicator
  * \return p_bat pointer to the BAT structure
  */
-dvbpsi_bat_t *dvbpsi_bat_new(uint16_t i_bouquet_id, uint8_t i_version,
-                             bool b_current_next);
+dvbpsi_bat_t *dvbpsi_bat_new(uint8_t i_table_id, uint16_t i_extension,
+                             uint8_t i_version, bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_bat_empty/dvbpsi_bat_delete

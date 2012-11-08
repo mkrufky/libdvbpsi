@@ -137,12 +137,14 @@ void dvbpsi_eit_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_eit_t structure.
  *****************************************************************************/
-void dvbpsi_eit_init(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
-                    bool b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
-                    uint8_t i_segment_last_section_number,
-                    uint8_t i_last_table_id)
+void dvbpsi_eit_init(dvbpsi_eit_t* p_eit, uint8_t i_table_id, uint16_t i_extension,
+                     uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
+                     uint16_t i_network_id, uint8_t i_segment_last_section_number,
+                     uint8_t i_last_table_id)
 {
-    p_eit->i_service_id = i_service_id;
+    p_eit->i_table_id = i_table_id;
+    p_eit->i_extension = i_extension;
+
     p_eit->i_version = i_version;
     p_eit->b_current_next = b_current_next;
     p_eit->i_ts_id = i_ts_id;
@@ -157,15 +159,16 @@ void dvbpsi_eit_init(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_versi
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_eit_t structure.
  *****************************************************************************/
-dvbpsi_eit_t* dvbpsi_eit_new(uint16_t i_service_id, uint8_t i_version,
-                             bool b_current_next, uint16_t i_ts_id,
+dvbpsi_eit_t* dvbpsi_eit_new(uint8_t i_table_id, uint16_t i_extension,
+                             uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
                              uint16_t i_network_id, uint8_t i_segment_last_section_number,
                              uint8_t i_last_table_id)
 {
     dvbpsi_eit_t *p_eit = (dvbpsi_eit_t*)malloc(sizeof(dvbpsi_eit_t));
     if (p_eit != NULL)
-        dvbpsi_eit_init(p_eit, i_service_id, i_version, b_current_next, i_ts_id,
-                       i_network_id, i_segment_last_section_number, i_last_table_id);
+        dvbpsi_eit_init(p_eit, i_table_id, i_extension, i_version,
+                        b_current_next, i_ts_id, i_network_id, i_segment_last_section_number,
+                        i_last_table_id);
     return p_eit;
 }
 
@@ -280,7 +283,7 @@ static bool dvbpsi_CheckEIT(dvbpsi_t *p_dvbpsi, dvbpsi_eit_decoder_t *p_eit_deco
     assert(p_dvbpsi);
     assert(p_eit_decoder);
 
-    if (p_eit_decoder->p_building_eit->i_service_id != p_section->i_extension)
+    if (p_eit_decoder->p_building_eit->i_extension != p_section->i_extension)
     {
         /* service_id */
         dvbpsi_error(p_dvbpsi, "EIT decoder",
@@ -370,7 +373,9 @@ static bool dvbpsi_AddSectionEIT(dvbpsi_t *p_dvbpsi, dvbpsi_eit_decoder_t *p_eit
     /* Initialize the structures if it's the first section received */
     if (!p_eit_decoder->p_building_eit)
     {
-        p_eit_decoder->p_building_eit = dvbpsi_eit_new(p_section->i_extension,
+        p_eit_decoder->p_building_eit = dvbpsi_eit_new(
+                                p_section->i_table_id,
+                                p_section->i_extension,
                                 p_section->i_version,
                                 p_section->b_current_next,
                                 ((uint16_t)(p_section->p_payload_start[0]) << 8)
@@ -561,7 +566,7 @@ static dvbpsi_psi_section_t* NewEITSection(dvbpsi_eit_t* p_eit, int i_table_id,
   p_result->b_private_indicator = 1;
   p_result->i_length = 15;                     /* header: 11B + CRC32 */
 
-  p_result->i_extension = p_eit->i_service_id;
+  p_result->i_extension = p_eit->i_extension;
   p_result->i_version = p_eit->i_version;
   p_result->b_current_next = p_eit->b_current_next;
   p_result->i_number = i_section_number;

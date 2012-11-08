@@ -124,7 +124,7 @@ dvbpsi_pmt_t* dvbpsi_pmt_new(uint16_t i_program_number, uint8_t i_version,
     dvbpsi_pmt_t *p_pmt = (dvbpsi_pmt_t*)malloc(sizeof(dvbpsi_pmt_t));
     if(p_pmt != NULL)
         dvbpsi_pmt_init(p_pmt, i_program_number, i_version,
-                       b_current_next, i_pcr_pid);
+                        b_current_next, i_pcr_pid);
     return p_pmt;
 }
 

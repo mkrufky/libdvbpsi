@@ -55,13 +55,16 @@ extern "C" {
 typedef struct dvbpsi_atsc_ett_s
 {
     /* general PSI table */
+    uint8_t                 i_table_id;     /*!< table id */
+    uint16_t                i_extension;    /*!< subtable id:
+                                                 ETT Table ID extension,
+                                                 normally 0x0000 */
+
     uint8_t                 i_version;      /*!< version_number */
     bool                    b_current_next; /*!< current_next_indicator */
     uint8_t                 i_protocol;     /*!< PSIP Protocol version */
 
     /* ETT specific */
-    uint16_t                i_ett_table_id; /*!< ETT Table ID extension,
-                                                 normally 0x0000 */
     uint32_t                i_etm_id;       /*!< ETM Identifier, made up of
                                                  source id and event id
                                                  (or 0 for channel ETT) */
@@ -97,8 +100,8 @@ typedef void (* dvbpsi_atsc_ett_callback)(void* p_cb_data, dvbpsi_atsc_ett_t* p_
  * \param p_cb_data private data given in argument to the callback.
  * \return true if everything went ok, else it returns false.
  */
-bool dvbpsi_atsc_AttachETT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_atsc_ett_callback pf_callback, void* p_cb_data);
+bool dvbpsi_atsc_AttachETT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                           dvbpsi_atsc_ett_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_atsc_DetachETT
@@ -119,32 +122,37 @@ void dvbpsi_atsc_DetachETT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_atsc_InitETT/dvbpsi_atsc_NewETT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_InitETT(dvbpsi_atsc_ett_t *p_ett, uint8_t i_version, uint8_t i_protocol,
-                         uint16_t i_ett_table_id, uint32_t i_etm_id, bool b_current_next);
+ * \fn void dvbpsi_atsc_InitETT(dvbpsi_atsc_ett_t *p_ett, uint8_t i_table_id, uint16_t i_extension,
+                         uint8_t i_version, uint8_t i_protocol,  uint32_t i_etm_id, bool b_current_next);
  * \brief Initialize a user-allocated dvbpsi_atsc_ett_t structure.
  * \param p_ett pointer to the ETT structure
+ * \param i_table_id Table ID, 0xCC.
+ * \param i_extension Table ID extension, normally 0x0000.
  * \param i_version version
  * \param i_protocol PSIP Protocol version.
- * \param i_ett_table_id Table ID (Normally 0x0000)
  * \param i_etm_id ETM Identifier.
  * \param b_current_next current next indicator
  * \return nothing.
  */
-void dvbpsi_atsc_InitETT(dvbpsi_atsc_ett_t *p_ett, uint8_t i_version, uint8_t i_protocol,
-                         uint16_t i_ett_table_id, uint32_t i_etm_id, bool b_current_next);
+void dvbpsi_atsc_InitETT(dvbpsi_atsc_ett_t *p_ett, uint8_t i_table_id, uint16_t i_extension,
+                         uint8_t i_version, uint8_t i_protocol,
+                         uint32_t i_etm_id, bool b_current_next);
 
 /*!
- * \fn dvbpsi_atsc_ett_t *dvbpsi_atsc_NewETT(uint8_t i_version, uint8_t i_protocol,
-                          uint16_t i_ett_table_id, uint32_t i_etm_id, bool b_current_next)
+ * \fn dvbpsi_atsc_ett_t *dvbpsi_atsc_NewETT(uint8_t i_table_id, uint16_t i_extension,
+                          uint8_t i_version, uint8_t i_protocol,
+                          uint32_t i_etm_id, bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_atsc_ett_t structure. Use ObjectRefDec to delete it.
+ * \param i_table_id Table ID, 0xCC.
+ * \param i_extension Table ID extension, normally 0x0000.
  * \param i_protocol PSIP Protocol version.
- * \param i_ett_table_id Table ID (Normally 0x0000)
  * \param i_etm_id ETM Identifier.
  * \param b_current_next current next indicator
  * \returns p_ett pointer to the ETT structure, NULL otherwise
  */
-dvbpsi_atsc_ett_t *dvbpsi_atsc_NewETT(uint8_t i_version, uint8_t i_protocol,
-                                      uint16_t i_ett_table_id, uint32_t i_etm_id, bool b_current_next);
+dvbpsi_atsc_ett_t *dvbpsi_atsc_NewETT(uint8_t i_table_id, uint16_t i_extension,
+                                      uint8_t i_version, uint8_t i_protocol,
+                                      uint32_t i_etm_id, bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_atsc_EmptyETT/dvbpsi_atsc_DeleteETT

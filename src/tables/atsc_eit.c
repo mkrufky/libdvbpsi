@@ -162,10 +162,14 @@ void dvbpsi_atsc_DetachEIT(dvbpsi_t * p_dvbpsi, uint8_t i_table_id, uint16_t i_e
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_atsc_eit_t structure.
  *****************************************************************************/
-void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_version, uint8_t i_protocol,
+void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_table_id, uint16_t i_extension,
+                         uint8_t i_version, uint8_t i_protocol,
                          uint16_t i_source_id, bool b_current_next)
 {
     assert(p_eit);
+
+    p_eit->i_table_id = i_table_id;
+    p_eit->i_extension = i_extension;
 
     p_eit->i_version = i_version;
     p_eit->b_current_next = b_current_next;
@@ -175,13 +179,15 @@ void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_version, uint8_t i_
     p_eit->p_first_descriptor = NULL;
 }
 
-dvbpsi_atsc_eit_t *dvbpsi_atsc_NewEIT(uint8_t i_version, uint8_t i_protocol,
+dvbpsi_atsc_eit_t *dvbpsi_atsc_NewEIT(uint8_t i_table_id, uint16_t i_extension,
+                                      uint8_t i_version, uint8_t i_protocol,
                                       uint16_t i_source_id, bool b_current_next)
 {
     dvbpsi_atsc_eit_t *p_eit;
     p_eit = (dvbpsi_atsc_eit_t*) malloc(sizeof(dvbpsi_atsc_eit_t));
     if (p_eit != NULL)
-        dvbpsi_atsc_InitEIT(p_eit, i_version, b_current_next, i_protocol, i_source_id);
+        dvbpsi_atsc_InitEIT(p_eit, i_table_id, i_extension, i_version,
+                            i_protocol, i_source_id, b_current_next);
     return p_eit;
 }
 
@@ -348,7 +354,9 @@ static bool dvbpsi_AddSectionEIT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_eit_decoder_t *
     /* Initialize the structures if it's the first section received */
     if (!p_decoder->p_building_eit)
     {
-        p_decoder->p_building_eit = dvbpsi_atsc_NewEIT(p_section->i_version,
+        p_decoder->p_building_eit = dvbpsi_atsc_NewEIT(p_section->i_table_id,
+                                                p_section->i_extension,
+                                                p_section->i_version,
                                                 p_section->p_payload_start[0],
                                                 p_section->i_extension,
                                                 p_section->b_current_next);

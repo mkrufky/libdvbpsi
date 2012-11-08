@@ -75,14 +75,17 @@ typedef struct dvbpsi_atsc_eit_event_s
  */
 typedef struct dvbpsi_atsc_eit_s
 {
+    uint8_t                 i_table_id;         /*!< table id */
+    uint16_t                i_extension;        /*!< subtable id */
+
     uint8_t                 i_version;          /*!< version_number */
     bool                    b_current_next;     /*!< current_next_indicator */
     uint16_t                i_source_id;        /*!< Source id used to match against channels */
     uint8_t                 i_protocol;         /*!< PSIP Protocol version */
 
-    dvbpsi_atsc_eit_event_t   *p_first_event;   /*!< First event information structure. */
+    dvbpsi_atsc_eit_event_t *p_first_event;     /*!< First event information structure. */
 
-    dvbpsi_descriptor_t     *p_first_descriptor; /*!< First descriptor structure. */
+    dvbpsi_descriptor_t     *p_first_descriptor;/*!< First descriptor structure. */
 } dvbpsi_atsc_eit_t;
 
 /*****************************************************************************
@@ -110,8 +113,8 @@ typedef void (* dvbpsi_atsc_eit_callback)(void* p_cb_data, dvbpsi_atsc_eit_t* p_
  * \param p_cb_data private data given in argument to the callback.
  * \return true if everything went ok, false otherwise
  */
-bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_atsc_eit_callback pf_callback, void* p_cb_data);
+bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
+                           dvbpsi_atsc_eit_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_eit_detach
@@ -126,30 +129,35 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  * \param i_extension Table ID extension, here TS ID.
  * \return nothing.
  */
-void dvbpsi_atsc_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension);
+void dvbpsi_atsc_DetachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension);
 
 /*****************************************************************************
  * dvbpsi_atsc_InitEIT/dvbpsi_atsc_NewEIT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_version, uint8_t i_protocol,
-                         uint16_t i_source_id, bool b_current_next);
+ * \fn void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_table_id, uint16_t i_extension,
+                                uint8_t i_version, uint8_t i_protocol,
+                                uint16_t i_source_id, bool b_current_next);
  * \brief Initialize a user-allocated dvbpsi_atsc_eit_t structure.
  * \param p_eit pointer to the EIT structure
+ * \param i_table_id Table ID, 0xCB.
+ * \param i_extension Table ID extension, here TS ID.
  * \param i_version EIT version
  * \param i_protocol PSIP Protocol version.
  * \param i_source_id Source id.
  * \param b_current_next current next indicator
  * \return nothing.
  */
-void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_version, uint8_t i_protocol,
-                         uint16_t i_source_id, bool b_current_next);
+void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_table_id, uint16_t i_extension,
+                         uint8_t i_version, uint8_t i_protocol, uint16_t i_source_id, bool b_current_next);
 
 /*!
- * \fn dvbpsi_atsc_eit_t *dvbpsi_atsc_NewEIT(uint8_t i_version, uint8_t i_protocol,
+ * \fn dvbpsi_atsc_eit_t *dvbpsi_atsc_NewEIT(uint8_t i_table_id, uint16_t i_extension,
+                                             uint8_t i_version, uint8_t i_protocol,
                                              uint16_t i_source_id, bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_eit_t structure. Use ObjectRefDec to delete it.
+ * \param i_table_id Table ID, 0xCB.
+ * \param i_extension Table ID extension, here TS ID.
  * \param i_network_id network id
  * \param i_version EIT version
  * \param b_current_next current next indicator
@@ -157,7 +165,8 @@ void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_version, uint8_t i_
  * \param b_cable_eit Whether this is CEIT or a TEIT.
  * \return p_eit pointer to the EIT structure or NULL on error
  */
-dvbpsi_atsc_eit_t *dvbpsi_atsc_NewEIT(uint8_t i_version, uint8_t i_protocol,
+dvbpsi_atsc_eit_t *dvbpsi_atsc_NewEIT(uint8_t i_table_id, uint16_t i_extension,
+                                      uint8_t i_version, uint8_t i_protocol,
                                       uint16_t i_source_id, bool b_current_next);
 
 /*****************************************************************************

@@ -88,9 +88,11 @@ typedef struct dvbpsi_atsc_vct_channel_s
  */
 typedef struct dvbpsi_atsc_vct_s
 {
+    uint8_t  i_table_id;         /*!< table id */
+    uint16_t i_extension;        /*!< subtable id */
+
     uint8_t  i_version;          /*!< version_number */
     bool     b_current_next;     /*!< current_next_indicator */
-    uint16_t i_ts_id;            /*!< transport stream id */
     uint8_t  i_protocol;         /*!< PSIP Protocol version */
     bool     b_cable_vct;        /*!< 1 if this is a cable VCT, 0 if it is a Terrestrial VCT. */
 
@@ -147,30 +149,34 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
  * dvbpsi_atsc_InitVCT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_protocol,
+ * \fn void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_table_id,
+                         uint16_t i_extension, uint8_t i_protocol,
                          uint16_t i_ts_id, bool b_cable_vct,
                          uint8_t i_version, bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_atsc_vct_t structure.
  * \param p_vct pointer to the VCT structure
+ * \param i_table_id Table ID, 0xC8 or 0xC9.
+ * \param i_extension Table ID extension, here TS ID.
  * \param i_protocol PSIP Protocol version.
- * \param i_ts_id Transport Stream id.
  * \param b_cable_vct Whether this is CVCT or a TVCT.
  * \param i_version VCT version
  * \param b_current_next current next indicator
  * \return nothing.
  */
-void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_protocol,
-                         uint16_t i_ts_id, bool b_cable_vct,
+void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_table_id,
+                         uint16_t i_extension, uint8_t i_protocol, bool b_cable_vct,
                          uint8_t i_version, bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_atsc_NewVCT
  *****************************************************************************/
 /*!
- * \fn dvbpsi_atsc_vct_t *dvbpsi_atsc_NewVCT(uint8_t i_protocol, uint16_t i_ts_id,
- *                   bool b_cable_vct, uint8_t i_version, bool b_current_next);
+ * \fn dvbpsi_atsc_vct_t *dvbpsi_atsc_NewVCT(uint8_t i_table_id, uint16_t i_extension,
+ *                   uint8_t i_protocol, bool b_cable_vct, uint8_t i_version, bool b_current_next);
  *
  * \brief Allocate and initialize a new dvbpsi_vct_t structure.
+ * \param i_table_id Table ID, 0xC8 or 0xC9.
+ * \param i_extension Table ID extension, here TS ID.
  * \param i_protocol PSIP Protocol version.
  * \param i_network_id network id
  * \param b_cable_vct Whether this is CVCT or a TVCT.
@@ -178,8 +184,9 @@ void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_protocol,
  * \param b_current_next current next indicator
  * \return p_vct pointer to the VCT structure
  */
-dvbpsi_atsc_vct_t *dvbpsi_atsc_NewVCT(uint8_t i_protocol, uint16_t i_ts_id,
-                    bool b_cable_vct, uint8_t i_version, bool b_current_next);
+dvbpsi_atsc_vct_t *dvbpsi_atsc_NewVCT(uint8_t i_table_id, uint16_t i_extension,
+                    uint8_t i_protocol, bool b_cable_vct, uint8_t i_version,
+                    bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_atsc_EmptyVCT

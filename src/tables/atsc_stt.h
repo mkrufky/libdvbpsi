@@ -47,6 +47,9 @@ extern "C" {
  */
 typedef struct dvbpsi_atsc_stt_s
 {
+    uint8_t                 i_table_id;         /*!< Table id */
+    uint16_t                i_extension;        /*!< Subtable id */
+
     uint8_t                 i_version;          /*!< PSIP Protocol version */
     bool                    b_current_next;     /*!< current_next_indicator */
 
@@ -103,22 +106,32 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
  * dvbpsi_atsc_InitSTT/dvbpsi_atsc_NewSTT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_protocol)
+ * \fn void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_table_id,
+                                uint16_t i_extension, uint8_t i_protocol,
+                                bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_atsc_stt_t structure.
+ * \param i_table_id Table ID, 0xCD.
+ * \param i_extension Table extension, ignored as this should always be 0.
  * \param p_stt pointer to the STT structure
  * \param i_version PSIP Protocol version.
+ * \param b_current_next current next indicator
  * \return nothing.
  */
-void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_protocol);
+void dvbpsi_atsc_InitSTT(dvbpsi_atsc_stt_t *p_stt, uint8_t i_table_id, uint16_t i_extension,
+                         uint8_t i_protocol, bool b_current_next);
 
 /*!
- * \fn dvbpsi_atsc_stt_t *dvbpsi_atsc_NewSTT(uint8_t i_version, bool b_current_next)
+ * \fn dvbpsi_atsc_stt_t *dvbpsi_atsc_NewSTT(uint8_t i_table_id, uint16_t i_extension,
+                                             uint8_t i_version, bool b_current_next)
  * \brief Allocate and initialize a new dvbpsi_atsc_stt_t structure. Use ObjectRefDec to delete it.
+ * \param i_table_id Table ID, 0xCD.
+ * \param i_extension Table extension, ignored as this should always be 0.
  * \param i_version PSIP Protocol version.
  * \param b_current_next current next indicator
  * \return p_stt pointer to the STT structure
  */
-dvbpsi_atsc_stt_t *dvbpsi_atsc_NewSTT(uint8_t i_version, bool b_current_next);
+dvbpsi_atsc_stt_t *dvbpsi_atsc_NewSTT(uint8_t i_table_id, uint16_t i_extension,
+                                      uint8_t i_version, bool b_current_next);
 
 /*****************************************************************************
  * dvbpsi_atsc_EmptySTT

@@ -176,13 +176,13 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
  *****************************************************************************
  * Allocate a new dvbpsi_atsc_vct_t structure and initialize it.
  *****************************************************************************/
-dvbpsi_atsc_vct_t *dvbpsi_atsc_NewVCT(uint8_t i_protocol, uint16_t i_ts_id,
-        bool b_cable_vct, uint8_t i_version, bool b_current_next)
+dvbpsi_atsc_vct_t *dvbpsi_atsc_NewVCT(uint8_t i_table_id, uint16_t i_extension,
+        uint8_t i_protocol, bool b_cable_vct, uint8_t i_version, bool b_current_next)
 {
     dvbpsi_atsc_vct_t *p_vct = (dvbpsi_atsc_vct_t*)malloc(sizeof(dvbpsi_atsc_vct_t));
     if (p_vct != NULL)
-        dvbpsi_atsc_InitVCT(p_vct, i_protocol, i_ts_id, b_cable_vct,
-                            i_version, b_current_next);
+        dvbpsi_atsc_InitVCT(p_vct, i_table_id, i_extension,  i_protocol,
+                            b_cable_vct, i_version, b_current_next);
     return p_vct;
 }
 
@@ -191,15 +191,17 @@ dvbpsi_atsc_vct_t *dvbpsi_atsc_NewVCT(uint8_t i_protocol, uint16_t i_ts_id,
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_atsc_vct_t structure.
  *****************************************************************************/
-void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_protocol,
-                         uint16_t i_ts_id, bool b_cable_vct,
+void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_table_id,
+                         uint16_t i_extension, uint8_t i_protocol, bool b_cable_vct,
                          uint8_t i_version, bool b_current_next)
 {
     assert(p_vct);
+    p_vct->i_table_id = i_table_id;
+    p_vct->i_extension = i_extension;
+
     p_vct->i_version = i_version;
     p_vct->b_current_next = b_current_next;
     p_vct->i_protocol = i_protocol;
-    p_vct->i_ts_id = i_ts_id;
     p_vct->b_cable_vct = b_cable_vct;
     p_vct->p_first_channel = NULL;
     p_vct->p_first_descriptor = NULL;
@@ -379,7 +381,7 @@ static bool dvbpsi_CheckVCT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_vct_decoder_t *p_vct
     assert(p_dvbpsi);
     assert(p_vct_decoder);
 
-    if (p_vct_decoder->p_building_vct->i_ts_id != p_section->i_extension)
+    if (p_vct_decoder->p_building_vct->i_extension != p_section->i_extension)
     {
         /* transport_stream_id */
         dvbpsi_error(p_dvbpsi, "ATSC VCT decoder",
@@ -417,7 +419,8 @@ static bool dvbpsi_AddSectionVCT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_vct_decoder_t *
     /* Initialize the structures if it's the first section received */
     if (!p_vct_decoder->p_building_vct)
     {
-        p_vct_decoder->p_building_vct = dvbpsi_atsc_NewVCT(p_section->i_extension,
+        p_vct_decoder->p_building_vct = dvbpsi_atsc_NewVCT(
+                              p_section->i_table_id, p_section->i_extension,
                               p_section->p_payload_start[0], p_section->i_table_id == 0xC9,
                               p_section->i_version, p_section->b_current_next);
         if (p_vct_decoder->p_building_vct)

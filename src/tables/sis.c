@@ -104,8 +104,7 @@ bool dvbpsi_sis_attach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extens
  *****************************************************************************
  * Close a SIS decoder.
  *****************************************************************************/
-void dvbpsi_sis_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
-          uint16_t i_extension)
+void dvbpsi_sis_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
 {
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
@@ -141,10 +140,12 @@ void dvbpsi_sis_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************
  * Initialize a pre-allocated dvbpsi_sis_t structure.
  *****************************************************************************/
-void dvbpsi_sis_init(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
-                    bool b_current_next, uint8_t i_protocol_version)
+void dvbpsi_sis_init(dvbpsi_sis_t *p_sis, uint8_t i_table_id, uint16_t i_extension,
+                     uint8_t i_version, bool b_current_next, uint8_t i_protocol_version)
 {
-    p_sis->i_ts_id = i_ts_id;
+    p_sis->i_table_id = i_table_id;
+    p_sis->i_extension = i_extension;
+
     p_sis->i_version = i_version;
     p_sis->b_current_next = b_current_next;
 
@@ -178,12 +179,13 @@ void dvbpsi_sis_init(dvbpsi_sis_t *p_sis, uint16_t i_ts_id, uint8_t i_version,
  *****************************************************************************
  * Allocate and Initialize a new dvbpsi_sis_t structure.
  *****************************************************************************/
-dvbpsi_sis_t* dvbpsi_sis_new(uint16_t i_ts_id, uint8_t i_version,
-                            bool b_current_next, uint8_t i_protocol_version)
+dvbpsi_sis_t* dvbpsi_sis_new(uint8_t i_table_id, uint16_t i_extension, uint8_t i_version,
+                             bool b_current_next, uint8_t i_protocol_version)
 {
     dvbpsi_sis_t* p_sis = (dvbpsi_sis_t*)malloc(sizeof(dvbpsi_sis_t));
     if (p_sis != NULL)
-        dvbpsi_sis_init(p_sis, i_ts_id, i_version, b_current_next, i_protocol_version);
+        dvbpsi_sis_init(p_sis, i_table_id, i_extension, i_version,
+                        b_current_next, i_protocol_version);
     return p_sis;
 }
 
@@ -268,7 +270,7 @@ static bool dvbpsi_CheckSIS(dvbpsi_t *p_dvbpsi, dvbpsi_sis_decoder_t* p_sis_deco
                      " while no discontinuity has occured");
         b_reinit = true;
     }
-    else if (p_sis_decoder->p_building_sis->i_ts_id != p_section->i_extension)
+    else if (p_sis_decoder->p_building_sis->i_extension != p_section->i_extension)
     {
         dvbpsi_error(p_dvbpsi, "SIS decoder",
                 "'transport_stream_id' differs"
@@ -305,8 +307,9 @@ static bool dvbpsi_AddSectionSIS(dvbpsi_t *p_dvbpsi, dvbpsi_sis_decoder_t *p_sis
     /* Initialize the structures if it's the first section received */
     if (!p_sis_decoder->p_building_sis)
     {
-        p_sis_decoder->p_building_sis = dvbpsi_sis_new(p_section->i_extension,
-                             p_section->i_version, p_section->b_current_next, 0);
+        p_sis_decoder->p_building_sis = dvbpsi_sis_new(
+                            p_section->i_table_id, p_section->i_extension,
+                            p_section->i_version, p_section->b_current_next, 0);
         if (p_sis_decoder->p_building_sis == NULL)
             return false;
         p_sis_decoder->i_last_section_number = p_section->i_last_number;

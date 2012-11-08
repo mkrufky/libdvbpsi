@@ -57,7 +57,10 @@ extern "C" {
  */
 typedef struct dvbpsi_tot_s
 {
-    uint16_t                  i_ts_id;            /*!< transport_stream_id */
+    uint8_t                   i_table_id;         /*!< table id */
+    uint16_t                  i_extension;        /*!< subtable id */
+
+    /* Subtable specific */
     uint8_t                   i_version;          /*!< version_number */
     bool                      b_current_next;     /*!< current_next_indicator */
 
@@ -94,7 +97,7 @@ typedef void (* dvbpsi_tot_callback)(void* p_cb_data, dvbpsi_tot_t* p_new_tot);
  * \return true on success, false on failure
  */
 bool dvbpsi_tot_attach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id, uint16_t i_extension,
-                      dvbpsi_tot_callback pf_callback, void* p_cb_data);
+                       dvbpsi_tot_callback pf_callback, void* p_cb_data);
 
 /*****************************************************************************
  * dvbpsi_tot_detach
@@ -114,31 +117,33 @@ void dvbpsi_tot_detach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  * dvbpsi_tot_init/dvbpsi_tot_new
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
-                    bool b_current_next, uint64_t i_utc_time);
+ * \fn void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint8_t i_table_id, uint16_t i_extension,
+            uint16_t i_ts_id, uint8_t i_version, bool b_current_next, uint64_t i_utc_time);
  * \brief Initialize a user-allocated dvbpsi_tot_t structure.
  * \param p_tot pointer to the TDT/TOT structure
- * \param i_ts_id transport stream ID
+ * \param i_table_id Table ID, usually 0x70
+ * \param i_extension Table ID extension, unused in the TDT/TOT
  * \param i_version SDT version
  * \param b_current_next current next indicator
  * \param i_utc_time the time in UTC
  * \return nothing.
  */
-void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint16_t i_ts_id, uint8_t i_version,
-                    bool b_current_next, uint64_t i_utc_time);
+void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint8_t i_table_id, uint16_t i_extension,
+                     uint8_t i_version, bool b_current_next, uint64_t i_utc_time);
 
 /*!
- * \fn dvbpsi_tot_t *dvbpsi_tot_new(uint16_t i_ts_id, uint8_t i_version,
-                            bool b_current_next, uint64_t i_utc_time);
+ * \fn dvbpsi_tot_t *dvbpsi_tot_new(uint8_t i_table_id, uint16_t i_extension,
+                            uint8_t i_version, bool b_current_next, uint64_t i_utc_time);
  * \brief Allocate and initialize a new dvbpsi_tot_t structure.
- * \param i_ts_id transport stream ID
+ * \param i_table_id Table ID, usually 0x70
+ * \param i_extension Table ID extension, unused in the TDT/TOT
  * \param i_version SDT version
  * \param b_current_next current next indicator
  * \param i_utc_time the time in UTC
  * \return p_tot pointer to the TDT/TOT structure
  */
-dvbpsi_tot_t *dvbpsi_tot_new(uint16_t i_ts_id, uint8_t i_version,
-                            bool b_current_next, uint64_t i_utc_time);
+dvbpsi_tot_t *dvbpsi_tot_new(uint8_t i_table_id, uint16_t i_extension, uint8_t i_version,
+                             bool b_current_next, uint64_t i_utc_time);
 
 /*****************************************************************************
  * dvbpsi_tot_empty/dvbpsi_tot_delete

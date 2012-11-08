@@ -1330,7 +1330,7 @@ static void handle_EIT(void* p_data, dvbpsi_eit_t* p_eit)
     printf("\n");
     printf("  EIT: Event Information Table\n");
     printf("\tVersion number : %d\n", p_eit->i_version);
-    printf("\tService id     : %d\n", p_eit->i_service_id);
+    printf("\tService id     : %d\n", p_eit->i_extension);
     printf("\tCurrent next   : %s\n", p_eit->b_current_next ? "yes" : "no");
     printf("\tTransport stream id : %d\n", p_eit->i_ts_id);
     printf("\tOriginal network id : %d\n", p_eit->i_network_id);
@@ -1355,7 +1355,6 @@ static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot)
 
     printf("\tVersion number : %d\n", p_tot->i_version);
     printf("\tCurrent next   : %s\n", p_tot->b_current_next ? "yes" : "no");
-    printf("\tTransport stream id : %d\n", p_tot->i_ts_id);
 
     printf("\tUTC time       : %"PRId64"\n", p_tot->i_utc_time);
     if (table_id == 0x73) /* TOT */
@@ -1451,7 +1450,7 @@ static void handle_BAT(void* p_data, dvbpsi_bat_t* p_bat)
     printf("\n");
     printf("  BAT: Bouquet Association Table\n");
     printf("\tVersion number : %d\n", p_bat->i_version);
-    printf("\tBouquet id     : %d\n", p_bat->i_bouquet_id);
+    printf("\tBouquet id     : %d\n", p_bat->i_extension);
     printf("\tCurrent next   : %s\n", p_bat->b_current_next ? "yes" : "no");
     DumpDescriptors("\t  |  ]", p_bat->p_first_descriptor);
     DumpTSDescriptorsBAT(p_bat->p_first_ts);
