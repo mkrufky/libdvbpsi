@@ -45,6 +45,10 @@ extern "C" {
 /*****************************************************************************
  * Helper for GCC version checks borrowed from VLC.
  *****************************************************************************/
+/*!
+ * \def DVBPSI_GCC_VERSION(maj,min)
+ * \brief Helper macro for GCC version check
+ */
 #ifdef __GNUC__
 # define DVBPSI_GCC_VERSION(maj,min) \
     ((__GNUC__ > (maj)) || (__GNUC__ == (maj) && __GNUC_MINOR__ >= (min)))
@@ -62,8 +66,8 @@ extern "C" {
 typedef struct dvbpsi_s dvbpsi_t;
 
 /*!
- * \typedef enum dvbpsi_msg_level dvbpsi_msg_level_t
- * \brief DVBPSI message level enum
+ * \enum dvbpsi_msg_level
+ * \brief DVBPSI message level enumeration type
  */
 enum dvbpsi_msg_level
 {
@@ -72,6 +76,10 @@ enum dvbpsi_msg_level
     DVBPSI_MSG_WARN  =  1, /*!< Error and Warning messages */
     DVBPSI_MSG_DEBUG =  2, /*!< Error, warning and debug messages */
 };
+/*!
+ * \typedef enum dvbpsi_msg_level dvbpsi_msg_level_t
+ * \brief DVBPSI message level enumeration type definition
+ */
 typedef enum dvbpsi_msg_level dvbpsi_msg_level_t;
 
 /*****************************************************************************
@@ -214,6 +222,12 @@ typedef void (* dvbpsi_callback_gather_t)(dvbpsi_t *p_dvbpsi,  /*!< pointer to d
 /*****************************************************************************
  * DVBPSI_DECODER_COMMON
  *****************************************************************************/
+/*!
+ * \def DVBPSI_DECODER_COMMON
+ * \brief Common members for all dvbpsi table decoders. These should be the first
+ * members of a table decoder struct, such that they can be casted to a
+ * dvbpsi_decoder_t type.
+ */
 #define DVBPSI_DECODER_COMMON                                                     \
 /*!                                                                               \
  * \name DVBPSI_DECODER_COMMON                                                    \
@@ -339,13 +353,23 @@ bool dvbpsi_decoder_present(dvbpsi_t *p_dvbpsi);
 /*****************************************************************************
  * deprecated API's
  *****************************************************************************/
+/*!
+ * \typedef struct dvbpsi_decoder_s * dvbpsi_handle
+ * \brief deprecated dvbpsi handle. It is replaced by a dvbpsi_t type.
+ */
 typedef struct dvbpsi_decoder_s * dvbpsi_handle;// __attribute__((deprecated));
 
 /* dvbpsi.h */
 /*!
- * \fn void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
+ * \fn __attribute__((deprecated)) void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
  * \brief function is deprecated and should no longer be used. Use
  * function dvbpsi_packet_push() instead.
+ * \param h_dvbpsi handle to dvbpsi_s struct
+ * \param p_data pointer to TS packet data (usually188 bytes)
+ */
+/*!
+ * \def dvbpsi_PushPacket(h,p)  dvbpsi_packet_push(h,p)
+ * \brief backwards compatibility wrapper around dvbpsi_packet_push()
  */
 __attribute__((deprecated))
 void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data);
