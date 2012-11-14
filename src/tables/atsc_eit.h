@@ -158,11 +158,10 @@ void dvbpsi_atsc_InitEIT(dvbpsi_atsc_eit_t* p_eit, uint8_t i_table_id, uint16_t 
  * \brief Allocate and initialize a new dvbpsi_eit_t structure. Use ObjectRefDec to delete it.
  * \param i_table_id Table ID, 0xCB.
  * \param i_extension Table ID extension, here TS ID.
- * \param i_network_id network id
  * \param i_version EIT version
- * \param b_current_next current next indicator
  * \param i_protocol PSIP Protocol version.
- * \param b_cable_eit Whether this is CEIT or a TEIT.
+ * \param i_source_id Source id.
+ * \param b_current_next current next indicator
  * \return p_eit pointer to the EIT structure or NULL on error
  */
 dvbpsi_atsc_eit_t *dvbpsi_atsc_NewEIT(uint8_t i_table_id, uint16_t i_extension,

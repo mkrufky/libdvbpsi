@@ -145,6 +145,7 @@ void dvbpsi_atsc_InitETT(dvbpsi_atsc_ett_t *p_ett, uint8_t i_table_id, uint16_t 
  * \brief Allocate and initialize a new dvbpsi_atsc_ett_t structure. Use ObjectRefDec to delete it.
  * \param i_table_id Table ID, 0xCC.
  * \param i_extension Table ID extension, normally 0x0000.
+ * \param i_version version
  * \param i_protocol PSIP Protocol version.
  * \param i_etm_id ETM Identifier.
  * \param b_current_next current next indicator

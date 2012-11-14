@@ -150,8 +150,7 @@ void dvbpsi_atsc_DetachVCT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_table_id,
-                         uint16_t i_extension, uint8_t i_protocol,
-                         uint16_t i_ts_id, bool b_cable_vct,
+                         uint16_t i_extension, uint8_t i_protocol, bool b_cable_vct,
                          uint8_t i_version, bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_atsc_vct_t structure.
  * \param p_vct pointer to the VCT structure
@@ -178,7 +177,6 @@ void dvbpsi_atsc_InitVCT(dvbpsi_atsc_vct_t* p_vct, uint8_t i_table_id,
  * \param i_table_id Table ID, 0xC8 or 0xC9.
  * \param i_extension Table ID extension, here TS ID.
  * \param i_protocol PSIP Protocol version.
- * \param i_network_id network id
  * \param b_cable_vct Whether this is CVCT or a TVCT.
  * \param i_version VCT version
  * \param b_current_next current next indicator

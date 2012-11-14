@@ -52,7 +52,7 @@ extern "C" {
  * \brief dvbpsi_nvod_ref_dr_t type definition.
  */
 /*!
- * \struct dvbpsi_linkage_s
+ * \struct dvbpsi_nvod_ref_s
  * \brief struct dvbpsi_nvod_ref_s @see dvbpsi_nvod_ref_t
  */
 typedef struct dvbpsi_nvod_ref_s
@@ -83,7 +83,7 @@ typedef struct dvbpsi_nvod_ref_s
 typedef struct dvbpsi_nvod_ref_dr_s
 {
   uint8_t               i_references;           /*!< number of nvod references */
-  dvbpsi_nvod_ref_t     p_nvod_refs[43];       /*!< NVOD references */
+  dvbpsi_nvod_ref_t     p_nvod_refs[43];        /*!< NVOD references */
 } dvbpsi_nvod_ref_dr_t;
 
 /*****************************************************************************

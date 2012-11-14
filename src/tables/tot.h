@@ -118,7 +118,7 @@ void dvbpsi_tot_detach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint8_t i_table_id, uint16_t i_extension,
-            uint16_t i_ts_id, uint8_t i_version, bool b_current_next, uint64_t i_utc_time);
+                            uint8_t i_version, bool b_current_next, uint64_t i_utc_time);
  * \brief Initialize a user-allocated dvbpsi_tot_t structure.
  * \param p_tot pointer to the TDT/TOT structure
  * \param i_table_id Table ID, usually 0x70

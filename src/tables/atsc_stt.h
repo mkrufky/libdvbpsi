@@ -91,7 +91,7 @@ bool dvbpsi_atsc_AttachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
  * dvbpsi_atsc_DetachSTT
  *****************************************************************************/
 /*!
- * \fn void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_externsion)
+ * \fn void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension)
  *
  * \brief Destroy a STT decoder.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
@@ -110,10 +110,10 @@ void dvbpsi_atsc_DetachSTT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
                                 uint16_t i_extension, uint8_t i_protocol,
                                 bool b_current_next)
  * \brief Initialize a user-allocated dvbpsi_atsc_stt_t structure.
+ * \param p_stt pointer to the STT structure
  * \param i_table_id Table ID, 0xCD.
  * \param i_extension Table extension, ignored as this should always be 0.
- * \param p_stt pointer to the STT structure
- * \param i_version PSIP Protocol version.
+ * \param i_protocol PSIP Protocol version.
  * \param b_current_next current next indicator
  * \return nothing.
  */

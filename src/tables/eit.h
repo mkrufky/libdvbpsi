@@ -146,10 +146,10 @@ void dvbpsi_eit_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extens
  *****************************************************************************/
 /*!
  * \fn void dvbpsi_eit_init(dvbpsi_eit_t* p_eit, uint8_t i_table_id,
-          uint16_t i_extension, uint16_t i_service_id,
-          uint8_t i_version, bool b_current_next, uint16_t i_ts_id,
-          uint16_t i_network_id, uint8_t i_segment_last_section_number,
-          uint8_t i_last_table_id)
+                     uint16_t i_extension, uint8_t i_version,
+                     bool b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
+                     uint8_t i_segment_last_section_number,
+                     uint8_t i_last_table_id);
  * \brief Initialize a user-allocated dvbpsi_eit_t structure.
  * \param p_eit pointer to the EIT structure
  * \param i_table_id Table ID, 0x4E, 0x4F, or 0x50-0x6F.

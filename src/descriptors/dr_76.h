@@ -34,11 +34,28 @@ Decode Content Identifier Descriptor.
 extern "C" {
 #endif
 
+/*!
+ * \def CRID_TYPE_CONTENT
+ * \brief Content Resource Identifier Descriptor for type content
+ *
+ * \def CRID_TYPE_SERIES
+ * \brief Content Resource Identifier Descriptor for type series content
+ *
+ * \def CRID_TYPE_RECOMMENDATION
+ * \brief Content Resource Identifier Descriptor for type recommended content
+ */
 #define CRID_TYPE_UNDEFINED      0
 #define CRID_TYPE_CONTENT        1
 #define CRID_TYPE_SERIES         2
 #define CRID_TYPE_RECOMMENDATION 3
 
+/*!
+ * \def CRID_LOCATION_DESCRIPTOR
+ * \brief Content Resource Identifier Descriptor for location
+ *
+ * \def CRID_LOCATION_CIT
+ * \brief Content Resource Identifier Descriptor for CIT(?)
+ */
 #define CRID_LOCATION_DESCRIPTOR 0
 #define CRID_LOCATION_CIT        1
 
