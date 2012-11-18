@@ -88,10 +88,9 @@ typedef struct dvbpsi_sdt_s
 {
     /* PSI table members */
     uint8_t                   i_table_id;         /*!< table id */
-    uint16_t                  i_extension;        /*!< subtable id */
+    uint16_t                  i_extension;        /*!< subtable id, here transport_stream_id */
 
     /* Table specific */
-    uint16_t                  i_ts_id;            /*!< transport_stream_id */
     uint8_t                   i_version;          /*!< version_number */
     bool                      b_current_next;     /*!< current_next_indicator */
     uint16_t                  i_network_id;       /*!< original network id */

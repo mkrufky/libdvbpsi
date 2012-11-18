@@ -1279,7 +1279,7 @@ static void handle_SDT(void* p_data, dvbpsi_sdt_t* p_sdt)
     printf("\n");
     printf("  SDT: Session Descriptor Table\n");
     printf("\tVersion number : %d\n", p_sdt->i_version);
-    printf("\tTransport stream id : %d\n", p_sdt->i_ts_id);
+    printf("\tTransport stream id : %d\n", p_sdt->i_extension);
     printf("\tNetwork id     : %d\n", p_sdt->i_network_id);
     while (p_service)
     {

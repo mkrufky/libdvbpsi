@@ -106,7 +106,7 @@ static void DumpSDT(void* p_zero, dvbpsi_sdt_t* p_sdt)
   printf(  "\n");
   printf(  "New active SDT\n");
   printf(  "  ts_id : %d\n",
-         p_sdt->i_ts_id);
+         p_sdt->i_extension);
   printf(  "  version_number : %d\n",
          p_sdt->i_version);
   printf(  "  network_id        : %d\n",

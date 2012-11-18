@@ -284,7 +284,7 @@ static bool dvbpsi_CheckSDT(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_decoder_t *p_sdt_deco
     assert(p_dvbpsi);
     assert(p_sdt_decoder);
 
-    if (p_sdt_decoder->p_building_sdt->i_ts_id != p_section->i_extension)
+    if (p_sdt_decoder->p_building_sdt->i_extension != p_section->i_extension)
     {
         /* transport_stream_id */
         dvbpsi_error(p_dvbpsi, "SDT decoder",
@@ -485,8 +485,8 @@ dvbpsi_psi_section_t *dvbpsi_sdt_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_sd
     p_current->i_table_id = 0x42;
     p_current->b_syntax_indicator = true;
     p_current->b_private_indicator = true;
-    p_current->i_length = 12;                     /* header + CRC_32 */
-    p_current->i_extension = p_sdt->i_ts_id;
+    p_current->i_length = 12;                    /* header + CRC_32 */
+    p_current->i_extension = p_sdt->i_extension; /* is transport_stream_id */
     p_current->i_version = p_sdt->i_version;
     p_current->b_current_next = p_sdt->b_current_next;
     p_current->i_number = 0;
@@ -525,7 +525,7 @@ dvbpsi_psi_section_t *dvbpsi_sdt_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_sd
             p_current->b_syntax_indicator = true;
             p_current->b_private_indicator = true;
             p_current->i_length = 12;                 /* header + CRC_32 */
-            p_current->i_extension = p_sdt->i_ts_id;;
+            p_current->i_extension = p_sdt->i_extension;;
             p_current->i_version = p_sdt->i_version;
             p_current->b_current_next = p_sdt->b_current_next;
             p_current->i_number = p_prev->i_number + 1;
