@@ -449,9 +449,9 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
 
-    const uint8_t i_table_id = (p_section->i_table_id == 0x8C ||
-                                p_section->i_table_id == 0x9C) ?
-                                p_section->i_table_id : 0x8C;
+    const uint8_t i_table_id = (p_section->i_table_id == 0xC8 ||
+                                p_section->i_table_id == 0xC9) ?
+                                p_section->i_table_id : 0xC8;
 
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, i_table_id, "ATSC VCT decoder"))
     {
