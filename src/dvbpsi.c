@@ -221,11 +221,16 @@ bool dvbpsi_decoder_psi_sections_completed(dvbpsi_decoder_t* p_decoder)
     bool b_complete = false;
 
     dvbpsi_psi_section_t *p = p_decoder->p_sections;
+    unsigned int prev_nr = 0;
     while (p)
     {
+        assert(prev_nr < 256);
+        if (prev_nr != p->i_number)
+            break;
         if (p_decoder->i_last_section_number == p->i_number)
             b_complete = true;
         p = p->p_next;
+        prev_nr++;
     }
 
     return b_complete;
