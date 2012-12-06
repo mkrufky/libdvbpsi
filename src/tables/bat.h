@@ -231,7 +231,7 @@ dvbpsi_bat_ts_t *dvbpsi_bat_ts_add(dvbpsi_bat_t* p_bat,
  * dvbpsi_bat_ts_descriptor_add
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t* dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_ts,
+ * \fn dvbpsi_descriptor_t* dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_bat,
                                                          uint8_t i_tag,
                                                          uint8_t i_length,
                                                          uint8_t *p_data)
@@ -242,7 +242,7 @@ dvbpsi_bat_ts_t *dvbpsi_bat_ts_add(dvbpsi_bat_t* p_bat,
  * \param p_data pointer to descriptor data
  * \return a pointer to the added descriptor.
  */
-dvbpsi_descriptor_t *dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_ts,
+dvbpsi_descriptor_t *dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_bat,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data);
 

@@ -257,7 +257,7 @@ dvbpsi_bat_ts_t *dvbpsi_bat_ts_add(dvbpsi_bat_t* p_bat,
  *****************************************************************************
  * Add a descriptor in the BAT TS descriptors, which is in the second loop of BAT.
  *****************************************************************************/
-dvbpsi_descriptor_t *dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_ts,
+dvbpsi_descriptor_t *dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_bat,
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data)
 {
@@ -266,11 +266,11 @@ dvbpsi_descriptor_t *dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_ts,
     if (p_descriptor == NULL)
         return NULL;
 
-    if (p_ts->p_first_descriptor == NULL)
-        p_ts->p_first_descriptor = p_descriptor;
+    if (p_bat->p_first_descriptor == NULL)
+        p_bat->p_first_descriptor = p_descriptor;
     else
     {
-        dvbpsi_descriptor_t *p_last_descriptor = p_ts->p_first_descriptor;
+        dvbpsi_descriptor_t *p_last_descriptor = p_bat->p_first_descriptor;
         while(p_last_descriptor->p_next != NULL)
             p_last_descriptor = p_last_descriptor->p_next;
         p_last_descriptor->p_next = p_descriptor;
