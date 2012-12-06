@@ -66,7 +66,7 @@ typedef struct dvbpsi_nvod_ref_s
  * dvbpsi_nvod_ref_dr_t
  *****************************************************************************/
 /*!
- * \struct dvbpsi_nvod_ref_dr_t
+ * \struct dvbpsi_nvod_ref_dr_s
  * \brief "NVOD reference" descriptor structure.
  *
  * This structure is used to store a decoded "Near Video On Demand (NVOD) reference"
@@ -75,10 +75,6 @@ typedef struct dvbpsi_nvod_ref_s
 /*!
  * \typedef struct dvbpsi_nvod_ref_dr_s dvbpsi_nvod_ref_dr_t
  * \brief dvbpsi_nvod_ref_dr_t type definition.
- */
-/*!
- * \struct dvbpsi_linkage_dr_s
- * \brief struct dvbpsi_nvod_ref_dr_s @see dvbpsi_nvod_ref_dr_t
  */
 typedef struct dvbpsi_nvod_ref_dr_s
 {
