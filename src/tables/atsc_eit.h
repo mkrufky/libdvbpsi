@@ -124,7 +124,6 @@ bool dvbpsi_atsc_AttachEIT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_ex
           uint16_t i_extension)
  * \brief Destroy a EIT decoder.
  * \param p_dvbpsi dvbpsi handle to Subtable demultiplexor to which the decoder is attached.
- * \param p_demux Subtable demultiplexor to which the decoder is attached.
  * \param i_table_id Table ID, 0xCB.
  * \param i_extension Table ID extension, here TS ID.
  * \return nothing.
