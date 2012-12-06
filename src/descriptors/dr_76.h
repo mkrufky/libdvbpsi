@@ -35,6 +35,9 @@ extern "C" {
 #endif
 
 /*!
+ * \def CRID_TYPE_UNDEFINED
+ * \brief Content Resource Identifier Descriptor for undefined content
+ *
  * \def CRID_TYPE_CONTENT
  * \brief Content Resource Identifier Descriptor for type content
  *
