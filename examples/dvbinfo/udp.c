@@ -172,7 +172,7 @@ int udp_close(int fd)
 {
     int result = 0;
 
-    result = shutdown(fd, 2);
+    result = close(fd);
     if (result < 0)
         perror("udp shutdown error");
     return result;
