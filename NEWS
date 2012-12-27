@@ -1,4 +1,4 @@
-Changes between 0.2.2 and 1.0.0_pre3:
+Changes between 0.2.2 and 1.0.0:
 --------------------------------
 
  * new example application dvbinfo: use 'dvbinfo -h' for more information on commandline options
