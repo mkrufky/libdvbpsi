@@ -318,8 +318,6 @@ void dvbpsi_tot_sections_gather(dvbpsi_t* p_dvbpsi,
                                  p_section->i_table_id == 0x73)) ? /* TOT */
                                     p_section->i_table_id : 0x70;
 
-    /* FIXME: setting b_syntax_indicator is a workaround here */
-    p_section->b_syntax_indicator = true;
     if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, i_table_id, "TDT/TOT decoder"))
     {
         dvbpsi_DeletePSISections(p_section);
@@ -403,27 +401,21 @@ void dvbpsi_tot_sections_gather(dvbpsi_t* p_dvbpsi,
  *****************************************************************************/
 static bool dvbpsi_tot_section_valid(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
+    /* TDT table */
     if (p_section->i_table_id == 0x70)
     {
         /* A TDT (table_id 0x70) always has a length of 5 bytes (which is only the UTC time) */
         if (p_section->i_length != 5)
         {
-            dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
+            dvbpsi_error(p_dvbpsi, "TDT decoder",
                          "TDT has an invalid payload size (%d bytes) !!!",
                           p_section->i_length);
             return false;
         }
-        return true;
     }
 
-    if (p_section->b_syntax_indicator &&
-        !dvbpsi_ValidPSISection(p_section))
-    {
-        dvbpsi_error(p_dvbpsi, "TDT/TOT decoder",
-                               "Bad CRC_32!!!");
-        return false;
-    }
-
+    /* CRC32 has already been checked by dvbpsi_packet_push()
+     * and by dvbpsi_BuildPSISection(). */
     return true;
 }
 
@@ -537,32 +529,19 @@ dvbpsi_psi_section_t* dvbpsi_tot_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_to
         p_result->p_payload_start[6] =  (p_result->i_length - 7)       & 0xff;
     }
 
-    if (p_result->i_table_id == 0x73)
-    {
-        /* A TOT has a CRC_32 although it's a private section,
-           but the CRC_32 is part of the payload! */
-        p_result->p_payload_end += 4;
-        p_result->i_length += 4;
-    }
-
+    /* Build the PSI section including the CRC32 on the playload.
+     * NOTE: The p_payload_end pointer should point to the last byte
+     * of the payload without the CRC32 field.
+     */
     dvbpsi_BuildPSISection(p_dvbpsi, p_result);
 
     if (p_result->i_table_id == 0x73)
     {
-        uint8_t* p_byte = p_result->p_data;
-        p_tot->i_crc = 0xffffffff;
-
-        while (p_byte < p_result->p_payload_end - 4)
-        {
-            p_tot->i_crc =   (p_tot->i_crc << 8)
-                           ^ dvbpsi_crc32_table[(p_tot->i_crc >> 24) ^ (*p_byte)];
-            p_byte++;
-        }
-
-        p_byte[0] = (p_tot->i_crc >> 24) & 0xff;
-        p_byte[1] = (p_tot->i_crc >> 16) & 0xff;
-        p_byte[2] = (p_tot->i_crc >> 8) & 0xff;
-        p_byte[3] = p_tot->i_crc & 0xff;
+        /* A TOT has a CRC_32 although it's a private section,
+           but the CRC_32 is part of the payload! */
+        p_tot->i_crc = p_result->i_crc;
+        p_result->p_payload_end += 4;
+        p_result->i_length += 4;
     }
 
     if (!dvbpsi_tot_section_valid(p_dvbpsi, p_result))

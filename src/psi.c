@@ -110,7 +110,8 @@ bool dvbpsi_CheckPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section,
         goto error;
     }
 
-    if (!p_section->b_syntax_indicator)
+    if (!p_section->b_syntax_indicator &&
+        (table_id != 0x73)) /* TOT has b_syntax_indicator set to '0' */
     {
         /* Invalid section_syntax_indicator */
         dvbpsi_error(p_dvbpsi, psz_table_name,
@@ -137,28 +138,42 @@ error:
  *****************************************************************************/
 bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
 {
-    if (p_section->b_syntax_indicator)
+    uint32_t i_crc = 0xffffffff;
+    uint8_t* p_byte = p_section->p_data;
+
+    while(p_byte < p_section->p_payload_end + 4)
     {
-        /* Check the CRC_32 if b_syntax_indicator is false */
-        uint32_t i_crc = 0xffffffff;
-        uint8_t* p_byte = p_section->p_data;
-
-        while(p_byte < p_section->p_payload_end + 4)
-        {
-            i_crc = (i_crc << 8) ^ dvbpsi_crc32_table[(i_crc >> 24) ^ (*p_byte)];
-            p_byte++;
-        }
-
-        if (i_crc == 0)
-            return true;
-        else
-            return false;
+        i_crc = (i_crc << 8) ^ dvbpsi_crc32_table[(i_crc >> 24) ^ (*p_byte)];
+        p_byte++;
     }
+
+    if (i_crc == 0)
+        return true;
     else
-    {
-        /* No check to do if b_syntax_indicator is false */
         return false;
+}
+
+/*****************************************************************************
+ * dvbpsi_CalculateCRC32
+ *****************************************************************************
+ * Calculate the CRC32 for this section
+ *****************************************************************************/
+void dvbpsi_CalculateCRC32(dvbpsi_psi_section_t *p_section)
+{
+    uint8_t* p_byte = p_section->p_data;
+    p_section->i_crc = 0xffffffff;
+
+    while (p_byte < p_section->p_payload_end)
+    {
+        p_section->i_crc =   (p_section->i_crc << 8)
+                           ^ dvbpsi_crc32_table[(p_section->i_crc >> 24) ^ (*p_byte)];
+        p_byte++;
     }
+
+    p_section->p_payload_end[0] = (p_section->i_crc >> 24) & 0xff;
+    p_section->p_payload_end[1] = (p_section->i_crc >> 16) & 0xff;
+    p_section->p_payload_end[2] = (p_section->i_crc >> 8) & 0xff;
+    p_section->p_payload_end[3] = p_section->i_crc & 0xff;
 }
 
 /*****************************************************************************
@@ -168,8 +183,6 @@ bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
  *****************************************************************************/
 void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
 {
-    uint8_t* p_byte = p_section->p_data;
-
     /* table_id */
     p_section->p_data[0] = p_section->i_table_id;
     /* setion_syntax_indicator | private_indicator |
@@ -197,20 +210,11 @@ void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section)
         /* last_section_number */
         p_section->p_data[7] = p_section->i_last_number;
 
-        /* CRC_32 */
-        p_section->i_crc = 0xffffffff;
+    }
 
-        while (p_byte < p_section->p_payload_end)
-        {
-            p_section->i_crc =   (p_section->i_crc << 8)
-                               ^ dvbpsi_crc32_table[(p_section->i_crc >> 24) ^ (*p_byte)];
-            p_byte++;
-        }
-
-        p_section->p_payload_end[0] = (p_section->i_crc >> 24) & 0xff;
-        p_section->p_payload_end[1] = (p_section->i_crc >> 16) & 0xff;
-        p_section->p_payload_end[2] = (p_section->i_crc >> 8) & 0xff;
-        p_section->p_payload_end[3] = p_section->i_crc & 0xff;
+    if (dvbpsi_has_CRC32(p_section))
+    {
+        dvbpsi_CalculateCRC32(p_section);
 
         if (!dvbpsi_ValidPSISection(p_section))
         {

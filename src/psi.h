@@ -124,8 +124,8 @@ void dvbpsi_DeletePSISections(dvbpsi_psi_section_t * p_section);
 /*!
  * \fn bool dvbpsi_CheckPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section,
                             const uint8_t table_id, const char *psz_table_name)
- * \brief Check if PSI section has the expected table_id and it the syntax indicator
- * is true.
+ * \brief Check if PSI section has the expected table_id. Call this function only for
+ * PSI sections that have a CRC32 (@see dvbpsi_has_CRC32() function)
  * \param p_dvbpsi pointer to dvbpsi library handle
  * \param p_section pointer to the PSI section structure
  * \param table_id expected table id
@@ -140,7 +140,8 @@ bool dvbpsi_CheckPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section,
  *****************************************************************************/
 /*!
  * \fn bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section)
- * \brief Validity check of a PSI section.
+ * \brief Validity check of a PSI section, make sure to call this function on
+ * tables that have a CRC32 (@see dvbpsi_has_CRC32() function)
  * \param p_section pointer to the PSI section structure
  * \return boolean value (false if the section is not valid).
  *
@@ -159,6 +160,41 @@ bool dvbpsi_ValidPSISection(dvbpsi_psi_section_t* p_section);
  * \return nothing.
  */
 void dvbpsi_BuildPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_section);
+
+/*****************************************************************************
+ * dvbpsi_CalculateCRC32
+ *****************************************************************************/
+/*!
+ * \fn void dvbpsi_CalculateCRC32(dvbpsi_psi_section_t *p_section);
+ * \brief Calculate the CRC32 field accourding to ISO/IEC 13818-1,
+ * ITU-T Rec H.222.0 or ETSI EN 300 468 v1.13.1.
+ * \param p_section pointer to PSI section, make sure p_payload_end does not
+ * include the CRC32 field.
+ * \return nothing.
+ */
+void dvbpsi_CalculateCRC32(dvbpsi_psi_section_t *p_section);
+
+/*****************************************************************************
+ * dvbpsi_has_CRC32
+ *****************************************************************************/
+/*!
+ * \fn static inline bool dvbpsi_has_CRC32(const uint8_t* table_id)
+ * \brief Check if this table_id has a CRC32 field accourding to ISO/IEC 13818-1,
+ * ITU-T Rec H.222.0 or ETSI EN 300 468 v1.13.1.
+ * \param p_section pointer to decoded PSI section
+ * \return false if PSI section has no CRC32 according to the specification,
+ * true otherwise.
+ */
+static inline bool dvbpsi_has_CRC32(dvbpsi_psi_section_t *p_section)
+{
+    if ((p_section->i_table_id == (uint8_t) 0x70) /* TDT (has no CRC 32) */ ||
+        (p_section->i_table_id == (uint8_t) 0x71) /* RST (has no CRC 32) */ ||
+        (p_section->i_table_id == (uint8_t) 0x72) /*  ST (has no CRC 32) */ ||
+        (p_section->i_table_id == (uint8_t) 0x7E))/* DIT (has no CRC 32) */
+        return false;
+
+    return (p_section->b_syntax_indicator || (p_section->i_table_id == 0x73));
+}
 
 #ifdef __cplusplus
 };

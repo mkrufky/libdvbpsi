@@ -498,16 +498,22 @@ bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
             }
             else
             {
+                bool b_valid_crc32 = false;
+                bool has_crc32 = dvbpsi_has_CRC32(p_section);
+
                 /* PSI section is complete */
                 p_section->b_syntax_indicator = p_section->p_data[1] & 0x80;
                 p_section->b_private_indicator = p_section->p_data[1] & 0x40;
+
                 /* Update the end of the payload if CRC_32 is present */
-                if (p_section->b_syntax_indicator)
+                if (p_section->b_syntax_indicator || has_crc32)
                     p_section->p_payload_end -= 4;
 
-                if ((p_section->p_data[0] == 0x70) /* TDT (has no CRC 32) */ ||
-                    (p_section->p_data[0] == 0x71) /* RST (has no CRC 32) */ ||
-                    (p_section->p_data[0] != 0x72 && dvbpsi_ValidPSISection(p_section)))
+                /* Check CRC32 if present */
+                if (has_crc32)
+                    b_valid_crc32 = dvbpsi_ValidPSISection(p_section);
+
+                if (!has_crc32 || b_valid_crc32)
                 {
                     /* PSI section is valid */
                     p_section->i_table_id = p_section->p_data[0];
@@ -536,9 +542,9 @@ bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
                 }
                 else
                 {
-                    if (!dvbpsi_ValidPSISection(p_section))
+                    if (has_crc32 && !dvbpsi_ValidPSISection(p_section))
                         dvbpsi_error(p_dvbpsi, "misc PSI", "Bad CRC_32 table 0x%x !!!",
-                                             p_section->p_data[0]);
+                                               p_section->p_data[0]);
                     else
                         dvbpsi_error(p_dvbpsi, "misc PSI", "table 0x%x", p_section->p_data[0]);
 
