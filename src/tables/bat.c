@@ -469,7 +469,7 @@ void dvbpsi_bat_sections_gather(dvbpsi_t *p_dvbpsi,
 void dvbpsi_bat_sections_decode(dvbpsi_bat_t* p_bat,
                               dvbpsi_psi_section_t* p_section)
 {
-    uint8_t* p_byte, * p_end, * p_end2;
+    uint8_t* p_byte, * p_end;
 
     while(p_section)
     {
@@ -477,6 +477,8 @@ void dvbpsi_bat_sections_decode(dvbpsi_bat_t* p_bat,
         p_byte = p_section->p_payload_start + 2;
         p_end = p_byte + (((uint16_t)(p_section->p_payload_start[0] & 0x0f) << 8)
                           | p_section->p_payload_start[1]);
+        if (p_end > p_section->p_payload_end)
+            p_end = p_section->p_payload_end;
 
         while(p_byte + 2 <= p_end)
         {
@@ -493,10 +495,10 @@ void dvbpsi_bat_sections_decode(dvbpsi_bat_t* p_bat,
             p_end = p_section->p_payload_end;
 
         /* - TSs */
+        p_byte += 2;
         while(p_byte + 6 <= p_end)
         {
-            p_byte += 2;
-
+            uint8_t *p_end2;
             uint16_t i_ts_id = ((uint16_t)p_byte[0] << 8) | p_byte[1];
             uint16_t i_orig_network_id = ((uint16_t)p_byte[2] << 8) | p_byte[3];
             uint16_t i_transport_descriptors_length = ((uint16_t)(p_byte[4] & 0x0f) << 8) | p_byte[5];
