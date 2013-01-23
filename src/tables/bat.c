@@ -469,59 +469,60 @@ void dvbpsi_bat_sections_gather(dvbpsi_t *p_dvbpsi,
 void dvbpsi_bat_sections_decode(dvbpsi_bat_t* p_bat,
                               dvbpsi_psi_section_t* p_section)
 {
-  uint8_t* p_byte, * p_end, * p_end2;
+    uint8_t* p_byte, * p_end, * p_end2;
 
-  while(p_section)
-  {
-    /* - first loop descriptors */
-    p_byte = p_section->p_payload_start + 2;
-    p_end = p_byte + ( ((uint16_t)(p_section->p_payload_start[0] & 0x0f) << 8)
-                       | p_section->p_payload_start[1]);
-
-    while(p_byte + 2 <= p_end)
+    while(p_section)
     {
-      uint8_t i_tag = p_byte[0];
-      uint8_t i_length = p_byte[1];
-      if(i_length + 2 <= p_end - p_byte)
-        dvbpsi_bat_bouquet_descriptor_add(p_bat, i_tag, i_length, p_byte + 2);
-      p_byte += 2 + i_length;
+        /* - first loop descriptors */
+        p_byte = p_section->p_payload_start + 2;
+        p_end = p_byte + (((uint16_t)(p_section->p_payload_start[0] & 0x0f) << 8)
+                          | p_section->p_payload_start[1]);
+
+        while(p_byte + 2 <= p_end)
+        {
+            uint8_t i_tag = p_byte[0];
+            uint8_t i_length = p_byte[1];
+            if (i_length + 2 <= p_end - p_byte)
+                dvbpsi_bat_bouquet_descriptor_add(p_bat, i_tag, i_length, p_byte + 2);
+            p_byte += 2 + i_length;
+        }
+
+        p_end = p_byte + (((uint16_t)(p_byte[0] & 0x0f) << 8)
+                          | p_byte[1]);
+        if (p_end > p_section->p_payload_end)
+            p_end = p_section->p_payload_end;
+
+        /* - TSs */
+        while(p_byte + 6 <= p_end)
+        {
+            p_byte += 2;
+
+            uint16_t i_ts_id = ((uint16_t)p_byte[0] << 8) | p_byte[1];
+            uint16_t i_orig_network_id = ((uint16_t)p_byte[2] << 8) | p_byte[3];
+            uint16_t i_transport_descriptors_length = ((uint16_t)(p_byte[4] & 0x0f) << 8) | p_byte[5];
+
+            dvbpsi_bat_ts_t* p_ts = dvbpsi_bat_ts_add(p_bat, i_ts_id, i_orig_network_id);
+            if (!p_ts)
+                break;
+
+            /* - TS descriptors */
+            p_byte += 6;
+            p_end2 = p_byte + i_transport_descriptors_length;
+            if (p_end2 > p_section->p_payload_end)
+                p_end2 = p_section->p_payload_end;
+
+            while (p_byte + 2 <= p_end2)
+            {
+                uint8_t i_tag = p_byte[0];
+                uint8_t i_length = p_byte[1];
+                if (i_length + 2 <= p_end2 - p_byte)
+                    dvbpsi_bat_ts_descriptor_add(p_ts, i_tag, i_length, p_byte + 2);
+                p_byte += 2 + i_length;
+            }
+        }
+
+        p_section = p_section->p_next;
     }
-
-    p_end = p_byte + ( ((uint16_t)(p_byte[0] & 0x0f) << 8)
-                       | p_byte[1]);
-    if(p_end > p_section->p_payload_end)
-    {
-        p_end = p_section->p_payload_end;
-    }
-
-    /* - TSs */
-    for(; p_byte + 6 <= p_end;)
-    {
-      p_byte += 2;
-
-      uint16_t i_ts_id = ((uint16_t)p_byte[0] << 8) | p_byte[1];
-      uint16_t i_orig_network_id = ((uint16_t)p_byte[2] << 8) | p_byte[3];
-      uint16_t i_transport_descriptors_length = ((uint16_t)(p_byte[4] & 0x0f) << 8) | p_byte[5];
-      dvbpsi_bat_ts_t* p_ts = dvbpsi_bat_ts_add(p_bat, i_ts_id, i_orig_network_id);
-      /* - TS descriptors */
-      p_byte += 6;
-      p_end2 = p_byte + i_transport_descriptors_length;
-      if( p_end2 > p_section->p_payload_end )
-      {
-            p_end2 = p_section->p_payload_end;
-      }
-      while(p_byte + 2 <= p_end2)
-      {
-        uint8_t i_tag = p_byte[0];
-        uint8_t i_length = p_byte[1];
-        if(i_length + 2 <= p_end2 - p_byte)
-          dvbpsi_bat_ts_descriptor_add(p_ts, i_tag, i_length, p_byte + 2);
-        p_byte += 2 + i_length;
-      }
-    }
-
-    p_section = p_section->p_next;
-  }
 }
 
 /*****************************************************************************
