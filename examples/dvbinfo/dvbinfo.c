@@ -442,6 +442,11 @@ int main(int argc, char **pp_argv)
         usage();
 
     param = params_init();
+    if (param == NULL)
+    {
+        printf("dvbinfo: out of memory\n");
+        exit(EXIT_FAILURE);
+    }
     capture.params = param;
     capture.fifo = fifo_new();
     capture.empty = fifo_new();
@@ -706,6 +711,7 @@ int main(int argc, char **pp_argv)
         closelog();
 #endif
     params_free(param);
+    param = NULL;
 
     if (err < 0)
         exit(EXIT_FAILURE);
