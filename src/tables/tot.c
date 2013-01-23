@@ -425,7 +425,7 @@ static bool dvbpsi_tot_section_valid(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p
  * TDT/TOT decoder.
  *****************************************************************************/
 void dvbpsi_tot_sections_decode(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot,
-                              dvbpsi_psi_section_t* p_section)
+                                dvbpsi_psi_section_t* p_section)
 {
     if (p_section)
     {
@@ -434,26 +434,30 @@ void dvbpsi_tot_sections_decode(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot,
         if (!dvbpsi_tot_section_valid(p_dvbpsi, p_section))
             return;
 
+        /* points at first byte of UTC time */
         p_byte = p_section->p_payload_start;
         if (p_byte + 5 <= p_section->p_payload_end)
         {
+            /* 16-bit MJD and 24 bits coded as 6 digits in 4-bit BCD */
             p_tot->i_utc_time = ((uint64_t)p_byte[0] << 32) |
                                 ((uint64_t)p_byte[1] << 24) |
                                 ((uint64_t)p_byte[2] << 16) |
                                 ((uint64_t)p_byte[3] << 8) |
                                  (uint64_t)p_byte[4];
+            p_byte += 5;
         }
 
         /* If we have a TOT, extract the descriptors */
         if (p_section->i_table_id == 0x73)
         {
+            uint16_t i_loop_length;
             uint8_t* p_end;
 
-            p_end = p_byte + (   ((uint16_t)(p_section->p_payload_start[5] & 0x0f) << 8)
-                                 | p_section->p_payload_start[6]);
-            p_byte += 7;
+            i_loop_length = (((uint16_t)(p_byte[0] & 0x0f) << 8) | (p_byte[1]));
+            p_end = p_byte + i_loop_length;
 
-            while (p_byte + 5 <= p_end)
+            p_byte += 2; /* start of descriptors loop */
+            while (p_byte + 2 <= p_end)
             {
                 uint8_t i_tag = p_byte[0];
                 uint8_t i_length = p_byte[1];
