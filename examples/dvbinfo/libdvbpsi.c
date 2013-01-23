@@ -618,7 +618,7 @@ static void handle_subtable(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_e
             if (!dvbpsi_eit_attach(p_dvbpsi, i_table_id, i_extension, handle_EIT, p_data))
                     fprintf(stderr, "dvbinfo: Failed to attach EIT subdecoder\n");
             break;
-        case 0x70:
+        case 0x70: /* TDT */
         case 0x73: /* TOT only */
             if (!dvbpsi_tot_attach(p_dvbpsi, i_table_id, i_extension, handle_TOT, p_data))
                     fprintf(stderr, "dvbinfo: Failed to attach TOT subdecoder\n");
