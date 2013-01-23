@@ -153,7 +153,6 @@ void dvbpsi_tot_init(dvbpsi_tot_t* p_tot, uint8_t i_table_id, uint16_t i_extensi
     p_tot->i_version = i_version;
     p_tot->b_current_next = b_current_next;
 
-    p_tot->i_crc = 0;
     p_tot->i_utc_time = i_utc_time;
     p_tot->p_first_descriptor = NULL;
 }
@@ -543,7 +542,6 @@ dvbpsi_psi_section_t* dvbpsi_tot_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_to
     {
         /* A TOT has a CRC_32 although it's a private section,
            but the CRC_32 is part of the payload! */
-        p_tot->i_crc = p_result->i_crc;
         p_result->p_payload_end += 4;
         p_result->i_length += 4;
     }

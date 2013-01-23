@@ -68,8 +68,6 @@ typedef struct dvbpsi_tot_s
 
     dvbpsi_descriptor_t *     p_first_descriptor; /*!< descriptor list */
 
-    uint32_t      i_crc;                          /*!< CRC_32 (TOT only) */
-
 } __attribute__((packed)) dvbpsi_tot_t;
 
 /*****************************************************************************

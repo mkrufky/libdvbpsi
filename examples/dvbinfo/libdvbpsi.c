@@ -1355,10 +1355,8 @@ static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot)
 
     printf("\tVersion number : %d\n", p_tot->i_version);
     printf("\tCurrent next   : %s\n", p_tot->b_current_next ? "yes" : "no");
-
     printf("\tUTC time       : %"PRId64"\n", p_tot->i_utc_time);
-    if (table_id == 0x73) /* TOT */
-        printf("\tCRC 32         : %d\n", p_tot->i_crc);
+
     DumpDescriptors("\t  |  ]", p_tot->p_first_descriptor);
     dvbpsi_tot_delete(p_tot);
 }
