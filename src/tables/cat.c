@@ -347,7 +347,7 @@ void dvbpsi_cat_sections_decode(dvbpsi_cat_t* p_cat, dvbpsi_psi_section_t* p_sec
     {
         /* CAT descriptors */
         p_byte = p_section->p_payload_start;
-        while (p_byte + 5 <= p_section->p_payload_end)
+        while (p_byte <= p_section->p_payload_end)
         {
             uint8_t i_tag = p_byte[0];
             uint8_t i_length = p_byte[1];
