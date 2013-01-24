@@ -474,8 +474,7 @@ void dvbpsi_nit_sections_decode(dvbpsi_nit_t* p_nit,
         }
 
         /* Transport stream loop length */
-        p_end = p_byte + (((uint16_t)(p_byte[0] & 0x0f) << 8)
-                          | p_byte[1]);
+        p_end = 2 + p_byte + (((uint16_t)(p_byte[0] & 0x0f) << 8) | p_byte[1]);
         if (p_end > p_section->p_payload_end)
             p_end = p_section->p_payload_end;
 
