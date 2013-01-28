@@ -45,9 +45,7 @@
 #       include <netinet/if_ether.h>
 #   endif
 #   include <netdb.h>
-#   ifndef BSD
-#       include <netinet/ip.h>
-#   endif
+#   include <netinet/ip.h>
 #   include <netinet/udp.h>
 #   include <arpa/inet.h>
 #endif
