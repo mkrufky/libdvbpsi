@@ -178,7 +178,7 @@ void dvbpsi_CalculateCRC32(dvbpsi_psi_section_t *p_section);
  * dvbpsi_has_CRC32
  *****************************************************************************/
 /*!
- * \fn static inline bool dvbpsi_has_CRC32(dvbpsi_section_t *p_section)
+ * \fn static inline bool dvbpsi_has_CRC32(dvbpsi_psi_section_t *p_section)
  * \brief Check if this table_id has a CRC32 field accourding to ISO/IEC 13818-1,
  * ITU-T Rec H.222.0 or ETSI EN 300 468 v1.13.1.
  * \param p_section pointer to decoded PSI section
