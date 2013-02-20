@@ -375,6 +375,11 @@ __attribute__((deprecated))
 void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data);
 #define dvbpsi_PushPacket(h,p)  dvbpsi_packet_push(h,p)
 
+/* Macros from libdvbpsi < version 1.0.0 are deprecated.
+ * NOTE: You probably want to use libdvbpsi-0.2.2 instead.
+ */
+#define DEPRECATED_MACRO DEPRECATED_MACRO_USE_libdvbpsi_0_2_2
+
 #ifdef __cplusplus
 };
 #endif

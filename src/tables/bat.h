@@ -291,6 +291,16 @@ dvbpsi_descriptor_t *dvbpsi_BATTSAddDescriptor(
                                                uint8_t i_tag, uint8_t i_length,
                                                uint8_t *p_data);
 
+#define dvbpsi_NewBAT(p_bat, i_bouquet_id, i_version, b_current_next) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
+#define dvbpsi_DeleteBAT(p_bat) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
 #ifdef __cplusplus
 };
 #endif

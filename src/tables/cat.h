@@ -199,6 +199,15 @@ dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
 __attribute__((deprecated))
 dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_cat_t* p_cat);
 
+#define dvbpsi_NewCAT(p_cat, i_version, b_current_next) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
+#define dvbpsi_DeleteCAT(p_cat) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
 
 #ifdef __cplusplus
 };

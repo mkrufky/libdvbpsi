@@ -221,6 +221,16 @@ dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
 __attribute__((deprecated))
 dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat, int i_max_pps);
 
+#define dvbpsi_NewPAT(p_pat, i_ts_id, i_version, b_current_next) \
+do {        \
+    DEPRECATED_MACRO \
+} while (0);
+
+#define dvbpsi_DeletePAT(p_pat) \
+do {        \
+    DEPRECATED_MACRO \
+} while (0);
+
 #ifdef __cplusplus
 };
 #endif

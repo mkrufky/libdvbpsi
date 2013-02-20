@@ -298,6 +298,16 @@ dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
     uint16_t i_event_id, uint64_t i_start_time, uint32_t i_duration,
     uint8_t i_running_status, int b_free_ca);
 
+#define dvbpsi_NewEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
+#define dvbpsi_DeleteEIT(p_eit) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
 #ifdef __cplusplus
 };
 #endif

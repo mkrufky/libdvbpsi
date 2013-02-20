@@ -279,6 +279,16 @@ dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
 __attribute__((deprecated))
 dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t * p_sdt);
 
+#define dvbpsi_NewSDT(p_sdt, i_ts_id, i_version, b_current_next, i_network_id) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
+#define dvbpsi_DeleteSDT(p_sdt) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
 #ifdef __cplusplus
 };
 #endif

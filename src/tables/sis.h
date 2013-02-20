@@ -483,6 +483,16 @@ dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor( dvbpsi_sis_t *p_sis,
 __attribute__((deprecated))
 dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_sis_t * p_sis);
 
+#define dvbpsi_NewSIS(p_sis, i_protocol_version) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
+#define dvbpsi_DeleteSIS(p_sis) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
 #ifdef __cplusplus
 };
 #endif

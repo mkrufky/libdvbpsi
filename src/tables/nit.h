@@ -289,6 +289,16 @@ __attribute__((deprecated))
 dvbpsi_psi_section_t* dvbpsi_GenNITSections(dvbpsi_nit_t* p_nit,
                                             uint8_t i_table_id);
 
+#define dvbpsi_NewNIT(p_nit, i_network_id, i_version, b_current_next) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
+#define dvbpsi_DeleteNIT(p_nit) \
+do {        \
+        DEPRECATED_MACRO \
+} while (0);
+
 #ifdef __cplusplus
 };
 #endif
