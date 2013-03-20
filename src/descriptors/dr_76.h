@@ -84,7 +84,14 @@ typedef struct dvbpsi_crid_entry_s
         uint8_t  path[253]; /*!< content path */
         uint16_t ref;       /*!< content reference */
     } value;                /*!< content specific value */
-}dvbpsi_crid_entry_t;
+} dvbpsi_crid_entry_t;
+
+/*!
+ * \def DVBPSI_CRID_ENTRY_DR_MAX
+ * \brief Maximum number of dvbpsi_crid_entry_t entries present in
+ * @see dvbpsi_content_id_dr_t
+ */
+#define DVBPSI_CRID_ENTRY_DR_MAX 85
 
 /*****************************************************************************
  * dvbpsi_content_id_dr_s
@@ -102,8 +109,8 @@ typedef struct dvbpsi_crid_entry_s
 typedef struct dvbpsi_content_id_dr_s
 {
     uint8_t i_number_of_entries;      /*!< Number of CRID entries present. */
-    dvbpsi_crid_entry_t p_entries[85];/*!< Array of CRID entries. */
-}dvbpsi_content_id_dr_t;
+    dvbpsi_crid_entry_t p_entries[DVBPSI_CRID_ENTRY_DR_MAX];/*!< Array of CRID entries. */
+} dvbpsi_content_id_dr_t;
 
 /*****************************************************************************
  * dvbpsi_DecodeLCNDr

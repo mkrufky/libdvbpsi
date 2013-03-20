@@ -64,7 +64,9 @@ dvbpsi_content_id_dr_t *dvbpsi_DecodeContentIdDr(dvbpsi_descriptor_t *p_descript
         return NULL;
 
     p_decoded->i_number_of_entries = 0;
-    for (byte = 0; byte < p_descriptor->i_length; p_decoded->i_number_of_entries ++)
+    for (byte = 0;
+         (byte < p_descriptor->i_length) && (p_decoded->i_number_of_entries < DVBPSI_CRID_ENTRY_DR_MAX);
+         p_decoded->i_number_of_entries ++)
     {
         dvbpsi_crid_entry_t *entry = &p_decoded->p_entries[p_decoded->i_number_of_entries];
 
