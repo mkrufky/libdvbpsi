@@ -66,6 +66,8 @@ dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor)
         return NULL;
 
     p_decoded->i_code_count = p_descriptor->i_length / 4;
+    if (p_decoded->i_code_count > 64)
+        p_decoded->i_code_count = 64;
 
     int i = 0;
     while( i < p_decoded->i_code_count )
@@ -88,6 +90,9 @@ dvbpsi_iso639_dr_t * dvbpsi_DecodeISO639Dr(dvbpsi_descriptor_t * p_descriptor)
 dvbpsi_descriptor_t * dvbpsi_GenISO639Dr(dvbpsi_iso639_dr_t * p_decoded,
                                          bool b_duplicate)
 {
+    if (p_decoded->i_code_count > 64)
+        p_decoded->i_code_count = 64;
+
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x0a, p_decoded->i_code_count * 4, NULL);
