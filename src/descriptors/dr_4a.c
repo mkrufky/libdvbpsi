@@ -123,6 +123,8 @@ dvbpsi_linkage_dr_t* dvbpsi_DecodeLinkageDr(dvbpsi_descriptor_t * p_descriptor)
        i = 10;
     }
     p_decoded->i_private_data_length = p_descriptor->i_length - i;
+    if (p_decoded->i_private_data_length > 248)
+        p_decoded->i_private_data_length = 248;
     memcpy(p_decoded->i_private_data, &p_descriptor->p_data[i], p_decoded->i_private_data_length);
 
     p_descriptor->p_decoded = (void*)p_decoded;
@@ -154,7 +156,7 @@ dvbpsi_descriptor_t * dvbpsi_GenLinkageDr(dvbpsi_linkage_dr_t * p_decoded,
     if (p_decoded->i_linkage_type == 0x0D)
         length+=3;
     if (length+p_decoded->i_private_data_length > 255)
-	return NULL;
+        return NULL;
 
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
