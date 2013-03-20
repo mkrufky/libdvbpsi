@@ -64,6 +64,8 @@ dvbpsi_content_dr_t * dvbpsi_DecodeContentDr(
         return NULL;
 
     int i_contents_number = p_descriptor->i_length / 2;
+    if (i_contents_number > DVBPSI_CONTENT_DR_MAX)
+        i_contents_number = DVBPSI_CONTENT_DR_MAX;
     p_decoded->i_contents_number = i_contents_number;
 
     for (int i = 0; i < i_contents_number; i++)
@@ -85,6 +87,9 @@ dvbpsi_descriptor_t * dvbpsi_GenContentDr(
                                         dvbpsi_content_dr_t * p_decoded,
                                         bool b_duplicate)
 {
+    if (p_decoded->i_contents_number > DVBPSI_CONTENT_DR_MAX)
+        p_decoded->i_contents_number = DVBPSI_CONTENT_DR_MAX;
+
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x54, p_decoded->i_contents_number * 2 , NULL);

@@ -34,9 +34,10 @@
 extern "C" {
 #endif
 
-#define DVDPSI_GetContentCategoryFromType(type) (type >> 4)
+#define DVDPSI_GetContentCategoryFromType(type) ((type) >> 4)
 
-#define L1L2MERGE(L1,L2) ( ( DVBPSI_CONTENT ## L1<<4) | L2 )
+#define L1L2MERGE(L1,L2) ( ( DVBPSI_CONTENT_CAT ## L1<<4) | (L2) )
+
 #define DVBPSI_CONTENT_CAT_UNDEFINED    0x0
 #define DVBPSI_CONTENT_CAT_MOVIE        0x1
 #define DVBPSI_CONTENT_CAT_NEWS         0x2
@@ -51,7 +52,7 @@ extern "C" {
 #define DVBPSI_CONTENT_CAT_SPECIAL      0xb
 #define DVBPSI_CONTENT_CAT_USERDEFINED  0xf
 
-                /* Movie/Drama */
+/* Movie/Drama */
 #define DVBPSI_CONTENT_MOVIE_GENERAL        L1L2MERGE( _MOVIE, 0x0 )
 #define DVBPSI_CONTENT_MOVIE_DETECTIVE      L1L2MERGE( _MOVIE, 0x1 )
 #define DVBPSI_CONTENT_MOVIE_ADVENTURE      L1L2MERGE( _MOVIE, 0x2 )
@@ -157,7 +158,6 @@ extern "C" {
 #define DVBPSI_CONTENT_SPECIAL_USERDEFINED2     L1L2MERGE( _SPECIAL, 0xd )
 #define DVBPSI_CONTENT_SPECIAL_USERDEFINED3     L1L2MERGE( _SPECIAL, 0xe )
 #define DVBPSI_CONTENT_SPECIAL_USERDEFINED4     L1L2MERGE( _SPECIAL, 0xf )
-#undef L1L2MERGE
 
 /*****************************************************************************
  * dvbpsi_content_t
@@ -180,6 +180,11 @@ typedef struct dvbpsi_content_s
 
 } dvbpsi_content_t;
 
+/*!
+ * \def DVBPSI_CONTENT_DR_MAX
+ * \brief Maximum number of dvbps_content_t entries present in @see dvbpsi_content_dr_t
+ */
+#define DVBPSI_CONTENT_DR_MAX 64
 
 /*****************************************************************************
  * dvbpsi_content_dr_t
@@ -197,8 +202,8 @@ typedef struct dvbpsi_content_s
  */
 typedef struct dvbpsi_content_dr_s
 {
-  uint8_t       i_contents_number;   /*!< number of content */
-  dvbpsi_content_t p_content[64];   /*!< parental rating table */
+  uint8_t          i_contents_number;                /*!< number of content */
+  dvbpsi_content_t p_content[DVBPSI_CONTENT_DR_MAX]; /*!< parental rating table */
 
 } dvbpsi_content_dr_t;
 
@@ -241,6 +246,5 @@ dvbpsi_descriptor_t * dvbpsi_GenContentDr(
 #endif
 
 #else
-#error "Multiple inclusions of dr_55.h"
+#error "Multiple inclusions of dr_54.h"
 #endif
-
