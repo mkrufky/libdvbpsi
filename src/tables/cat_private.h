@@ -62,15 +62,6 @@ void dvbpsi_cat_sections_gather(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sect
 void dvbpsi_cat_sections_decode(dvbpsi_cat_t* p_cat,
                                 dvbpsi_psi_section_t* p_section);
 
-/*****************************************************************************
- * Deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_GatherCATSections(dvbpsi_handle* p_dvbpsi, dvbpsi_psi_section_t* p_section);
-__attribute__((deprecated))
-void dvbpsi_DecodeCATSections(dvbpsi_cat_t* p_cat,
-                              dvbpsi_psi_section_t* p_section);
-
 #else
 #error "Multiple inclusions of cat_private.h"
 #endif

@@ -60,15 +60,6 @@ void dvbpsi_pat_sections_gather(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sect
 void dvbpsi_pat_sections_decode(dvbpsi_pat_t* p_pat,
                                 dvbpsi_psi_section_t* p_section);
 
-/*****************************************************************************
- * Deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_DecodePATSection(dvbpsi_pat_t* p_pat,
-                             dvbpsi_psi_section_t* p_section);
-__attribute__((deprecated))
-void dvbpsi_GatherPATSections(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_section);
-
 #else
 #error "Multiple inclusions of pat_private.h"
 #endif

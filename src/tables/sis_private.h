@@ -62,16 +62,6 @@ void dvbpsi_sis_sections_gather(dvbpsi_t* p_dvbpsi,
 void dvbpsi_sis_sections_decode(dvbpsi_t* p_dvbpsi, dvbpsi_sis_t* p_sis,
                                dvbpsi_psi_section_t* p_section);
 
-/*****************************************************************************
- * Deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_GatherSISSections(dvbpsi_handle* p_dvbpsi,
-                              dvbpsi_decoder_t * p_decoder,
-                              dvbpsi_psi_section_t* p_section);
-__attribute__((deprecated))
-void dvbpsi_DecodeSISSections(dvbpsi_sis_t* p_sis,
-                              dvbpsi_psi_section_t* p_section);
 #else
 #error "Multiple inclusions of sis_private.h"
 #endif

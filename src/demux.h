@@ -241,23 +241,6 @@ void dvbpsi_AttachDemuxSubDecoder(dvbpsi_demux_t *p_demux, dvbpsi_demux_subdec_t
  */
 void dvbpsi_DetachDemuxSubDecoder(dvbpsi_demux_t *p_demux, dvbpsi_demux_subdec_t *p_subdec);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-#if 0
-__attribute__((deprecated))
-dvbpsi_handle dvbpsi_AttachDemux(dvbpsi_demux_new_cb_t pf_new_cb,
-                                 void *                p_new_cb_data);
-__attribute__((deprecated))
-void dvbpsi_DetachDemux(dvbpsi_handle h_dvbpsi);
-__attribute__((deprecated))
-dvbpsi_demux_subdec_t * dvbpsi_demuxGetSubDec(dvbpsi_demux_t * p_demux,
-                                              uint8_t          i_table_id,
-                                              uint16_t         i_extension);
-__attribute__((deprecated))
-void dvbpsi_Demux(dvbpsi_handle h_dvbpsi, dvbpsi_psi_section_t * p_section);
-#endif
-
 #ifdef __cplusplus
 };
 #endif

@@ -253,42 +253,6 @@ dvbpsi_descriptor_t* dvbpsi_pmt_es_descriptor_add(dvbpsi_pmt_es_t* p_es,
  */
 dvbpsi_psi_section_t* dvbpsi_pmt_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_pmt_t* p_pmt);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-dvbpsi_handle dvbpsi_AttachPMT(uint16_t i_program_number,
-                               dvbpsi_pmt_callback pf_callback,
-                               void* p_cb_data);
-__attribute__((deprecated)) void dvbpsi_DetachPMT(dvbpsi_handle h_dvbpsi);
-__attribute__((deprecated))
-void dvbpsi_InitPMT(dvbpsi_pmt_t* p_pmt, uint16_t i_program_number,
-                    uint8_t i_version, int b_current_next, uint16_t i_pcr_pid);
-__attribute__((deprecated)) void dvbpsi_EmptyPMT(dvbpsi_pmt_t* p_pmt);
-__attribute__((deprecated))
-dvbpsi_descriptor_t* dvbpsi_PMTAddDescriptor(dvbpsi_pmt_t* p_pmt,
-                                             uint8_t i_tag, uint8_t i_length,
-                                             uint8_t* p_data);
-__attribute__((deprecated))
-dvbpsi_pmt_es_t* dvbpsi_PMTAddES(dvbpsi_pmt_t* p_pmt,
-                                 uint8_t i_type, uint16_t i_pid);
-__attribute__((deprecated))
-dvbpsi_descriptor_t* dvbpsi_PMTESAddDescriptor(dvbpsi_pmt_es_t* p_es,
-                                               uint8_t i_tag, uint8_t i_length,
-                                               uint8_t* p_data);
-__attribute__((deprecated))
-dvbpsi_psi_section_t* dvbpsi_GenPMTSections(dvbpsi_pmt_t* p_pmt);
-
-#define dvbpsi_NewPMT(p_pmt, i_program_number, i_version, b_current_next, i_pcr_pid) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
-#define dvbpsi_DeletePMT(p_pmt) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
 #ifdef __cplusplus
 };
 #endif

@@ -260,47 +260,6 @@ dvbpsi_descriptor_t *dvbpsi_bat_ts_descriptor_add(dvbpsi_bat_ts_t *p_bat,
  *****************************************************************************/
 dvbpsi_psi_section_t *dvbpsi_bat_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_bat_t * p_bat);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-int dvbpsi_AttachBAT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_bat_callback pf_callback,
-                               void* p_cb_data);
-__attribute__((deprecated))
-void dvbpsi_DetachBAT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-          uint16_t i_extension);
-__attribute__((deprecated))
-void dvbpsi_InitBAT(dvbpsi_bat_t *p_bat, uint16_t i_bouquet_id, uint8_t i_version,
-                    int b_current_next);
-__attribute__((deprecated))
-void dvbpsi_EmptyBAT(dvbpsi_bat_t *p_bat);
-__attribute__((deprecated))
-dvbpsi_psi_section_t *dvbpsi_GenBATSections(dvbpsi_bat_t *p_bat);
-__attribute__((deprecated))
-dvbpsi_bat_ts_t *dvbpsi_BATAddTS(dvbpsi_bat_t* p_bat,
-                                 uint16_t i_ts_id, uint16_t i_orig_network_id);
-__attribute__((deprecated))
-dvbpsi_descriptor_t *dvbpsi_BATBouquetAddDescriptor(
-                                               dvbpsi_bat_t *p_bat,
-                                               uint8_t i_tag, uint8_t i_length,
-                                               uint8_t *p_data);
-__attribute__((deprecated))
-dvbpsi_descriptor_t *dvbpsi_BATTSAddDescriptor(
-                                               dvbpsi_bat_ts_t *p_ts,
-                                               uint8_t i_tag, uint8_t i_length,
-                                               uint8_t *p_data);
-
-#define dvbpsi_NewBAT(p_bat, i_bouquet_id, i_version, b_current_next) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
-#define dvbpsi_DeleteBAT(p_bat) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
 #ifdef __cplusplus
 };
 #endif

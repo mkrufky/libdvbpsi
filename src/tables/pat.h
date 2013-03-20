@@ -204,33 +204,6 @@ dvbpsi_pat_program_t* dvbpsi_pat_program_add(dvbpsi_pat_t* p_pat,
 dvbpsi_psi_section_t* dvbpsi_pat_sections_generate(dvbpsi_t *p_dvbpsi,
                                             dvbpsi_pat_t* p_pat, int i_max_pps);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-dvbpsi_handle dvbpsi_AttachPAT(dvbpsi_pat_callback pf_callback,
-                               void* p_cb_data);
-__attribute__((deprecated)) void dvbpsi_DetachPAT(dvbpsi_handle h_dvbpsi);
-__attribute__((deprecated))
-void dvbpsi_InitPAT(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
-                    int b_current_next);
-__attribute__((deprecated)) void dvbpsi_EmptyPAT(dvbpsi_pat_t* p_pat);
-__attribute__((deprecated))
-dvbpsi_pat_program_t* dvbpsi_PATAddProgram(dvbpsi_pat_t* p_pat,
-                                           uint16_t i_number, uint16_t i_pid);
-__attribute__((deprecated))
-dvbpsi_psi_section_t* dvbpsi_GenPATSections(dvbpsi_pat_t* p_pat, int i_max_pps);
-
-#define dvbpsi_NewPAT(p_pat, i_ts_id, i_version, b_current_next) \
-do {        \
-    DEPRECATED_MACRO \
-} while (0);
-
-#define dvbpsi_DeletePAT(p_pat) \
-do {        \
-    DEPRECATED_MACRO \
-} while (0);
-
 #ifdef __cplusplus
 };
 #endif

@@ -260,45 +260,6 @@ dvbpsi_descriptor_t* dvbpsi_nit_ts_descriptor_add(dvbpsi_nit_ts_t* p_ts,
 dvbpsi_psi_section_t* dvbpsi_nit_sections_generate(dvbpsi_t* p_dvbpsi, dvbpsi_nit_t* p_nit,
                                             uint8_t i_table_id);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-int dvbpsi_AttachNIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
-                     uint16_t i_extension, dvbpsi_nit_callback pf_callback,
-                     void* p_cb_data);
-__attribute__((deprecated))
-void dvbpsi_DetachNIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-                      uint16_t i_extension);
-__attribute__((deprecated))
-void dvbpsi_InitNIT(dvbpsi_nit_t* p_nit, uint16_t i_network_id,
-                    uint8_t i_version, int b_current_next);
-__attribute__((deprecated)) void dvbpsi_EmptyNIT(dvbpsi_nit_t* p_nit);
-__attribute__((deprecated))
-dvbpsi_descriptor_t* dvbpsi_NITAddDescriptor(dvbpsi_nit_t* p_nit,
-                                             uint8_t i_tag, uint8_t i_length,
-                                             uint8_t* p_data);
-__attribute__((deprecated))
-dvbpsi_nit_ts_t* dvbpsi_NITAddTS(dvbpsi_nit_t* p_nit,
-                                 uint16_t i_ts_id, uint16_t i_orig_network_id);
-__attribute__((deprecated))
-dvbpsi_descriptor_t* dvbpsi_NITTSAddDescriptor(dvbpsi_nit_ts_t* p_ts,
-                                               uint8_t i_tag, uint8_t i_length,
-                                               uint8_t* p_data);
-__attribute__((deprecated))
-dvbpsi_psi_section_t* dvbpsi_GenNITSections(dvbpsi_nit_t* p_nit,
-                                            uint8_t i_table_id);
-
-#define dvbpsi_NewNIT(p_nit, i_network_id, i_version, b_current_next) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
-#define dvbpsi_DeleteNIT(p_nit) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
 #ifdef __cplusplus
 };
 #endif

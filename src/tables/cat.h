@@ -179,36 +179,6 @@ dvbpsi_descriptor_t* dvbpsi_cat_descriptor_add(dvbpsi_cat_t* p_cat,
  */
 dvbpsi_psi_section_t* dvbpsi_cat_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_cat_t* p_cat);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-dvbpsi_handle dvbpsi_AttachCAT(dvbpsi_cat_callback pf_callback,
-                               void* p_cb_data);
-__attribute__((deprecated))
-void dvbpsi_DetachCAT(dvbpsi_handle h_dvbpsi);
-__attribute__((deprecated))
-void dvbpsi_InitCAT(dvbpsi_cat_t* p_cat,
-                    uint8_t i_version, int b_current_next);
-__attribute__((deprecated))
-void dvbpsi_EmptyCAT(dvbpsi_cat_t* p_cat);
-__attribute__((deprecated))
-dvbpsi_descriptor_t* dvbpsi_CATAddDescriptor(dvbpsi_cat_t* p_cat,
-                                             uint8_t i_tag, uint8_t i_length,
-                                             uint8_t* p_data);
-__attribute__((deprecated))
-dvbpsi_psi_section_t* dvbpsi_GenCATSections(dvbpsi_cat_t* p_cat);
-
-#define dvbpsi_NewCAT(p_cat, i_version, b_current_next) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
-#define dvbpsi_DeleteCAT(p_cat) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
 #ifdef __cplusplus
 };
 #endif

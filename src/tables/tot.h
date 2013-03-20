@@ -195,36 +195,6 @@ dvbpsi_descriptor_t* dvbpsi_tot_descriptor_add(dvbpsi_tot_t* p_tot,
  */
 dvbpsi_psi_section_t* dvbpsi_tot_sections_generate(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-int dvbpsi_AttachTOT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
-                     uint16_t i_extension,
-                     dvbpsi_tot_callback pf_callback, void* p_cb_data);
-__attribute__((deprecated))
-void dvbpsi_DetachTOT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-                      uint16_t i_extension);
-__attribute__((deprecated))
-void dvbpsi_NewTOT(dvbpsi_tot_t* p_tot, uint64_t i_utc_time);
-__attribute__((deprecated)) void dvbpsi_DeleteTOT(dvbpsi_tot_t* p_tot);
-__attribute__((deprecated))
-dvbpsi_descriptor_t* dvbpsi_TOTAddDescriptor(dvbpsi_tot_t* p_tot,
-                                             uint8_t i_tag, uint8_t i_length,
-                                             uint8_t* p_data);
-__attribute__((deprecated))
-dvbpsi_psi_section_t* dvbpsi_GenTOTSections(dvbpsi_tot_t* p_tot);
-
-#define dvbpsi_NewTOT(p_tot, i_utc_time) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
-#define dvbpsi_DeleteTOT(p_tot) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
 #ifdef __cplusplus
 };
 #endif

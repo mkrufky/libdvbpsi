@@ -66,17 +66,6 @@ void dvbpsi_tot_sections_gather(dvbpsi_t* p_dvbpsi,
 void dvbpsi_tot_sections_decode(dvbpsi_t* p_dvbpsi, dvbpsi_tot_t* p_tot,
                               dvbpsi_psi_section_t* p_section);
 
-/*****************************************************************************
- * Deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_GatherTOTSections(dvbpsi_handle* p_dvbpsi,
-                              dvbpsi_decoder_t* p_decoder,
-                              dvbpsi_psi_section_t* p_section);
-__attribute__((deprecated))
-void dvbpsi_DecodeTOTSections(dvbpsi_handle* p_dvbpsi, dvbpsi_tot_t* p_tot,
-                              dvbpsi_psi_section_t* p_section);
-
 #else
 #error "Multiple inclusions of tot_private.h"
 #endif

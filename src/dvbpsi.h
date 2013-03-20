@@ -350,36 +350,6 @@ bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_sect
  */
 bool dvbpsi_decoder_present(dvbpsi_t *p_dvbpsi);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-/*!
- * \typedef struct dvbpsi_decoder_s * dvbpsi_handle
- * \brief deprecated dvbpsi handle. It is replaced by a dvbpsi_t type.
- */
-typedef struct dvbpsi_decoder_s * dvbpsi_handle;// __attribute__((deprecated));
-
-/* dvbpsi.h */
-/*!
- * \fn __attribute__((deprecated)) void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data)
- * \brief function is deprecated and should no longer be used. Use
- * function dvbpsi_packet_push() instead.
- * \param h_dvbpsi handle to dvbpsi_s struct
- * \param p_data pointer to TS packet data (usually188 bytes)
- */
-/*!
- * \def dvbpsi_PushPacket(h,p)  dvbpsi_packet_push(h,p)
- * \brief backwards compatibility wrapper around dvbpsi_packet_push()
- */
-__attribute__((deprecated))
-void dvbpsi_PushPacket(dvbpsi_handle h_dvbpsi, uint8_t* p_data);
-#define dvbpsi_PushPacket(h,p)  dvbpsi_packet_push(h,p)
-
-/* Macros from libdvbpsi < version 1.0.0 are deprecated.
- * NOTE: You probably want to use libdvbpsi-0.2.2 instead.
- */
-#define DEPRECATED_MACRO DEPRECATED_MACRO_USE_libdvbpsi_0_2_2
-
 #ifdef __cplusplus
 };
 #endif

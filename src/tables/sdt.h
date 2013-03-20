@@ -253,42 +253,6 @@ dvbpsi_descriptor_t *dvbpsi_sdt_service_descriptor_add(
  */
 dvbpsi_psi_section_t *dvbpsi_sdt_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_sdt_t * p_sdt);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-int dvbpsi_AttachSDT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_sdt_callback pf_callback,
-                               void* p_cb_data);
-__attribute__((deprecated))
-void dvbpsi_DetachSDT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-          uint16_t i_extension);
-__attribute__((deprecated))
-void dvbpsi_InitSDT(dvbpsi_sdt_t *p_sdt, uint16_t i_ts_id, uint8_t i_version,
-                    int b_current_next, uint16_t i_network_id);
-__attribute__((deprecated)) void dvbpsi_EmptySDT(dvbpsi_sdt_t *p_sdt);
-__attribute__((deprecated))
-dvbpsi_sdt_service_t *dvbpsi_SDTAddService(dvbpsi_sdt_t* p_sdt,
-    uint16_t i_service_id, int b_eit_schedule, int b_eit_present,
-    uint8_t i_running_status, int b_free_ca);
-__attribute__((deprecated))
-dvbpsi_descriptor_t *dvbpsi_SDTServiceAddDescriptor(
-                                               dvbpsi_sdt_service_t *p_service,
-                                               uint8_t i_tag, uint8_t i_length,
-                                               uint8_t *p_data);
-__attribute__((deprecated))
-dvbpsi_psi_section_t *dvbpsi_GenSDTSections(dvbpsi_sdt_t * p_sdt);
-
-#define dvbpsi_NewSDT(p_sdt, i_ts_id, i_version, b_current_next, i_network_id) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
-#define dvbpsi_DeleteSDT(p_sdt) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
 #ifdef __cplusplus
 };
 #endif

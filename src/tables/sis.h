@@ -463,36 +463,6 @@ dvbpsi_descriptor_t *dvbpsi_sis_descriptor_add(dvbpsi_sis_t *p_sis,
  */
 dvbpsi_psi_section_t *dvbpsi_sis_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_sis_t * p_sis);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-int dvbpsi_AttachSIS(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_sis_callback pf_callback,
-                               void* p_cb_data);
-__attribute__((deprecated))
-void dvbpsi_DetachSIS(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-          uint16_t i_extension);
-__attribute__((deprecated))
-void dvbpsi_InitSIS(dvbpsi_sis_t *p_sis, uint8_t i_protocol_version);
-__attribute__((deprecated)) void dvbpsi_EmptySIS(dvbpsi_sis_t *p_sis);
-__attribute__((deprecated))
-dvbpsi_descriptor_t *dvbpsi_SISAddDescriptor( dvbpsi_sis_t *p_sis,
-                                              uint8_t i_tag, uint8_t i_length,
-                                              uint8_t *p_data);
-__attribute__((deprecated))
-dvbpsi_psi_section_t *dvbpsi_GenSISSections(dvbpsi_sis_t * p_sis);
-
-#define dvbpsi_NewSIS(p_sis, i_protocol_version) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
-#define dvbpsi_DeleteSIS(p_sis) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
 #ifdef __cplusplus
 };
 #endif

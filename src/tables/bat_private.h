@@ -62,17 +62,6 @@ void dvbpsi_bat_sections_gather(dvbpsi_t* p_dvbpsi, dvbpsi_decoder_t* p_decoder,
 void dvbpsi_bat_sections_decode(dvbpsi_bat_t* p_bat,
                               dvbpsi_psi_section_t* p_section);
 
-
-
-/*****************************************************************************
- * Deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-void dvbpsi_GatherBATSections(dvbpsi_t* p_dvbpsi, dvbpsi_decoder_t* p_decoder,
-                              dvbpsi_psi_section_t* p_section);
-__attribute__((deprecated))
-void dvbpsi_DecodeBATSections(dvbpsi_bat_t* p_bat,
-                              dvbpsi_psi_section_t* p_section);
 #else
 #error "Multiple inclusions of bat_private.h"
 #endif

@@ -273,41 +273,6 @@ dvbpsi_descriptor_t* dvbpsi_eit_event_descriptor_add(
 dvbpsi_psi_section_t *dvbpsi_eit_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_eit_t *p_eit,
                                             uint8_t i_table_id);
 
-/*****************************************************************************
- * deprecated API's
- *****************************************************************************/
-__attribute__((deprecated))
-int dvbpsi_AttachEIT(dvbpsi_decoder_t * p_psi_decoder, uint8_t i_table_id,
-          uint16_t i_extension, dvbpsi_eit_callback pf_callback,
-                               void* p_cb_data);
-__attribute__((deprecated))
-void dvbpsi_DetachEIT(dvbpsi_demux_t * p_demux, uint8_t i_table_id,
-          uint16_t i_extension);
-__attribute__((deprecated))
-void dvbpsi_InitEIT(dvbpsi_eit_t* p_eit, uint16_t i_service_id, uint8_t i_version,
-                    int b_current_next, uint16_t i_ts_id, uint16_t i_network_id,
-                    uint8_t i_segment_last_section_number,
-                    uint8_t i_last_table_id);
-__attribute__((deprecated)) void dvbpsi_EmptyEIT(dvbpsi_eit_t* p_eit);
-__attribute__((deprecated))
-dvbpsi_descriptor_t* dvbpsi_EITEventAddDescriptor(dvbpsi_eit_event_t* p_event,
-                                                  uint8_t i_tag, uint8_t i_length,
-                                                  uint8_t* p_data);
-__attribute__((deprecated))
-dvbpsi_eit_event_t* dvbpsi_EITAddEvent(dvbpsi_eit_t* p_eit,
-    uint16_t i_event_id, uint64_t i_start_time, uint32_t i_duration,
-    uint8_t i_running_status, int b_free_ca);
-
-#define dvbpsi_NewEIT(p_eit, i_service_id, i_version, b_current_next, i_ts_id, i_network_id, i_segment_last_section_number, i_last_table_id) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
-#define dvbpsi_DeleteEIT(p_eit) \
-do {        \
-        DEPRECATED_MACRO \
-} while (0);
-
 #ifdef __cplusplus
 };
 #endif
