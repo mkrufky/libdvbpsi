@@ -65,6 +65,12 @@ typedef struct dvbpsi_local_time_offset_s
 
 } dvbpsi_local_time_offset_t;
 
+/*!
+ * \def DVBPSI_LOCAL_TIME_OFFSET_DR_MAX
+ * \brief Maximum number of dvbpsi_local_time_offset_t entries present in
+ * @see dvbpsi_local_time_offset_dr_t
+ */
+#define DVBPSI_LOCAL_TIME_OFFSET_DR_MAX 19
 
 /*****************************************************************************
  * dvbpsi_local_time_offset_dr_t
@@ -83,10 +89,10 @@ typedef struct dvbpsi_local_time_offset_s
 typedef struct dvbpsi_local_time_offset_dr_s
 {
   uint8_t      i_local_time_offsets_number;             /*!< local time offset number */
-  dvbpsi_local_time_offset_t p_local_time_offset[19];   /*!< local time offset */
+  dvbpsi_local_time_offset_t
+               p_local_time_offset[DVBPSI_LOCAL_TIME_OFFSET_DR_MAX]; /*!< local time offset */
 
 } dvbpsi_local_time_offset_dr_t;
-
 
 /*****************************************************************************
  * dvbpsi_DecodeLocalTimeOffsetDr

@@ -84,7 +84,12 @@ dvbpsi_local_time_offset_dr_t * dvbpsi_DecodeLocalTimeOffsetDr(
         p_current->i_next_time_offset           =   ((uint16_t)p_data[11] << 8)
                 |  (uint16_t)p_data[12];
 
+        /* NOTE: Only decode upto DVBPSI_LOCAL_TIME_OFFSET_DR_MAX number of time
+           offsets. The decoding struct cannot hold more then that. */
         p_decoded->i_local_time_offsets_number++;
+        if (p_decoded->i_local_time_offsets_number == DVBPSI_LOCAL_TIME_OFFSET_DR_MAX)
+            break;
+
         p_data += 13;
         p_current++;
     }
@@ -101,6 +106,9 @@ dvbpsi_descriptor_t * dvbpsi_GenLocalTimeOffsetDr(
                                         dvbpsi_local_time_offset_dr_t * p_decoded,
                                         bool b_duplicate)
 {
+    if (p_decoded->i_local_time_offsets_number > DVBPSI_LOCAL_TIME_OFFSET_DR_MAX)
+        p_decoded->i_local_time_offsets_number = DVBPSI_LOCAL_TIME_OFFSET_DR_MAX;
+
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x58, p_decoded->i_local_time_offsets_number * 13, NULL);
