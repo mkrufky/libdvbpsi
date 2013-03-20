@@ -62,6 +62,12 @@ typedef struct dvbpsi_teletextpage_s
 
 } dvbpsi_teletextpage_t;
 
+/*!
+ * \def DVBPSI_TELETEXT_DR_MAX
+ * \brief Maximum number of dvbpsi_teletextpage_t entries present in
+ * @see dvbpsi_teletext_dr_t
+ */
+#define DVBPSI_TELETEXT_DR_MAX 64
 
 /*****************************************************************************
  * dvbpsi_teletext_dr_t
@@ -79,11 +85,10 @@ typedef struct dvbpsi_teletextpage_s
  */
 typedef struct dvbpsi_teletext_dr_s
 {
-  uint8_t      i_pages_number;          /*!< number of pages */
-  dvbpsi_teletextpage_t p_pages[64];    /*!< teletext pages */
+  uint8_t      i_pages_number;                           /*!< number of pages */
+  dvbpsi_teletextpage_t p_pages[DVBPSI_TELETEXT_DR_MAX]; /*!< teletext pages */
 
 } dvbpsi_teletext_dr_t;
-
 
 /*****************************************************************************
  * dvbpsi_DecodeTeletextDataDr

@@ -62,15 +62,16 @@ dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
     if(p_descriptor->i_length % 5)
         return NULL;
 
-    int i_pages_number;
-    i_pages_number = p_descriptor->i_length / 5;
-
     /* Allocate memory */
     dvbpsi_teletext_dr_t * p_decoded;
     p_decoded = (dvbpsi_teletext_dr_t*)malloc(sizeof(dvbpsi_teletext_dr_t));
     if (!p_decoded)
         return NULL;
 
+    int i_pages_number;
+    i_pages_number = p_descriptor->i_length / 5;
+    if (i_pages_number > DVBPSI_TELETEXT_DR_MAX)
+        i_pages_number = DVBPSI_TELETEXT_DR_MAX;
     p_decoded->i_pages_number = i_pages_number;
 
     for (int i = 0; i < i_pages_number; i++)
@@ -99,6 +100,9 @@ dvbpsi_teletext_dr_t * dvbpsi_DecodeTeletextDr(
 dvbpsi_descriptor_t * dvbpsi_GenTeletextDr(dvbpsi_teletext_dr_t * p_decoded,
                                            bool b_duplicate)
 {
+    if (p_decoded->i_pages_number > DVBPSI_TELETEXT_DR_MAX)
+        p_decoded->i_pages_number = DVBPSI_TELETEXT_DR_MAX;
+
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x56, p_decoded->i_pages_number * 8 , NULL);
