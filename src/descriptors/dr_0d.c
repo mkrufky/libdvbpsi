@@ -72,6 +72,9 @@ dvbpsi_copyright_dr_t * dvbpsi_DecodeCopyrightDr(
             | ((uint32_t)(p_descriptor->p_data[2]) << 8)
             | (uint32_t)(p_descriptor->p_data[3]);
     p_decoded->i_additional_length = p_descriptor->i_length - 4;
+    if (p_decoded->i_additional_length > 251)
+        p_decoded->i_additional_length = 251;
+
     if (p_decoded->i_additional_length)
         memcpy(p_decoded->i_additional_info,
                p_descriptor->p_data + 4,
@@ -89,6 +92,9 @@ dvbpsi_copyright_dr_t * dvbpsi_DecodeCopyrightDr(
 dvbpsi_descriptor_t * dvbpsi_GenCopyrightDr(dvbpsi_copyright_dr_t * p_decoded,
                                             bool b_duplicate)
 {
+    if (p_decoded->i_additional_length > 251)
+        p_decoded->i_additional_length = 251;
+
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x0d, p_decoded->i_additional_length + 4, NULL);
