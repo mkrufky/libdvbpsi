@@ -94,12 +94,11 @@ dvbpsi_short_event_dr_t * dvbpsi_DecodeShortEventDr(dvbpsi_descriptor_t * p_desc
 dvbpsi_descriptor_t * dvbpsi_GenShortEventDr(dvbpsi_short_event_dr_t * p_decoded,
                                              bool b_duplicate)
 {
-    int i_len1 = p_decoded->i_event_name_length;
-    int i_len2 = p_decoded->i_text_length;
+    uint8_t i_len1 = p_decoded->i_event_name_length;
+    uint8_t i_len2 = p_decoded->i_text_length;
 
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor = dvbpsi_NewDescriptor(0x4d, 5 + i_len1 + i_len2, NULL );
-
     if (!p_descriptor)
         return NULL;
 
