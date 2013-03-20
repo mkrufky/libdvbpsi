@@ -66,6 +66,8 @@ dvbpsi_parental_rating_dr_t * dvbpsi_DecodeParentalRatingDr(
         return NULL;
 
     int i_ratings_number = p_descriptor->i_length / 4;
+    if (i_ratings_number > DVBPSI_PARENTAL_RATING_DR_MAX)
+        i_ratings_number = DVBPSI_PARENTAL_RATING_DR_MAX;
     p_decoded->i_ratings_number = i_ratings_number;
 
     for (int i = 0; i < i_ratings_number; i++)
@@ -90,7 +92,10 @@ dvbpsi_parental_rating_dr_t * dvbpsi_DecodeParentalRatingDr(
 dvbpsi_descriptor_t * dvbpsi_GenParentalRatingDr(
                                         dvbpsi_parental_rating_dr_t * p_decoded,
                                         bool b_duplicate)
-{
+{    
+    if (p_decoded->i_ratings_number > DVBPSI_PARENTAL_RATING_DR_MAX)
+        p_decoded->i_ratings_number = DVBPSI_PARENTAL_RATING_DR_MAX;
+
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x55, p_decoded->i_ratings_number * 4 , NULL);

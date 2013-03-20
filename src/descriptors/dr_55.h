@@ -58,6 +58,12 @@ typedef struct dvbpsi_parental_rating_s
 
 } dvbpsi_parental_rating_t;
 
+/*!
+ * \def DVBPSI_PARENTAL_RATING_DR_MAX
+ * \brief Maximum number of dvbpsi_parental_rating_t entries present in
+ * @see dvbpsi_parental_rating_t
+ */
+#define DVBPSI_PARENTAL_RATING_DR_MAX 64
 
 /*****************************************************************************
  * dvbpsi_parental_rating_dr_t
@@ -76,7 +82,8 @@ typedef struct dvbpsi_parental_rating_s
 typedef struct dvbpsi_parental_rating_dr_s
 {
   uint8_t       i_ratings_number;                   /*!< number of rating */
-  dvbpsi_parental_rating_t p_parental_rating[64];   /*!< parental rating table */
+  dvbpsi_parental_rating_t
+                p_parental_rating[DVBPSI_PARENTAL_RATING_DR_MAX]; /*!< parental rating table */
 
 } dvbpsi_parental_rating_dr_t;
 
