@@ -23,6 +23,8 @@
 #ifndef DVBINFO_DVBPSI_H_
 #define DVBINFO_DVBPSI_H_
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+
 /* Date and time */
 typedef int64_t mtime_t;
 mtime_t mdate(void);

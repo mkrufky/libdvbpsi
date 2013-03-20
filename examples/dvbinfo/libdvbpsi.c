@@ -905,6 +905,164 @@ static void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_d
 }
 
 /*****************************************************************************
+ * DumpContentDescriptor
+ *****************************************************************************/
+typedef struct {
+    const int i_category;
+    const char *p_category;
+} dr_content_category_t;
+
+static const char *GetContentSubCategory( const int i_type )
+{
+    dr_content_category_t content_subcategory[] = {
+        /* Movie/Drama */
+        { DVBPSI_CONTENT_MOVIE_GENERAL, "General" },
+        { DVBPSI_CONTENT_MOVIE_DETECTIVE, "Detective" },
+        { DVBPSI_CONTENT_MOVIE_ADVENTURE, "Adventure" },
+        { DVBPSI_CONTENT_MOVIE_SF, "Science Fiction" },
+        { DVBPSI_CONTENT_MOVIE_COMEDY, "Comedy" },
+        { DVBPSI_CONTENT_MOVIE_SOAP, "Soap" },
+        { DVBPSI_CONTENT_MOVIE_ROMANCE, "Romance" },
+        { DVBPSI_CONTENT_MOVIE_CLASSICAL, "Classical" },
+        { DVBPSI_CONTENT_MOVIE_ADULT, "Adult" },
+        { DVBPSI_CONTENT_MOVIE_USERDEFINED, "User defined" },
+        /* News/Current affairs */
+        { DVBPSI_CONTENT_NEWS_GENERAL, "General" },
+        { DVBPSI_CONTENT_NEWS_WEATHER, "Weather" },
+        { DVBPSI_CONTENT_NEWS_MAGAZINE, "Magazine" },
+        { DVBPSI_CONTENT_NEWS_DOCUMENTARY, "Documentary" },
+        { DVBPSI_CONTENT_NEWS_DISCUSSION, "Discussion" },
+        { DVBPSI_CONTENT_NEWS_USERDEFINED, "User Defined" },
+        /* Show/Game show */
+        { DVBPSI_CONTENT_SHOW_GENERAL, "General" },
+        { DVBPSI_CONTENT_SHOW_QUIZ, "Quiz" },
+        { DVBPSI_CONTENT_SHOW_VARIETY, "Variety" },
+        { DVBPSI_CONTENT_SHOW_TALK, "Talk" },
+        { DVBPSI_CONTENT_SHOW_USERDEFINED, "User Defined" },
+        /* Sports */
+        { DVBPSI_CONTENT_SPORTS_GENERAL, "General" },
+        { DVBPSI_CONTENT_SPORTS_EVENTS, "Events" },
+        { DVBPSI_CONTENT_SPORTS_MAGAZINE, "Magazine" },
+        { DVBPSI_CONTENT_SPORTS_FOOTBALL, "Football" },
+        { DVBPSI_CONTENT_SPORTS_TENNIS, "Tennis" },
+        { DVBPSI_CONTENT_SPORTS_TEAM, "Team" },
+        { DVBPSI_CONTENT_SPORTS_ATHLETICS, "Athletics" },
+        { DVBPSI_CONTENT_SPORTS_MOTOR, "Motor" },
+        { DVBPSI_CONTENT_SPORTS_WATER, "Water" },
+        { DVBPSI_CONTENT_SPORTS_WINTER, "Winter" },
+        { DVBPSI_CONTENT_SPORTS_EQUESTRIAN, "Equestrian" },
+        { DVBPSI_CONTENT_SPORTS_MARTIAL, "Martial" },
+        { DVBPSI_CONTENT_SPORTS_USERDEFINED, "User Defined" },
+        /* Children's/Youth */
+        { DVBPSI_CONTENT_CHILDREN_GENERAL, "General" },
+        { DVBPSI_CONTENT_CHILDREN_PRESCHOOL, "Preschool" },
+        { DVBPSI_CONTENT_CHILDREN_06TO14ENT, "06 to 14" },
+        { DVBPSI_CONTENT_CHILDREN_10TO16ENT, "10 to 16" },
+        { DVBPSI_CONTENT_CHILDREN_EDUCATIONAL, "Educational" },
+        { DVBPSI_CONTENT_CHILDREN_CARTOONS, "Cartoons" },
+        { DVBPSI_CONTENT_CHILDREN_USERDEFINED, "User Defined" },
+        /* Music/Ballet/Dance */
+        { DVBPSI_CONTENT_MUSIC_GENERAL, "General" },
+        { DVBPSI_CONTENT_MUSIC_POPROCK, "Poprock" },
+        { DVBPSI_CONTENT_MUSIC_CLASSICAL, "Classical" },
+        { DVBPSI_CONTENT_MUSIC_FOLK, "Folk" },
+        { DVBPSI_CONTENT_MUSIC_JAZZ, "Jazz" },
+        { DVBPSI_CONTENT_MUSIC_OPERA, "Opera" },
+        { DVBPSI_CONTENT_MUSIC_BALLET, "Ballet" },
+        { DVBPSI_CONTENT_MUSIC_USERDEFINED, "User Defined" },
+        /* Arts/Culture */
+        { DVBPSI_CONTENT_CULTURE_GENERAL, "General" },
+        { DVBPSI_CONTENT_CULTURE_PERFORMANCE, "Performance" },
+        { DVBPSI_CONTENT_CULTURE_FINEARTS, "Fine Arts" },
+        { DVBPSI_CONTENT_CULTURE_RELIGION, "Religion" },
+        { DVBPSI_CONTENT_CULTURE_TRADITIONAL, "Traditional" },
+        { DVBPSI_CONTENT_CULTURE_LITERATURE, "Literature" },
+        { DVBPSI_CONTENT_CULTURE_CINEMA, "Cinema" },
+        { DVBPSI_CONTENT_CULTURE_EXPERIMENTAL, "Experimental" },
+        { DVBPSI_CONTENT_CULTURE_PRESS, "Press" },
+        { DVBPSI_CONTENT_CULTURE_NEWMEDIA, "New Media" },
+        { DVBPSI_CONTENT_CULTURE_MAGAZINE, "Magazine" },
+        { DVBPSI_CONTENT_CULTURE_FASHION, "Fashion" },
+        { DVBPSI_CONTENT_CULTURE_USERDEFINED, "User Defined" },
+        /* Socal/Political/Economics */
+        { DVBPSI_CONTENT_SOCIAL_GENERAL, "General" },
+        { DVBPSI_CONTENT_SOCIAL_MAGAZINE, "Magazine" },
+        { DVBPSI_CONTENT_SOCIAL_ADVISORY, "Advisory" },
+        { DVBPSI_CONTENT_SOCIAL_PEOPLE, "People" },
+        { DVBPSI_CONTENT_SOCIAL_USERDEFINED, "User Defined" },
+        /* Eduction/Science/Factual */
+        { DVBPSI_CONTENT_EDUCATION_GENERAL, "General" },
+        { DVBPSI_CONTENT_EDUCATION_NATURE, "Nature" },
+        { DVBPSI_CONTENT_EDUCATION_TECHNOLOGY, "Technology" },
+        { DVBPSI_CONTENT_EDUCATION_MEDICINE, "Medicine" },
+        { DVBPSI_CONTENT_EDUCATION_FOREIGN, "Foreign" },
+        { DVBPSI_CONTENT_EDUCATION_SOCIAL, "Social" },
+        { DVBPSI_CONTENT_EDUCATION_FURTHER, "Further" },
+        { DVBPSI_CONTENT_EDUCATION_LANGUAGE, "Language" },
+        { DVBPSI_CONTENT_EDUCATION_USERDEFINED, "User Defined" },
+        /* Leisure/Hobbies */
+        { DVBPSI_CONTENT_LEISURE_GENERAL, "General" },
+        { DVBPSI_CONTENT_LEISURE_TRAVEL, "Travel" },
+        { DVBPSI_CONTENT_LEISURE_HANDICRAFT, "Handicraft" },
+        { DVBPSI_CONTENT_LEISURE_MOTORING, "Motoring" },
+        { DVBPSI_CONTENT_LEISURE_FITNESS, "Fitness" },
+        { DVBPSI_CONTENT_LEISURE_COOKING, "Cooking" },
+        { DVBPSI_CONTENT_LEISURE_SHOPPING, "Shopping" },
+        { DVBPSI_CONTENT_LEISURE_GARDENING, "Gardening" },
+        { DVBPSI_CONTENT_LEISURE_USERDEFINED, "User Defined" },
+        /* Special characteristics */
+        { DVBPSI_CONTENT_SPECIAL_ORIGINALLANGUAGE, "Original Language" },
+        { DVBPSI_CONTENT_SPECIAL_BLACKANDWHITE, "Black and White " },
+        { DVBPSI_CONTENT_SPECIAL_UNPUBLISHED, "Unpublished" },
+        { DVBPSI_CONTENT_SPECIAL_LIVE, "Live" },
+        { DVBPSI_CONTENT_SPECIAL_PLANOSTEREOSCOPIC, "Planostereoscopic" },
+        { DVBPSI_CONTENT_SPECIAL_USERDEFINED, "User Defined" },
+        { DVBPSI_CONTENT_SPECIAL_USERDEFINED1, "User Defined 1" },
+        { DVBPSI_CONTENT_SPECIAL_USERDEFINED2, "User Defined 2" },
+        { DVBPSI_CONTENT_SPECIAL_USERDEFINED3, "User Defined 3" },
+        { DVBPSI_CONTENT_SPECIAL_USERDEFINED4, "User Defined 4" }
+    };
+
+    for (unsigned int i = 0; i < ARRAY_SIZE(content_subcategory); i++)
+    {
+        if (i_type == content_subcategory[i].i_category)
+            return content_subcategory[i].p_category;
+    }
+    return "Unknown";
+}
+
+static void DumpContentDescriptor(dvbpsi_content_dr_t *p_content_descriptor)
+{
+    dr_content_category_t content_category[] = {
+        { DVBPSI_CONTENT_CAT_UNDEFINED, "Undefined" },
+        { DVBPSI_CONTENT_CAT_MOVIE, "Movie" },
+        { DVBPSI_CONTENT_CAT_NEWS, "News" },
+        { DVBPSI_CONTENT_CAT_SHOW, "Show" },
+        { DVBPSI_CONTENT_CAT_SPORTS, "Sports" },
+        { DVBPSI_CONTENT_CAT_CHILDREN, "Children" },
+        { DVBPSI_CONTENT_CAT_MUSIC, "Music" },
+        { DVBPSI_CONTENT_CAT_CULTURE, "Culture" },
+        { DVBPSI_CONTENT_CAT_SOCIAL, "Social" },
+        { DVBPSI_CONTENT_CAT_EDUCATION, "Education" },
+        { DVBPSI_CONTENT_CAT_LEISURE, "Leisur" },
+        { DVBPSI_CONTENT_CAT_SPECIAL, "Special" },
+        { DVBPSI_CONTENT_CAT_USERDEFINED, "User defined" },
+        { 0, NULL }
+    };
+
+    printf("Content\n");
+    for(int i = 0; i < p_content_descriptor->i_contents_number; i++)
+    {
+        int i_type = p_content_descriptor->p_content[i].i_type;
+        int i_category = DVDPSI_GetContentCategoryFromType(i_type);
+
+        printf("\t\tcategory: %s\n", content_category[i_category].p_category);
+        printf("\t\tsub category: %s\n", GetContentSubCategory(i_type));
+        printf("\t\tuser byte: 0x%x\n", p_content_descriptor->p_content[i].i_user_byte);
+    }
+}
+
+/*****************************************************************************
  * DumpSubtitleDescriptor
  *****************************************************************************/
 static void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor)
@@ -1254,6 +1412,9 @@ static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
                 break;
             case 0x52:
                 DumpStreamIdentifierDescriptor(dvbpsi_DecodeStreamIdentifierDr(p_descriptor));
+                break;
+            case 0x54:
+                DumpContentDescriptor(dvbpsi_DecodeContentDr(p_descriptor));
                 break;
             case 0x59:
                 DumpSubtitleDescriptor(dvbpsi_DecodeSubtitlingDr(p_descriptor));
