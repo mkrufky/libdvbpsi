@@ -60,6 +60,13 @@ typedef struct dvbpsi_vbidata_line_s
 
 } dvbpsi_vbidata_line_t;
 
+/*!
+ * \def DVBPSI_VBIDATA_LINE_DR_MAX
+ * \brief Maximum number of dvbpsi_vbidata_line_t entries present in
+ * @see dvbpsi_vbidata_t
+ */
+#define DVBPSI_VBIDATA_LINE_DR_MAX 255
+
 /*****************************************************************************
  * dvbpsi_vbidata_t
  *****************************************************************************/
@@ -82,6 +89,13 @@ typedef struct dvbpsi_vbidata_s
 
 } dvbpsi_vbidata_t;
 
+/*!
+ * \def DVBPSI_VBI_DR_MAX
+ * \brief Maximum number of dvbpsi_vbidata_t entries present in
+ * @see dvbpsi_vbi_dr_t
+ */
+#define DVBPSI_VBI_DR_MAX 85
+
 /*****************************************************************************
  * dvbpsi_vbi_dr_t
  *****************************************************************************/
@@ -99,7 +113,7 @@ typedef struct dvbpsi_vbidata_s
 typedef struct dvbpsi_vbi_dr_s
 {
   uint8_t          i_services_number;   /*!< service number */
-  dvbpsi_vbidata_t p_services[85];      /*!< services table */
+  dvbpsi_vbidata_t p_services[DVBPSI_VBI_DR_MAX]; /*!< services table */
 
 } dvbpsi_vbi_dr_t;
 

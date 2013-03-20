@@ -63,6 +63,8 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
     /* */
     dvbpsi_vbi_dr_t * p_decoded;
     int i_services_number = p_descriptor->i_length / 2;
+    if (i_services_number > DVBPSI_VBI_DR_MAX)
+        i_services_number = DVBPSI_VBI_DR_MAX;
 
     /* Allocate memory */
     p_decoded = (dvbpsi_vbi_dr_t*)malloc(sizeof(dvbpsi_vbi_dr_t));
@@ -79,6 +81,8 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
         p_decoded->p_services[i].i_data_service_id = i_data_service_id;
 
         i_lines = ((uint8_t)(p_descriptor->p_data[3 * i + 3]));
+        if (i_lines > DVBPSI_VBIDATA_LINE_DR_MAX)
+            i_lines = DVBPSI_VBIDATA_LINE_DR_MAX;
         p_decoded->p_services[i].i_lines = i_lines;
         for (int n = 0; n < i_lines; n++ )
         {
@@ -103,6 +107,9 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
 dvbpsi_descriptor_t * dvbpsi_GenVBIDataDr(dvbpsi_vbi_dr_t * p_decoded,
                                           bool b_duplicate)
 {
+    if (p_decoded->i_services_number > DVBPSI_VBI_DR_MAX)
+        p_decoded->i_services_number = DVBPSI_VBI_DR_MAX;
+
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x45, p_decoded->i_services_number * 5 , NULL);
@@ -114,6 +121,9 @@ dvbpsi_descriptor_t * dvbpsi_GenVBIDataDr(dvbpsi_vbi_dr_t * p_decoded,
     {
         p_descriptor->p_data[5 * i + 3] =
                 ( (uint8_t) p_decoded->p_services[i].i_data_service_id );
+
+        if (p_decoded->p_services[i].i_lines > DVBPSI_VBIDATA_LINE_DR_MAX)
+            p_decoded->p_services[i].i_lines = DVBPSI_VBIDATA_LINE_DR_MAX;
 
         p_descriptor->p_data[5 * i + 4] = p_decoded->p_services[i].i_lines;
         for (int n=0; n < p_decoded->p_services[i].i_lines; n++ )
