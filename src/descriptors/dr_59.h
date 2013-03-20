@@ -61,6 +61,12 @@ typedef struct dvbpsi_subtitle_s
 
 } dvbpsi_subtitle_t;
 
+/*!
+ * \def DVBPSI_SUBTITLING_DR_MAX
+ * \brief Maximum number of dvbpsi_subtitle_t entries present in
+ * @see dvbpsi_subtitling_dr_t
+ */
+#define DVBPSI_SUBTITLING_DR_MAX 20
 
 /*****************************************************************************
  * dvbpsi_subtitling_dr_t
@@ -79,7 +85,7 @@ typedef struct dvbpsi_subtitle_s
 typedef struct dvbpsi_subtitling_dr_s
 {
   uint8_t      i_subtitles_number;  /*!< subtiles number */
-  dvbpsi_subtitle_t p_subtitle[20]; /*!< subtitles */
+  dvbpsi_subtitle_t p_subtitle[DVBPSI_SUBTITLING_DR_MAX]; /*!< subtitles */
 
 } dvbpsi_subtitling_dr_t;
 

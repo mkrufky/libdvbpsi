@@ -72,7 +72,8 @@ dvbpsi_subtitling_dr_t * dvbpsi_DecodeSubtitlingDr(
         return NULL;
 
     i_subtitles_number = p_descriptor->i_length / 8;
-
+    if (i_subtitles_number > DVBPSI_SUBTITLING_DR_MAX)
+        i_subtitles_number = DVBPSI_SUBTITLING_DR_MAX;
     p_decoded->i_subtitles_number = i_subtitles_number;
 
     for (int i = 0; i < i_subtitles_number; i++)
@@ -105,6 +106,9 @@ dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
                                         dvbpsi_subtitling_dr_t * p_decoded,
                                         bool b_duplicate)
 {
+    if (p_decoded->i_subtitles_number > DVBPSI_SUBTITLING_DR_MAX)
+        p_decoded->i_subtitles_number = DVBPSI_SUBTITLING_DR_MAX;
+
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x59, p_decoded->i_subtitles_number * 8 , NULL);
