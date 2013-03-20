@@ -13,6 +13,8 @@ Changes between 1.0.0 and 1.1.0:
    - BAT
    - TOT
    - NIT
+ * New descriptor:
+   - 0x54 content descriptor
 
 Changes between 0.2.2 and 1.0.0:
 --------------------------------
