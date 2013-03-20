@@ -61,7 +61,7 @@ dvbpsi_service_dr_t * dvbpsi_DecodeServiceDr(
 
     /* Allocate memory */
     dvbpsi_service_dr_t * p_decoded;
-    p_decoded = (dvbpsi_service_dr_t*)malloc(sizeof(dvbpsi_service_dr_t));
+    p_decoded = (dvbpsi_service_dr_t*)calloc(1, sizeof(dvbpsi_service_dr_t));
     if (!p_decoded)
         return NULL;
 
@@ -72,6 +72,9 @@ dvbpsi_service_dr_t * dvbpsi_DecodeServiceDr(
     p_decoded->i_service_name_length = 0;
     p_decoded->i_service_provider_name[0] = 0;
     p_decoded->i_service_name[0] = 0;
+
+    if (p_decoded->i_service_provider_name_length > 252)
+        p_decoded->i_service_provider_name_length = 252;
 
     if (p_decoded->i_service_provider_name_length + 2 > p_descriptor->i_length)
         return p_decoded;
@@ -86,6 +89,9 @@ dvbpsi_service_dr_t * dvbpsi_DecodeServiceDr(
 
     p_decoded->i_service_name_length =
             p_descriptor->p_data[2+p_decoded->i_service_provider_name_length];
+
+    if (p_decoded->i_service_name_length > 252)
+        p_decoded->i_service_name_length = 252;
 
     if (p_decoded->i_service_provider_name_length + 3 +
             p_decoded->i_service_name_length > p_descriptor->i_length)
@@ -105,10 +111,15 @@ dvbpsi_service_dr_t * dvbpsi_DecodeServiceDr(
 dvbpsi_descriptor_t * dvbpsi_GenServiceDr(dvbpsi_service_dr_t * p_decoded,
                                           bool b_duplicate)
 {
+    if (p_decoded->i_service_provider_name_length > 252)
+        p_decoded->i_service_provider_name_length = 252;
+    if (p_decoded->i_service_name_length > 252)
+        p_decoded->i_service_name_length = 252;
+
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x48, 3 + p_decoded->i_service_name_length +
-                                 p_decoded->i_service_provider_name_length , NULL);
+                                 p_decoded->i_service_provider_name_length, NULL);
     if (!p_descriptor)
         return NULL;
 
