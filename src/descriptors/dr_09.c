@@ -69,6 +69,9 @@ dvbpsi_ca_dr_t * dvbpsi_DecodeCADr(dvbpsi_descriptor_t * p_descriptor)
     p_decoded->i_ca_pid =   ((uint16_t)(p_descriptor->p_data[2] & 0x1f) << 8)
             | p_descriptor->p_data[3];
     p_decoded->i_private_length = p_descriptor->i_length - 4;
+    if (p_decoded->i_private_length > 251)
+        p_decoded->i_private_length = 251;
+
     if (p_decoded->i_private_length)
         memcpy(p_decoded->i_private_data,
                p_descriptor->p_data + 4,
@@ -85,6 +88,9 @@ dvbpsi_ca_dr_t * dvbpsi_DecodeCADr(dvbpsi_descriptor_t * p_descriptor)
 dvbpsi_descriptor_t * dvbpsi_GenCADr(dvbpsi_ca_dr_t * p_decoded,
                                      bool b_duplicate)
 {
+    if (p_decoded->i_private_length > 251)
+        p_decoded->i_private_length = 251;
+
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x09, p_decoded->i_private_length + 4, NULL);
