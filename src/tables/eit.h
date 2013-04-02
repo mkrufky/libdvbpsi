@@ -59,6 +59,7 @@ typedef struct dvbpsi_eit_event_s
   uint32_t                  i_duration;             /*!< duration */
   uint8_t                   i_running_status;       /*!< Running status */
   bool                      b_free_ca;              /*!< Free CA mode flag */
+  bool                      b_nvod;                 /*!< Unscheduled NVOD Event */
   uint16_t                  i_descriptors_length;   /*!< Descriptors loop
                                                          length */
   dvbpsi_descriptor_t *     p_first_descriptor;     /*!< First of the following
@@ -234,6 +235,28 @@ void dvbpsi_eit_delete(dvbpsi_eit_t* p_eit);
 dvbpsi_eit_event_t* dvbpsi_eit_event_add(dvbpsi_eit_t* p_eit,
     uint16_t i_event_id, uint64_t i_start_time, uint32_t i_duration,
     uint8_t i_running_status, bool b_free_ca,
+    uint16_t i_event_descriptor_length);
+
+/*****************************************************************************
+ * dvbpsi_eit_nvod_event_add
+ *****************************************************************************/
+/*!
+ * \fn dvbpsi_eit_event_t* dvbpsi_eit_nvod_event_add(dvbpsi_eit_t* p_eit,
+                                              uint16_t i_event_id,
+                                              uint32_t i_duration,
+                                              bool b_free_ca,
+                                              uint16_t i_event_descriptor_length)
+ * \brief Add a NVOD service description at the end of the EIT.
+ * \param p_eit pointer to the EIT structure
+ * \param i_event_id Event ID
+ * \param i_duration Duration
+ * \param b_free_ca Free CA flag
+ * \param i_event_descriptor_length The descriptors loop length in bytes of
+                                    all descriptors for this event.
+ * \return a pointer to the added service description.
+ */
+dvbpsi_eit_event_t* dvbpsi_eit_nvod_event_add(dvbpsi_eit_t* p_eit,
+    uint16_t i_event_id, uint32_t i_duration, bool b_free_ca,
     uint16_t i_event_descriptor_length);
 
 /*****************************************************************************

@@ -222,6 +222,8 @@ dvbpsi_eit_event_t* dvbpsi_eit_event_add(dvbpsi_eit_t* p_eit,
     p_event->i_duration = i_duration;
     p_event->i_running_status = i_running_status;
     p_event->b_free_ca = b_free_ca;
+    p_event->b_nvod = ( (i_start_time & 0xFFFFF000) == 0xFFFFF000
+		    && i_running_status == 0x0 );
     p_event->p_next = NULL;
     p_event->i_descriptors_length = i_event_descriptor_length;
     p_event->p_first_descriptor = NULL;
@@ -236,6 +238,19 @@ dvbpsi_eit_event_t* dvbpsi_eit_event_add(dvbpsi_eit_t* p_eit,
         p_last_event->p_next = p_event;
     }
     return p_event;
+}
+
+/*****************************************************************************
+ * dvbpsi_eit_nvod_event_add
+ *****************************************************************************
+ * Add an NVOD event description at the end of the EIT.
+ *****************************************************************************/
+dvbpsi_eit_event_t* dvbpsi_eit_nvod_event_add(dvbpsi_eit_t* p_eit,
+    uint16_t i_event_id, uint32_t i_duration, bool b_free_ca,
+    uint16_t i_event_descriptor_length)
+{
+    return dvbpsi_eit_event_add(p_eit, i_event_id, 0xFFFFF000, i_duration,
+                                0x0, b_free_ca, i_event_descriptor_length);
 }
 
 /*****************************************************************************
