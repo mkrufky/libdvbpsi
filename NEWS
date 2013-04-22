@@ -2,7 +2,7 @@
 Changes between 1.0.0 and 1.1.0:
 --------------------------------
 
- * Remove deprecated APIs
+ * Remove deprecated APIs and bump library version.
  * Corrected use of dvbpsi_ValidPSISection() to not use b_syntax_indicator as check,
    the function tries to always check the CRC32 of the given PSI section. Take care
    to only use the function for PSI sections that have a CRC32 field. Use the function
