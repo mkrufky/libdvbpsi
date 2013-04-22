@@ -21,6 +21,11 @@ D: subtables decoder
 D: SDT decoder
 D: most DVB descriptors
 
+N: Francois Cartegnie
+E: <fcartegnie@free.fr>
+D: NVOD detection in EIT
+D: Add dr_54 (Content Descriptor)
+
 N: Johann Hanne
 E: jhml@gmx.net
 D: CAT support
@@ -60,6 +65,7 @@ E: jpsaman@videolan.org
 D: VBI Data Descriptor (0x45)
 D: CUE Identifier Descriptor (0x8a)
 D: Splice Information Table
+D: Maintainer
 
 N: Zlu Zu
 E: zluzu@gmail.com
