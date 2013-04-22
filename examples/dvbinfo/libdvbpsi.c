@@ -1473,7 +1473,10 @@ static void DumpEITEventDescriptors(dvbpsi_eit_event_t *p_eit_event)
     while (p_event)
     {
         printf("\t  | Event id: %d\n", p_event->i_event_id);
-        printf("\t  | Start time: %"PRId64"\n", p_event->i_start_time);
+        if( p_event->b_nvod )
+            printf("\t  | Start time: Unscheduled Near Video On Demand (NVOD) event\n");
+        else
+            printf("\t  | Start time: %"PRId64"\n", p_event->i_start_time);
         printf("\t  | Duration: %d\n", p_event->i_duration);
         printf("\t  | Running status: %d\n", p_event->i_running_status);
         printf("\t  | Free CA mode: %s\n", p_event->b_free_ca ? "yes" : "no");
