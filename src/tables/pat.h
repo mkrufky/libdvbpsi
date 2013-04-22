@@ -138,7 +138,7 @@ void dvbpsi_pat_detach(dvbpsi_t *p_dvbpsi);
  * \return nothing.
  */
 void dvbpsi_pat_init(dvbpsi_pat_t* p_pat, uint16_t i_ts_id, uint8_t i_version,
-                    bool b_current_next);
+                     bool b_current_next);
 
 /*!
  * \fn dvbpsi_pat_t *dvbpsi_pat_new(uint16_t i_ts_id, uint8_t i_version,
@@ -184,7 +184,7 @@ void dvbpsi_pat_delete(dvbpsi_pat_t *p_pat);
  * \return a pointer to the added program.
  */
 dvbpsi_pat_program_t* dvbpsi_pat_program_add(dvbpsi_pat_t* p_pat,
-                                           uint16_t i_number, uint16_t i_pid);
+                                             uint16_t i_number, uint16_t i_pid);
 
 /*****************************************************************************
  * dvbpsi_pat_sections_generate
