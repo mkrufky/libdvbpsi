@@ -87,7 +87,7 @@ typedef struct dvbpsi_eit_event_s
 typedef struct dvbpsi_eit_s
 {
     uint8_t             i_table_id;         /*!< table id */
-    uint16_t            i_extension;        /*!< subtable id */
+    uint16_t            i_extension;        /*!< subtable id, here service_id */
 
     uint8_t             i_version;          /*!< version_number */
     bool                b_current_next;     /*!< current_next_indicator */
