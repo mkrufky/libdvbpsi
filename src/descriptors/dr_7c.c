@@ -245,7 +245,7 @@ dvbpsi_aac_dr_t *dvbpsi_DecodeAACDr(dvbpsi_descriptor_t *p_descriptor)
     /* Keep additional info bytes field */
     if (p_descriptor->i_length > 1)
     {
-        uint8_t i_info_length = p_descriptor->i_length - p_decoded->b_type ? 3 : 2;
+        uint8_t i_info_length = p_descriptor->i_length - (p_decoded->b_type ? 3 : 2);
         dvbpsi_aac_dr_t *p_tmp = realloc(p_decoded, sizeof(dvbpsi_aac_dr_t) + i_info_length);
         if (!p_tmp)
         {
