@@ -47,6 +47,16 @@
 #   include <arpa/inet.h>
 #endif
 
+#ifndef SOL_IP
+#   define SOL_IP IPPROTO_IP
+#endif
+#ifndef SOL_IPV6
+#   define SOL_IPV6 IPPROTO_IPV6
+#endif
+#ifndef IPPROTO_IPV6
+# define IPPROTO_IPV6 41 /* IANA */
+#endif
+
 #include <assert.h>
 
 #include "udp.h"
