@@ -203,7 +203,7 @@ void dvbpsi_sdt_delete(dvbpsi_sdt_t *p_sdt);
                                                   bool b_eit_present,
                                                   uint8_t i_running_status,
                                                   bool b_free_ca)
- * \brief Add a service description at the end of the SDT.
+ * \brief Add a service at the end of the SDT.
  * \param p_sdt pointer to the SDT structure
  * \param i_service_id Service ID
  * \param b_eit_schedule EIT Schedule flag
