@@ -202,16 +202,16 @@ bool dvbpsi_CheckPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section,
         dvbpsi_error(p_dvbpsi, psz_table_name,
                      "invalid section (table_id == 0x%02x expected 0x%02x)",
                      p_section->i_table_id, table_id);
-        goto error;
+        return false;
     }
 
     if (!p_section->b_syntax_indicator &&
-        (table_id != 0x73)) /* TOT has b_syntax_indicator set to '0' */
+        (table_id != 0x70 && table_id != 0x73)) /* TDT/TOT has b_syntax_indicator set to '0' */
     {
         /* Invalid section_syntax_indicator */
         dvbpsi_error(p_dvbpsi, psz_table_name,
                      "invalid section (section_syntax_indicator == 0)");
-        goto error;
+        return false;
     }
 
     dvbpsi_debug(p_dvbpsi, psz_table_name,
@@ -221,9 +221,6 @@ bool dvbpsi_CheckPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section,
                    p_section->i_number, p_section->i_last_number,
                    p_section->b_current_next);
     return true;
-
-error:
-    return false;
 }
 
 /*****************************************************************************
