@@ -59,6 +59,7 @@
 #include "dr_49.h"
 #include "dr_4a.h"
 #include "dr_4b.h"
+#include "dr_4c.h"
 #include "dr_4d.h"
 #include "dr_4e.h"
 #include "dr_4f.h"
