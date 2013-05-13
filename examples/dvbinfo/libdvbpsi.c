@@ -905,6 +905,16 @@ static void DumpStreamIdentifierDescriptor(dvbpsi_stream_identifier_dr_t* p_si_d
 }
 
 /*****************************************************************************
+ * DumpCAIdentifierDescriptor
+ *****************************************************************************/
+static void DumpCAIdentifierDescriptor(dvbpsi_ca_identifier_dr_t *p_ca_descriptor)
+{
+    printf("CA system id\n");
+    for(int i = 0; i < p_ca_descriptor->i_number; i++ )
+        printf("\t%d: %d\n", i, p_ca_descriptor->p_system[i].i_ca_system_id);
+}
+
+/*****************************************************************************
  * DumpContentDescriptor
  *****************************************************************************/
 typedef struct {
@@ -1220,6 +1230,25 @@ static void DumpAACDescriptor(dvbpsi_aac_dr_t *p_aac_descriptor)
 }
 
 /*****************************************************************************
+ * DumpTimeShiftedServiceDescriptor
+ *****************************************************************************/
+static void DumpTimeShiftedServiceDescriptor(dvbpsi_tshifted_service_dr_t *p_ts_service)
+{
+    printf("Time Shifted Service\n");
+    printf("\treference service id:%d", p_ts_service->i_ref_service_id);
+}
+
+/*****************************************************************************
+ * DumpTimeShiftedEventDescriptor
+ *****************************************************************************/
+static void DumpTimeShiftedEventDescriptor(dvbpsi_tshifted_ev_dr_t *p_ts_event)
+{
+    printf("Time Shifted Event");
+    printf("\treference service id:%d", p_ts_event->i_ref_service_id);
+    printf("\treference event id:%d", p_ts_event->i_ref_event_id);
+}
+
+/*****************************************************************************
  * DumpCUEIdentifierDescriptor
  *****************************************************************************/
 #ifdef TS_USE_DVB_CUEI
@@ -1410,8 +1439,17 @@ static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
             case 0x0e:
                 DumpMaxBitrateDescriptor(dvbpsi_DecodeMaxBitrateDr(p_descriptor));
                 break;
+            case 0x4c:
+                DumpTimeShiftedServiceDescriptor(dvbpsi_DecodeTimeShiftedServiceDr(p_descriptor));
+                break;
+            case 0x4f:
+                DumpTimeShiftedEventDescriptor(dvbpsi_DecodeTimeShiftedEventDr(p_descriptor));
+                break;
             case 0x52:
                 DumpStreamIdentifierDescriptor(dvbpsi_DecodeStreamIdentifierDr(p_descriptor));
+                break;
+            case 0x53:
+                DumpCAIdentifierDescriptor(dvbpsi_DecodeCAIdentifierDr(p_descriptor));
                 break;
             case 0x54:
                 DumpContentDescriptor(dvbpsi_DecodeContentDr(p_descriptor));
