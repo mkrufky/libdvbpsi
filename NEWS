@@ -3,6 +3,9 @@ Changes between 1.1.0 and 1.1.1:
 
  * Various bugfixes (documentation, dvbinfo)
  * Check TDT and TOT in dvbpsi_CheckPSISection() both have b_syntax_indicator set to '0'.
+ * Added new descriptors:
+   - 0x4c Time shifted service
+   - 0x53 CA system id
 
 Changes between 1.0.0 and 1.1.0:
 --------------------------------
