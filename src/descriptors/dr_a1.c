@@ -48,10 +48,10 @@ dvbpsi_service_location_dr_t * dvbpsi_DecodeServiceLocationDr(
 
   p_descriptor->p_decoded = (void*)p_decoded;
 
-  p_decoded->i_pcr_pid = dvbpsi_get_bits(buf, 3, 13);
-  p_decoded->i_number_elements = dvbpsi_get_bits(buf, 16, 8);
+  p_decoded->i_pcr_pid = ((uint16_t)(buf[0] & 0x1f) << 8) | buf[1];
+  p_decoded->i_number_elements = buf[2];
 
-  buf = &p_descriptor->p_data[3];
+  buf += 3;
 
   for (int i = 0; i < p_decoded->i_number_elements; i++)
   {
@@ -62,8 +62,8 @@ dvbpsi_service_location_dr_t * dvbpsi_DecodeServiceLocationDr(
 
     memset(p_element, 0, sizeof(dvbpsi_service_location_element_t));
 
-    p_element->i_stream_type = dvbpsi_get_bits(buf, 0, 8);
-    p_element->i_elementary_pid = dvbpsi_get_bits(buf, 11, 13);
+    p_element->i_stream_type = buf[0];
+    p_element->i_elementary_pid = ((uint16_t)(buf[1] & 0x1f) << 8) | buf[2];
     memcpy(p_element->i_iso_639_code, &buf[3], 3);
 
     if (p_decoded->p_first_element == NULL)
