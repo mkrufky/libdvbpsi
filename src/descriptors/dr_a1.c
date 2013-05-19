@@ -91,7 +91,7 @@ dvbpsi_service_location_dr_t * dvbpsi_DecodeServiceLocationDr(
 
     p_element->i_stream_type = dvbpsi_get_bits(buf, 0, 8);
     p_element->i_elementary_PID = dvbpsi_get_bits(buf, 11, 13);
-    memcpy(p_element->i_ISO_639_language_code, &buf[3], sizeof(p_element->i_ISO_639_language_code));
+    memcpy(p_element->i_iso_639_code, &buf[3], 3);
 
     if (p_decoded->p_first_element == NULL)
       p_decoded->p_first_element = p_element;
