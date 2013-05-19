@@ -25,7 +25,6 @@ dvbpsi_service_location_dr_t * dvbpsi_DecodeServiceLocationDr(
                                         dvbpsi_descriptor_t * p_descriptor)
 {
   dvbpsi_service_location_dr_t * p_decoded;
-  int i;
   uint8_t * buf = p_descriptor->p_data;
 
   /* Check the tag */
@@ -54,7 +53,7 @@ dvbpsi_service_location_dr_t * dvbpsi_DecodeServiceLocationDr(
 
   buf = &p_descriptor->p_data[3];
 
-  for (i=0; i<p_decoded->i_number_elements; i++)
+  for (int i = 0; i < p_decoded->i_number_elements; i++)
   {
     dvbpsi_service_location_element_t * p_element =
         (dvbpsi_service_location_element_t*)malloc(sizeof(dvbpsi_service_location_element_t));
