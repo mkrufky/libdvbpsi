@@ -52,7 +52,7 @@ dvbpsi_service_location_dr_t * dvbpsi_DecodeServiceLocationDr(
 
   p_descriptor->p_decoded = (void*)p_decoded;
 
-  p_decoded->i_PCR_PID = dvbpsi_get_bits(buf, 3, 13);
+  p_decoded->i_pcr_pid = dvbpsi_get_bits(buf, 3, 13);
   p_decoded->i_number_elements = dvbpsi_get_bits(buf, 16, 8);
 
   buf = &p_descriptor->p_data[3];
@@ -67,7 +67,7 @@ dvbpsi_service_location_dr_t * dvbpsi_DecodeServiceLocationDr(
     memset(p_element, 0, sizeof(dvbpsi_service_location_element_t));
 
     p_element->i_stream_type = dvbpsi_get_bits(buf, 0, 8);
-    p_element->i_elementary_PID = dvbpsi_get_bits(buf, 11, 13);
+    p_element->i_elementary_pid = dvbpsi_get_bits(buf, 11, 13);
     memcpy(p_element->i_iso_639_code, &buf[3], 3);
 
     if (p_decoded->p_first_element == NULL)
