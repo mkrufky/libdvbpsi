@@ -10,7 +10,7 @@ typedef struct dvbpsi_service_location_element_s
 {
   uint8_t     i_stream_type;
   uint16_t    i_elementary_PID;
-  char        i_ISO_639_language_code[3];
+  char        i_iso_639_code[3];
 
   struct dvbpsi_service_location_element_s * p_next;
 
