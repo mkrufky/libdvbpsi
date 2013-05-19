@@ -59,19 +59,16 @@ dvbpsi_service_location_dr_t * dvbpsi_DecodeServiceLocationDr(
   if(p_descriptor->p_decoded)
     return p_descriptor->p_decoded;
 
+  /* Check length */
+  if((p_descriptor->i_length - 3) % 6)
+    return NULL;
+
   /* Allocate memory */
   p_decoded =
         (dvbpsi_service_location_dr_t*)malloc(sizeof(dvbpsi_service_location_dr_t));
   if(!p_decoded) return NULL;
 
   memset(p_decoded, 0, sizeof(dvbpsi_service_location_dr_t));
-
-  /* Decode data and check the length */
-  if(p_descriptor->i_length < 3)
-  {
-    free(p_decoded);
-    return NULL;
-  }
 
   p_descriptor->p_decoded = (void*)p_decoded;
 
