@@ -32,7 +32,7 @@ typedef struct dvbpsi_service_location_element_s
  */
 typedef struct dvbpsi_service_location_dr_s
 {
-  uint16_t     i_pcr_pid;             /*!< PID of the Transport Stream packets*/
+  uint16_t     i_pcr_pid;             /*!< PCR_PID */
   uint8_t      i_number_elements;     /*!< number of elements used for this service */
 
   dvbpsi_service_location_element_t * p_first_element;
