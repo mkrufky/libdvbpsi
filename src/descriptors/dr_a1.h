@@ -41,9 +41,6 @@ extern "C"
     uint8_t i_stream_type;
     uint16_t i_elementary_pid;
     char i_iso_639_code[3];
-
-    struct dvbpsi_service_location_element_s *p_next;
-
   } dvbpsi_service_location_element_t;
 
 /*****************************************************************************
@@ -65,7 +62,7 @@ extern "C"
     uint16_t i_pcr_pid;		/*!< PCR_PID */
     uint8_t i_number_elements;	/*!< number of elements used for this service */
 
-    dvbpsi_service_location_element_t *p_first_element;
+    dvbpsi_service_location_element_t elements[0xff];
 
   } dvbpsi_service_location_dr_t;
 
@@ -84,18 +81,6 @@ extern "C"
   dvbpsi_service_location_dr_t
     *dvbpsi_DecodeServiceLocationDr (dvbpsi_descriptor_t * p_descriptor);
 
-
-/*****************************************************************************
- * dvbpsi_FreeServiceLocationDr
- *****************************************************************************/
-/*!
- * \fn void  dvbpsi_FreeServiceLocationDr(
-                                        dvbpsi_service_location_dr_t * p_descriptor)
- * \brief frees service location descriptor
- * \param p_descriptor pointer to the descriptor structure
- */
-  void dvbpsi_FreeServiceLocationDr (dvbpsi_service_location_dr_t *
-				     p_descriptor);
 #if 0
 /*****************************************************************************
  * dvbpsi_GenServiceDataDr
