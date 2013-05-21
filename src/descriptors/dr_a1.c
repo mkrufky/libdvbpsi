@@ -57,57 +57,17 @@ dvbpsi_DecodeServiceLocationDr (dvbpsi_descriptor_t * p_descriptor)
 
   for (int i = 0; i < p_decoded->i_number_elements; i++)
     {
-      dvbpsi_service_location_element_t *p_element =
-	(dvbpsi_service_location_element_t *)
-	malloc (sizeof (dvbpsi_service_location_element_t));
-
-      if (!p_element)
-	return NULL;
-
-      memset (p_element, 0, sizeof (dvbpsi_service_location_element_t));
+      dvbpsi_service_location_element_t *p_element = &p_decoded->elements[i];
 
       p_element->i_stream_type = buf[0];
-      p_element->i_elementary_pid =
-	((uint16_t) (buf[1] & 0x1f) << 8) | buf[2];
+      p_element->i_elementary_pid = ((uint16_t) (buf[1] & 0x1f) << 8) | buf[2];
       memcpy (p_element->i_iso_639_code, &buf[3], 3);
-
-      if (p_decoded->p_first_element == NULL)
-	p_decoded->p_first_element = p_element;
-      else
-	{
-	  dvbpsi_service_location_element_t *p_last_element =
-	    p_decoded->p_first_element;
-	  while (p_last_element->p_next != NULL)
-	    p_last_element = p_last_element->p_next;
-	  p_last_element->p_next = p_element;
-	}
 
       buf += 6;
     }
 
 
   return p_decoded;
-}
-
-/*****************************************************************************
- * dvbpsi_FreeServiceLocationDr
- *****************************************************************************/
-void
-dvbpsi_FreeServiceLocationDr (dvbpsi_service_location_dr_t * descriptor)
-{
-  dvbpsi_service_location_element_t *p_element = NULL;
-
-  if (descriptor == NULL)
-    return;
-
-  p_element = descriptor->p_first_element;
-
-  while (p_element)
-    {
-      dvbpsi_service_location_element_t *p_next = p_element->p_next;
-      free (p_element);
-      p_element = p_next;
-    }
 }
 
 #if 0
