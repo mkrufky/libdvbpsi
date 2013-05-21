@@ -65,19 +65,12 @@ dvbpsi_caption_service_dr_t *dvbpsi_DecodeCaptionServiceDr(dvbpsi_descriptor_t *
 
     p_descriptor->p_decoded = (void*)p_decoded;
 
-    p_decoded->p_first_service = NULL;
-
     p_decoded->i_number_of_services = 0x1f & buf[0];
     buf++;
 
     for (int i = 0; i < p_decoded->i_number_of_services; i++)
     {
-        dvbpsi_caption_service_t * p_service =
-            (dvbpsi_caption_service_t*)malloc(sizeof(dvbpsi_caption_service_t));
-
-        if (!p_service) return NULL;
-
-        memset(p_service, 0, sizeof(dvbpsi_caption_service_t));
+        dvbpsi_caption_service_t * p_service = &p_decoded->services[i];
 
         memcpy(p_service->i_iso_639_code, buf, 3);
         buf += 3;
@@ -88,15 +81,6 @@ dvbpsi_caption_service_dr_t *dvbpsi_DecodeCaptionServiceDr(dvbpsi_descriptor_t *
         p_service->b_easy_reader            = 0x01 & (buf[0] >> 7);
         p_service->b_wide_aspect_ratio      = 0x01 & (buf[0] >> 6);
 
-        if (p_decoded->p_first_service == NULL)
-            p_decoded->p_first_service = p_service;
-        else
-        {
-            dvbpsi_caption_service_t* p_last_service = p_decoded->p_first_service;
-            while (p_last_service->p_next != NULL)
-              p_last_service = p_last_service->p_next;
-            p_last_service->p_next = p_service;
-        }
         buf += 2;
     }
     return p_decoded;
