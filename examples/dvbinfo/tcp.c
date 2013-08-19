@@ -1,7 +1,7 @@
 /*****************************************************************************
  * tcp.c: network socket abstractions
  *****************************************************************************
- * Copyright (C) 2010-2011 M2X BV
+ * Copyright (C) 2010-2013 M2X BV
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
  *
@@ -50,9 +50,32 @@
 #   include <arpa/inet.h>
 #endif
 
+#ifndef SOCK_CLOEXEC
+#   include <fcntl.h>
+#endif
+
 #include "tcp.h"
 
 #ifdef HAVE_SYS_SOCKET_H
+
+#ifndef SOCK_CLOEXEC
+#   include <stdbool.h>
+static bool set_fdsocketclosexec(int s)
+{
+    int flags = fcntl(s, F_GETFD);
+    if (flags != -1)
+    {
+        if (fcntl(s, F_SETFD, flags | FD_CLOEXEC) != -1)
+        {
+            return true;
+        }
+    }
+
+    perror("tcp socket error");
+    return false;
+}
+#endif
+
 int tcp_close(int fd)
 {
     int result = 0;
@@ -98,12 +121,24 @@ int tcp_open(const char *ipaddress, int port)
 
     for (struct addrinfo *ptr = addr; ptr != NULL; ptr = ptr->ai_next )
     {
-        s_ctl = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+        int sflags = 0;
+#ifdef SOCK_CLOEXEC
+        sflags = SOCK_CLOEXEC;
+#endif
+        s_ctl = socket(ptr->ai_family, ptr->ai_socktype | sflags, ptr->ai_protocol);
         if (s_ctl <= 0)
         {
             perror("tcp socket error");
             continue;
         }
+
+#ifndef SOCK_CLOEXEC
+        if (!set_fdsocketclosexec(s_ctl))
+        {
+            close(s_ctl);
+            continue;
+        }
+#endif
 
         setsockopt (s_ctl, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
 
@@ -126,7 +161,7 @@ ssize_t tcp_read(int fd, void *buf, size_t count)
 {
     ssize_t err;
 again:
-    err = recv(fd, buf, count, MSG_CMSG_CLOEXEC | MSG_WAITALL);
+    err = recv(fd, buf, count, MSG_WAITALL);
     if (err < 0)
     {
         switch(errno)
@@ -148,4 +183,3 @@ again:
     return err;
 }
 #endif
-
