@@ -1,7 +1,7 @@
 /*****************************************************************************
  * udp.c: network socket abstractions
  *****************************************************************************
- * Copyright (C) 2010-2011 M2X BV
+ * Copyright (C) 2010-2013 M2X BV
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
  *
@@ -55,6 +55,10 @@
 #endif
 #ifndef IPPROTO_IPV6
 # define IPPROTO_IPV6 41 /* IANA */
+#endif
+
+#ifndef SOCK_CLOEXEC
+#   include <fcntl.h>
 #endif
 
 #include <assert.h>
@@ -176,6 +180,23 @@ static bool is_ipv6(const char *ipaddress)
     return (strchr(ipaddress, ':') != NULL);
 }
 
+#ifndef SOCK_CLOEXEC
+static bool set_fdsocketclosexec(int s)
+{
+    int flags = fcntl(s, F_GETFD);
+    if (flags != -1)
+    {
+        if (fcntl(s, F_SETFD, flags | FD_CLOEXEC) != -1)
+        {
+            return true;
+        }
+    }
+
+    perror("udp socket error");
+    return false;
+}
+#endif
+
 int udp_close(int fd)
 {
     int result = 0;
@@ -221,12 +242,24 @@ int udp_open(const char *interface, const char *ipaddress, int port)
 
     for (struct addrinfo *ptr = addr; ptr != NULL; ptr = ptr->ai_next )
     {
-        s_ctl = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+        int sflags = 0;
+#ifdef SOCK_CLOEXEC
+        sflags = SOCK_CLOEXEC;
+#endif
+        s_ctl = socket(ptr->ai_family, ptr->ai_socktype | sflags, ptr->ai_protocol);
         if (s_ctl <= 0)
         {
             perror("udp socket error");
             continue;
         }
+
+#ifndef SOCK_CLOEXEC
+        if (!set_fdsocketclosexec(s_ctl))
+        {
+            close(s_ctl);
+            continue;
+        }
+#endif
 
         /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
          * to avoid packet loss caused in case of scheduling hiccups */
@@ -267,7 +300,7 @@ ssize_t udp_read(int fd, void *buf, size_t count)
 {
     ssize_t err;
 again:
-    err = recv(fd, buf, count, MSG_CMSG_CLOEXEC);
+    err = recv(fd, buf, count, 0);
     if (err < 0)
     {
         switch(errno)
