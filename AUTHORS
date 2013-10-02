@@ -26,6 +26,10 @@ E: <fcartegnie@free.fr>
 D: NVOD detection in EIT
 D: Add dr_54 (Content Descriptor)
 
+N: Steinar Gunderson
+E: sgunderson@bigfoot.com
+D: SDT add 0x46 table_id
+
 N: Johann Hanne
 E: jhml@gmx.net
 D: CAT support
