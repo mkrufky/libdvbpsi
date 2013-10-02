@@ -34,10 +34,22 @@
 extern "C" {
 #endif
 
+/*!
+ * \def DVDPSI_GetContentCategoryFromType
+ * \brief Extract content category by type. The value 'type' includes the
+ * content category (MSB) and content detail (LSB).
+ */
 #define DVDPSI_GetContentCategoryFromType(type) ((type) >> 4)
 
+/*!
+ * \def L1L2MERGE
+ * \brief Merge content category and content detail in one byte. The
+ * category is in the topmost 4-bits (MSB) and the content detail in
+ * the lower 4-bits (LSB).
+ */
 #define L1L2MERGE(L1,L2) ( ( DVBPSI_CONTENT_CAT ## L1<<4) | (L2) )
 
+/* Content category */
 #define DVBPSI_CONTENT_CAT_UNDEFINED    0x0
 #define DVBPSI_CONTENT_CAT_MOVIE        0x1
 #define DVBPSI_CONTENT_CAT_NEWS         0x2
