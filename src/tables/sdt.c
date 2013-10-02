@@ -353,7 +353,11 @@ void dvbpsi_sdt_sections_gather(dvbpsi_t *p_dvbpsi,
     assert(p_dvbpsi);
     assert(p_dvbpsi->p_decoder);
 
-    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, 0x42, "SDT decoder"))
+    const uint8_t i_table_id = (p_section->i_table_id == 0x42 ||
+                                p_section->i_table_id == 0x46) ?
+                                    p_section->i_table_id : 0x42;
+
+    if (!dvbpsi_CheckPSISection(p_dvbpsi, p_section, i_table_id, "SDT decoder"))
     {
         dvbpsi_DeletePSISections(p_section);
         return;
