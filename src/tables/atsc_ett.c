@@ -297,7 +297,7 @@ static bool dvbpsi_AddSectionETT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_ett_decoder_t *
                                                        p_section->p_payload_start[0],
                                                        i_etm_id,
                                                        p_section->b_current_next);
-        if (p_decoder->p_building_ett)
+        if (!p_decoder->p_building_ett)
             return false;
 
         p_decoder->i_last_section_number = p_section->i_last_number;

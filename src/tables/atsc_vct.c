@@ -423,7 +423,7 @@ static bool dvbpsi_AddSectionVCT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_vct_decoder_t *
                               p_section->i_table_id, p_section->i_extension,
                               p_section->p_payload_start[0], p_section->i_table_id == 0xC9,
                               p_section->i_version, p_section->b_current_next);
-        if (p_vct_decoder->p_building_vct)
+        if (!p_vct_decoder->p_building_vct)
             return false;
 
         p_vct_decoder->i_last_section_number = p_section->i_last_number;

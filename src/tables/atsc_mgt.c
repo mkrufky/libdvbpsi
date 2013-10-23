@@ -384,7 +384,7 @@ static bool dvbpsi_AddSectionMGT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_mgt_decoder_t *
                                                        p_section->i_version,
                                                        p_section->p_payload_start[0],
                                                        p_section->b_current_next);
-        if (p_decoder->p_building_mgt)
+        if (!p_decoder->p_building_mgt)
             return false;
 
         p_decoder->i_last_section_number = p_section->i_last_number;
@@ -502,13 +502,17 @@ static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
         /* Delete the sections */
         dvbpsi_DeletePSISections(p_mgt_decoder->p_sections);
         p_mgt_decoder->p_sections = NULL;
+        p_section = NULL;
         /* signal the new MGT */
         p_mgt_decoder->pf_mgt_callback(p_mgt_decoder->p_cb_data,
                                        p_mgt_decoder->p_building_mgt);
         /* Reinitialize the structures */
         dvbpsi_ReInitMGT(p_mgt_decoder, false);
     }
-    dvbpsi_DeletePSISections(p_section);
+    if( NULL != p_section )
+    {
+        dvbpsi_DeletePSISections(p_section);
+    }
 }
 
 /*****************************************************************************
