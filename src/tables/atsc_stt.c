@@ -288,7 +288,7 @@ static bool dvbpsi_AddSectionSTT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_stt_decoder_t *
     {
         p_decoder->p_building_stt = dvbpsi_atsc_NewSTT(p_section->i_table_id, p_section->i_extension,
                                                        p_section->i_version, p_section->b_current_next);
-        if (p_decoder->p_building_stt)
+        if (!p_decoder->p_building_stt)
             return false;
 
         p_decoder->i_last_section_number = p_section->i_last_number;

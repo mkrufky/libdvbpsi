@@ -360,7 +360,7 @@ static bool dvbpsi_AddSectionEIT(dvbpsi_t *p_dvbpsi, dvbpsi_atsc_eit_decoder_t *
                                                 p_section->p_payload_start[0],
                                                 p_section->i_extension,
                                                 p_section->b_current_next);
-        if (p_decoder->p_building_eit)
+        if (!p_decoder->p_building_eit)
             return false;
 
         p_decoder->i_last_section_number = p_section->i_last_number;
