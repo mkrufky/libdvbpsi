@@ -537,14 +537,12 @@ static void dvbpsi_atsc_GatherVCTSections(dvbpsi_t *p_dvbpsi,
         /* Decode the sections */
         dvbpsi_atsc_DecodeVCTSections(p_vct_decoder->p_building_vct,
                                       p_vct_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_vct_decoder->p_sections);
-        p_vct_decoder->p_sections = NULL;
         /* signal the new VCT */
         p_vct_decoder->pf_vct_callback(p_vct_decoder->p_cb_data,
                                        p_vct_decoder->p_building_vct);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitVCT(p_vct_decoder, false);
+        assert(p_vct_decoder->p_sections == NULL);
     }
 }
 

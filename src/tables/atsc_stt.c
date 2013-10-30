@@ -404,14 +404,12 @@ static void dvbpsi_atsc_GatherSTTSections(dvbpsi_t *p_dvbpsi,
         /* Decode the sections */
         dvbpsi_atsc_DecodeSTTSections(p_stt_decoder->p_building_stt,
                                       p_stt_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_stt_decoder->p_sections);
-        p_stt_decoder->p_sections = NULL;
         /* signal the new STT */
         p_stt_decoder->pf_stt_callback(p_stt_decoder->p_cb_data,
                                        p_stt_decoder->p_building_stt);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitSTT(p_stt_decoder, false);
+        assert(p_stt_decoder->p_sections == NULL);
     }
 }
 

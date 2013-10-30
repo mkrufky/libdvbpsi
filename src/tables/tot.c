@@ -382,14 +382,12 @@ void dvbpsi_tot_sections_gather(dvbpsi_t* p_dvbpsi,
         /* Decode the sections */
         dvbpsi_tot_sections_decode(p_dvbpsi, p_tot_decoder->p_building_tot,
                                    p_tot_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_tot_decoder->p_sections);
-        p_tot_decoder->p_sections = NULL;
         /* signal the new TOT */
         p_tot_decoder->pf_tot_callback(p_tot_decoder->p_cb_data,
                                        p_tot_decoder->p_building_tot);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitTOT(p_tot_decoder, false);
+        assert(p_tot_decoder->p_sections == NULL);
     }
 }
 

@@ -323,14 +323,12 @@ void dvbpsi_cat_sections_gather(dvbpsi_t *p_dvbpsi,
         /* Decode the sections */
         dvbpsi_cat_sections_decode(p_cat_decoder->p_building_cat,
                                    p_cat_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_cat_decoder->p_sections);
-        p_cat_decoder->p_sections = NULL;
         /* signal the new CAT */
         p_cat_decoder->pf_cat_callback(p_cat_decoder->p_cb_data,
                                        p_cat_decoder->p_building_cat);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitCAT(p_cat_decoder, false);
+        assert(p_cat_decoder->p_sections == NULL);
     }
 }
 

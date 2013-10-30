@@ -499,19 +499,12 @@ static void dvbpsi_atsc_GatherMGTSections(dvbpsi_t * p_dvbpsi,
         /* Decode the sections */
         dvbpsi_atsc_DecodeMGTSections(p_mgt_decoder->p_building_mgt,
                                       p_mgt_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_mgt_decoder->p_sections);
-        p_mgt_decoder->p_sections = NULL;
-        p_section = NULL;
         /* signal the new MGT */
         p_mgt_decoder->pf_mgt_callback(p_mgt_decoder->p_cb_data,
                                        p_mgt_decoder->p_building_mgt);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitMGT(p_mgt_decoder, false);
-    }
-    if( NULL != p_section )
-    {
-        dvbpsi_DeletePSISections(p_section);
+        assert(p_mgt_decoder->p_sections == NULL);
     }
 }
 

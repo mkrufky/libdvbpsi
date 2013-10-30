@@ -393,14 +393,12 @@ void dvbpsi_pmt_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sect
         /* Decode the sections */
         dvbpsi_pmt_sections_decode(p_pmt_decoder->p_building_pmt,
                                    p_pmt_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_pmt_decoder->p_sections);
-        p_pmt_decoder->p_sections = NULL;
         /* signal the new PMT */
         p_pmt_decoder->pf_pmt_callback(p_pmt_decoder->p_cb_data,
                                        p_pmt_decoder->p_building_pmt);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitPMT(p_pmt_decoder, false);
+        assert(p_pmt_decoder->p_sections == NULL);
     }
 }
 

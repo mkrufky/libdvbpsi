@@ -476,14 +476,12 @@ static void dvbpsi_atsc_GatherEITSections(dvbpsi_t * p_dvbpsi,
         /* Decode the sections */
         dvbpsi_atsc_DecodeEITSections(p_eit_decoder->p_building_eit,
                                       p_eit_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_eit_decoder->p_sections);
-        p_eit_decoder->p_sections = NULL;
         /* signal the new EIT */
         p_eit_decoder->pf_eit_callback(p_eit_decoder->p_cb_data,
                                        p_eit_decoder->p_building_eit);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitEIT(p_eit_decoder, false);
+        assert(p_eit_decoder->p_sections == NULL);
     }
 }
 

@@ -498,15 +498,12 @@ void dvbpsi_eit_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_
         dvbpsi_eit_sections_decode(p_eit_decoder->p_building_eit,
                                    p_eit_decoder->p_sections);
 
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_eit_decoder->p_sections);
-        p_eit_decoder->p_sections = NULL;
-
         /* signal the new EIT */
         p_eit_decoder->pf_eit_callback(p_eit_decoder->p_cb_data, p_eit_decoder->p_building_eit);
 
-        /* Reinitialize the structures */
-        p_eit_decoder->p_building_eit = NULL;
+        /* Delete sections and Reinitialize the structures */
+        dvbpsi_ReInitEIT(p_eit_decoder, false);
+        assert(p_eit_decoder->p_sections == NULL);
     }
 }
 
