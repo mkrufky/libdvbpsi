@@ -196,6 +196,7 @@ static void params_free(params_t *param)
     free(param->input);
     free(param->output);
     free(param->summary.file);
+    free(param);
     param = NULL;
 }
 
