@@ -57,7 +57,7 @@ void dvbpsi_pat_sections_gather(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sect
  *****************************************************************************
  * PAT decoder.
  *****************************************************************************/
-void dvbpsi_pat_sections_decode(dvbpsi_pat_t* p_pat,
+bool dvbpsi_pat_sections_decode(dvbpsi_pat_t* p_pat,
                                 dvbpsi_psi_section_t* p_section);
 
 #else
