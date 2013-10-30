@@ -1064,7 +1064,7 @@ static void DumpContentDescriptor(dvbpsi_content_dr_t *p_content_descriptor)
     for(int i = 0; i < p_content_descriptor->i_contents_number; i++)
     {
         int i_type = p_content_descriptor->p_content[i].i_type;
-        int i_category = DVDPSI_GetContentCategoryFromType(i_type);
+        int i_category = DVBPSI_GetContentCategoryFromType(i_type);
 
         printf("\t\tcategory: %s\n", content_category[i_category].p_category);
         printf("\t\tsub category: %s\n", GetContentSubCategory(i_type));
