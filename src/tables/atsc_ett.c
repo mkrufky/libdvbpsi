@@ -391,16 +391,13 @@ static void dvbpsi_atsc_GatherETTSections(dvbpsi_t* p_dvbpsi,
         /* Decode the sections */
         dvbpsi_atsc_DecodeETTSections(p_ett_decoder->p_building_ett,
                                       p_ett_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_ett_decoder->p_sections);
-        p_ett_decoder->p_sections = NULL;
         /* signal the new ETT */
         p_ett_decoder->pf_ett_callback(p_ett_decoder->p_cb_data,
                                        p_ett_decoder->p_building_ett);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitETT(p_ett_decoder, false);
+        assert(p_ett_decoder->p_sections == NULL);
     }
-    dvbpsi_DeletePSISections(p_section);
 }
 
 /*****************************************************************************

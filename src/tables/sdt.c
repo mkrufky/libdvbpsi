@@ -419,14 +419,12 @@ void dvbpsi_sdt_sections_gather(dvbpsi_t *p_dvbpsi,
         /* Decode the sections */
         dvbpsi_sdt_sections_decode(p_sdt_decoder->p_building_sdt,
                                    p_sdt_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_sdt_decoder->p_sections);
-        p_sdt_decoder->p_sections = NULL;
         /* signal the new SDT */
         p_sdt_decoder->pf_sdt_callback(p_sdt_decoder->p_cb_data,
                                        p_sdt_decoder->p_building_sdt);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitSDT(p_sdt_decoder, false);
+        assert(p_sdt_decoder->p_sections == NULL);
     }
 }
 

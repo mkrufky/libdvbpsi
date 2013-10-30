@@ -436,14 +436,12 @@ void dvbpsi_nit_sections_gather(dvbpsi_t *p_dvbpsi,
         /* Decode the sections */
         dvbpsi_nit_sections_decode(p_nit_decoder->p_building_nit,
                                    p_nit_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_nit_decoder->p_sections);
-        p_nit_decoder->p_sections = NULL;
         /* signal the new NIT */
         p_nit_decoder->pf_nit_callback(p_nit_decoder->p_cb_data,
                                        p_nit_decoder->p_building_nit);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitNIT(p_nit_decoder, false);
+        assert(p_nit_decoder->p_sections == NULL);
     }
 }
 

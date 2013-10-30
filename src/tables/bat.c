@@ -447,14 +447,12 @@ void dvbpsi_bat_sections_gather(dvbpsi_t *p_dvbpsi,
         /* Decode the sections */
         dvbpsi_bat_sections_decode(p_bat_decoder->p_building_bat,
                                    p_bat_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_bat_decoder->p_sections);
-        p_bat_decoder->p_sections = NULL;
         /* signal the new BAT */
         p_bat_decoder->pf_bat_callback(p_bat_decoder->p_cb_data,
                                        p_bat_decoder->p_building_bat);
-        /* Reinitialize the structures */
+        /* Delete sections and Reinitialize the structures */
         dvbpsi_ReInitBAT(p_bat_decoder, false);
+        assert(p_bat_decoder->p_sections == NULL);
     }
 }
 

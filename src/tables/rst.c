@@ -386,14 +386,12 @@ void dvbpsi_rst_sections_gather(dvbpsi_t *p_dvbpsi,
         /* Decode the sections */
         dvbpsi_rst_sections_decode(p_rst_decoder->p_building_rst,
                                    p_rst_decoder->p_sections);
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_rst_decoder->p_sections);
-        p_rst_decoder->p_sections = NULL;
         /* signal the new CAT */
         p_rst_decoder->pf_rst_callback(p_rst_decoder->p_cb_data,
                                        p_rst_decoder->p_building_rst);
-        /* Reinitialize the structures */
+        /* Delete sectioins and Reinitialize the structures */
         dvbpsi_rst_reset(p_rst_decoder, false);
+        assert(p_rst_decoder->p_sections == NULL);
     }
 }
 
