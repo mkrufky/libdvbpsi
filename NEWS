@@ -3,6 +3,8 @@ Changes between 1.1.1 and 1.1.2:
 
  * Various bugfixes for ATSC PSI tables
  * dvbpsi_packet_push() bugfix
+ * Various bugfixes for dvbinfo
+ * Ignore invalid program pids (pid=0) inside PAT table (closes vlc ticket #9695)
 
 Changes between 1.1.0 and 1.1.1:
 --------------------------------
