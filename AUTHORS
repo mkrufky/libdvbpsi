@@ -21,6 +21,10 @@ D: subtables decoder
 D: SDT decoder
 D: most DVB descriptors
 
+N: Brad Bitterman
+E: <bitter@vtilt.com>
+D: ATSC PSI table fixes
+
 N: Francois Cartegnie
 E: <fcartegnie@free.fr>
 D: NVOD detection in EIT
