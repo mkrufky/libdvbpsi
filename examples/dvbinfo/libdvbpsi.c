@@ -1056,6 +1056,9 @@ static void DumpContentDescriptor(dvbpsi_content_dr_t *p_content_descriptor)
         { DVBPSI_CONTENT_CAT_EDUCATION, "Education" },
         { DVBPSI_CONTENT_CAT_LEISURE, "Leisur" },
         { DVBPSI_CONTENT_CAT_SPECIAL, "Special" },
+        { 0, NULL }, /* 0xc unknown */
+        { 0, NULL }, /* 0xd unknown */
+        { 0, NULL }, /* 0xe unknown */
         { DVBPSI_CONTENT_CAT_USERDEFINED, "User defined" },
         { 0, NULL }
     };
