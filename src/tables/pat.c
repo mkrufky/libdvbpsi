@@ -161,6 +161,11 @@ dvbpsi_pat_program_t* dvbpsi_pat_program_add(dvbpsi_pat_t* p_pat,
 {
     dvbpsi_pat_program_t* p_program;
 
+    /* PID = 0 is invalid for programs
+     * FIXME: check for other fixed PIDs too. */
+    if (i_pid == 0)
+        return NULL;
+
     p_program = (dvbpsi_pat_program_t*) malloc(sizeof(dvbpsi_pat_program_t));
     if (p_program == NULL)
         return NULL;
@@ -328,32 +333,32 @@ void dvbpsi_pat_sections_gather(dvbpsi_t* p_dvbpsi, dvbpsi_psi_section_t* p_sect
 
         /* Save the current information */
         p_pat_decoder->current_pat = *p_pat_decoder->p_building_pat;
-        p_pat_decoder->b_current_valid = true;
 
         /* Decode the sections */
-        dvbpsi_pat_sections_decode(p_pat_decoder->p_building_pat,
-                                   p_pat_decoder->p_sections);
-
-        /* Delete the sections */
-        dvbpsi_DeletePSISections(p_pat_decoder->p_sections);
-        p_pat_decoder->p_sections = NULL;
+        if (dvbpsi_pat_sections_decode(p_pat_decoder->p_building_pat,
+                                       p_pat_decoder->p_sections))
+            p_pat_decoder->b_current_valid = true;
 
         /* signal the new PAT */
-        p_pat_decoder->pf_pat_callback(p_pat_decoder->p_cb_data,
-                                       p_pat_decoder->p_building_pat);
+        if (p_pat_decoder->b_current_valid)
+            p_pat_decoder->pf_pat_callback(p_pat_decoder->p_cb_data,
+                                           p_pat_decoder->p_building_pat);
 
-        /* Reinitialize the structures */
-        dvbpsi_ReInitPAT(p_pat_decoder, false);
+        /* Delete sectioins and Reinitialize the structures */
+        dvbpsi_ReInitPAT(p_pat_decoder, !p_pat_decoder->b_current_valid);
+        assert(p_pat_decoder->p_sections == NULL);
     }
 }
 
 /*****************************************************************************
  * dvbpsi_DecodePATSection
  *****************************************************************************
- * PAT decoder.
+ * Decode sections into a PAT table. The function returns 'true' on success,
+ * 'false' otherwise.
  *****************************************************************************/
-void dvbpsi_pat_sections_decode(dvbpsi_pat_t* p_pat, dvbpsi_psi_section_t* p_section)
+bool dvbpsi_pat_sections_decode(dvbpsi_pat_t* p_pat, dvbpsi_psi_section_t* p_section)
 {
+    bool b_valid = false;
     while (p_section)
     {
         for (uint8_t *p_byte = p_section->p_payload_start;
@@ -362,11 +367,14 @@ void dvbpsi_pat_sections_decode(dvbpsi_pat_t* p_pat, dvbpsi_psi_section_t* p_sec
         {
             uint16_t i_program_number = ((uint16_t)(p_byte[0]) << 8) | p_byte[1];
             uint16_t i_pid = ((uint16_t)(p_byte[2] & 0x1f) << 8) | p_byte[3];
-            dvbpsi_pat_program_add(p_pat, i_program_number, i_pid);
+            dvbpsi_pat_program_t* p_program = dvbpsi_pat_program_add(p_pat, i_program_number, i_pid);
+            if (p_program)
+                b_valid = true;
         }
 
         p_section = p_section->p_next;
     }
+    return b_valid;
 }
 
 /*****************************************************************************
