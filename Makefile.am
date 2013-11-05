@@ -25,3 +25,9 @@ changelog:
 	  sed -e 's/^[^0-9]/ /' -e 's/^  *$$//' -e 's/^ \* 	/ /g' | \
 	  grep -v '^ \*$$' | uniq >| ChangeLog
 
+dist-checksum: $(DIST_TARGETS)
+	rm -f *.md5 *.sha256
+	for sum in '$(DIST_ARCHIVES)'; do \
+	  md5sum $$sum > $$sum.md5 && \
+	  sha256sum $$sum > $$sum.sha256; \
+	done
