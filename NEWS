@@ -1,5 +1,8 @@
 Changes between 1.1.2 and 2.0.0:
 --------------------------------
+
+ * Rename define  DVDPSI_GetContentCategoryFromType() to DVBPSI_GetContentCategoryFromType()
+   - the prefix said DVD, should have been DVB instead
  * Added new descriptors:
    - 0x4c Time shifted service
    - 0x53 CA system id
