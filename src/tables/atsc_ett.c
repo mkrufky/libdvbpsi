@@ -209,6 +209,7 @@ void dvbpsi_atsc_EmptyETT(dvbpsi_atsc_ett_t *p_ett)
     dvbpsi_DeleteDescriptors(p_ett->p_first_descriptor);
 
     free(p_ett->p_etm_data);
+    p_ett->i_etm_length = 0;
     p_ett->p_etm_data = NULL;
     p_ett->p_first_descriptor = NULL;
 }
@@ -412,10 +413,15 @@ static void dvbpsi_atsc_DecodeETTSections(dvbpsi_atsc_ett_t* p_ett,
     {
         uint16_t i_etm_length = p_section->i_length - 14;
 
-        /* FIXME: Decode the separate strings. For now copy the data in the
-         * decoded table struct. */
+        /* NOTE: p_etm_data should be NULL if not then,
+         * the PSI table is spread over multiple PSI sections */
         if (p_ett->p_etm_data)
             abort();
+        p_ett->p_etm_data = calloc(i_etm_length, sizeof(uint8_t));
+        if (!p_ett->p_etm_data)
+            continue;
+        /* FIXME: Decode the separate strings. For now copy the data in the
+         * decoded table struct. */
         memcpy(p_ett->p_etm_data, p_section->p_payload_start + 5, i_etm_length);
         p_ett->i_etm_length = i_etm_length;
 

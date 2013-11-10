@@ -60,6 +60,12 @@
 #   include "../../src/tables/tot.h"
 #   include "../../src/tables/rst.h"
 #   include "../../src/descriptors/dr.h"
+/*  ATSC PSI Tables */
+#   include "../../src/tables/atsc_eit.h"
+#   include "../../src/tables/atsc_ett.h"
+#   include "../../src/tables/atsc_mgt.h"
+#   include "../../src/tables/atsc_stt.h"
+#   include "../../src/tables/atsc_vct.h"
 #else
 #   include <dvbpsi/dvbpsi.h>
 #   include <dvbpsi/demux.h>
@@ -75,6 +81,12 @@
 #   include <dvbpsi/tot.h>
 #   include <dvbpsi/rst.h>
 #   include <dvbpsi/dr.h>
+/*  ATSC PSI Tables */
+#   include <dvbpsi/atsc_eit.h>
+#   include <dvbpsi/atsc_ett.h>
+#   include <dvbpsi/atsc_mgt.h>
+#   include <dvbpsi/atsc_stt.h>
+#   include <dvbpsi/atsc_vct.h>
 #endif
 
 #include "libdvbpsi.h"
@@ -96,6 +108,7 @@
  *****************************************************************************/
 typedef struct ts_pid_s
 {
+    /* TS header fields */
     int         i_pid;
     int         i_cc;   /* countinuity counter */
 
@@ -207,6 +220,24 @@ typedef struct ts_tdt_s
     ts_pid_t    *pid;
 } ts_tdt_t;
 
+typedef struct ts_atsc_s
+{
+    dvbpsi_t    *handle;
+    ts_pid_t    *pid;
+} ts_atsc_t;
+
+typedef struct ts_atsc_eit_s ts_atsc_eit_t;
+struct ts_atsc_eit_s
+{
+    dvbpsi_t    *handle;
+
+    int         i_table_pid;
+    int         i_mgt_version;
+    ts_pid_t    *pid;
+
+    ts_atsc_eit_t *p_next;
+};
+
 struct ts_stream_t
 {
     /* Program Association Table */
@@ -230,6 +261,11 @@ struct ts_stream_t
     ts_sdt_t    sdt;
     ts_eit_t    eit;
     ts_tdt_t    tdt;
+
+    /* Atsc tables */
+    ts_atsc_t   atsc;
+    ts_atsc_eit_t *atsc_eit;
+    int         i_atsc_eit;
 
     /* pid */
     ts_pid_t    pid[8192];
@@ -261,6 +297,11 @@ static void handle_RST(void* p_data, dvbpsi_rst_t* p_rst);
 #ifdef TS_USE_SCTE_SIS
 static void handle_SIS(void* p_data, dvbpsi_sis_t* p_sis);
 #endif
+static void handle_atsc_VCT(void* p_data, dvbpsi_atsc_vct_t *p_vct);
+static void handle_atsc_MGT(void *p_data, dvbpsi_atsc_mgt_t *p_mgt);
+static void handle_atsc_EIT(void *p_data, dvbpsi_atsc_eit_t *p_eit);
+static void handle_atsc_ETT(void* p_data, dvbpsi_atsc_ett_t *p_ett);
+static void handle_atsc_STT(void* p_data, dvbpsi_atsc_stt_t *p_stt);
 
 /*****************************************************************************
  * mdate: current time in milliseconds
@@ -633,6 +674,28 @@ static void handle_subtable(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_e
         case 0x78: // MPE-FEC section (EN 301 192 [4])
         case 0x79: // resolution notification section (TS 102 323 [13])
 #endif
+        /* Handle ATSC PSI tables */
+        case 0xC7: /* ATSC MGT */
+            if (!dvbpsi_atsc_AttachMGT(p_dvbpsi, i_table_id, i_extension, handle_atsc_MGT, p_data))
+                fprintf(stderr, "dvbinfo: Failed to attach ATSC MGT subdecoder\n");
+            break;
+        case 0xC8:
+        case 0xC9: /* ATSC VCT */
+            if (!dvbpsi_atsc_AttachVCT(p_dvbpsi, i_table_id, i_extension, handle_atsc_VCT, p_data))
+                    fprintf(stderr, "dvbinfo: Failed to attach ATSC VCT subdecoder\n");
+            break;
+        case 0xCB: /* ATSC EIT */
+            if (!dvbpsi_atsc_AttachEIT(p_dvbpsi, i_table_id, i_extension, handle_atsc_EIT, p_data))
+                    fprintf(stderr, "dvbinfo: Failed to attach ATSC EIT subdecoder\n");
+            break;
+        case 0xCC: /* ATSC ETT */
+            if (!dvbpsi_atsc_AttachETT(p_dvbpsi, i_table_id, i_extension, handle_atsc_ETT, p_data))
+                    fprintf(stderr, "dvbinfo: Failed to attach ATSC ETT subdecoder\n");
+            break;
+        case 0xCD: /* ATSC STT */
+            if (!dvbpsi_atsc_AttachSTT(p_dvbpsi, i_table_id, i_extension, handle_atsc_STT, p_data))
+                    fprintf(stderr, "dvbinfo: Failed to attach ATSC STT subdecoder\n");
+            break;
 #ifdef TS_USE_SCTE_SIS
         case 0xFC:
             if (!dvbpsi_sis_attach(p_dvbpsi, i_table_id, i_extension, handle_SIS, p_data))
@@ -1566,6 +1629,265 @@ static void handle_TOT(void* p_data, dvbpsi_tot_t* p_tot)
     dvbpsi_tot_delete(p_tot);
 }
 
+static const char *GetATSCTableType(const int i_type)
+{
+    switch (i_type)
+    {
+    case 0x0000: return "Terrestrial VCT with current_next_indicator=’1’";
+    case 0x0001: return "Terrestrial VCT with current_next_indicator=’0’";
+    case 0x0002: return "Cable VCT with current_next_indicator=’1’";
+    case 0x0003: return "Cable VCT with current_next_indicator=’0’";
+    case 0x0004: return "Channel ETT";
+    case 0x0005: return "DCCSCT";
+    default:
+        if (i_type >= 0x0006 && i_type <= 0x00FF)
+           return "Reserved for future ATSC use";
+        if (i_type >= 0x0100 && i_type <= 0x017F)
+            return "EIT-0 to EIT-127";
+        if (i_type >= 0x0180 && i_type <= 0x01FF)
+            return "[Reserved for future ATSC use]";
+        if (i_type >= 0x0200 && i_type <= 0x027F)
+            return "Event ETT-0 to event ETT-127";
+        if (i_type >= 0x0280 && i_type <= 0x0300)
+            return "Reserved for future ATSC use";
+        if (i_type >= 0x0301 && i_type <= 0x03FF)
+            return "RRT with rating_region 1-255";
+        if (i_type >= 0x0400 && i_type <= 0x0FFF)
+            return "User private";
+        if (i_type >= 0x1000 && i_type <= 0x13FF)
+            return "Reserved for future ATSC use";
+        if (i_type >= 0x1400 && i_type <= 0x14FF)
+            return "DCCT with dcc_id 0x00 – 0xFF";
+        if (i_type >= 0x1500 && i_type <= 0xFFFF)
+            return "Reserved for future ATSC use";
+        break;
+    }
+    return "unknown";
+}
+
+static void handle_atsc_MGT(void *p_data, dvbpsi_atsc_mgt_t *p_mgt)
+{
+    ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    printf("\n");
+    printf("  ATSC MGT: Master Guide Table\n");
+
+    printf("\tVersion number : %d\n", p_mgt->i_version);
+    printf("\tCurrent next   : %s\n", p_mgt->b_current_next ? "yes" : "no");
+    printf("\tTable ID extension: %d\n", p_mgt->i_table_id_ext);
+    printf("\tProtocol version: %d\n", p_mgt->i_protocol); /* PSIP protocol version */
+
+    dvbpsi_atsc_mgt_table_t   *p_table = p_mgt->p_first_table;
+    while (p_table)
+    {
+        /* Attach new ATSC EIT decoder */
+        ts_atsc_eit_t *p = calloc(1, sizeof(ts_atsc_eit_t));
+        if (p)
+        {
+            /* PMT */
+            p->handle = dvbpsi_new(&dvbpsi_message, p_stream->level);
+            if (p->handle == NULL)
+            {
+                fprintf(stderr, "dvbinfo: Failed attach new ATSC EIT decoder\n");
+                free(p);
+                break;
+            }
+
+            p->i_table_pid = p_table->i_table_type_pid;
+            p->pid = &p_stream->pid[p_table->i_table_type_pid];
+            p->pid->i_pid = p_table->i_table_type_pid;
+            p->p_next = NULL;
+
+            if (!dvbpsi_AttachDemux(p->handle, handle_subtable, p_stream))
+            {
+                 fprintf(stderr, "dvbinfo: Failed to attach new ATSC EIT decoder\n");
+                 break;
+            }
+
+            /* insert at start of list */
+            p->p_next = p_stream->atsc_eit;
+            p_stream->atsc_eit = p;
+            p_stream->i_atsc_eit++;
+            assert(p_stream->atsc_eit);
+        }
+        else
+            fprintf(stderr, "dvbinfo: Failed create new ATSC EIT decoder\n");
+
+        printf("\n\t Table %d\n", p_stream->i_atsc_eit);
+        printf("\t | PID : 0x%x (%d)\n", p_table->i_table_type_pid, p_table->i_table_type_pid);
+        printf("\t | Type: %s\n", GetATSCTableType(p_table->i_table_type));
+        printf("\t | Version: %d\n", p_table->i_table_type_version);
+        printf("\t | Size: %d bytes\n", p_table->i_number_bytes);
+
+        DumpDescriptors("\t  |  ]", p_table->p_first_descriptor);
+
+        p_table = p_table->p_next;
+    }
+
+    DumpDescriptors("\t  |  ]", p_mgt->p_first_descriptor);
+    dvbpsi_atsc_DeleteMGT(p_mgt);
+}
+
+static const char *GetAtscVCTModulationModes(const uint8_t i_mode)
+{
+    switch (i_mode)
+    {
+    case 0x00: return "Reserved";
+    case 0x01: return "Analog — The virtual channel is modulated using standard analog methods for analog television.";
+    case 0x02: return "SCTE_mode_1 — The virtual channel has a symbol rate of 5.057 Msps, transmitted in accordance with ANSI/SCTE 07 [21] (Mode 1). Typically, mode 1 will be used for 64-QAM.";
+    case 0x03: return "SCTE_mode_2 — The virtual channel has a symbol rate of 5.361 Msps, transmitted in accordance with ANSI/SCTE 07 [21] (Mode 2). Typically, mode 2 will be used for 256-QAM.";
+    case 0x04: return "ATSC (8 VSB) — The virtual channel uses the 8-VSB modulation method conforming to A/53 Part 2 [2].";
+    case 0x05: return "ATSC (16 VSB) — The virtual channel uses the 16-VSB modulation method conforming to A/53 Part 2 [2].";
+    default:
+        if (i_mode >= 0x06 && i_mode <= 0x7F)
+            return "Reserved for future use by ATSC";
+        if (i_mode >= 0x80 && i_mode <= 0xFF)
+            return "User Private";
+        break;
+    }
+    return "unknown";
+}
+
+static const char *GetAtscETMLocations(const uint8_t i_etm_location)
+{
+    switch (i_etm_location)
+    {
+    case 0x0: return "No ETM";
+    case 0x1: return "ETM located in the PTC carrying this PSIP";
+    case 0x2: return "ETM located in the PTC specified by the channel_TSID";
+    case 0x3: return "Reserved for future ATSC use";
+    }
+    return "unknown";
+}
+
+static void DumpAtscVCTChannels(dvbpsi_atsc_vct_channel_t *p_vct_channels)
+{
+    dvbpsi_atsc_vct_channel_t *p_channel = p_vct_channels;
+
+    while (p_channel)
+    {
+        printf("\n");
+        printf("\t  | Short name  : %s\n", p_channel->i_short_name);
+        printf("\t  | Major number: %d\n", p_channel->i_major_number);
+        printf("\t  | Minor number: %d\n", p_channel->i_minor_number);
+        printf("\t  | Modulation  : %s\n", GetAtscVCTModulationModes(p_channel->i_modulation));
+        printf("\t  | Carrier     : %d\n", p_channel->i_carrier_freq);
+        printf("\t  | Transport id: %d\n", p_channel->i_channel_tsid);
+        printf("\t  | Program number: %d\n", p_channel->i_program_number);
+        printf("\t  | ETM location: %s\n", GetAtscETMLocations(p_channel->i_etm_location));
+        printf("\t  | Scrambled   : %s\n", p_channel->b_access_controlled ? "yes" : "no");
+        printf("\t  | Path Select : %s\n", p_channel->b_path_select ? "yes" : "no");
+        printf("\t  | Out of band : %s\n", p_channel->b_out_of_band ? "yes" : "no");
+        printf("\t  | Hidden      : %s\n", p_channel->b_hidden ? "yes" : "no");
+        printf("\t  | Hide guide  : %s\n", p_channel->b_hide_guide ? "yes" : "no");
+        printf("\t  | Service type: %d\n", p_channel->i_service_type);
+        printf("\t  | Source id   : %d\n", p_channel->i_source_id);
+
+        DumpDescriptors("\t  |  ]", p_channel->p_first_descriptor);
+        p_channel = p_channel->p_next;
+    }
+}
+
+static void handle_atsc_VCT(void* p_data, dvbpsi_atsc_vct_t *p_vct)
+{
+    //ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    printf("\n");
+    printf("  ATSC VCT: Virtual Channel Table\n");
+
+    printf("\tVersion number : %d\n", p_vct->i_version);
+    printf("\tCurrent next   : %s\n", p_vct->b_current_next ? "yes" : "no");
+    printf("\tProtocol version: %d\n", p_vct->i_protocol); /* PSIP protocol version */
+    printf("\tType : %s Virtual Channel Table\n", (p_vct->b_cable_vct) ? "Cable" : "Terrestrial" );
+
+    DumpAtscVCTChannels(p_vct->p_first_channel);
+    DumpDescriptors("\t  |  ]", p_vct->p_first_descriptor);
+    dvbpsi_atsc_DeleteVCT(p_vct);
+}
+
+static void DumpATSCEITEventDescriptors(dvbpsi_atsc_eit_event_t *p_atsc_eit_event)
+{
+    dvbpsi_atsc_eit_event_t *p_event = p_atsc_eit_event;
+
+    while (p_event)
+    {
+        printf("\t  | Event id: %d\n", p_event->i_event_id);
+        printf("\t  | Start time: %u\n", p_event->i_start_time);
+        printf("\t  | ETM location: %s\n", GetAtscETMLocations(p_event->i_etm_location));
+        printf("\t  | Duration: %d seconds\n", p_event->i_length_seconds);
+        printf("\t  | Title length: %d bytes\n", p_event->i_title_length);
+        printf("\t  | Title: %s\n", p_event->i_title);
+        DumpDescriptors("\t  |  ]", p_event->p_first_descriptor);
+
+        p_event = p_event->p_next;
+    }
+}
+
+static void handle_atsc_EIT(void* p_data, dvbpsi_atsc_eit_t* p_eit)
+{
+    //ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    printf("\n");
+    printf("  ATSC EIT: Event Information Table\n");
+
+    printf("\tVersion number : %d\n", p_eit->i_version);
+    printf("\tCurrent next   : %s\n", p_eit->b_current_next ? "yes" : "no");
+    printf("\tProtocol version: %d\n", p_eit->i_protocol);
+    printf("\tSource id      : %d\n", p_eit->i_source_id);
+
+    printf("\tEIT events\n");
+    DumpATSCEITEventDescriptors(p_eit->p_first_event);
+    DumpDescriptors("\t  |  ]", p_eit->p_first_descriptor);
+    dvbpsi_atsc_DeleteEIT(p_eit);
+
+}
+
+static void handle_atsc_ETT(void* p_data, dvbpsi_atsc_ett_t* p_ett)
+{
+    //ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    printf("\n");
+    printf("  ATSC ETT: Extended Text Table\n");
+
+    printf("\tVersion number : %d\n", p_ett->i_version);
+    printf("\tCurrent next   : %s\n", p_ett->b_current_next ? "yes" : "no");
+    printf("\tProtocol version: %d\n", p_ett->i_protocol);
+
+    printf("\tETM specific\n");
+    printf("\tIdentifier     : %d\n", p_ett->i_etm_id);
+    printf("\tLength         : %d\n", p_ett->i_etm_length);
+    printf("\tRaw Data       : '%s'\n", p_ett->p_etm_data);
+
+    DumpDescriptors("\t  |  ]", p_ett->p_first_descriptor);
+    dvbpsi_atsc_DeleteETT(p_ett);
+}
+
+static void handle_atsc_STT(void* p_data, dvbpsi_atsc_stt_t *p_stt)
+{
+    //ts_stream_t* p_stream = (ts_stream_t*) p_data;
+
+    printf("\n");
+    printf("  ATSC STT: System Time Table\n");
+
+    printf("\tVersion number : %d\n", p_stt->i_version);
+    printf("\tCurrent next   : %s\n", p_stt->b_current_next ? "yes" : "no");
+
+    printf("\tSystem time (GPS): %d seconds\n", p_stt->i_system_time);
+    printf("\tGPS-UTC Offset   : %d seconds\n", p_stt->i_gps_utc_offset);
+
+    /* decode daylight savings */
+    bool b_status = (p_stt->i_daylight_savings & 0x01);
+    uint8_t i_day_of_month = ((p_stt->i_daylight_savings & 0x00F8) >> 3);
+    uint8_t i_hour = (p_stt->i_daylight_savings >> 8);
+
+    printf("\tDaylight savings : %s\n", b_status ? "on" : "off" );
+    printf("\t\tDay of month: %d\n", i_day_of_month);
+    printf("\t\tHour of day : %d\n", i_hour);
+
+    DumpDescriptors("\t  |  ]", p_stt->p_first_descriptor);
+    dvbpsi_atsc_DeleteSTT(p_stt);
+}
+
 static void DumpRSTEvents(const char* str, dvbpsi_rst_event_t* p_event)
 {
     while (p_event)
@@ -1804,6 +2126,17 @@ ts_stream_t *libdvbpsi_init(int debug, ts_stream_log_cb pf_log, void *cb_data)
         goto error;
     }
 
+    /* ATSC MGT demuxer */
+    stream->atsc.handle = dvbpsi_new(&dvbpsi_message, stream->level);
+    if (stream->atsc.handle == NULL)
+        goto error;
+    if (!dvbpsi_AttachDemux(stream->atsc.handle, handle_subtable, stream))
+    {
+        dvbpsi_delete(stream->atsc.handle);
+        stream->atsc.handle = NULL;
+        goto error;
+    }
+
     /* */
     stream->pat.pid = &stream->pid[0x00];
     stream->cat.pid = &stream->pid[0x01];
@@ -1815,6 +2148,7 @@ ts_stream_t *libdvbpsi_init(int debug, ts_stream_log_cb pf_log, void *cb_data)
     stream->eit.pid = &stream->pid[0x12];
     stream->rst.pid = &stream->pid[0x13];
     stream->tdt.pid = &stream->pid[0x14];
+    stream->atsc.pid = &stream->pid[0x1FFB];
     return stream;
 
 error:
@@ -1830,6 +2164,8 @@ error:
         dvbpsi_rst_detach(stream->rst.handle);
     if (dvbpsi_decoder_present(stream->tdt.handle))
         dvbpsi_DetachDemux(stream->tdt.handle);
+    if (dvbpsi_decoder_present(stream->atsc.handle))
+        dvbpsi_DetachDemux(stream->atsc.handle);
 
     if (stream->pat.handle)
         dvbpsi_delete(stream->pat.handle);
@@ -1843,8 +2179,11 @@ error:
         dvbpsi_delete(stream->eit.handle);
     if (stream->tdt.handle)
         dvbpsi_delete(stream->tdt.handle);
+    if (stream->atsc.handle)
+        dvbpsi_delete(stream->atsc.handle);
 
     free(stream);
+
     return NULL;
 }
 
@@ -1857,7 +2196,7 @@ void libdvbpsi_exit(ts_stream_t *stream)
 
    ts_pmt_t *p_pmt = stream->pmt;
    ts_pmt_t *p_prev = NULL;
-   while(p_pmt)
+   while (p_pmt)
    {
        dvbpsi_t *handle = p_pmt->handle;
        if (dvbpsi_decoder_present(handle))
@@ -1873,6 +2212,24 @@ void libdvbpsi_exit(ts_stream_t *stream)
        free(p_prev);
    }
 
+   ts_atsc_eit_t *p_atsc_eit = stream->atsc_eit;
+   ts_atsc_eit_t *p_atsc_prev = NULL;
+   while (p_atsc_eit)
+   {
+       dvbpsi_t *handle = p_atsc_eit->handle;
+       if (dvbpsi_decoder_present(handle))
+       {
+            dvbpsi_DetachDemux(handle);
+            dvbpsi_delete(p_atsc_eit->handle);
+       }
+       stream->i_atsc_eit--;
+       p_atsc_prev = p_atsc_eit;
+       p_atsc_eit = p_atsc_eit->p_next;
+       if (p_atsc_prev)
+           p_atsc_prev->p_next = NULL;
+       free(p_atsc_prev);
+   }
+
    if (dvbpsi_decoder_present(stream->cat.handle))
        dvbpsi_cat_detach(stream->cat.handle);
    if (dvbpsi_decoder_present(stream->sdt.handle))
@@ -1883,6 +2240,8 @@ void libdvbpsi_exit(ts_stream_t *stream)
        dvbpsi_DetachDemux(stream->eit.handle);
    if (dvbpsi_decoder_present(stream->tdt.handle))
        dvbpsi_DetachDemux(stream->tdt.handle);
+   if (dvbpsi_decoder_present(stream->atsc.handle))
+        dvbpsi_DetachDemux(stream->atsc.handle);
 
    if (stream->pat.handle)
        dvbpsi_delete(stream->pat.handle);
@@ -1896,6 +2255,8 @@ void libdvbpsi_exit(ts_stream_t *stream)
        dvbpsi_delete(stream->eit.handle);
    if (stream->tdt.handle)
        dvbpsi_delete(stream->tdt.handle);
+   if (stream->atsc.handle)
+       dvbpsi_delete(stream->atsc.handle);
 
    free(stream);
    stream = NULL;
@@ -1976,6 +2337,8 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
             dvbpsi_packet_push(stream->rst.handle, p_tmp);
         else if (i_pid == 0x14) /* TDT/TOT */
             dvbpsi_packet_push(stream->tdt.handle, p_tmp);
+        else if (i_pid == 0x1FFB) /* ATSC tables */
+            dvbpsi_packet_push(stream->atsc.handle, p_tmp);
         else
         {
             ts_pmt_t *p = stream->pmt;
@@ -1984,6 +2347,14 @@ bool libdvbpsi_process(ts_stream_t *stream, uint8_t *buf, ssize_t length, mtime_
                 if (p->pid_pmt->i_pid == i_pid)
                     dvbpsi_packet_push(p->handle, p_tmp);
                 p = p->p_next;
+            }
+
+            ts_atsc_eit_t *p_atsc_eit = stream->atsc_eit;
+            while (p_atsc_eit)
+            {
+                if (p_atsc_eit->pid->i_pid == i_pid)
+                    dvbpsi_packet_push(p_atsc_eit->handle, p_tmp);
+                p_atsc_eit = p_atsc_eit->p_next;
             }
         }
 
