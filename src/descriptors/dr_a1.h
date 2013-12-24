@@ -21,6 +21,12 @@ Service Location Descriptor.
 
 */
 
+/*!
+ * \file dr_a1.h
+ * \author Yonathan Yusim
+ * \brief Decode Service Location Descriptor.
+ */
+
 #ifndef _DVBPSI_DR_A1_H_
 #define _DVBPSI_DR_A1_H_
 
