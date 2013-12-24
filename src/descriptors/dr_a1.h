@@ -109,7 +109,7 @@ dvbpsi_descriptor_t * dvbpsi_GenServiceLocationDr(
 
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 #else
