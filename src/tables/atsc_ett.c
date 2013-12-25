@@ -416,6 +416,11 @@ static void dvbpsi_atsc_DecodeETTSections(dvbpsi_atsc_ett_t* p_ett,
          * decoded table struct. */
         if (p_ett->p_etm_data)
             abort();
+
+        p_ett->p_etm_data = malloc(i_etm_length);
+        if (!p_ett->p_etm_data)
+            abort();
+
         memcpy(p_ett->p_etm_data, p_section->p_payload_start + 5, i_etm_length);
         p_ett->i_etm_length = i_etm_length;
 
