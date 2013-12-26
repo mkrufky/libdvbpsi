@@ -63,6 +63,8 @@ dvbpsi_ac3_audio_dr_t *dvbpsi_DecodeAc3AudioDr(dvbpsi_descriptor_t *p_descriptor
     if (!p_decoded)
         return NULL;
 
+    memset(p_decoded, 0, sizeof (dvbpsi_ac3_audio_dr_t));
+
     p_descriptor->p_decoded = (void*)p_decoded;
 
     p_decoded->i_sample_rate_code = 0x07 & (buf[0] >> 5);
