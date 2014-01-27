@@ -3,7 +3,11 @@
 SUBDIRS = dvbinfo
 DIST_SUBDIRS = $(SUBDIRS)
 
-noinst_PROGRAMS = decode_pat decode_pmt get_pcr_pid decode_sdt decode_mpeg decode_bat
+noinst_PROGRAMS = decode_pat decode_pmt get_pcr_pid decode_sdt decode_mpeg decode_bat dump_pids
+
+dump_pids_SOURCES = dump_pids.c
+dump_pids_CPPFLAGS =
+dump_pids_LDFLAGS =
 
 decode_pat_SOURCES = decode_pat.c
 decode_pat_CPPFLAGS = -DDVBPSI_DIST
