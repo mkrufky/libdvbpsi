@@ -80,7 +80,7 @@ int tcp_close(int fd)
 {
     int result = 0;
 
-    result = shutdown(fd, 2);
+    result = shutdown(fd, SHUT_RDWR);
     if (result < 0)
         perror("tcp shutdown error");
     return result;
@@ -149,6 +149,8 @@ int tcp_open(const char *ipaddress, int port)
             perror( "tcp connect error" );
             continue;
         }
+
+        break; /* success */
     }
 
     freeaddrinfo(addr);
