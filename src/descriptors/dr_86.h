@@ -55,7 +55,7 @@ typedef struct dvbpsi_caption_service_s
     uint16_t i_caption_service_number;
     int      b_easy_reader;
     int      b_wide_aspect_ratio;
-}dvbpsi_caption_service_t;
+} dvbpsi_caption_service_t;
 
 /*****************************************************************************
  * dvbpsi_caption_service_dr_s
@@ -74,7 +74,7 @@ typedef struct dvbpsi_caption_service_dr_s
 {
     uint8_t i_number_of_services;
     dvbpsi_caption_service_t services[0x1f];
-}dvbpsi_caption_service_dr_t;
+} dvbpsi_caption_service_dr_t;
 
 /*****************************************************************************
  * dvbpsi_DecodeCaptionServiceDr
