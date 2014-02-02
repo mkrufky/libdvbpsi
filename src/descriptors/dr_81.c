@@ -48,11 +48,11 @@ dvbpsi_ac3_audio_dr_t *dvbpsi_DecodeAc3AudioDr(dvbpsi_descriptor_t *p_descriptor
     uint8_t * buf = p_descriptor->p_data;
 
     /* Check the tag */
-    if (p_descriptor->i_tag != 0x81)
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x81))
         return NULL;
 
     /* Don't decode twice */
-    if (p_descriptor->p_decoded)
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
         return p_descriptor->p_decoded;
 
     /* Check length */

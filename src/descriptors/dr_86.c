@@ -48,11 +48,11 @@ dvbpsi_caption_service_dr_t *dvbpsi_DecodeCaptionServiceDr(dvbpsi_descriptor_t *
     uint8_t * buf = p_descriptor->p_data;
 
     /* Check the tag */
-    if (p_descriptor->i_tag != 0x86)
+    if (!dvbpsi_CanDecodeAsDescriptor(p_descriptor, 0x86))
         return NULL;
 
     /* Don't decode twice */
-    if (p_descriptor->p_decoded)
+    if (dvbpsi_IsDescriptorDecoded(p_descriptor))
         return p_descriptor->p_decoded;
 
     /* Check length */
