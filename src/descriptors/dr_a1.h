@@ -36,12 +36,12 @@ extern "C"
 #endif
 
 
-  typedef struct dvbpsi_service_location_element_s
-  {
+typedef struct dvbpsi_service_location_element_s
+{
     uint8_t i_stream_type;
     uint16_t i_elementary_pid;
     char i_iso_639_code[3];
-  } dvbpsi_service_location_element_t;
+} dvbpsi_service_location_element_t;
 
 /*****************************************************************************
  * dvbpsi_service_location_dr_s
@@ -57,14 +57,14 @@ extern "C"
  * \typedef struct dvbpsi_service_location_dr_s dvbpsi_service_location_dr_t
  * \brief dvbpsi_service_dr_t type definition.
  */
-  typedef struct dvbpsi_service_location_dr_s
-  {
+typedef struct dvbpsi_service_location_dr_s
+{
     uint16_t i_pcr_pid;		/*!< PCR_PID */
     uint8_t i_number_elements;	/*!< number of elements used for this service */
 
     dvbpsi_service_location_element_t elements[0xff];
 
-  } dvbpsi_service_location_dr_t;
+} dvbpsi_service_location_dr_t;
 
 
 /*****************************************************************************
@@ -78,7 +78,7 @@ extern "C"
  * \return a pointer to a new "service" descriptor structure
  * which contains the decoded data.
  */
-  dvbpsi_service_location_dr_t
+dvbpsi_service_location_dr_t
     *dvbpsi_DecodeServiceLocationDr (dvbpsi_descriptor_t * p_descriptor);
 
 #if 0
@@ -95,7 +95,7 @@ extern "C"
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
-  dvbpsi_descriptor_t *dvbpsi_GenServiceLocationDr (dvbpsi_service_dr_t *
+dvbpsi_descriptor_t *dvbpsi_GenServiceLocationDr (dvbpsi_service_dr_t *
 						    p_decoded,
 						    bool b_duplicate);
 #endif
