@@ -1,4 +1,4 @@
-AC_INIT(libdvbpsi, 1.1.2)
+AC_INIT(libdvbpsi, 1.2.0)
 
 AC_PREREQ(2.50)
 AC_CONFIG_AUX_DIR(.auto)
