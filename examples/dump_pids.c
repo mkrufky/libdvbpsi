@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
         uint32_t pid = ts_getpid(&p[0]);
         uint32_t cc  = ts_getcc(&p[0]);
         n++;
-        printf("packet %ld, pid %u, cc %d\n", n, pid, cc );
+        printf("packet %ld, pid %u (0x%x), cc %d\n", n, pid, pid, cc );
     }
 
     close(file);
