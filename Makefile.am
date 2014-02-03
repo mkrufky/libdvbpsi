@@ -31,3 +31,6 @@ dist-checksum: $(DIST_TARGETS)
 	  md5sum $$sum > $$sum.md5 && \
 	  sha256sum $$sum > $$sum.sha256; \
 	done
+
+generate-header_dr:
+	misc/gen_dr_h.sh > src/descriptors/dr.h
