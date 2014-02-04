@@ -186,7 +186,7 @@ dvbpsi_atsc_mgt_t *dvbpsi_atsc_NewMGT(uint8_t i_table_id, uint16_t i_extension,
                                       uint8_t i_version, uint8_t i_protocol, bool b_current_next)
 {
     dvbpsi_atsc_mgt_t* p_mgt;
-    p_mgt = (dvbpsi_atsc_mgt_t*)malloc(sizeof(dvbpsi_atsc_mgt_t));
+    p_mgt = (dvbpsi_atsc_mgt_t*)calloc(1, sizeof(dvbpsi_atsc_mgt_t));
     if (p_mgt != NULL)
         dvbpsi_atsc_InitMGT(p_mgt, i_table_id, i_extension, i_version, i_protocol, b_current_next);
     return p_mgt;
