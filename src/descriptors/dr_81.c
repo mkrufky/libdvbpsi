@@ -59,11 +59,9 @@ dvbpsi_ac3_audio_dr_t *dvbpsi_DecodeAc3AudioDr(dvbpsi_descriptor_t *p_descriptor
     if (p_descriptor->i_length < 3)
         return NULL;
 
-    p_decoded = (dvbpsi_ac3_audio_dr_t*)malloc(sizeof(dvbpsi_ac3_audio_dr_t));
+    p_decoded = (dvbpsi_ac3_audio_dr_t*)calloc(1, sizeof(dvbpsi_ac3_audio_dr_t));
     if (!p_decoded)
         return NULL;
-
-    memset(p_decoded, 0, sizeof (dvbpsi_ac3_audio_dr_t));
 
     p_descriptor->p_decoded = (void*)p_decoded;
 
