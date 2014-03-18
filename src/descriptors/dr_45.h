@@ -64,6 +64,7 @@ typedef struct dvbpsi_vbidata_line_s
  * \def DVBPSI_VBIDATA_LINE_DR_MAX
  * \brief Maximum number of dvbpsi_vbidata_line_t entries present in
  * @see dvbpsi_vbidata_t
+ * @deprecated will be removed in next major version
  */
 #define DVBPSI_VBIDATA_LINE_DR_MAX 255
 
