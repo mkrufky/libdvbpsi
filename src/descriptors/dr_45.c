@@ -62,7 +62,7 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
 
     /* */
     dvbpsi_vbi_dr_t * p_decoded;
-    int i_services_number = p_descriptor->i_length / 2;
+    uint8_t i_services_number = p_descriptor->i_length / 2;
     if (i_services_number > DVBPSI_VBI_DR_MAX)
         i_services_number = DVBPSI_VBI_DR_MAX;
 
@@ -73,18 +73,17 @@ dvbpsi_vbi_dr_t * dvbpsi_DecodeVBIDataDr(
 
     p_decoded->i_services_number = i_services_number;
 
-    for (int i = 0; i < i_services_number; i++)
+    for (uint8_t i = 0; i < i_services_number; i++)
     {
-        int i_lines = 0, i_data_service_id;
+        uint8_t i_lines = 0, i_data_service_id;
 
         i_data_service_id = ((uint8_t)(p_descriptor->p_data[3 * i + 2 + i_lines]));
         p_decoded->p_services[i].i_data_service_id = i_data_service_id;
 
         i_lines = ((uint8_t)(p_descriptor->p_data[3 * i + 3]));
-        if (i_lines > DVBPSI_VBIDATA_LINE_DR_MAX)
-            i_lines = DVBPSI_VBIDATA_LINE_DR_MAX;
         p_decoded->p_services[i].i_lines = i_lines;
-        for (int n = 0; n < i_lines; n++ )
+
+        for (uint8_t n = 0; n < i_lines; n++)
         {
             if( (i_data_service_id >= 0x01) && (i_data_service_id <= 0x07) )
             {
@@ -117,16 +116,13 @@ dvbpsi_descriptor_t * dvbpsi_GenVBIDataDr(dvbpsi_vbi_dr_t * p_decoded,
         return NULL;
 
     /* Encode data */
-    for (int i = 0; i < p_decoded->i_services_number; i++ )
+    for (uint8_t i = 0; i < p_decoded->i_services_number; i++)
     {
         p_descriptor->p_data[5 * i + 3] =
                 ( (uint8_t) p_decoded->p_services[i].i_data_service_id );
 
-        if (p_decoded->p_services[i].i_lines > DVBPSI_VBIDATA_LINE_DR_MAX)
-            p_decoded->p_services[i].i_lines = DVBPSI_VBIDATA_LINE_DR_MAX;
-
         p_descriptor->p_data[5 * i + 4] = p_decoded->p_services[i].i_lines;
-        for (int n=0; n < p_decoded->p_services[i].i_lines; n++ )
+        for (uint8_t n=0; n < p_decoded->p_services[i].i_lines; n++ )
         {
             if( (p_decoded->p_services[i].i_data_service_id >= 0x01) &&
                     (p_decoded->p_services[i].i_data_service_id <= 0x07) )
