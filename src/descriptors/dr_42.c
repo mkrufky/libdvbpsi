@@ -65,8 +65,6 @@ dvbpsi_stuffing_dr_t * dvbpsi_DecodeStuffingDr(
 
     /* Decode data */
     p_decoded->i_stuffing_length = p_descriptor->i_length;
-    if (p_decoded->i_stuffing_length > 255)
-        p_decoded->i_stuffing_length = 255;
 
     if (p_decoded->i_stuffing_length)
         memcpy(p_decoded->i_stuffing_byte,
@@ -85,9 +83,6 @@ dvbpsi_stuffing_dr_t * dvbpsi_DecodeStuffingDr(
 dvbpsi_descriptor_t * dvbpsi_GenStuffingDr(dvbpsi_stuffing_dr_t * p_decoded,
                                            bool b_duplicate)
 {
-    if (p_decoded->i_stuffing_length > 255)
-        p_decoded->i_stuffing_length = 255;
-
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x42, p_decoded->i_stuffing_length, NULL);
