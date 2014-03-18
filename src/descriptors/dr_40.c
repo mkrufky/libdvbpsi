@@ -62,8 +62,6 @@ dvbpsi_network_name_dr_t* dvbpsi_DecodeNetworkNameDr(
 
     /* Decode data */
     p_decoded->i_name_length = p_descriptor->i_length;
-    if (p_decoded->i_name_length > 255)
-        p_decoded->i_name_length = 255;
 
     if (p_decoded->i_name_length)
         memcpy(p_decoded->i_name_byte,
@@ -83,9 +81,6 @@ dvbpsi_descriptor_t * dvbpsi_GenNetworkNameDr(
                                         dvbpsi_network_name_dr_t * p_decoded,
                                         bool b_duplicate)
 {
-    if (p_decoded->i_name_length > 255)
-        p_decoded->i_name_length = 255;
-
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x40, p_decoded->i_name_length, NULL);
