@@ -65,8 +65,6 @@ dvbpsi_bouquet_name_dr_t * dvbpsi_DecodeBouquetNameDr(
 
     /* Decode data */
     p_decoded->i_name_length = p_descriptor->i_length;
-    if (p_decoded->i_name_length > 255)
-        p_decoded->i_name_length = 255;
 
     if (p_decoded->i_name_length)
         memcpy(p_decoded->i_char,
@@ -85,9 +83,6 @@ dvbpsi_bouquet_name_dr_t * dvbpsi_DecodeBouquetNameDr(
 dvbpsi_descriptor_t * dvbpsi_GenBouquetNameDr(dvbpsi_bouquet_name_dr_t *p_decoded,
                                         bool b_duplicate)
 {
-    if (p_decoded->i_name_length > 255)
-        p_decoded->i_name_length = 255;
-
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
             dvbpsi_NewDescriptor(0x47, p_decoded->i_name_length, NULL);
