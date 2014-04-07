@@ -156,8 +156,13 @@ static void TSHandle( uint8_t *p_ts )
 
     if ( !ts_CheckSync( p_ts ) )
     {
-        fprintf( stderr, "lost TS synchro, go and fix your file (pos=%ju)\n",
-                 (uintmax_t)i_ts_read * TS_SIZE );
+        fprintf( stderr, "lost TS synchro, go and fix your file "
+#if defined(WIN32)
+                 " (pos=%u)\n",  (uint32_t) i_ts_read * TS_SIZE
+#else
+                 " (pos=%ju)\n", (uintmax_t)i_ts_read * TS_SIZE
+#endif
+	);
         exit(EXIT_FAILURE);
     }
 
