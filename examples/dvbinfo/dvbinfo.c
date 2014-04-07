@@ -41,7 +41,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include <syslog.h>
+#ifndef WIN32
+#   include <syslog.h>
+#else
+#   define O_NONBLOCK (0) /* O_NONBLOCK does not exist for Windows */
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -67,8 +71,10 @@
 #define FIFO_THRESHOLD_SIZE (400 * 1024 * 1024) /* threshold in bytes */
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
+#ifdef HAVE_SYS_SOCKET_H
 static const int   i_summary_mode[] = { SUM_BANDWIDTH, SUM_TABLE, SUM_PACKET, SUM_WIRE };
 static const char *psz_summary_mode[] = { "bandwidth", "table", "packet", "wire" };
+#endif
 
 /*****************************************************************************
  *
@@ -125,7 +131,9 @@ static void usage(void)
 }
 
 /* Logging */
+#ifndef WIN32
 static int log_level[] = { LOG_ERR, LOG_WARNING, LOG_INFO, LOG_DEBUG };
+#endif
 static const char *psz_level[] = { "ERROR", "WARNING", "INFO", "DEBUG" };
 
 static void libdvbpsi_log(void *data, const int level, const char *format, ...)
@@ -154,9 +162,11 @@ static void libdvbpsi_log(void *data, const int level, const char *format, ...)
         free(msg);
         return;
     }
+#ifndef WIN32
     if (param->b_monitor)
         syslog(log_level[level], "%s", msg);
     else
+#endif
         fprintf(stderr, "%s: %s", psz_level[level], msg);
     free(msg);
 }
