@@ -398,7 +398,13 @@ static int dvbinfo_process(dvbinfo_capture_t *capture)
                     fflush(fd);
                     fclose(fd);
                     unlink(param->summary.file);
-                    rename(psz_temp, param->summary.file);
+                    int ret = rename(psz_temp, param->summary.file);
+                    if (ret < 0)
+                    {
+                        libdvbpsi_log(param, DVBINFO_LOG_ERROR,
+                                      "failed renming summary file (disabling summary logging)\n");
+                        param->b_summary = false;
+                    }
                 }
                 else
                 {
