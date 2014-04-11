@@ -214,15 +214,15 @@ static void params_free(params_t *param)
 static void dvbinfo_close(params_t *param)
 {
 #ifdef HAVE_SYS_SOCKET_H
-    if (param->input && param->b_udp)
+    if (param->input && param->b_udp && (param->fd_in >= 0))
         udp_close(param->fd_in);
-    else if (param->input && param->b_tcp)
+    else if (param->input && param->b_tcp && (param->fd_in >= 0))
         tcp_close(param->fd_in);
     else
 #endif
-    if (param->input)
+    if (param->input && (param->fd_in >= 0))
         close(param->fd_in);
-    if (param->output)
+    if (param->output && (param->fd_out >= 0))
         close(param->fd_out);
 }
 
