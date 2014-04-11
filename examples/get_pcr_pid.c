@@ -116,7 +116,7 @@ static void PATCallback( void *_unused, dvbpsi_pat_t *p_pat )
         return;
     }
 
-    for( p_program = p_pat->p_first_program; p_program != NULL;
+    for( p_program = p_pat->p_first_program; p_program != NULL && i_nb_programs < MAX_PROGRAMS;
          p_program = p_program->p_next )
     {
         if( p_program->i_number != 0
