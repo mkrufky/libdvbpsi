@@ -525,7 +525,6 @@ int main(int argc, char **pp_argv)
 
 #ifdef HAVE_SYS_SOCKET_H
             case 'a':
-            {
                 if (optarg)
                 {
                     if (asprintf(&param->mcast_interface, "%s", optarg) < 0)
@@ -534,7 +533,8 @@ int main(int argc, char **pp_argv)
                         usage();
                     }
                 }
-            }
+                break;
+
             case 'i':
                 if (optarg)
                 {
