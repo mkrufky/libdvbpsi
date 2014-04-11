@@ -748,6 +748,8 @@ static void handle_PAT(void* p_data, dvbpsi_pat_t* p_pat)
             if (!dvbpsi_pmt_attach(p_pmt->handle, p_program->i_number, handle_PMT, p_stream))
             {
                  fprintf(stderr, "dvbinfo: Failed to attach new pmt decoder\n");
+                 dvbpsi_delete(p_pmt->handle);
+                 free(p_pmt);
                  break;
             }
 
