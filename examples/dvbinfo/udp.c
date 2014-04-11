@@ -247,7 +247,7 @@ int udp_open(const char *interface, const char *ipaddress, int port)
         sflags = SOCK_CLOEXEC;
 #endif
         s_ctl = socket(ptr->ai_family, ptr->ai_socktype | sflags, ptr->ai_protocol);
-        if (s_ctl <= 0)
+        if (s_ctl < 0)
         {
             perror("udp socket error");
             continue;
@@ -257,6 +257,7 @@ int udp_open(const char *interface, const char *ipaddress, int port)
         if (!set_fdsocketclosexec(s_ctl))
         {
             close(s_ctl);
+            s_ctl = -1;
             continue;
         }
 #endif
@@ -274,6 +275,7 @@ int udp_open(const char *interface, const char *ipaddress, int port)
         if (result < 0)
         {
             close(s_ctl);
+            s_ctl = -1;
             perror("udp bind error");
             continue;
         }
@@ -283,6 +285,7 @@ int udp_open(const char *interface, const char *ipaddress, int port)
             mcast_connect(s_ctl, NULL, saddr, ptr->ai_addrlen))
         {
             close(s_ctl);
+            s_ctl = -1;
             perror("mcast connect error");
             continue;
         }
