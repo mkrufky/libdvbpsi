@@ -141,7 +141,8 @@ int tcp_open(const char *ipaddress, int port)
         }
 #endif
 
-        setsockopt (s_ctl, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
+        if (setsockopt (s_ctl, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int)) < 0)
+            perror("tcp setsockopt error");
 
         result = connect( s_ctl, ptr->ai_addr, ptr->ai_addrlen );
         if (result < 0)
