@@ -24,6 +24,7 @@ stamp-*
 *-stamp
 doc/doxygen
 doc/decoder.png
+examples/check_cc_pid
 examples/decode_mpeg
 examples/decode_pat
 examples/decode_pmt
