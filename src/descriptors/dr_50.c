@@ -71,7 +71,7 @@ dvbpsi_component_dr_t* dvbpsi_DecodeComponentDr(dvbpsi_descriptor_t * p_descript
     {
     	p_decoded->i_text_length = p_descriptor->i_length - 6;
     	p_decoded->i_text = calloc(p_decoded->i_text_length - 6, sizeof(uint8_t));
-        if (!p_decoded)
+        if (!p_decoded->i_text)
         {
         	free(p_decoded);
             return NULL;
