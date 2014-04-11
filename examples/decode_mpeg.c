@@ -665,6 +665,13 @@ int main(int i_argc, char* pa_argv[])
         goto error;
     }
 
+    if( i_fd < 0 )
+    {
+        fprintf( stderr, "no input selected\n" );
+        usage( pa_argv[0] );
+        goto error;
+    }
+
     p_stream = (ts_stream_t *) malloc( sizeof(ts_stream_t) );
     if( !p_stream )
         goto out_of_memory;
