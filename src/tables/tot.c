@@ -116,7 +116,7 @@ void dvbpsi_tot_detach(dvbpsi_t* p_dvbpsi, uint8_t i_table_id,
 
     i_extension = 0; /* NOTE: force to 0 when handling TDT/TOT */
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
-    if (p_demux == NULL)
+    if (p_subdec == NULL)
     {
         dvbpsi_error(p_dvbpsi, "TDT/TOT Decoder",
                      "No such TDT/TOT decoder (table_id == 0x%02x,"
