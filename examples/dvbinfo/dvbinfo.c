@@ -124,8 +124,8 @@ static void usage(void)
     printf("                         table  = tables and descriptors\n");
     printf("                         packet = decode packets and print structs\n");
 //    printf("                         wire = print arrival time per packet (wireshark like)\n");
-    printf("      --summary-file   : file to write summary information to (default: stdout)\n");
-    printf("      --summary-period : refresh summary file every n milliseconds (default: 1000ms)\n");
+    printf(" -j | --summary-file   : file to write summary information to (default: stdout)\n");
+    printf(" -p | --summary-period : refresh summary file every n milliseconds (default: 1000ms)\n");
 #endif
     exit(EXIT_FAILURE);
 }
@@ -610,8 +610,7 @@ int main(int argc, char **pp_argv)
 
             case 'p':
                 {
-                    char *end = NULL;
-                    param->summary.period = strtoll(optarg, &end, 10);
+                    param->summary.period = strtoll(optarg, NULL, 10);
                     if (((errno == ERANGE) &&
                             ((param->summary.period == LLONG_MIN) ||
                              (param->summary.period == LLONG_MAX))) ||
