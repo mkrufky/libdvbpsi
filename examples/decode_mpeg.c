@@ -573,8 +573,8 @@ int main(int i_argc, char* pa_argv[])
     int next_option = 0;
 
     int i_fd = -1;
-    int i_mtu = 1316; /* (7 * 188) = 1316 < 1500 network MTU */
 #ifdef HAVE_SYS_SOCKET_H
+    int i_mtu = 1316; /* (7 * 188) = 1316 < 1500 network MTU */
     int i_report = REPORT_UDP; /* REPORT_PCR REPORT_UDP */
     int i_port = 0;
     char *ipaddress = NULL;
@@ -636,12 +636,15 @@ int main(int i_argc, char* pa_argv[])
         }
     } while( next_option != -1 );
 
-#ifdef HAVE_SYS_SOCKET_H
     if( b_verbose )
     {
+#ifdef HAVE_SYS_SOCKET_H
         fprintf( stderr, "set mtu to %d\n", i_mtu );
-    }
+#else
+        fprintf( stderr, "using file: %s", filename);
 #endif
+    }
+
     /* initialize */
     if( filename )
     {
