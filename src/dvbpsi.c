@@ -65,9 +65,10 @@ dvbpsi_t *dvbpsi_new(dvbpsi_message_cb callback, enum dvbpsi_msg_level level)
  *****************************************************************************/
 void dvbpsi_delete(dvbpsi_t *p_dvbpsi)
 {
-    assert(p_dvbpsi->p_decoder == NULL);
-    if (p_dvbpsi)
+    if (p_dvbpsi) {
+        assert(p_dvbpsi->p_decoder == NULL);
         p_dvbpsi->pf_message = NULL;
+    }
     free(p_dvbpsi);
 }
 
