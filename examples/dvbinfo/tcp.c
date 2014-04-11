@@ -126,7 +126,7 @@ int tcp_open(const char *ipaddress, int port)
         sflags = SOCK_CLOEXEC;
 #endif
         s_ctl = socket(ptr->ai_family, ptr->ai_socktype | sflags, ptr->ai_protocol);
-        if (s_ctl <= 0)
+        if (s_ctl < 0)
         {
             perror("tcp socket error");
             continue;
@@ -136,6 +136,7 @@ int tcp_open(const char *ipaddress, int port)
         if (!set_fdsocketclosexec(s_ctl))
         {
             close(s_ctl);
+            s_ctl = -1;
             continue;
         }
 #endif
@@ -146,6 +147,7 @@ int tcp_open(const char *ipaddress, int port)
         if (result < 0)
         {
             close(s_ctl);
+            s_ctl = -1;
             perror( "tcp connect error" );
             continue;
         }
