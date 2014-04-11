@@ -460,33 +460,33 @@ static void DumpSubtitleDescriptor(dvbpsi_subtitling_dr_t* p_subtitle_descriptor
  *****************************************************************************/
 static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
 {
-  int i;
+    int i;
 
-  while(p_descriptor)
-  {
-    fprintf( stderr, "%s 0x%02x : ", str, p_descriptor->i_tag);
-    switch (p_descriptor->i_tag)
-      {
-      case SYSTEM_CLOCK_DR:
-    DumpSystemClockDescriptor(dvbpsi_DecodeSystemClockDr(p_descriptor));
-    break;
-      case MAX_BITRATE_DR:
-    DumpMaxBitrateDescriptor(dvbpsi_DecodeMaxBitrateDr(p_descriptor));
-    break;
-      case STREAM_IDENTIFIER_DR:
-    DumpStreamIdentifierDescriptor(dvbpsi_DecodeStreamIdentifierDr(p_descriptor));
-    break;
-      case SUBTITLING_DR:
-    DumpSubtitleDescriptor(dvbpsi_DecodeSubtitlingDr(p_descriptor));
-    break;
-      default:
-    fprintf( stderr, "\"");
-    for(i = 0; i < p_descriptor->i_length; i++)
-      fprintf( stderr, "%c", p_descriptor->p_data[i]);
-      fprintf( stderr, "\"\n");
-      }
-    p_descriptor = p_descriptor->p_next;
-  }
+    while(p_descriptor)
+    {
+        fprintf( stderr, "%s 0x%02x : ", str, p_descriptor->i_tag);
+        switch (p_descriptor->i_tag)
+        {
+        case SYSTEM_CLOCK_DR:
+            DumpSystemClockDescriptor(dvbpsi_DecodeSystemClockDr(p_descriptor));
+            break;
+        case MAX_BITRATE_DR:
+            DumpMaxBitrateDescriptor(dvbpsi_DecodeMaxBitrateDr(p_descriptor));
+            break;
+        case STREAM_IDENTIFIER_DR:
+            DumpStreamIdentifierDescriptor(dvbpsi_DecodeStreamIdentifierDr(p_descriptor));
+            break;
+        case SUBTITLING_DR:
+            DumpSubtitleDescriptor(dvbpsi_DecodeSubtitlingDr(p_descriptor));
+            break;
+        default:
+            fprintf( stderr, "\"");
+            for(i = 0; i < p_descriptor->i_length; i++)
+                fprintf( stderr, "%c", p_descriptor->p_data[i]);
+            fprintf( stderr, "\"\n");
+        }
+        p_descriptor = p_descriptor->p_next;
+    }
 }
 
 /*****************************************************************************
