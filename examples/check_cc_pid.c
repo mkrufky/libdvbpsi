@@ -16,6 +16,10 @@
 
 #include <assert.h>
 
+#ifdef WIN32
+#   define O_NONBLOCK (0) /* O_NONBLOCK does not exist for Windows */
+#endif
+
 static inline uint32_t ts_getcc(uint8_t *packet)
 {
     return (packet[3] & 0x0f);
