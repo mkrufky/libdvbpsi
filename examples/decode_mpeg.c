@@ -856,7 +856,7 @@ out_of_memory:
     fprintf( stderr, "Out of memory\n" );
 
 dvbpsi_out:
-    if( p_stream->pat.handle )
+    if( p_stream && p_stream->pat.handle )
     {
         dvbpsi_pat_detach( p_stream->pat.handle );
         dvbpsi_delete( p_stream->pat.handle );
