@@ -114,7 +114,7 @@ void dvbpsi_sis_detach(dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extens
     i_extension = 0;
     dvbpsi_demux_subdec_t* p_subdec;
     p_subdec = dvbpsi_demuxGetSubDec(p_demux, i_table_id, i_extension);
-    if (p_demux == NULL)
+    if (p_subdec == NULL)
     {
         dvbpsi_error(p_dvbpsi, "SIS Decoder",
                          "No such SIS decoder (table_id == 0x%02x,"
