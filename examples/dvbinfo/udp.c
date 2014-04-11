@@ -264,12 +264,16 @@ int udp_open(const char *interface, const char *ipaddress, int port)
 
         /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
          * to avoid packet loss caused in case of scheduling hiccups */
-        setsockopt (s_ctl, SOL_SOCKET, SO_RCVBUF,
-                    (void *)&(int){ 0x80000 }, sizeof (int));
-        setsockopt (s_ctl, SOL_SOCKET, SO_SNDBUF,
-                    (void *)&(int){ 0x80000 }, sizeof (int));
+        if (setsockopt (s_ctl, SOL_SOCKET, SO_RCVBUF,
+                    (void *)&(int){ 0x80000 }, sizeof (int)) < 0)
+            perror("udp setsockopt error");
 
-        setsockopt (s_ctl, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
+        if (setsockopt (s_ctl, SOL_SOCKET, SO_SNDBUF,
+                    (void *)&(int){ 0x80000 }, sizeof (int)) < 0)
+            perror("udp setsockopt error");
+
+        if (setsockopt (s_ctl, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int)) < 0)
+            perror("udp setsockopt error");
 
         result = bind(s_ctl, ptr->ai_addr, ptr->ai_addrlen);
         if (result < 0)
