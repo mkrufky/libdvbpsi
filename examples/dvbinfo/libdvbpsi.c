@@ -1703,6 +1703,8 @@ static void handle_atsc_MGT(void *p_data, dvbpsi_atsc_mgt_t *p_mgt)
             if (!dvbpsi_AttachDemux(p->handle, handle_subtable, p_stream))
             {
                  fprintf(stderr, "dvbinfo: Failed to attach new ATSC EIT decoder\n");
+                 dvbpsi_delete(p->handle);
+                 free(p);
                  break;
             }
 
