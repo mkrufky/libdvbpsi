@@ -99,7 +99,7 @@
 
 #define BOZO_end_boolean(name)                                          \
       s_decoded.name += 12;                                             \
-    } while(!i_err && (s_decoded.name <= 12));                          \
+    } while(!i_err && (true/*s_decoded.name <= 12*/));                  \
     fprintf(stdout, "\r  iteration count: %22llu", i_loop_count);       \
     if(i_err)                                                           \
       fprintf(stdout, "    FAILED !!!\n");                              \
