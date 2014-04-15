@@ -9,6 +9,11 @@ Changes between 1.1.2 and 1.2.0:
    - 0x53 CA system id
    - 0x81 AC3 audio
    - 0x86 Caption service
+ * Fixed Coverity Scan issues
+   - out-of-bound writes
+   - null pointer dereferences
+   - resource leaks
+   - check return values
 
 Changes between 1.1.1 and 1.1.2:
 --------------------------------
