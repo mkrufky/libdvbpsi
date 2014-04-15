@@ -45,6 +45,20 @@ then
   CFLAGS_dist="${CFLAGS_dist} -ggdb3"
 fi
 
+dnl --enable-gcc-sanitize
+dnl NOTE: Only use with more then 8GB of memory in your system
+AC_ARG_ENABLE(gcc-sanitize,
+[  --enable-gcc-sanitize   Use gcc address sanitizer (default disabled)],
+[case "${enableval}" in
+  yes) sanitize=true ;;
+  no)  sanitize=false;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-gcc-sanitize) ;;
+esac],[sanitize=false])
+if test "$sanitize" = "true"
+then
+  CFLAGS_dist="${CFLAG_dist} -fsanitize=address -fno-omit-frame-pointer"
+fi
+
 dnl --enable-release
 AC_ARG_ENABLE(release,
 [  --enable-release        Enable release mode (default disabled)],
