@@ -206,6 +206,7 @@ static void report_Header( int i_report )
 /*****************************************************************************
  * PrintPacketTiming for REPORT_UDP
  *****************************************************************************/
+#ifdef HAVE_SYS_SOCKET_H
 #ifdef HAVE_GETTIMEOFDAY
 static mtime_t report_UDPPacketTiming( int32_t i_seqno, int32_t bytes, mtime_t time_prev, mtime_t *time_base )
 {
@@ -237,6 +238,7 @@ static void report_UDPPacketTiming( int32_t i_seqno, int32_t bytes )
     printf( "%.2d %"PRId64" %"PRId64" ", i_seqno, 0UL, 0UL );
     printf( "%d\n", bytes );
 }
+#endif
 #endif
 
 #ifdef HAVE_GETTIMEOFDAY
@@ -281,7 +283,7 @@ static void report_PCRPacketTiming( int i_cc, ts_pid_t *ts_pid,
 
     /* bitrate since last pcr */
     if( (i_delta > 0) )
-        printf( "%d %lld", i_bytes, (long long int)(i_bytes*8)/i_delta/1000 );
+        printf( "%d %"PRId64"", i_bytes, (long int)(i_bytes*8)/i_delta/1000 );
     else
         printf( "%d 0", i_bytes );
 
@@ -578,12 +580,12 @@ int main(int i_argc, char* pa_argv[])
     int i_report = REPORT_UDP; /* REPORT_PCR REPORT_UDP */
     int i_port = 0;
     char *ipaddress = NULL;
-#endif
 #ifdef HAVE_GETTIMEOFDAY
     mtime_t  time_prev = 0;
     mtime_t  time_base = 0;
 #endif
     mtime_t  i_prev_pcr = 0;  /* 33 bits */
+#endif
     int      i_old_cc = -1;
     uint32_t i_bytes = 0; /* bytes transmitted between PCR's */
     char *filename = NULL;
@@ -701,8 +703,9 @@ int main(int i_argc, char* pa_argv[])
     while( i_len > 0 )
     {
         int i = 0;
+#ifdef HAVE_SYS_SOCKET_H
         vlc_bool_t b_first = VLC_FALSE;
-
+#endif
         i_bytes += i_len;
         for( i = 0; i < i_len; i += 188 )
         {
@@ -780,10 +783,11 @@ int main(int i_argc, char* pa_argv[])
                               ( (mtime_t)p_tmp[8] << 9 ) |
                               ( (mtime_t)p_tmp[9] << 1 ) |
                               ( (mtime_t)p_tmp[10] >> 7 ) ) / 90;
-                    i_prev_pcr = p_stream->pid[i_pid].i_pcr;
                     p_stream->pid[i_pid].i_pcr = i_pcr;
 
 #ifdef HAVE_SYS_SOCKET_H
+                    i_prev_pcr = p_stream->pid[i_pid].i_pcr;
+
                     if( i_report == REPORT_PCR )
                     {
 #ifdef HAVE_GETTIMEOFDAY
