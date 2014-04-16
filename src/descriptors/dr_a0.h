@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2013  Michael Krufky
+Copyright (C) 2013-2014  Michael Ira Krufky
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ Decode Extended Channel Name Descriptor.
 
 /*!
  * \file dr_a0.h
- * \author Michael Krufky
+ * \author Michael Ira Krufky
  * \brief Decode Extended Channel Name Descriptor.
  */
 
