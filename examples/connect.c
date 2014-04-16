@@ -93,7 +93,7 @@ int create_udp_connection( const char *ipaddress, int port )
     if( !ipaddress ) return -1;
 
     s_ctl = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (s_ctl <= 0)
+    if (s_ctl < 0)
     {
         perror( "udp socket error" );
         return -1;
@@ -106,6 +106,7 @@ int create_udp_connection( const char *ipaddress, int port )
     result = bind(s_ctl, (struct sockaddr*) &addr_ctl, sizeof(addr_ctl));
     if( result < 0 )
     {
+        close(s_ctl);
         perror( "udp bind error" );
         return -1;
     }
