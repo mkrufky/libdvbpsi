@@ -75,6 +75,9 @@ D: CUE Identifier Descriptor (0x8a)
 D: Splice Information Table
 D: Maintainer
 
+N: Yonathan Yusim
+D: Descriptor 0xa1
+
 N: Zlu Zu
 E: zluzu@gmail.com
 D: BAT decoder and generator
