@@ -507,7 +507,7 @@ int main(int argc, char **pp_argv)
         { NULL, 0, NULL, 0 }
     };
 #ifdef HAVE_SYS_SOCKET_H
-    while ((c = getopt_long(argc, pp_argv, "a:d:f:i:ho:ms:tu", long_options, NULL)) != -1)
+    while ((c = getopt_long(argc, pp_argv, "a:d:f:i:j:ho:p:ms:tu", long_options, NULL)) != -1)
 #else
     while ((c = getopt_long(argc, pp_argv, "d:f:h", long_options, NULL)) != -1)
 #endif
@@ -603,16 +603,25 @@ int main(int argc, char **pp_argv)
             /* - Statistics */
             case 's':
             {
-                param->b_summary = true;
-                ssize_t size = ARRAY_SIZE(psz_summary_mode);
-                for (ssize_t i = 0; i < size; i++)
+                if (optarg)
                 {
-                    printf("summary mode %s\n", psz_summary_mode[i]);
-                    if (strncmp(optarg, psz_summary_mode[i], strlen(psz_summary_mode[i])) == 0)
+                    ssize_t size = ARRAY_SIZE(psz_summary_mode);
+                    for (ssize_t i = 0; i < size; i++)
                     {
-                        param->summary.mode = i_summary_mode[i];
-                        break;
+                        printf("summary mode %s\n", psz_summary_mode[i]);
+                        if (strncmp(optarg, psz_summary_mode[i], strlen(psz_summary_mode[i])) == 0)
+                        {
+                            param->summary.mode = i_summary_mode[i];
+                            param->b_summary = true;
+                            break;
+                        }
                     }
+                }
+                if (!param->b_summary)
+                {
+                    fprintf(stderr, "Option --summary has invalid content %s\n", optarg);
+                    params_free(param);
+                    usage();
                 }
                 break;
             }
@@ -628,6 +637,7 @@ int main(int argc, char **pp_argv)
                 break;
 
             case 'p':
+                if (optarg)
                 {
                     param->summary.period = strtoll(optarg, NULL, 10);
                     if (((errno == ERANGE) &&
