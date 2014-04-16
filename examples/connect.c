@@ -53,7 +53,7 @@ int create_tcp_connection( const char *ipaddress, int port )
     if( !ipaddress ) return -1;
 
     s_ctl = socket( PF_INET, SOCK_STREAM, 0 );
-    if (s_ctl <= 0)
+    if (s_ctl < 0)
     {
         perror( "tcp socket error" );
         return -1;
@@ -67,6 +67,7 @@ int create_tcp_connection( const char *ipaddress, int port )
     if( result < 0 )
     {
         perror( "tcp connect error" );
+        close(s_ctl);
         return -1;
     }
 
