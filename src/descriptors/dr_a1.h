@@ -38,9 +38,9 @@ extern "C"
 
 typedef struct dvbpsi_service_location_element_s
 {
-    uint8_t i_stream_type;
-    uint16_t i_elementary_pid;
-    char i_iso_639_code[3];
+    uint8_t i_stream_type;     /*!< service stream type */
+    uint16_t i_elementary_pid; /*!< PID of elementary stream */
+    char i_iso_639_code[3];    /*!< ISO 936 language code */
 } dvbpsi_service_location_element_t;
 
 /*****************************************************************************
@@ -62,7 +62,7 @@ typedef struct dvbpsi_service_location_dr_s
     uint16_t i_pcr_pid;		/*!< PCR_PID */
     uint8_t i_number_elements;	/*!< number of elements used for this service */
 
-    dvbpsi_service_location_element_t elements[0xff];
+    dvbpsi_service_location_element_t elements[0xff]; /*!< service location elements array */
 
 } dvbpsi_service_location_dr_t;
 
