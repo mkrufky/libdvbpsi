@@ -49,25 +49,25 @@ extern "C" {
  */
 typedef struct dvbpsi_ac3_audio_dr_s
 {
-    uint8_t  i_sample_rate_code; // 3bits
-    uint8_t  i_bsid;             // 5bits
-    uint8_t  i_bit_rate_code;    // 6bits
-    uint8_t  i_surround_mode;    // 2bits
-    uint8_t  i_bsmod;            // 3bits
-    uint8_t  i_num_channels;     // 4bits
-    int      b_full_svc;
-    uint8_t  i_lang_code;        // 8bits
-    uint8_t  i_lang_code2;       // 8bits
-    uint8_t  i_mainid;           // 3bits
-    uint8_t  i_priority;         // 2bits
-    uint8_t  i_asvcflags;        // 8bits
-    uint8_t  i_textlen;          // 7bits
-    int      b_text_code;
-    unsigned char text[128];
-    int      b_language_flag;
-    int      b_language_flag_2;
-    uint8_t  language[3];
-    uint8_t  language_2[3];
+    uint8_t  i_sample_rate_code; /*!< sample rate code (3bits) */
+    uint8_t  i_bsid;             /*!< bsid (5bits) */
+    uint8_t  i_bit_rate_code;    /*!< bitrate code (6bits) */
+    uint8_t  i_surround_mode;    /*!< surround mode indicator (2bits) */
+    uint8_t  i_bsmod;            /*!< (3bits) */
+    uint8_t  i_num_channels;     /*!< number of audio channels (4bits) */
+    int      b_full_svc;         /*!< */
+    uint8_t  i_lang_code;        /*!< language code (8bits) */
+    uint8_t  i_lang_code2;       /*!< language code (8bits( */
+    uint8_t  i_mainid;           /*!< main identifier (3bits) */
+    uint8_t  i_priority;         /*!< priority (2bits) */
+    uint8_t  i_asvcflags;        /*!< asvc flags  (8bits) */
+    uint8_t  i_textlen;          /*!< text length (7bits) */
+    int      b_text_code;        /*!< text code is present */
+    unsigned char text[128];     /*!< text code */
+    int      b_language_flag;    /*!< language flag */
+    int      b_language_flag_2;  /*!< language flag */
+    uint8_t  language[3];        /*!< language code */
+    uint8_t  language_2[3];      /*!< language code */
 }dvbpsi_ac3_audio_dr_t;
 
 /*****************************************************************************
