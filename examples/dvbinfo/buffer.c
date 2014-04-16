@@ -32,6 +32,7 @@
 #   include <stdint.h>
 #endif
 
+#include <sys/types.h>
 #include <assert.h>
 
 typedef int64_t mtime_t;
