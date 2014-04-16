@@ -527,9 +527,12 @@ void dvbpsi_message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char
         int err = vasprintf(&msg, fmt, ap);
 #else
         msg = malloc(DVBPSI_MSG_SIZE);
-        if (msg == NULL)
+        if (msg == NULL) {
+            va_end(ap);
             return;
+        }
         if (snprintf(&msg, DVBPSI_MSG_SIZE, DVBPSI_MSG_FORMAT, ap) < 0) {
+            va_end(ap);
             free(msg);
             return;
         }
@@ -553,10 +556,13 @@ void dvbpsi_message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char
         va_start(ap, fmt);                                      \
         char *tmp = NULL;                                       \
         int err = vasprintf(&tmp, fmt, ap);                     \
-        if (err < 0)                                            \
+        if (err < 0) {                                          \
+            va_end(ap);                                         \
             return;                                             \
+        }                                                       \
         char *msg = NULL;                                       \
         if (asprintf(&msg, DVBPSI_MSG_FORMAT, src, tmp) < 0) {  \
+            va_end(ap);                                         \
             free(tmp);                                          \
             return;                                             \
         }                                                       \
@@ -574,10 +580,14 @@ void dvbpsi_message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char
         va_list ap;                                             \
         va_start(ap, fmt);                                      \
         char *msg = malloc(DVBPSI_MSG_SIZE);                    \
-        if (msg == NULL)                                        \
+        if (msg == NULL) {                                      \
+            va_end(ap);                                         \
             return;                                             \
-        if (snprintf(&msg, DVBPSI_MSG_SIZE, DVBPSI_MSG_FORMAT, src) < 0) \
+        }                                                       \
+        if (snprintf(&msg, DVBPSI_MSG_SIZE, DVBPSI_MSG_FORMAT, src) < 0) { \
+            va_end(ap);                                         \
             return;                                             \
+        }                                                       \
         int err = vsnprintf(&msg, DVBPSI_MSG_SIZE, fmt, ap);    \
         va_end(ap);                                             \
         if (err > 0) {                                          \
