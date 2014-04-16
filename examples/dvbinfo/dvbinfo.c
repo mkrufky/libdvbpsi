@@ -22,6 +22,14 @@
 
 #include "config.h"
 
+#if __APPLE__
+// In Mac OS X 10.5 and later trying to use the daemon function gives a “‘daemon’ is deprecated”
+// error, which prevents compilation because we build with "-Werror".
+// Since this is supposed to be portable cross-platform code, we don't care that daemon is
+// deprecated on Mac OS X 10.5, so we use this preprocessor trick to eliminate the error message.
+#define daemon yes_we_know_that_daemon_is_deprecated_in_os_x_10_5_thankyou
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -66,6 +74,11 @@
 #ifdef HAVE_SYS_SOCKET_H
 #   include "udp.h"
 #   include "tcp.h"
+#endif
+
+#if __APPLE__
+#undef daemon
+extern int daemon(int, int);
 #endif
 
 #define FIFO_THRESHOLD_SIZE (400 * 1024 * 1024) /* threshold in bytes */
