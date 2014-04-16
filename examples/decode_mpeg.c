@@ -241,6 +241,7 @@ static void report_UDPPacketTiming( int32_t i_seqno, int32_t bytes )
 #endif
 #endif
 
+#ifdef HAVE_SYS_SOCKET_H
 #ifdef HAVE_GETTIMEOFDAY
 static mtime_t report_PCRPacketTiming( int i_cc, ts_pid_t *ts_pid,
                     mtime_t i_prev_pcr, mtime_t time_prev, int32_t i_bytes )
@@ -294,6 +295,7 @@ static void report_PCRPacketTiming( int i_cc, ts_pid_t *ts_pid,
     printf( "\n" );
 #endif
 }
+#endif
 
 static void message(dvbpsi_t *handle, const dvbpsi_msg_level_t level, const char* msg)
 {
