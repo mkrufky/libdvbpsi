@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         n++;
         tcc = cc;
         if (pid == tpid)
-            printf("packet %ld, pid %u (0x%x), cc %d %s\n",
+            printf("packet %"PRId64", pid %u (0x%x), cc %d %s\n",
                    n, pid, pid, cc,
                    ((cc % 16) == (tcc + 1)%16) ? "discontinuity" : "");
     }
