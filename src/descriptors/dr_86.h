@@ -49,12 +49,12 @@ extern "C" {
  */
 typedef struct dvbpsi_caption_service_s
 {
-    char     i_iso_639_code[3];
-    int      b_digital_cc;
-    int      b_line21_field;
-    uint16_t i_caption_service_number;
-    int      b_easy_reader;
-    int      b_wide_aspect_ratio;
+    char     i_iso_639_code[3]; /*!< ISO 639 language code */
+    int      b_digital_cc;      /*!< Digital CC  flag */
+    int      b_line21_field;    /*!< */
+    uint16_t i_caption_service_number; /*!< */
+    int      b_easy_reader;     /*!< */
+    int      b_wide_aspect_ratio; /*!< Wide aspect ratio flag */
 } dvbpsi_caption_service_t;
 
 /*****************************************************************************
@@ -72,8 +72,8 @@ typedef struct dvbpsi_caption_service_s
  */
 typedef struct dvbpsi_caption_service_dr_s
 {
-    uint8_t i_number_of_services;
-    dvbpsi_caption_service_t services[0x1f];
+    uint8_t i_number_of_services; /*!< Number of Captions services */
+    dvbpsi_caption_service_t services[0x1f]; /*!< Caption services array */
 } dvbpsi_caption_service_dr_t;
 
 /*****************************************************************************
