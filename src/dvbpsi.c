@@ -508,7 +508,7 @@ bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
  *  1 is warning and errors
  *  2 is debug, warning and errors
  *****************************************************************************/
-#if !defined(_GNU_SOURCE)
+#if !defined(HAVE_ASPRINTF)
 #   define DVBPSI_MSG_SIZE 1024
 #endif
 
@@ -523,7 +523,7 @@ void dvbpsi_message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char
         va_list ap;
         va_start(ap, fmt);
         char *msg = NULL;
-#if defined(_GNU_SOURCE)
+#if defined(HAVE_ASPRINTF)
         int err = vasprintf(&msg, fmt, ap);
 #else
         msg = malloc(DVBPSI_MSG_SIZE);
@@ -544,7 +544,7 @@ void dvbpsi_message(dvbpsi_t *dvbpsi, const dvbpsi_msg_level_t level, const char
 #else
 
 /* Common code for printing messages */
-#   if defined(_GNU_SOURCE)
+#   if defined(HAVE_ASPRINTF)
 #       define DVBPSI_MSG_COMMON(level)                         \
     do {                                                        \
         va_list ap;                                             \
