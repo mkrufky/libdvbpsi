@@ -60,7 +60,7 @@ dvbpsi_vstream_dr_t * dvbpsi_DecodeVStreamDr(dvbpsi_descriptor_t * p_descriptor)
   if(!p_decoded) return NULL;
 
   /* Decode data and check the length */
-  p_decoded->b_mpeg2 = (p_descriptor->p_data[0] & 0x04) ? true : false;
+  p_decoded->b_mpeg2 = !((p_descriptor->p_data[0] & 0x04) ? true : false);
   if(    (!p_decoded->b_mpeg2 && (p_descriptor->i_length != 1))
       || (p_decoded->b_mpeg2 && (p_descriptor->i_length != 3)))
   {
