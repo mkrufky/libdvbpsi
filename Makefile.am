@@ -3,7 +3,7 @@
 ACLOCAL_AMFLAGS=-I m4
 
 SUBDIRS = src examples misc
-DIST_SUBDIRS = $(SUBDIRS) doc wince
+DIST_SUBDIRS = $(SUBDIRS) doc
 
 EXTRA_DIST = libdvbpsi.spec libdvbpsi.spec.in libdvbpsi.pc.in bootstrap
 

@@ -141,7 +141,6 @@ AC_OUTPUT([Makefile
            examples/dvbinfo/Makefile
            misc/Makefile
            doc/Makefile
-           wince/Makefile
            libdvbpsi.pc
            libdvbpsi.spec])
 
