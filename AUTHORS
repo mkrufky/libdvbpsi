@@ -48,6 +48,11 @@ E: gnu_andrew@member.fsf.org
 D: descriptor 0x52
 D: decode_pmt verbose output
 
+N: Jean-Baptiste Kempf
+E: jb@videolan.org
+C: j-b
+D: Bugfixing
+
 N: Tristan Leteurtre
 E: tristan.leteurtre@anevia.com
 C: tooney
