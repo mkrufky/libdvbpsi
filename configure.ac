@@ -23,13 +23,23 @@ CFLAGS_save="${CFLAGS}"
 
 dnl add features to CFLAGS
 CFLAGS_dist="-Wall -Werror --std=gnu99 -D_GNU_SOURCE"
-CFLAGS_dist="${CFLAGS_dist} -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-prototypes -Wshadow -Waggregate-return -Wmissing-prototypes -Wnested-externs -Wsign-compare"
+CFLAGS_dist="${CFLAGS_dist} -Wpointer-arith -Wcast-align -Wstrict-prototypes -Wshadow -Waggregate-return -Wmissing-prototypes -Wnested-externs -Wsign-compare"
 
 dnl check the operating system
 case "${target_os}" in
   darwin*)
+    SYS=darwin
     CFLAGS_dist="${CFLAGS_dist} -no-cpp-precomp"
     ;;
+  *mingw32*)
+    SYS=mingw32
+    CFLAGS_dist="${CFLAGS_dist} -Wno-cast-qual"
+    AC_DEFINE([WIN32],[1],["Define to 1 if building for windows with mingw32"])
+    ;;
+   *)
+    SYS=linux
+    CFLAGS_dist="${CFLAGS_dist} -Wcast-qual"
+   ;;
 esac
 
 dnl --enable-debug
@@ -120,4 +130,5 @@ libdvbpsi version     : ${VERSION}
 debug                 : ${debug}
 release               : ${release}
 compile flags         : ${CFLAGS}
+build for             : ${SYS}
 "
