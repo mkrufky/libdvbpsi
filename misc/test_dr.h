@@ -20,7 +20,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  *****************************************************************************/
-
+#ifdef WIN32
+# define PRI64d "I64u"
+#else
+# define PRI64d "llu"
+#endif
 
 #define BOZO_VARS(sname)                                                \
   int i_err = 0;                                                        \
@@ -33,7 +37,7 @@
 
 #define BOZO_DOJOB(fname)                                               \
   if(!(i_loop_count & 0xffff))                                          \
-    fprintf(stdout, "\r  iteration count: %22llu", i_loop_count);       \
+    fprintf(stdout, "\r  iteration count: %22"PRI64d, i_loop_count);       \
   i_loop_count++;                                                       \
   p_descriptor = dvbpsi_Gen##fname##Dr(&s_decoded, 0);                  \
   p_new_decoded = dvbpsi_Decode##fname##Dr(p_descriptor);
@@ -67,7 +71,7 @@
       s_decoded.name <<= 1;                                             \
     } while(!i_err                                                      \
          && (++i < bitcount));                                          \
-    fprintf(stdout, "\r  iteration count: %22llu", i_loop_count);       \
+    fprintf(stdout, "\r  iteration count: %22"PRI64d, i_loop_count);       \
     if(i_err)                                                           \
       fprintf(stdout, "    FAILED !!!\n");                              \
     else                                                                \
@@ -77,7 +81,7 @@
 #define BOZO_check_integer(name, bitcount)                              \
   if(!i_err && (s_decoded.name != p_new_decoded->name))                 \
   {                                                                     \
-    fprintf(stderr, "\nError: integer %s %llu -> %llu\n", #name,        \
+    fprintf(stderr, "\nError: integer %s %"PRI64d" -> %"PRI64d"\n", #name,        \
             (long long unsigned int)s_decoded.name,                     \
             (long long unsigned int)p_new_decoded->name);               \
     i_err = 1;                                                          \
@@ -100,7 +104,7 @@
 #define BOZO_end_boolean(name)                                          \
       s_decoded.name += 12;                                             \
     } while(!i_err && (s_decoded.name <= 12));                          \
-    fprintf(stdout, "\r  iteration count: %22llu", i_loop_count);       \
+    fprintf(stdout, "\r  iteration count: %22"PRI64d, i_loop_count);       \
     if(i_err)                                                           \
       fprintf(stdout, "    FAILED !!!\n");                              \
     else                                                                \
@@ -116,4 +120,3 @@
             s_decoded.name, p_new_decoded->name);                       \
     i_err = 1;                                                          \
   }
-
