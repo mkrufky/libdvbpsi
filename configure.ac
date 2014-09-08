@@ -22,7 +22,7 @@ dnl store CFLAGS from user
 CFLAGS_save="${CFLAGS}"
 
 dnl add features to CFLAGS
-CFLAGS_dist="-Wall -Werror --std=gnu99 -D_GNU_SOURCE"
+CFLAGS_dist="-Wall -std=gnu99 -D_GNU_SOURCE"
 CFLAGS_dist="${CFLAGS_dist} -Wpointer-arith -Wcast-align -Wstrict-prototypes -Wshadow -Waggregate-return -Wmissing-prototypes -Wnested-externs -Wsign-compare"
 
 dnl check the operating system
@@ -52,7 +52,7 @@ AC_ARG_ENABLE(debug,
 esac],[debug=false])
 if test "$debug" = "true"
 then
-  CFLAGS_dist="${CFLAGS_dist} -ggdb3"
+  CFLAGS_dist="${CFLAGS_dist} -Werror -ggdb3"
 fi
 
 dnl --enable-gcc-sanitize
