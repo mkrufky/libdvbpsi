@@ -45,6 +45,9 @@ typedef struct params_s
     bool b_tcp;
     bool b_file;
 
+    /* tuning options */
+    size_t threshold; /* capture fifo threshold */
+
     /* */
     int  fd_in;
     int  fd_out;

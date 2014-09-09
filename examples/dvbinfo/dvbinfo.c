@@ -113,7 +113,7 @@ typedef struct dvbinfo_capture_s
 static void usage(void)
 {
 #ifdef HAVE_SYS_SOCKET_H
-    printf("Usage: dvbinfo [-h] [-d <debug>] [-f|-m| [[-u|-t] -a <mcast_interface> -i <ipaddress:port>] -o <outputfile>\n");
+    printf("Usage: dvbinfo [-h] [-d <debug>] [-f <filename> | -m | -c <bufsize> | [[-u|-t] -a <mcast_interface> -i <ipaddress:port>] -o <outputfile>\n");
     printf("               [-s [bandwidth|table|packet] --summary-file <file> --summary-period <ms>]\n");
 #else
     printf("Usage: dvbinfo [-h] [-d <debug>] [-f|\n");
@@ -139,6 +139,8 @@ static void usage(void)
 //    printf("                         wire = print arrival time per packet (wireshark like)\n");
     printf(" -j | --summary-file   : file to write summary information to (default: stdout)\n");
     printf(" -p | --summary-period : refresh summary file every n milliseconds (default: 1000ms)\n");
+    printf("\nTuing options: \n");
+    printf(" -c | --capture buffer size : number of bytes in capture buffer (default: %d bytes)\n", FIFO_THRESHOLD_SIZE);
 #endif
     exit(EXIT_FAILURE);
 }
@@ -199,6 +201,9 @@ static params_t *params_init(void)
 
     param->b_verbose = false;
     param->b_monitor = false;
+
+    /* tuning options */
+    param->threshold = FIFO_THRESHOLD_SIZE;
 
     /* statistics */
     param->b_summary = false;
@@ -311,7 +316,7 @@ static void *dvbinfo_capture(void *data)
         buffer->i_date = mdate();
 
         /* check fifo size */
-        if (fifo_size(capture->fifo) >= FIFO_THRESHOLD_SIZE)
+        if (fifo_size(capture->fifo) >= param->threshold)
         {
             pthread_mutex_lock(&capture->lock);
             capture->b_fifo_full = true;
@@ -328,7 +333,7 @@ static void *dvbinfo_capture(void *data)
             else
             {
                 libdvbpsi_log(capture->params, DVBINFO_LOG_ERROR,
-                          "error fifo full discarding buffer");
+                          "error fifo full discarding buffer\n");
                 fifo_push(capture->empty, buffer);
                 continue;
             }
@@ -385,13 +390,13 @@ static int dvbinfo_process(dvbinfo_capture_t *capture)
             if (size < 0) /* error writing */
             {
                 libdvbpsi_log(param, DVBINFO_LOG_ERROR,
-                              "error (%d) writting to %s", errno, param->output);
+                              "error (%d) writting to %s\n", errno, param->output);
                 break;
             }
             else if ((size_t)size < buffer->i_size) /* short writting disk full? */
             {
                 libdvbpsi_log(param, DVBINFO_LOG_ERROR,
-                              "error writting to %s (disk full?)", param->output);
+                              "error writting to %s (disk full?)\n", param->output);
                 break;
             }
         }
@@ -434,7 +439,7 @@ static int dvbinfo_process(dvbinfo_capture_t *capture)
         buffer = NULL;
 
         /* check fifo size */
-        if (fifo_size(capture->fifo) < FIFO_THRESHOLD_SIZE)
+        if (fifo_size(capture->fifo) < param->threshold)
         {
             pthread_mutex_lock(&capture->lock);
             capture->b_fifo_full = false;
@@ -503,11 +508,13 @@ int main(int argc, char **pp_argv)
         { "summary",        required_argument, NULL, 's' },
         { "summary-file",   required_argument, NULL, 'j' },
         { "summary-period", required_argument, NULL, 'p' },
+        /* - tuning options - */
+        { "capturesize",    required_argument, NULL, 'c' },
 #endif
         { NULL, 0, NULL, 0 }
     };
 #ifdef HAVE_SYS_SOCKET_H
-    while ((c = getopt_long(argc, pp_argv, "a:d:f:i:j:ho:p:ms:tu", long_options, NULL)) != -1)
+    while ((c = getopt_long(argc, pp_argv, "a:c:d:f:i:j:ho:p:ms:tu", long_options, NULL)) != -1)
 #else
     while ((c = getopt_long(argc, pp_argv, "d:f:h", long_options, NULL)) != -1)
 #endif
@@ -598,6 +605,18 @@ int main(int argc, char **pp_argv)
             case 'u':
                 param->b_udp = true;
                 param->pf_read = udp_read;
+                break;
+
+            /* - tuning options - */
+            case 'c':
+                param->threshold = strtoul(optarg, NULL, 10);
+                if (((errno == ERANGE) && (param->threshold == ULONG_MAX)) ||
+                    ((errno != 0) && (param->threshold == 0)))
+                {
+                    fprintf(stderr, "Option --capturesize has invalid content %s\n", optarg);
+                    params_free(param);
+                    usage();
+                }
                 break;
 
             /* - Statistics */
