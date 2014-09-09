@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dvbinfo.c: DVB PSI Information
  *****************************************************************************
- * Copyright (C) 2010-2011 M2X BV
+ * Copyright (C) 2010-2014 M2X BV
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
  *
@@ -470,7 +470,7 @@ int main(int argc, char **pp_argv)
     params_t *param = NULL;
     char c;
 
-    printf("dvbinfo: Copyright (C) 2011-2012 M2X BV\n");
+    printf("dvbinfo: Copyright (C) 2011-2014 M2X BV\n");
     printf("License: LGPL v2.1\n");
 
     if (argc == 1)
