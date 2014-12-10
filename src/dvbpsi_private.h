@@ -45,7 +45,7 @@ void dvbpsi_message(dvbpsi_t *dvbpsi, const int level, const char *fmt, ...);
 #  define dvbpsi_error(hnd, src, str, x...)                             \
         dvbpsi_message(hnd, DVBPSI_MSG_ERROR, "libdvbpsi error (%s): " str, src, ##x)
 #  define dvbpsi_warning(hnd, src, str, x...)                                \
-        dvbpsi_message(hnd, DVBPSI_MSG_WARNING, "libdvbpsi warning (%s): " str, src, ##x)
+        dvbpsi_message(hnd, DVBPSI_MSG_WARN, "libdvbpsi warning (%s): " str, src, ##x)
 #  define dvbpsi_debug(hnd, src, str, x...)                                  \
         dvbpsi_message(hnd, DVBPSI_MSG_DEBUG, "libdvbpsi debug (%s): " str, src, ##x)
 #else
