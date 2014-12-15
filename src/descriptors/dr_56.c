@@ -105,7 +105,7 @@ dvbpsi_descriptor_t * dvbpsi_GenTeletextDr(dvbpsi_teletext_dr_t * p_decoded,
 
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
-            dvbpsi_NewDescriptor(0x56, p_decoded->i_pages_number * 8 , NULL);
+            dvbpsi_NewDescriptor(0x56, p_decoded->i_pages_number * 5 , NULL);
     if (!p_descriptor)
         return NULL;
 
