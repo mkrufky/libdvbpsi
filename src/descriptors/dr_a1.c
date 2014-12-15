@@ -91,49 +91,43 @@ dvbpsi_DecodeServiceLocationDr (dvbpsi_descriptor_t * p_descriptor)
     return p_decoded;
 }
 
-#if 0
+
 /*****************************************************************************
- * dvbpsi_GenServiceDr
+ * dvbpsi_GenServiceLocationDr
  *****************************************************************************/
-dvbpsi_descriptor_t *
-dvbpsi_GenServiceDr (dvbpsi_service_location_dr_t * p_decoded,
-		     bool b_duplicate)
+dvbpsi_descriptor_t* dvbpsi_GenServiceLocationDr(
+                                        dvbpsi_service_location_dr_t* p_decoded,
+                                        bool b_duplicate)
 {
-    /* Create the descriptor */
-    dvbpsi_descriptor_t *p_descriptor =
-            dvbpsi_NewDescriptor (0x48,
-                                  3 + p_decoded->i_service_location_name_length +
-                                  p_decoded->i_service_location_provider_name_length,
-                                  NULL);
+    uint8_t i_desc_length = 3 + p_decoded->i_number_elements * 6;
+    dvbpsi_descriptor_t* p_descriptor = dvbpsi_NewDescriptor(0xa1, i_desc_length, NULL);
+    if (!p_descriptor)
+        return NULL;
 
-    if (p_descriptor)
+    uint8_t* p_data = p_descriptor->p_data;
+    p_data[0] = p_decoded->i_pcr_pid >> 8;
+    p_data[1] = p_decoded->i_pcr_pid;
+    p_data[2] = p_decoded->i_number_elements;
+
+    p_data += 3;
+    for (uint8_t i = 0; i < p_decoded->i_number_elements; ++i) {
+      dvbpsi_service_location_element_t p_es = p_decoded->elements[i];
+      uint8_t* p_es_data = p_data;
+      p_es_data[0] = p_es.i_stream_type;
+      p_es_data[1] = p_es.i_elementary_pid >> 8;
+      p_es_data[2] = p_es.i_elementary_pid;
+      p_es_data[3] = p_es.i_iso_639_code[0];
+      p_es_data[4] = p_es.i_iso_639_code[1];
+      p_es_data[5] = p_es.i_iso_639_code[2];
+
+      p_data += 6;
+    }
+
+    if (b_duplicate)
     {
-        /* Encode data */
-        p_descriptor->p_data[0] = p_decoded->i_service_type;
-        p_descriptor->p_data[1] = p_decoded->i_service_provider_name_length;
-        if (p_decoded->i_service_provider_name_length)
-            memcpy (p_descriptor->p_data + 2,
-                    p_decoded->i_service_provider_name,
-                    p_decoded->i_service_provider_name_length);
-        p_descriptor->p_data[2 + p_decoded->i_service_provider_name_length] =
-                p_decoded->i_service_name_length;
-        if (p_decoded->i_service_name_length)
-            memcpy (p_descriptor->p_data + 3 +
-                    p_decoded->i_service_provider_name_length,
-                    p_decoded->i_service_name, p_decoded->i_service_name_length);
-
-        if (b_duplicate)
-        {
-            /* Duplicate decoded data */
-            dvbpsi_service_dr_t *p_dup_decoded =
-                    (dvbpsi_service_dr_t *) malloc (sizeof (dvbpsi_service_dr_t));
-            if (p_dup_decoded)
-                memcpy (p_dup_decoded, p_decoded, sizeof (dvbpsi_service_dr_t));
-
-            p_descriptor->p_decoded = (void *) p_dup_decoded;
-        }
+      p_descriptor->p_decoded = dvbpsi_DuplicateDecodedDescriptor(p_decoded,
+        sizeof(dvbpsi_service_location_dr_t));
     }
 
     return p_descriptor;
 }
-#endif

@@ -81,7 +81,6 @@ typedef struct dvbpsi_service_location_dr_s
 dvbpsi_service_location_dr_t
     *dvbpsi_DecodeServiceLocationDr (dvbpsi_descriptor_t * p_descriptor);
 
-#if 0
 /*****************************************************************************
  * dvbpsi_GenServiceDataDr
  *****************************************************************************/
@@ -95,10 +94,9 @@ dvbpsi_service_location_dr_t
  * the descriptor
  * \return a pointer to a new descriptor structure which contains encoded data.
  */
-dvbpsi_descriptor_t *dvbpsi_GenServiceLocationDr (dvbpsi_service_dr_t *
-						    p_decoded,
-						    bool b_duplicate);
-#endif
+dvbpsi_descriptor_t* dvbpsi_GenServiceLocationDr(
+                                        dvbpsi_service_location_dr_t* p_decoded,
+                                        bool b_duplicate);
 
 
 #ifdef __cplusplus
