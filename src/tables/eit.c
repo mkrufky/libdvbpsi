@@ -535,7 +535,7 @@ void dvbpsi_eit_sections_decode(dvbpsi_eit_t* p_eit,
                                   ((uint32_t)(p_byte[8]) << 8)  |
                                               p_byte[9];
             uint8_t i_running_status = (uint8_t)(p_byte[10]) >> 5;
-            bool b_free_ca = ((p_byte[10] & 0x8) == 0x8) ? false : true;
+            bool b_free_ca = ((p_byte[10] & 0x10) == 0x10) ? true : false;
             uint16_t i_ev_length = ((uint16_t)(p_byte[10] & 0xf) << 8) |
                                                p_byte[11];
             dvbpsi_eit_event_t *p_event = dvbpsi_eit_event_add(p_eit,
