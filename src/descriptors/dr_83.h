@@ -85,9 +85,24 @@ typedef struct dvbpsi_lcn_dr_s
  */
 dvbpsi_lcn_dr_t *dvbpsi_DecodeLCNDr(dvbpsi_descriptor_t *p_descriptor);
 
+/*****************************************************************************
+ * dvbpsi_GenLCNDr
+ *****************************************************************************/
+/*!
+ * \fn dvbpsi_descriptor_t * dvbpsi_GenLogicalChannelDr(
+                        dvbpsi_lcn_dr_t* p_decoded, bool b_duplicate)
+ * \brief "logical_channel" descriptor generator.
+ * \param p_decoded pointer to a decoded "logical_channel" descriptor
+ * structure
+ * \param b_duplicate if true then duplicate the p_decoded structure into
+ * the descriptor
+ * \return a pointer to a new descriptor structure which contains encoded data.
+ */
+dvbpsi_descriptor_t* dvbpsi_GenLCNDr(dvbpsi_lcn_dr_t* p_decoded, bool b_duplicate);
+
 #ifdef __cplusplus
 };
 #endif
 
-#endif
+#endif // _DR_83_H
 
