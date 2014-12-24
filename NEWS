@@ -1,8 +1,10 @@
 Changes between 1.2.0 and 1.2.1:
 --------------------------------
 
- * Fix bugs in descriptor: 0x02, 0x50
+ * Fix bugs in descriptor: 0x02, 0x50, 0x56
  * Build with mingw32
+ * Generate descriptors: 0x83, 0xa1
+
 
 Changes between 1.1.2 and 1.2.0:
 --------------------------------
