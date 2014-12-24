@@ -609,13 +609,16 @@ int main(int argc, char **pp_argv)
 
             /* - tuning options - */
             case 'c':
-                param->threshold = strtoul(optarg, NULL, 10);
-                if (((errno == ERANGE) && (param->threshold == ULONG_MAX)) ||
-                    ((errno != 0) && (param->threshold == 0)))
+                if (optarg)
                 {
-                    fprintf(stderr, "Option --capturesize has invalid content %s\n", optarg);
-                    params_free(param);
-                    usage();
+                    param->threshold = strtoul(optarg, NULL, 10);
+                    if (((errno == ERANGE) && (param->threshold == ULONG_MAX)) ||
+                        ((errno != 0) && (param->threshold == 0)))
+                    {
+                        fprintf(stderr, "Option --capturesize has invalid content %s\n", optarg);
+                        params_free(param);
+                        usage();
+                    }
                 }
                 break;
 
