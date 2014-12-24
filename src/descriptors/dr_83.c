@@ -90,6 +90,9 @@ dvbpsi_lcn_dr_t *dvbpsi_DecodeLCNDr(dvbpsi_descriptor_t *p_descriptor)
 dvbpsi_descriptor_t* dvbpsi_GenLCNDr(dvbpsi_lcn_dr_t* p_decoded,
                                        bool b_duplicate)
 {
+    if (p_decoded->i_number_of_entries > 63)
+        p_decoded->i_number_of_entries = 63;
+
     dvbpsi_descriptor_t* p_descriptor = dvbpsi_NewDescriptor(0x83, p_decoded->i_number_of_entries * 4, 0);
     if (NULL == p_descriptor)
         return NULL;
