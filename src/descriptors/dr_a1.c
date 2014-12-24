@@ -99,6 +99,9 @@ dvbpsi_descriptor_t* dvbpsi_GenServiceLocationDr(
                                         dvbpsi_service_location_dr_t* p_decoded,
                                         bool b_duplicate)
 {
+    if (p_decoded->i_number_elements > 42)
+        p_decoded->i_number_elements = 42;
+
     uint8_t i_desc_length = 3 + p_decoded->i_number_elements * 6;
     dvbpsi_descriptor_t* p_descriptor = dvbpsi_NewDescriptor(0xa1, i_desc_length, NULL);
     if (!p_descriptor)
