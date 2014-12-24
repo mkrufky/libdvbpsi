@@ -55,7 +55,7 @@ typedef struct dvbpsi_ac3_audio_dr_s
     uint8_t  i_surround_mode;    /*!< surround mode indicator (2bits) */
     uint8_t  i_bsmod;            /*!< (3bits) */
     uint8_t  i_num_channels;     /*!< number of audio channels (4bits) */
-    int      b_full_svc;         /*!< */
+    int      b_full_svc;         /*!< full SVC flag */
     uint8_t  i_lang_code;        /*!< language code (8bits) */
     uint8_t  i_lang_code2;       /*!< language code (8bits( */
     uint8_t  i_mainid;           /*!< main identifier (3bits) */
