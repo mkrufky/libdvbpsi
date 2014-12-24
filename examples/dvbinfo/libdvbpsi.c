@@ -314,6 +314,7 @@ mtime_t mdate(void)
     if (gettimeofday(&tv, NULL) < 0)
     {
         fprintf(stderr, "gettimeofday() error: %s\n", strerror(errno));
+	/* coverity [+kill} */
         abort();
     }
 
