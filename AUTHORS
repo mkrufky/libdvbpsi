@@ -25,6 +25,10 @@ N: Brad Bitterman
 E: <bitter@vtilt.com>
 D: ATSC PSI table fixes
 
+N: M. Benoit
+E: <mbenoit@anevia.com>
+D: Generate descriptors 0x83, 0xa1
+
 N: Francois Cartegnie
 E: <fcartegnie@free.fr>
 D: NVOD detection in EIT
