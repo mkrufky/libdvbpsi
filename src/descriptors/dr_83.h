@@ -89,7 +89,7 @@ dvbpsi_lcn_dr_t *dvbpsi_DecodeLCNDr(dvbpsi_descriptor_t *p_descriptor);
  * dvbpsi_GenLCNDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_descriptor_t * dvbpsi_GenLogicalChannelDr(
+ * \fn dvbpsi_descriptor_t *dvbpsi_GenLCNDr(
                         dvbpsi_lcn_dr_t* p_decoded, bool b_duplicate)
  * \brief "logical_channel" descriptor generator.
  * \param p_decoded pointer to a decoded "logical_channel" descriptor
