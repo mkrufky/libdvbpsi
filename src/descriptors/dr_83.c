@@ -90,27 +90,27 @@ dvbpsi_lcn_dr_t *dvbpsi_DecodeLCNDr(dvbpsi_descriptor_t *p_descriptor)
 dvbpsi_descriptor_t* dvbpsi_GenLCNDr(dvbpsi_lcn_dr_t* p_decoded,
                                        bool b_duplicate)
 {
-  dvbpsi_descriptor_t* p_descriptor = dvbpsi_NewDescriptor(0x83, p_decoded->i_number_of_entries * 4, 0);
-  if (NULL == p_descriptor) {
-    return NULL;
-  }
+    dvbpsi_descriptor_t* p_descriptor = dvbpsi_NewDescriptor(0x83, p_decoded->i_number_of_entries * 4, 0);
+    if (NULL == p_descriptor)
+        return NULL;
 
-  for (int i = 0; i < p_decoded->i_number_of_entries; i++ )
-  {
-    p_descriptor->p_data[4 * i] = p_decoded->p_entries[i].i_service_id >> 8;
-    p_descriptor->p_data[4 * i + 1] = p_decoded->p_entries[i].i_service_id;
-    p_descriptor->p_data[4 * i + 2] = (p_decoded->p_entries[i].b_visible_service_flag << 7);
-    p_descriptor->p_data[4 * i + 2] |= (p_decoded->p_entries[i].i_logical_channel_number >> 8);
-    p_descriptor->p_data[4 * i + 3] = p_decoded->p_entries[i].i_logical_channel_number;
-  }
+    for (int i = 0; i < p_decoded->i_number_of_entries; i++ )
+    {
+        p_descriptor->p_data[4 * i] = p_decoded->p_entries[i].i_service_id >> 8;
+        p_descriptor->p_data[4 * i + 1] = p_decoded->p_entries[i].i_service_id;
+        p_descriptor->p_data[4 * i + 2] = (p_decoded->p_entries[i].b_visible_service_flag << 7);
+        p_descriptor->p_data[4 * i + 2] |= (p_decoded->p_entries[i].i_logical_channel_number >> 8);
+        p_descriptor->p_data[4 * i + 3] = p_decoded->p_entries[i].i_logical_channel_number;
+    }
 
-  if (b_duplicate)
-  {
-    dvbpsi_lcn_dr_t * p_dup = (dvbpsi_lcn_dr_t*) malloc(sizeof (dvbpsi_lcn_dr_t));
-    if (NULL != p_dup)
-      memcpy(p_dup, p_decoded, sizeof(dvbpsi_lcn_dr_t));
-    p_descriptor->p_decoded = (void*)p_dup;
-  }
+    if (b_duplicate)
+    {
+        dvbpsi_lcn_dr_t * p_dup = (dvbpsi_lcn_dr_t*) malloc(sizeof (dvbpsi_lcn_dr_t));
+        if (NULL != p_dup)
+            memcpy(p_dup, p_decoded, sizeof(dvbpsi_lcn_dr_t));
+        p_descriptor->p_decoded = (void*)p_dup;
+    }
 
-  return p_descriptor;
+    return p_descriptor;
 }
+
