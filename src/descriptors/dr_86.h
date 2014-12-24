@@ -51,9 +51,9 @@ typedef struct dvbpsi_caption_service_s
 {
     char     i_iso_639_code[3]; /*!< ISO 639 language code */
     int      b_digital_cc;      /*!< Digital CC  flag */
-    int      b_line21_field;    /*!< */
-    uint16_t i_caption_service_number; /*!< */
-    int      b_easy_reader;     /*!< */
+    int      b_line21_field;    /*!< Line 21 */
+    uint16_t i_caption_service_number; /*!< Caption Service Number */
+    int      b_easy_reader;     /*!< Easy reader flag */
     int      b_wide_aspect_ratio; /*!< Wide aspect ratio flag */
 } dvbpsi_caption_service_t;
 
