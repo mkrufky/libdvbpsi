@@ -67,7 +67,7 @@ typedef struct dvbpsi_teletextpage_s
  * \brief Maximum number of dvbpsi_teletextpage_t entries present in
  * @see dvbpsi_teletext_dr_t
  */
-#define DVBPSI_TELETEXT_DR_MAX 64
+#define DVBPSI_TELETEXT_DR_MAX 51
 
 /*****************************************************************************
  * dvbpsi_teletext_dr_t
