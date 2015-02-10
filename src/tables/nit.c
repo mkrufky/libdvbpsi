@@ -687,7 +687,7 @@ dvbpsi_psi_section_t* dvbpsi_nit_sections_generate(dvbpsi_t *p_dvbpsi,
             dvbpsi_error(p_dvbpsi, "NIT generator", "unable to carry all the TS descriptors");
 
         /* TS_info_length */
-        i_ts_length = p_current->p_payload_end - p_ts_start - 5;
+        i_ts_length = p_current->p_payload_end - p_ts_start - 6;
         p_ts_start[4] = (i_ts_length >> 8) | 0xf0;
         p_ts_start[5] = i_ts_length;
 
