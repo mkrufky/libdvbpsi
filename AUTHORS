@@ -29,6 +29,12 @@ N: M. Benoit
 E: <mbenoit@anevia.com>
 D: Generate descriptors 0x83, 0xa1
 
+N: Roberto Corno
+E: corno.roberto@gmail.com
+D: Descriptors 0x40, 0x41, 0x49, 0x4a, 0x4b, 0x4f and 0x50
+D: BAT improvements
+D: RST table support
+
 N: Francois Cartegnie
 E: <fcartegnie@free.fr>
 D: NVOD detection in EIT
@@ -51,6 +57,11 @@ N: Andrew John Hughes
 E: gnu_andrew@member.fsf.org
 D: descriptor 0x52
 D: decode_pmt verbose output
+
+N: Michael Ira Krufky
+E: mkrufky@linuxtv.org
+D: Descriptors 0xa0, 0x81, 0x86
+D: ATSC tables
 
 N: Daniel Kamil Kozar
 E: dkk089@gmail.com
@@ -95,13 +106,3 @@ N: Zlu Zu
 E: zluzu@gmail.com
 D: BAT decoder and generator
 
-N: Roberto Corno
-E: corno.roberto@gmail.com
-D: Descriptors 0x40, 0x41, 0x49, 0x4a, 0x4b, 0x4f and 0x50
-D: BAT improvements
-D: RST table support
-
-N: Michael Ira Krufky
-E: mkrufky@linuxtv.org
-D: Descriptors 0xa0, 0x81, 0x86
-D: ATSC tables
