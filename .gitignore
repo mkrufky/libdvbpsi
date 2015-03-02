@@ -22,6 +22,7 @@ configure
 libtool
 stamp-*
 *-stamp
+.dirstamp
 doc/doxygen
 doc/decoder.png
 examples/check_cc_pid
