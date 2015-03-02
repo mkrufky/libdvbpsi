@@ -52,6 +52,10 @@ E: gnu_andrew@member.fsf.org
 D: descriptor 0x52
 D: decode_pmt verbose output
 
+N: Daniel Kamil Kozar
+E: dkk089@gmail.com
+D: descriptor 0x10
+
 N: Jean-Baptiste Kempf
 E: jb@videolan.org
 C: j-b
