@@ -952,6 +952,15 @@ static void DumpMaxBitrateDescriptor(dvbpsi_max_bitrate_dr_t* bitrate_descriptor
 }
 
 /*****************************************************************************
+ * DumpSmoothingBufferDescriptor
+ *****************************************************************************/
+static void DumpSmoothingBufferDescriptor(dvbpsi_smoothing_buffer_dr_t *smoothing_descriptor)
+{
+    printf("Leak rate: %d \n", smoothing_descriptor->i_sb_leak_rate);
+    printf("Size: %d \n", smoothing_descriptor->i_sb_size);
+}
+
+/*****************************************************************************
  * DumpSystemClockDescriptor
  *****************************************************************************/
 static void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
@@ -1507,6 +1516,9 @@ static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
 #endif
             case 0x0e:
                 DumpMaxBitrateDescriptor(dvbpsi_DecodeMaxBitrateDr(p_descriptor));
+                break;
+            case 0x10:
+                DumpSmoothingBufferDescriptor(dvbpsi_DecodeSmoothingBufferDr(p_descriptor));
                 break;
             case 0x4c:
                 DumpTimeShiftedServiceDescriptor(dvbpsi_DecodeTimeShiftedServiceDr(p_descriptor));
