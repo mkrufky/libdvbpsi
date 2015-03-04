@@ -36,6 +36,7 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
                      descriptors/dr_0f.h \
                      descriptors/dr_10.h \
                      descriptors/dr_11.h \
+                     descriptors/dr_12.h \
                      descriptors/dr_13.h \
                      descriptors/dr_14.h \
 		     descriptors/dr_40.h \
@@ -92,6 +93,7 @@ descriptors_src = descriptors/dr_02.c \
                   descriptors/dr_0f.c \
                   descriptors/dr_10.c \
                   descriptors/dr_11.c \
+                  descriptors/dr_12.c \
                   descriptors/dr_13.c \
                   descriptors/dr_14.c \
 		  descriptors/dr_40.c \
