@@ -969,6 +969,16 @@ static void DumpSTDDescriptor(dvbpsi_std_dr_t* std_descriptor)
 }
 
 /*****************************************************************************
+ * DumpIBPDescriptor
+ *****************************************************************************/
+static void DumpIBPDescriptor(dvbpsi_ibp_dr_t *ibp_descriptor)
+{
+    printf("Closed GOP flag: %d \n", ibp_descriptor->b_closed_gop_flag);
+    printf("Identical GOP flag: %d \n", ibp_descriptor->b_identical_gop_flag);
+    printf("Max GOP length: %" PRIu16 " \n", ibp_descriptor->i_max_gop_length);
+}
+
+/*****************************************************************************
  * DumpSystemClockDescriptor
  *****************************************************************************/
 static void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
@@ -1530,6 +1540,9 @@ static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
                 break;
             case 0x11:
                 DumpSTDDescriptor(dvbpsi_DecodeSTDDr(p_descriptor));
+                break;
+            case 0x12:
+                DumpIBPDescriptor(dvbpsi_DecodeIBPDr(p_descriptor));
                 break;
             case 0x4c:
                 DumpTimeShiftedServiceDescriptor(dvbpsi_DecodeTimeShiftedServiceDr(p_descriptor));
