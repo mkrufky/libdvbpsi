@@ -961,6 +961,14 @@ static void DumpSmoothingBufferDescriptor(dvbpsi_smoothing_buffer_dr_t *smoothin
 }
 
 /*****************************************************************************
+ * DumpSTDDescriptor
+ *****************************************************************************/
+static void DumpSTDDescriptor(dvbpsi_std_dr_t* std_descriptor)
+{
+    printf("Leak valid flag: %d\n", std_descriptor->b_leak_valid_flag);
+}
+
+/*****************************************************************************
  * DumpSystemClockDescriptor
  *****************************************************************************/
 static void DumpSystemClockDescriptor(dvbpsi_system_clock_dr_t* p_clock_descriptor)
@@ -1519,6 +1527,9 @@ static void DumpDescriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
                 break;
             case 0x10:
                 DumpSmoothingBufferDescriptor(dvbpsi_DecodeSmoothingBufferDr(p_descriptor));
+                break;
+            case 0x11:
+                DumpSTDDescriptor(dvbpsi_DecodeSTDDr(p_descriptor));
                 break;
             case 0x4c:
                 DumpTimeShiftedServiceDescriptor(dvbpsi_DecodeTimeShiftedServiceDr(p_descriptor));
