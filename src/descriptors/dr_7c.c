@@ -257,7 +257,7 @@ dvbpsi_aac_dr_t *dvbpsi_DecodeAACDr(dvbpsi_descriptor_t *p_descriptor)
 
         uint8_t i_data = p_decoded->b_type ? 3 : 2;
         uint8_t *p = &p_descriptor->p_data[i_data];
-        memcpy(&p_decoded->p_additional_info, p, i_info_length);
+        memcpy(p_decoded->p_additional_info, p, i_info_length);
     }
 
     p_descriptor->p_decoded = (void*)p_decoded;
@@ -292,7 +292,7 @@ dvbpsi_descriptor_t *dvbpsi_GenAACDr(dvbpsi_aac_dr_t *p_decoded, bool b_duplicat
     if (p_descriptor->i_length > 1)
     {
         uint8_t *p = &p_descriptor->p_data[p_decoded->b_type ? 3 : 2];
-        memcpy(&p, p_decoded->p_additional_info, p_decoded->i_additional_info_length);
+        memcpy(p, p_decoded->p_additional_info, p_decoded->i_additional_info_length);
     }
 
     if (b_duplicate)
