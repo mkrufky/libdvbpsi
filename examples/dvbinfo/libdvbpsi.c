@@ -842,7 +842,7 @@ static char const* GetDescriptorName(uint8_t tag)
     case 0x0d: return "Copyright descriptor";
     case 0x0e: return "Maximum bitrate descriptor";
     case 0x0f: return "Private data indicator descriptor";
-    case 0x10: return "Soothing buffer descriptor";
+    case 0x10: return "Smoothing buffer descriptor";
     case 0x11: return "STD descriptor";
     case 0x12: return "IBP descriptor";
     // case 0x13..0x1a: return "Defined in ISO/IEC 13818-6";
