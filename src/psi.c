@@ -199,8 +199,8 @@ bool dvbpsi_CheckPSISection(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_section,
     if (p_section->i_table_id != table_id)
     {
         /* Invalid table_id value */
-        dvbpsi_error(p_dvbpsi, psz_table_name,
-                     "invalid section (table_id == 0x%02x expected 0x%02x)",
+        dvbpsi_debug(p_dvbpsi, psz_table_name,
+                     "ignoring section (table_id == 0x%02x expected 0x%02x)",
                      p_section->i_table_id, table_id);
         return false;
     }
