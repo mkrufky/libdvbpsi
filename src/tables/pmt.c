@@ -338,7 +338,8 @@ void dvbpsi_pmt_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t* p_sect
     if (p_pmt_decoder->i_program_number != p_section->i_extension)
     {
         /* Invalid program_number */
-        dvbpsi_error(p_dvbpsi, "PMT decoder", "'program_number' don't match");
+        dvbpsi_debug(p_dvbpsi, "PMT decoder", "ignoring section %d not belonging to 'program_number' %d",
+                     p_section->i_extension, p_pmt_decoder->i_program_number);
         dvbpsi_DeletePSISections(p_section);
         return;
     }
