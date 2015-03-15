@@ -982,6 +982,61 @@ static void DumpIBPDescriptor(const void *p_descriptor)
     printf("Max GOP length: %" PRIu16 " \n", ibp_descriptor->i_max_gop_length);
 }
 
+static const char* MPEG4VideoProfileToString(dvbpsi_mpeg4_visual_profile_and_level_t profile)
+{
+    switch(profile)
+    {
+        case DVBPSI_MPEG4V_PROFILE_SIMPLE_L1: return "Simple Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_SIMPLE_L2: return "Simple Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_SIMPLE_L3: return "Simple Profile/Level 3";
+        case DVBPSI_MPEG4V_PROFILE_SIMPLE_SCALABLE_L1: return "Simple Scalable Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_SIMPLE_SCALABLE_L2: return "Simple Scalable Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_CORE_L1: return "Core Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_CORE_L2: return "Core Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_MAIN_L2: return "Main Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_MAIN_L3: return "Main Profile/Level 3";
+        case DVBPSI_MPEG4V_PROFILE_MAIN_L4: return "Main Profile/Level 4";
+        case DVBPSI_MPEG4V_PROFILE_N_BIT_L2: return "N-bit Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_SCALABLE_TEXTURE_L1: return "Scalable Texture Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_SIMPLE_FACE_ANIMATION_L1: return "Simple Face Animation Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_SIMPLE_FACE_ANIMATION_L2: return "Simple Face Animation Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_SIMPLE_FBA_L1: return "Simple FBA Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_SIMPLE_FBA_L2: return "Simple FBA Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_BASIC_ANIMATED_TEXTURE_L1: return "Basic Animated Texture Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_BASIC_ANIMATED_TEXTURE_L2: return "Basic Animated Texture Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_HYBRID_L1: return "Hybrid Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_HYBRID_L2: return "Hybrid Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_ADV_REAL_TIME_SIMPLE_L1: return "Advanced Real Time Simple Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_ADV_REAL_TIME_SIMPLE_L2: return "Advanced Real Time Simple Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_ADV_REAL_TIME_SIMPLE_L3: return "Advanced Real Time Simple Profile/Level 3";
+        case DVBPSI_MPEG4V_PROFILE_ADV_REAL_TIME_SIMPLE_L4: return "Advanced Real Time Simple Profile/Level 4";
+        case DVBPSI_MPEG4V_PROFILE_CORE_SCALABLE_L1: return "Core Scalable Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_CORE_SCALABLE_L2: return "Core Scalable Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_CORE_SCALABLE_L3: return "Core Scalable Profile/Level 3";
+        case DVBPSI_MPEG4V_PROFILE_ADV_CODING_EFF_L1: return "Advanced Coding Efficiency Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_ADV_CODING_EFF_L2: return "Advanced Coding Efficiency Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_ADV_CODING_EFF_L3: return "Advanced Coding Efficiency Profile/Level 3";
+        case DVBPSI_MPEG4V_PROFILE_ADV_CODING_EFF_L4: return "Advanced Coding Efficiency Profile/Level 4";
+        case DVBPSI_MPEG4V_PROFILE_ADV_CORE_L1: return "Advanced Core Profile/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_ADV_CORE_L2: return "Advanced Core Profile/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_ADV_SCALABLE_TEXTURE_L1: return "Advanced Scalable Texture/Level 1";
+        case DVBPSI_MPEG4V_PROFILE_ADV_SCALABLE_TEXTURE_L2: return "Advanced Scalable Texture/Level 2";
+        case DVBPSI_MPEG4V_PROFILE_ADV_SCALABLE_TEXTURE_L3: return "Advanced Scalable Texture/Level 3";
+
+        case DVBPSI_MPEG4V_PROFILE_LAST:
+        default:
+            return "Reserved";
+    }
+}
+
+static void DumpMPEG4VideoDescriptor(const void *p_descriptor)
+{
+    const dvbpsi_mpeg4_video_dr_t *mpeg4_descriptor = p_descriptor;
+    printf("MPEG-4 Video Profile and Level : %s (0x%02x) \n",
+        MPEG4VideoProfileToString(mpeg4_descriptor->i_mpeg4_visual_profile_and_level),
+        mpeg4_descriptor->i_mpeg4_visual_profile_and_level);
+}
+
 /*****************************************************************************
  * DumpSystemClockDescriptor
  *****************************************************************************/
@@ -1563,6 +1618,10 @@ static void DumpDescriptor(dvbpsi_descriptor_t *p_descriptor)
         case 0x12:
             p_decoded = dvbpsi_DecodeIBPDr(p_descriptor);
             dump_dr_fn = DumpIBPDescriptor;
+            break;
+        case 0x1b:
+            p_decoded = dvbpsi_DecodeMPEG4VideoDr(p_descriptor);
+            dump_dr_fn = DumpMPEG4VideoDescriptor;
             break;
         case 0x4c:
             p_decoded = dvbpsi_DecodeTimeShiftedServiceDr(p_descriptor);
