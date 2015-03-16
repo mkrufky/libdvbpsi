@@ -65,7 +65,7 @@ D: ATSC tables
 
 N: Daniel Kamil Kozar
 E: dkk089@gmail.com
-D: descriptor 0x10, 0x11, 0x12
+D: descriptor 0x10, 0x11, 0x12, 0x1b
 
 N: Jean-Baptiste Kempf
 E: jb@videolan.org
