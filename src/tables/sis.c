@@ -430,7 +430,7 @@ void dvbpsi_sis_sections_decode(dvbpsi_t* p_dvbpsi, dvbpsi_sis_t* p_sis,
              p_byte < p_section->p_payload_end; )
         {
             p_sis->i_protocol_version = p_byte[3];
-            p_sis->b_encrypted_packet = ((p_byte[4] & 0x80)>>8);
+            p_sis->b_encrypted_packet = ((p_byte[4] & 0x80) == 0x80);
             /* NOTE: cannot handle encrypted packet */
             assert(p_sis->b_encrypted_packet);
             p_sis->i_encryption_algorithm = ((p_byte[4] & 0x7E) >> 1);
