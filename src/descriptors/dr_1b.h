@@ -40,8 +40,7 @@ extern "C" {
  * ISO/IEC 14496-2:2001 Table G-1.
  */
 /*!
- * \typedef enum dvbpsi_mpeg4_visual_profile_and_level_s
- * dvbpsi_mpeg4_visual_profile_and_level_t
+ * \typedef enum dvbpsi_mpeg4_visual_profile_and_level_s dvbpsi_mpeg4_visual_profile_and_level_t
  * \note Values not present in this enumeration were marked by the specification
  * as reserved at the time of writing.
  * \brief MPEG-4 video profile and level as specified in ISO/IEC 14496-2:2001
