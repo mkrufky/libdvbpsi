@@ -5,12 +5,12 @@ Changes between 1.2.0 and 1.3.0:
    - 0x10 Smoothing Buffer
    - 0x11 STD descriptor
    - 0x12 IBP descriptor
+   - 0x1b MPEG-4 video descriptor
  * Fix bugs in descriptor: 0x02, 0x50, 0x56, 0x7c
  * Fix bugs in table: EIT, NIT
  * Build with mingw32
  * Generate descriptors: 0x83, 0xa1
  * Documentation fixes: NIT
-
 
 Changes between 1.1.2 and 1.2.0:
 --------------------------------
