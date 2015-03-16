@@ -67,7 +67,7 @@ typedef struct dvbpsi_service_location_element_s
  */
 /*!
  * \typedef struct dvbpsi_service_location_dr_s dvbpsi_service_location_dr_t
- * \brief dvbpsi_service_dr_t type definition.
+ * \brief dvbpsi_service_location_dr_t type definition.
  */
 typedef struct dvbpsi_service_location_dr_s
 {
@@ -83,7 +83,7 @@ typedef struct dvbpsi_service_location_dr_s
  * dvbpsi_DecodeServiceLocationDr
  *****************************************************************************/
 /*!
- * \fn dvbpsi_service_dr_t * dvbpsi_DecodeServiceLocationDr(
+ * \fn dvbpsi_service_location_dr_t * dvbpsi_DecodeServiceLocationDr(
                                         dvbpsi_descriptor_t * p_descriptor)
  * \brief "service location" descriptor decoder.
  * \param p_descriptor pointer to the descriptor structure
@@ -98,7 +98,7 @@ dvbpsi_service_location_dr_t
  *****************************************************************************/
 /*!
  * \fn dvbpsi_descriptor_t * dvbpsi_GenServiceLocationDr(
-                        dvbpsi_service_dr_t * p_decoded, bool b_duplicate)
+                        dvbpsi_service_location_dr_t * p_decoded, bool b_duplicate)
  * \brief "service" descriptor generator.
  * \param p_decoded pointer to a decoded "service" descriptor
  * structure
