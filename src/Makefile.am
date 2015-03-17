@@ -76,6 +76,7 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
 		     descriptors/dr_8a.h \
 		     descriptors/dr_a0.h \
 		     descriptors/dr_a1.h \
+                     descriptors/types/aac_profile.h \
                      descriptors/dr.h
 
 descriptors_src = descriptors/dr_02.c \
