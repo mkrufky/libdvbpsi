@@ -49,7 +49,8 @@ struct dvbpsi_aac_profile_and_level_table_s
 static struct dvbpsi_aac_profile_and_level_table_s aac_profile_and_level_table[] =
 {
     { 0x00, DVBPSI_AAC_PROFILE_RESERVED },
-    /* 0x00-0x0F Reserved */
+    /* 0x00-0x0E Reserved */
+    { 0x0F, DVBPSI_AAC_PROFILE_NOT_DEFINED },
     { 0x10, DVBPSI_AAC_PROFILE_MAIN_LEVEL_1 },
     { 0x11, DVBPSI_AAC_PROFILE_MAIN_LEVEL_2 },
     { 0x12, DVBPSI_AAC_PROFILE_MAIN_LEVEL_3 },
@@ -103,8 +104,14 @@ static struct dvbpsi_aac_profile_and_level_table_s aac_profile_and_level_table[]
     { 0x58, DVBPSI_HE_AAC_PROFILE_LEVEL_2 },
     { 0x59, DVBPSI_HE_AAC_PROFILE_LEVEL_3 },
     { 0x5A, DVBPSI_HE_AAC_PROFILE_LEVEL_4 },
-    { 0x5B, DVBPSI_HE_AAC_PROFILE_LEVEL_5 }
-    /* 0x5C-0xFF RESERVED */
+    { 0x5B, DVBPSI_HE_AAC_PROFILE_LEVEL_5 },
+    /* 0x5C-0x5F RESERVED */
+    { 0x60, DVBPSI_HE_AAC_V2_PROFILE_LEVEL_2 },
+    { 0x61, DVBPSI_HE_AAC_V2_PROFILE_LEVEL_3 },
+    { 0x62, DVBPSI_HE_AAC_V2_PROFILE_LEVEL_4 },
+    { 0x63, DVBPSI_HE_AAC_V2_PROFILE_LEVEL_5 },
+    /* 0x64-0xFE RESERVED */
+    { 0xFF, DVBPSI_AAC_PROFILE_NOT_SPECIFIED }
 };
 static dvbpsi_aac_profile_and_level_t dvbpsi_aac_profile_and_level_lookup(const uint8_t value)
 {
