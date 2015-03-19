@@ -302,6 +302,7 @@ static void handle_atsc_MGT(void *p_data, dvbpsi_atsc_mgt_t *p_mgt);
 static void handle_atsc_EIT(void *p_data, dvbpsi_atsc_eit_t *p_eit);
 static void handle_atsc_ETT(void* p_data, dvbpsi_atsc_ett_t *p_ett);
 static void handle_atsc_STT(void* p_data, dvbpsi_atsc_stt_t *p_stt);
+static const char *AACProfileToString(dvbpsi_aac_profile_and_level_t profile);
 
 /*****************************************************************************
  * mdate: current time in milliseconds
@@ -1037,6 +1038,14 @@ static void DumpMPEG4VideoDescriptor(const void *p_descriptor)
         mpeg4_descriptor->i_mpeg4_visual_profile_and_level);
 }
 
+static void DumpMPEG4AudioDescriptor(const void *p_descriptor)
+{
+    const dvbpsi_mpeg4_audio_dr_t *mpeg4_descriptor = p_descriptor;
+    printf("MPEG-4 Audio Profile and Level : %s (0x%02x) \n",
+        AACProfileToString(mpeg4_descriptor->i_mpeg4_audio_profile_and_level),
+        mpeg4_descriptor->i_mpeg4_audio_profile_and_level);
+}
+
 /*****************************************************************************
  * DumpSystemClockDescriptor
  *****************************************************************************/
@@ -1641,6 +1650,10 @@ static void DumpDescriptor(dvbpsi_descriptor_t *p_descriptor)
         case 0x1b:
             p_decoded = dvbpsi_DecodeMPEG4VideoDr(p_descriptor);
             dump_dr_fn = DumpMPEG4VideoDescriptor;
+            break;
+        case 0x1c:
+            p_decoded = dvbpsi_DecodeMPEG4AudioDr(p_descriptor);
+            dump_dr_fn = DumpMPEG4AudioDescriptor;
             break;
         case 0x4c:
             p_decoded = dvbpsi_DecodeTimeShiftedServiceDr(p_descriptor);
