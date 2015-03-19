@@ -127,6 +127,4 @@ typedef enum dvbpsi_aac_profile_and_level_s
 };
 #endif
 
-#else
-#error "Multiple inclusions of aac_profile.h"
 #endif
