@@ -159,3 +159,7 @@ install-data-local:
 
 install-data-hook:
 	mv $(DESTDIR)$(pkgincludedir)/aac_profile.h $(DESTDIR)$(pkgincludedir)/types
+
+uninstall-local:
+	rm -f $(DESTDIR)$(pkgincludedir)/types/aac_profile.h
+	rmdir $(DESTDIR)$(pkgincludedir)/types
