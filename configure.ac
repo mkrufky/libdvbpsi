@@ -1,8 +1,9 @@
-AC_INIT(libdvbpsi, 1.3.0)
+AC_INIT([libdvbpsi], [1.3.0])
 
-AC_PREREQ(2.50)
-AC_CONFIG_AUX_DIR(.auto)
+AC_PREREQ([2.50])
+AC_CONFIG_AUX_DIR([.auto])
 AC_CANONICAL_SYSTEM
+AC_CONFIG_SRCDIR([src/dvbpsi.c])
 
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_HEADERS(config.h)
@@ -85,10 +86,10 @@ dnl compile feature tests
 CFLAGS="${CFLAGS_save} ${CFLAGS_dist}"
 
 dnl Check for headers
-AC_CHECK_HEADERS(stdbool.h stdint.h inttypes.h getopt.h strings.h sys/time.h)
+AC_CHECK_HEADERS([stdbool.h stdint.h inttypes.h getopt.h strings.h sys/time.h])
 dnl AC_CHECK_FUNCS([gettimeofday])
 
-AC_CHECK_HEADERS(sys/socket.h, [ac_have_sys_socket_h=yes])
+AC_CHECK_HEADERS([sys/socket.h], [ac_have_sys_socket_h=yes])
 AM_CONDITIONAL(HAVE_SYS_SOCKET_H, test "${ac_have_sys_socket_h}" = "yes")
 
 AC_CHECK_HEADERS([net/if.h], [], [],
