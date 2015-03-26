@@ -77,8 +77,8 @@ pkginclude_HEADERS = dvbpsi.h psi.h descriptor.h demux.h \
 		     descriptors/dr_8a.h \
 		     descriptors/dr_a0.h \
 		     descriptors/dr_a1.h \
-                     descriptors/types/aac_profile.h \
-                     descriptors/dr.h
+		     descriptors/types/aac_profile.h \
+		     descriptors/dr.h
 
 descriptors_src = descriptors/dr_02.c \
                   descriptors/dr_03.c \
@@ -154,3 +154,8 @@ tables_src = tables/pat.c tables/pat_private.h \
 	     tables/atsc_ett.c tables/atsc_ett.h \
 	     tables/atsc_mgt.c tables/atsc_mgt.h
 
+install-data-local:
+	mkdir -p $(DESTDIR)$(pkgincludedir)/types
+
+install-data-hook:
+	mv $(DESTDIR)$(pkgincludedir)/aac_profile.h $(DESTDIR)$(pkgincludedir)/types
