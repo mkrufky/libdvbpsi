@@ -139,7 +139,7 @@ static void usage(void)
 //    printf("                         wire = print arrival time per packet (wireshark like)\n");
     printf(" -j | --summary-file   : file to write summary information to (default: stdout)\n");
     printf(" -p | --summary-period : refresh summary file every n milliseconds (default: 1000ms)\n");
-    printf("\nTuing options: \n");
+    printf("\nTuning options: \n");
     printf(" -c | --capture buffer size : number of bytes in capture buffer (default: %d bytes)\n", FIFO_THRESHOLD_SIZE);
 #endif
     exit(EXIT_FAILURE);
