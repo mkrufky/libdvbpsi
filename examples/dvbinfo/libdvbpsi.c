@@ -960,7 +960,7 @@ static void DumpSmoothingBufferDescriptor(const void *p_descriptor)
 {
     const dvbpsi_smoothing_buffer_dr_t *smoothing_descriptor = p_descriptor;
     printf("Leak rate: %d \n", smoothing_descriptor->i_sb_leak_rate);
-    printf("Size: %d \n", smoothing_descriptor->i_sb_size);
+    printf("\t\tSize: %d \n", smoothing_descriptor->i_sb_size);
 }
 
 /*****************************************************************************
@@ -979,8 +979,8 @@ static void DumpIBPDescriptor(const void *p_descriptor)
 {
     const dvbpsi_ibp_dr_t *ibp_descriptor = p_descriptor;
     printf("Closed GOP flag: %d \n", ibp_descriptor->b_closed_gop_flag);
-    printf("Identical GOP flag: %d \n", ibp_descriptor->b_identical_gop_flag);
-    printf("Max GOP length: %" PRIu16 " \n", ibp_descriptor->i_max_gop_length);
+    printf("\t\tIdentical GOP flag: %d \n", ibp_descriptor->b_identical_gop_flag);
+    printf("\t\tMax GOP length: %" PRIu16 " \n", ibp_descriptor->i_max_gop_length);
 }
 
 static const char* MPEG4VideoProfileToString(dvbpsi_mpeg4_visual_profile_and_level_t profile)
