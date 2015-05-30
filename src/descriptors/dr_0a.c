@@ -94,8 +94,9 @@ dvbpsi_descriptor_t * dvbpsi_GenISO639Dr(dvbpsi_iso639_dr_t * p_decoded,
         p_decoded->i_code_count = 64;
 
     /* Create the descriptor */
+    uint8_t i_size = (p_decoded->i_code_count * 4) > UINT8_MAX ? 255 : p_decoded->i_code_count * 4;
     dvbpsi_descriptor_t * p_descriptor =
-            dvbpsi_NewDescriptor(0x0a, p_decoded->i_code_count * 4, NULL);
+            dvbpsi_NewDescriptor(0x0a, i_size, NULL);
     if (!p_descriptor)
         return NULL;
 
