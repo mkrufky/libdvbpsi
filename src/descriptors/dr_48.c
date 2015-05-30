@@ -116,10 +116,14 @@ dvbpsi_descriptor_t * dvbpsi_GenServiceDr(dvbpsi_service_dr_t * p_decoded,
     if (p_decoded->i_service_name_length > 252)
         p_decoded->i_service_name_length = 252;
 
+    /* FIXME: is this correct? A descriptor cannot be more then 255 bytes due to
+     * the function prototype definition */
+    uint8_t i_size = 0;
+    int i_length = 3 + p_decoded->i_service_name_length + p_decoded->i_service_provider_name_length;
+    i_size = (i_length >= UINT8_MAX) ? 255 : i_length;
+
     /* Create the descriptor */
-    dvbpsi_descriptor_t * p_descriptor =
-            dvbpsi_NewDescriptor(0x48, 3 + p_decoded->i_service_name_length +
-                                 p_decoded->i_service_provider_name_length, NULL);
+    dvbpsi_descriptor_t *p_descriptor = dvbpsi_NewDescriptor(0x48, i_size, NULL);
     if (!p_descriptor)
         return NULL;
 
