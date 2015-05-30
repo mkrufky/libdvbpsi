@@ -110,8 +110,10 @@ dvbpsi_descriptor_t * dvbpsi_GenVBIDataDr(dvbpsi_vbi_dr_t * p_decoded,
         p_decoded->i_services_number = DVBPSI_VBI_DR_MAX;
 
     /* Create the descriptor */
+    uint8_t i_size = (p_decoded->i_services_number * 5) > UINT8_MAX ?
+                        255 : (p_decoded->i_services_number * 5); /* FIXME: */
     dvbpsi_descriptor_t * p_descriptor =
-            dvbpsi_NewDescriptor(0x45, p_decoded->i_services_number * 5 , NULL);
+            dvbpsi_NewDescriptor(0x45, i_size, NULL);
     if (!p_descriptor)
         return NULL;
 
