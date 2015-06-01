@@ -100,7 +100,7 @@ dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(dvbpsi_vstream_dr_t * p_decoded,
         return NULL;
 
     /* Encode data */
-    p_descriptor->p_data[0] = 0;
+    p_descriptor->p_data[0] = (p_decoded->b_mpeg2) ? 0 : 0x04;
     if (p_decoded->b_multiple_frame_rate)
         p_descriptor->p_data[0] |= 0x80;
     p_descriptor->p_data[0] |= (p_decoded->i_frame_rate_code & 0x0f) << 3;
@@ -111,7 +111,6 @@ dvbpsi_descriptor_t * dvbpsi_GenVStreamDr(dvbpsi_vstream_dr_t * p_decoded,
 
     if (p_decoded->b_mpeg2)
     {
-        p_descriptor->p_data[0] |= 0x04;
         p_descriptor->p_data[1] = p_decoded->i_profile_level_indication;
         p_descriptor->p_data[2] = 0x1f;
         p_descriptor->p_data[2] |= (p_decoded->i_chroma_format & 0x03) << 6;
