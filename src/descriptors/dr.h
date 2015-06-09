@@ -52,6 +52,7 @@
 #include "dr_14.h"
 #include "dr_1b.h"
 #include "dr_1c.h"
+#include "dr_24.h"
 #include "dr_40.h"
 #include "dr_41.h"
 #include "dr_42.h"
