@@ -35,8 +35,8 @@
 #ifndef _DVBPSI_DVBPSI_H_
 #define _DVBPSI_DVBPSI_H_
 
-#define DVBPSI_VERSION      1.3.0              /*!< Human readible DVBPSI version*/
-#define DVBPSI_VERSION_INT  ((1<<16)+(3<<8)+0) /*!< Machine readible DVBPSI version */
+#define DVBPSI_VERSION      2.0.0              /*!< Human readible DVBPSI version*/
+#define DVBPSI_VERSION_INT  ((2<<16)+(0<<8)+0) /*!< Machine readible DVBPSI version */
 
 #ifdef __cplusplus
 extern "C" {
