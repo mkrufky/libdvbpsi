@@ -772,6 +772,18 @@ static void handle_PAT(void* p_data, dvbpsi_pat_t* p_pat)
     dvbpsi_pat_delete(p_pat);
 }
 
+static void dump_hex_data(const char *prefix, const uint8_t *data,
+    unsigned int length)
+{
+    unsigned int i;
+    printf("%s : [ ", prefix);
+    for(i = 0 ; i < length ; ++i)
+    {
+        printf("0x%02" PRIx8 " ", data[i]);
+    }
+    printf("]\n");
+}
+
 /*****************************************************************************
  * GetTypeName of PMT stream_type
  *****************************************************************************/
@@ -1044,6 +1056,58 @@ static void DumpMPEG4AudioDescriptor(const void *p_descriptor)
     printf("MPEG-4 Audio Profile and Level : %s (0x%02x) \n",
         AACProfileToString(mpeg4_descriptor->i_mpeg4_audio_profile_and_level),
         mpeg4_descriptor->i_mpeg4_audio_profile_and_level);
+}
+
+static void DumpContentLabellingDescriptor(const void *p_descriptor)
+{
+    const dvbpsi_content_labelling_dr_t *p_content_lbl_dr = p_descriptor;
+    printf("Metadata application format : 0x%04" PRIx16 "\n",
+        p_content_lbl_dr->i_metadata_application_format);
+    if(p_content_lbl_dr->i_metadata_application_format == 0xFFFF)
+    {
+        printf("\t\t Metadata application format identifier : 0x%08" PRIx32 "\n",
+            p_content_lbl_dr->i_metadata_application_format_identifier);
+    }
+
+    printf("\t\t Content reference ID record flag : %d\n",
+        p_content_lbl_dr->b_content_reference_id_record_flag);
+    printf("\t\t Content time base indicator : 0x%02" PRIx8 "\n",
+        p_content_lbl_dr->i_content_time_base_indicator);
+
+    if(p_content_lbl_dr->b_content_reference_id_record_flag)
+    {
+        dump_hex_data("\t\t Content reference ID",
+            p_content_lbl_dr->p_content_reference_id,
+            p_content_lbl_dr->i_content_reference_id_record_length);
+    }
+
+    if(p_content_lbl_dr->i_content_time_base_indicator == 1 ||
+        p_content_lbl_dr->i_content_time_base_indicator == 2)
+    {
+        printf("\t\t Content time base value : 0x%09" PRIx64 "\n",
+            p_content_lbl_dr->i_content_time_base_value);
+        printf("\t\t Metadata time base value : 0x%09" PRIx64 "\n",
+            p_content_lbl_dr->i_metadata_time_base_value);
+    }
+
+    if(p_content_lbl_dr->i_content_time_base_indicator == 2)
+    {
+        printf("\t\t contentId : 0x%02" PRIx8 "\n", p_content_lbl_dr->i_contentId);
+    }
+
+    if(p_content_lbl_dr->i_content_time_base_indicator >= 3 &&
+        p_content_lbl_dr->i_content_time_base_indicator <= 7)
+    {
+        dump_hex_data("\t\t Time base association data",
+            p_content_lbl_dr->p_time_base_association_data,
+            p_content_lbl_dr->i_time_base_association_data_length);
+    }
+
+    if(p_content_lbl_dr->i_private_data_len)
+    {
+        dump_hex_data("\t\t Private data", p_content_lbl_dr->p_private_data,
+            p_content_lbl_dr->i_private_data_len);
+    }
 }
 
 /*****************************************************************************
@@ -1654,6 +1718,10 @@ static void DumpDescriptor(dvbpsi_descriptor_t *p_descriptor)
         case 0x1c:
             p_decoded = dvbpsi_DecodeMPEG4AudioDr(p_descriptor);
             dump_dr_fn = DumpMPEG4AudioDescriptor;
+            break;
+        case 0x24:
+            p_decoded = dvbpsi_DecodeContentLabellingDr(p_descriptor);
+            dump_dr_fn = DumpContentLabellingDescriptor;
             break;
         case 0x4c:
             p_decoded = dvbpsi_DecodeTimeShiftedServiceDr(p_descriptor);
