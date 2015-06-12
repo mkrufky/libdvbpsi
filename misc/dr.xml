@@ -7,7 +7,7 @@
     <integer name="i_frame_rate_code" bitcount="4" default="0" />
     <insert>
       <begin>
-  s_decoded.b_mpeg2 = 0;</begin>
+  s_decoded.b_mpeg2 = false;</begin>
     </insert>
     <boolean name="b_constrained_parameter" default="0" />
     <boolean name="b_still_picture" default="0" />
@@ -18,7 +18,7 @@
     <integer name="i_frame_rate_code" bitcount="4" default="0" />
     <insert>
       <begin>
-  s_decoded.b_mpeg2 = 12;</begin>
+  s_decoded.b_mpeg2 = true;</begin>
     </insert>
     <boolean name="b_constrained_parameter" default="0" />
     <boolean name="b_still_picture" default="0" />

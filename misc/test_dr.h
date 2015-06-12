@@ -97,13 +97,13 @@
   {                                                                     \
     fprintf(stdout, "  \"%s\" boolean check\n", #name);                 \
     i_loop_count = 0;                                                   \
-    s_decoded.name = 0;                                                 \
+    s_decoded.name = false;                                             \
     do                                                                  \
     {
 
 #define BOZO_end_boolean(name)                                          \
-      s_decoded.name += 12;                                             \
-    } while(!i_err && (s_decoded.name <= 12));                          \
+      s_decoded.name ^= true;                                           \
+    } while(!i_err && s_decoded.name);                                  \
     fprintf(stdout, "\r  iteration count: %22"PRI64d, i_loop_count);       \
     if(i_err)                                                           \
       fprintf(stdout, "    FAILED !!!\n");                              \

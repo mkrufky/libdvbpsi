@@ -100,7 +100,7 @@ static int main_vstream_2(void)
   /* check b_multiple_frame_rate */
   BOZO_init_boolean(b_multiple_frame_rate, 0);
   BOZO_init_integer(i_frame_rate_code, 0);
-  s_decoded.b_mpeg2 = 12;
+  s_decoded.b_mpeg2 = true;
   BOZO_init_boolean(b_constrained_parameter, 0);
   BOZO_init_boolean(b_still_picture, 0);
   BOZO_init_integer(i_profile_level_indication, 0);
@@ -115,7 +115,7 @@ static int main_vstream_2(void)
   /* check i_frame_rate_code */
   BOZO_init_boolean(b_multiple_frame_rate, 0);
   BOZO_init_integer(i_frame_rate_code, 0);
-  s_decoded.b_mpeg2 = 12;
+  s_decoded.b_mpeg2 = true;
   BOZO_init_boolean(b_constrained_parameter, 0);
   BOZO_init_boolean(b_still_picture, 0);
   BOZO_init_integer(i_profile_level_indication, 0);
@@ -130,7 +130,7 @@ static int main_vstream_2(void)
   /* check b_constrained_parameter */
   BOZO_init_boolean(b_multiple_frame_rate, 0);
   BOZO_init_integer(i_frame_rate_code, 0);
-  s_decoded.b_mpeg2 = 12;
+  s_decoded.b_mpeg2 = true;
   BOZO_init_boolean(b_constrained_parameter, 0);
   BOZO_init_boolean(b_still_picture, 0);
   BOZO_init_integer(i_profile_level_indication, 0);
@@ -145,7 +145,7 @@ static int main_vstream_2(void)
   /* check b_still_picture */
   BOZO_init_boolean(b_multiple_frame_rate, 0);
   BOZO_init_integer(i_frame_rate_code, 0);
-  s_decoded.b_mpeg2 = 12;
+  s_decoded.b_mpeg2 = true;
   BOZO_init_boolean(b_constrained_parameter, 0);
   BOZO_init_boolean(b_still_picture, 0);
   BOZO_init_integer(i_profile_level_indication, 0);
@@ -160,7 +160,7 @@ static int main_vstream_2(void)
   /* check i_profile_level_indication */
   BOZO_init_boolean(b_multiple_frame_rate, 0);
   BOZO_init_integer(i_frame_rate_code, 0);
-  s_decoded.b_mpeg2 = 12;
+  s_decoded.b_mpeg2 = true;
   BOZO_init_boolean(b_constrained_parameter, 0);
   BOZO_init_boolean(b_still_picture, 0);
   BOZO_init_integer(i_profile_level_indication, 0);
@@ -175,7 +175,7 @@ static int main_vstream_2(void)
   /* check i_chroma_format */
   BOZO_init_boolean(b_multiple_frame_rate, 0);
   BOZO_init_integer(i_frame_rate_code, 0);
-  s_decoded.b_mpeg2 = 12;
+  s_decoded.b_mpeg2 = true;
   BOZO_init_boolean(b_constrained_parameter, 0);
   BOZO_init_boolean(b_still_picture, 0);
   BOZO_init_integer(i_profile_level_indication, 0);
@@ -190,7 +190,7 @@ static int main_vstream_2(void)
   /* check b_frame_rate_extension */
   BOZO_init_boolean(b_multiple_frame_rate, 0);
   BOZO_init_integer(i_frame_rate_code, 0);
-  s_decoded.b_mpeg2 = 12;
+  s_decoded.b_mpeg2 = true;
   BOZO_init_boolean(b_constrained_parameter, 0);
   BOZO_init_boolean(b_still_picture, 0);
   BOZO_init_integer(i_profile_level_indication, 0);
