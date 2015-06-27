@@ -495,7 +495,8 @@ void dvbpsi_eit_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_
         p_eit_decoder->b_current_valid = true;
 
         /* Decode the sections */
-        dvbpsi_eit_sections_decode(p_eit_decoder->p_building_eit,
+        dvbpsi_eit_sections_decode(p_dvbpsi,
+                                   p_eit_decoder->p_building_eit,
                                    p_eit_decoder->p_sections);
 
         /* signal the new EIT */
@@ -512,7 +513,8 @@ void dvbpsi_eit_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_decoder_t *p_private_
  *****************************************************************************
  * EIT decoder.
  *****************************************************************************/
-void dvbpsi_eit_sections_decode(dvbpsi_eit_t* p_eit,
+void dvbpsi_eit_sections_decode(dvbpsi_t *p_dvbpsi,
+                                dvbpsi_eit_t* p_eit,
                                 dvbpsi_psi_section_t* p_section)
 {
     uint8_t* p_byte, *p_end;
@@ -555,9 +557,18 @@ void dvbpsi_eit_sections_decode(dvbpsi_eit_t* p_eit,
                 uint8_t i_length = p_byte[1];
                 if (i_length + 2 <= p_ev_end - p_byte)
                     dvbpsi_eit_event_descriptor_add(p_event, i_tag, i_length, p_byte + 2);
+                else
+                {
+                    dvbpsi_error(p_dvbpsi, "EIT decoder", "failed decoding "
+                        "section %d : descriptor size exceeds event size",
+                        p_section->i_number);
+                    goto next_section;
+                }
+
                 p_byte += 2 + i_length;
             }
         }
+    next_section:
         p_section = p_section->p_next;
     }
 }
