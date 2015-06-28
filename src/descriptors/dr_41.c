@@ -96,7 +96,7 @@ dvbpsi_descriptor_t * dvbpsi_GenServiceListDr(
 
     /* Create the descriptor */
     dvbpsi_descriptor_t * p_descriptor =
-            dvbpsi_NewDescriptor(0x83, p_decoded->i_service_count*3, NULL);
+            dvbpsi_NewDescriptor(0x41, p_decoded->i_service_count*3, NULL);
     if (!p_descriptor)
         return NULL;
 
