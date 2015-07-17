@@ -80,7 +80,7 @@ typedef struct dvbpsi_linkage_dr_s
 
   uint8_t       i_private_data_length;         /*!< length of the i_private_data
                                                     array */
-  uint8_t       i_private_data[248];           /*!< private data */
+  uint8_t       i_private_data[246];           /*!< private data */
 
 } dvbpsi_linkage_dr_t;
 

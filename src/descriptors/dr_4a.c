@@ -39,6 +39,10 @@
 
 #include "dr_4a.h"
 
+/* the smallest valid linkage descriptor consists of a transport_stream_id (16),
+ * original_network_id (16), service_id (16), and linkage_type (8). */
+#define DR_4A_MIN_SIZE 7
+
 /*****************************************************************************
  * dvbpsi_DecodeLinkageDr
  *****************************************************************************/
@@ -53,23 +57,25 @@ dvbpsi_linkage_dr_t* dvbpsi_DecodeLinkageDr(dvbpsi_descriptor_t * p_descriptor)
         return p_descriptor->p_decoded;
 
     /* Check the length */
+    if (p_descriptor->i_length < DR_4A_MIN_SIZE)
+        return NULL;
+    
     int handover_type = 0, origin_type = 0;
     if (p_descriptor->p_data[6] == 0x08)
     {
+        if (p_descriptor->i_length < DR_4A_MIN_SIZE + 1)
+            return NULL;
+        
         handover_type = p_descriptor->p_data[7] & 0xF0 >> 4;
         origin_type = p_descriptor->p_data[7] & 0x01;
         if ((( handover_type > 0 ) && ( handover_type < 4 )
-                && ( origin_type == 0 ) && ( p_descriptor->i_length > 243 )) ||
+                && ( origin_type == 0 ) && ( p_descriptor->i_length < DR_4A_MIN_SIZE + 5 )) ||
             (( handover_type > 0 ) && ( handover_type < 4 )
-                && ( origin_type == 1 ) && ( p_descriptor->i_length > 245 )))
+                && ( origin_type == 1 ) && ( p_descriptor->i_length < DR_4A_MIN_SIZE + 3 )))
             return NULL;
     }
     if (p_descriptor->p_data[6] == 0x0D &&
-        p_descriptor->i_length > 245)
-        return NULL;
-    if (p_descriptor->p_data[6] != 0x08 &&
-        p_descriptor->p_data[6] != 0x0D &&
-        p_descriptor->i_length > 248)
+        p_descriptor->i_length < DR_4A_MIN_SIZE + 3)
         return NULL;
 
     /* Allocate memory */
@@ -123,8 +129,8 @@ dvbpsi_linkage_dr_t* dvbpsi_DecodeLinkageDr(dvbpsi_descriptor_t * p_descriptor)
        i = 10;
     }
     p_decoded->i_private_data_length = p_descriptor->i_length - i;
-    if (p_decoded->i_private_data_length > 248)
-        p_decoded->i_private_data_length = 248;
+    if (p_decoded->i_private_data_length > 246)
+        p_decoded->i_private_data_length = 246;
     memcpy(p_decoded->i_private_data, &p_descriptor->p_data[i], p_decoded->i_private_data_length);
 
     p_descriptor->p_decoded = (void*)p_decoded;
