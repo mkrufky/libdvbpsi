@@ -98,6 +98,7 @@ dvbpsi_linkage_dr_t* dvbpsi_DecodeLinkageDr(dvbpsi_descriptor_t * p_descriptor)
     {
         p_decoded->i_handover_type = handover_type;
         p_decoded->i_origin_type = origin_type;
+        i = 8;
         if (handover_type > 0 && handover_type < 4)
         {
             p_decoded->i_network_id = p_descriptor->p_data[8] << 8
@@ -183,6 +184,7 @@ dvbpsi_descriptor_t * dvbpsi_GenLinkageDr(dvbpsi_linkage_dr_t * p_decoded,
     {
     	p_descriptor->p_data[7] = ( (p_decoded->i_handover_type & 0x0F) << 4 )
     			| 0x0E | ( p_decoded->i_origin_type & 0x01 );
+        last_pos = 7;
         if ((p_decoded->i_handover_type > 0) &&
             (p_decoded->i_handover_type < 3 ))
         {
