@@ -65,7 +65,7 @@ dvbpsi_nvod_ref_dr_t* dvbpsi_DecodeNVODReferenceDr(dvbpsi_descriptor_t * p_descr
         return NULL;
 
     /* Decode data */
-    p_decoded->i_references = p_descriptor->i_length % 6;
+    p_decoded->i_references = p_descriptor->i_length / 6;
     if (p_decoded->i_references > 43)
 	p_decoded->i_references = 43;
 
