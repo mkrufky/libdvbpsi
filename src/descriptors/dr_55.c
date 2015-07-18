@@ -112,14 +112,14 @@ dvbpsi_descriptor_t * dvbpsi_GenParentalRatingDr(
     /* Encode data */
     for (int i = 0; i < p_decoded->i_ratings_number; i++ )
     {
-        p_descriptor->p_data[8 * i] =
+        p_descriptor->p_data[4 * i] =
                 p_decoded->p_parental_rating[i].i_country_code >> 16;
-        p_descriptor->p_data[8 * i + 1] =
+        p_descriptor->p_data[4 * i + 1] =
                 (p_decoded->p_parental_rating[i].i_country_code >> 8) & 0xff;
-        p_descriptor->p_data[8 * i + 2] =
+        p_descriptor->p_data[4 * i + 2] =
                 p_decoded->p_parental_rating[i].i_country_code & 0xff;
 
-        p_descriptor->p_data[8 * i + 3] =
+        p_descriptor->p_data[4 * i + 3] =
                 p_decoded->p_parental_rating[i].i_rating;
     }
 
