@@ -152,13 +152,13 @@ dvbpsi_descriptor_t * dvbpsi_GenLinkageDr(dvbpsi_linkage_dr_t * p_decoded,
     if (p_decoded->i_linkage_type == 0x08)
     {
         length++;
+
         if ((p_decoded->i_handover_type > 0) &&
             (p_decoded->i_handover_type < 3))
-        {
             length+=2;
-	    if (p_decoded->i_origin_type == 0)
-                length+=2;
-	}
+
+        if (p_decoded->i_origin_type == 0)
+            length+=2;
     }
     if (p_decoded->i_linkage_type == 0x0D)
         length+=3;
