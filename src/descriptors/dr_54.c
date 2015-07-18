@@ -100,8 +100,8 @@ dvbpsi_descriptor_t * dvbpsi_GenContentDr(
     /* Encode data */
     for (int i = 0; i < p_decoded->i_contents_number; i++ )
     {
-        p_descriptor->p_data[8 * i] = p_decoded->p_content[i].i_type;
-        p_descriptor->p_data[8 * i + 1] = p_decoded->p_content[i].i_user_byte;
+        p_descriptor->p_data[2 * i] = p_decoded->p_content[i].i_type;
+        p_descriptor->p_data[2 * i + 1] = p_decoded->p_content[i].i_user_byte;
     }
 
     if (b_duplicate)
