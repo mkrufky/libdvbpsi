@@ -128,12 +128,12 @@ dvbpsi_descriptor_t * dvbpsi_GenSubtitlingDr(
         p_descriptor->p_data[8 * i + 4] =
                 p_decoded->p_subtitle[i].i_composition_page_id >> 8;
         p_descriptor->p_data[8 * i + 5] =
-                p_decoded->p_subtitle[i].i_composition_page_id % 0xFF;
+                p_decoded->p_subtitle[i].i_composition_page_id & 0xFF;
 
         p_descriptor->p_data[8 * i + 6] =
                 p_decoded->p_subtitle[i].i_ancillary_page_id >> 8;
         p_descriptor->p_data[8 * i + 7] =
-                p_decoded->p_subtitle[i].i_ancillary_page_id % 0xFF;
+                p_decoded->p_subtitle[i].i_ancillary_page_id & 0xFF;
     }
 
     if (b_duplicate)
