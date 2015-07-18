@@ -60,13 +60,13 @@ dvbpsi_linkage_dr_t* dvbpsi_DecodeLinkageDr(dvbpsi_descriptor_t * p_descriptor)
     if (p_descriptor->i_length < DR_4A_MIN_SIZE)
         return NULL;
     
-    int handover_type = 0, origin_type = 0;
+    unsigned int handover_type = 0, origin_type = 0;
     if (p_descriptor->p_data[6] == 0x08)
     {
         if (p_descriptor->i_length < DR_4A_MIN_SIZE + 1)
             return NULL;
         
-        handover_type = p_descriptor->p_data[7] & 0xF0 >> 4;
+        handover_type = (p_descriptor->p_data[7] & 0xF0) >> 4;
         origin_type = p_descriptor->p_data[7] & 0x01;
         if ((( handover_type > 0 ) && ( handover_type < 4 )
                 && ( origin_type == 0 ) && ( p_descriptor->i_length < DR_4A_MIN_SIZE + 5 )) ||
