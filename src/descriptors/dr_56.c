@@ -112,15 +112,15 @@ dvbpsi_descriptor_t * dvbpsi_GenTeletextDr(dvbpsi_teletext_dr_t * p_decoded,
     /* Encode data */
     for (int i = 0; i < p_decoded->i_pages_number; i++ )
     {
-        memcpy( p_descriptor->p_data + 8 * i,
+        memcpy( p_descriptor->p_data + 5 * i,
                 p_decoded->p_pages[i].i_iso6392_language_code,
                 3);
 
-        p_descriptor->p_data[8 * i + 3] =
+        p_descriptor->p_data[5 * i + 3] =
                 (uint8_t) ( ( (uint8_t) p_decoded->p_pages[i].i_teletext_type << 3 ) |
                             ( (uint8_t) p_decoded->p_pages[i].i_teletext_magazine_number & 0x07 ) );
 
-        p_descriptor->p_data[8 * i + 4] =
+        p_descriptor->p_data[5 * i + 4] =
                 p_decoded->p_pages[i].i_teletext_page_number;
     }
 
