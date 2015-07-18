@@ -70,7 +70,8 @@ dvbpsi_ca_identifier_dr_t * dvbpsi_DecodeCAIdentifierDr(dvbpsi_descriptor_t *p_d
     for (int i = 0; i < i_number; i++)
     {
         /* TODO: decode CA system identifier values */
-        p_decoded->p_system[i].i_ca_system_id = p_descriptor->p_data[2 * i];
+        p_decoded->p_system[i].i_ca_system_id =  p_descriptor->p_data[2 * i] << 8;
+        p_decoded->p_system[i].i_ca_system_id |= p_descriptor->p_data[2 * i + 1];
     }
 
     p_descriptor->p_decoded = (void*)p_decoded;
