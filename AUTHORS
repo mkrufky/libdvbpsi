@@ -65,7 +65,8 @@ D: ATSC tables
 
 N: Daniel Kamil Kozar
 E: dkk089@gmail.com
-D: descriptor 0x10, 0x11, 0x12, 0x1b, 0x1c
+D: descriptors 0x10, 0x11, 0x12, 0x1b, 0x1c
+D: Bugfixing
 
 N: Jean-Baptiste Kempf
 E: jb@videolan.org
@@ -94,9 +95,9 @@ D: Program Delivery Control (0x69)
 
 N: Jean-Paul Saman
 E: jpsaman@videolan.org
-D: VBI Data Descriptor (0x45)
-D: CUE Identifier Descriptor (0x8a)
+D: descriptors: 0x45, 0x8a
 D: Splice Information Table
+D: Bugfixing
 D: Maintainer
 
 N: Yonathan Yusim
