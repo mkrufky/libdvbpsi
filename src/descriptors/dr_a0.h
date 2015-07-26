@@ -55,17 +55,29 @@ typedef struct dvbpsi_extended_channel_name_dr_s
 }dvbpsi_extended_channel_name_dr_t;
 
 /*****************************************************************************
- * dvbpsi_ExtendedChannelNameDr
+ * dvbpsi_ExtendedChannelNameDr - deprecated
  *****************************************************************************/
 /*!
  * \fn dvbpsi_extended_channel_name_dr_t dvbpsi_ExtendedChannelNameDr(dvbpsi_descriptor_t *p_descriptor)
- * \brief Decode a Extended Channel Name descriptor (tag 0xA0)
+ * \brief Function is deprecated use dvbpsi_DecodeExtendedChannelNameDr instead.
  * \param p_descriptor Raw descriptor to decode.
  * \return NULL if the descriptor could not be decoded or a pointer to a
  *         dvbpsi_extended_channel_name_dr_t structure.
  */
 __attribute__((deprecated))
 dvbpsi_extended_channel_name_dr_t *dvbpsi_ExtendedChannelNameDr(dvbpsi_descriptor_t *p_descriptor);
+
+/*****************************************************************************
+ * dvbpsi_DecodeExtendedChannelNameDr
+ *****************************************************************************/
+/*!
+ * \fn dvbpsi_extended_channel_name_dr_t dvbpsi_DecodeExtendedChannelNameDr(dvbpsi_descriptor_t *p_descriptor)
+ * \brief Decode a Extended Channel Name descriptor (tag 0xA0)
+ * \param p_descriptor Raw descriptor to decode.
+ * \return NULL if the descriptor could not be decoded or a pointer to a
+ *         dvbpsi_extended_channel_name_dr_t structure.
+ */
+dvbpsi_extended_channel_name_dr_t *dvbpsi_DecodeExtendedChannelNameDr(dvbpsi_descriptor_t *p_descriptor);
 
 #ifdef __cplusplus
 }
