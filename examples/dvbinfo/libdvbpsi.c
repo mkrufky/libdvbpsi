@@ -50,6 +50,7 @@
 #   include "../../src/demux.h"
 #   include "../../src/psi.h"
 #   include "../../src/descriptor.h"
+#   include "../../src/multi_string.h"
 #   include "../../src/tables/pat.h"
 #   include "../../src/tables/pmt.h"
 #   include "../../src/tables/cat.h"
@@ -71,6 +72,7 @@
 #   include <dvbpsi/demux.h>
 #   include <dvbpsi/psi.h>
 #   include <dvbpsi/descriptor.h>
+#   include <dvbpsi/multi_string.h>
 #   include <dvbpsi/pat.h>
 #   include <dvbpsi/pmt.h>
 #   include <dvbpsi/cat.h>

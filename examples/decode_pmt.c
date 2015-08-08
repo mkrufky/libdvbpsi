@@ -44,12 +44,14 @@
 #include "../src/dvbpsi.h"
 #include "../src/psi.h"
 #include "../src/descriptor.h"
+#include "../src/multi_string.h"
 #include "../src/tables/pmt.h"
 #include "../src/descriptors/dr.h"
 #else
 #include <dvbpsi/dvbpsi.h>
 #include <dvbpsi/psi.h>
 #include <dvbpsi/descriptor.h>
+#include <dvbpsi/multi_string.h>
 #include <dvbpsi/pmt.h>
 #include <dvbpsi/dr.h>
 #endif

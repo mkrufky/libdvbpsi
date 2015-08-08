@@ -19,10 +19,12 @@
 #ifdef DVBPSI_DIST
 #include "../src/dvbpsi.h"
 #include "../src/descriptor.h"
+#include "../src/multi_string.h"
 #include "../src/descriptors/dr.h"
 #else
 #include <dvbpsi/dvbpsi.h>
 #include <dvbpsi/descriptor.h>
+#include <dvbpsi/multi_string.h>
 #include <dvbpsi/dr.h>
 #endif
 

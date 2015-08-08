@@ -58,6 +58,7 @@
 #include "../src/psi.h"
 #include "../src/tables/pat.h"
 #include "../src/descriptor.h"
+#include "../src/multi_string.h"
 #include "../src/tables/pmt.h"
 #include "../src/descriptors/dr.h"
 #else
@@ -65,6 +66,7 @@
 #include <dvbpsi/psi.h>
 #include <dvbpsi/pat.h>
 #include <dvbpsi/descriptor.h>
+#include <dvbpsi/multi_string.h>
 #include <dvbpsi/pmt.h>
 #include <dvbpsi/dr.h>
 #endif
