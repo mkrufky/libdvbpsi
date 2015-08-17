@@ -4,7 +4,7 @@ Changes between 1.3.0 and 2.0.0-git:
  * WinCE support removal
  * New descriptor:
    - 0x24 Content labelling descriptor
- * Fix bugs in descriptors: 0x41, 0x4a
+ * Fix bugs in descriptors: 0x41, 0x4a, 0x4b
  * FIx bugs in table: EIT
 
 Changes between 1.2.0 and 1.3.0:
