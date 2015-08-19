@@ -64,6 +64,7 @@ typedef struct dvbpsi_extended_channel_name_dr_s
  * \return NULL if the descriptor could not be decoded or a pointer to a
  *         dvbpsi_extended_channel_name_dr_t structure.
  */
+__attribute__((deprecated))
 dvbpsi_extended_channel_name_dr_t *dvbpsi_ExtendedChannelNameDr(dvbpsi_descriptor_t *p_descriptor);
 
 #ifdef __cplusplus
