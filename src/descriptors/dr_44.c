@@ -99,7 +99,9 @@ dvbpsi_descriptor_t * dvbpsi_GenCableDelivSysDr(
     p_descriptor->p_data[1]  =     (p_decoded->i_frequency >> 16)       & 0xff;
     p_descriptor->p_data[2]  =     (p_decoded->i_frequency >>  8)       & 0xff;
     p_descriptor->p_data[3]  =      p_decoded->i_frequency              & 0xff;
-    p_descriptor->p_data[5]  =     (p_decoded->i_fec_outer              & 0x0f);
+    p_descriptor->p_data[4]  =      0xff;
+    p_descriptor->p_data[5]  =      0xf0
+                                  |(p_decoded->i_fec_outer              & 0x0f);
     p_descriptor->p_data[6]  =     (p_decoded->i_modulation);
     p_descriptor->p_data[7]  =     (p_decoded->i_symbol_rate >> 20)     & 0xff;
     p_descriptor->p_data[8]  =     (p_decoded->i_symbol_rate >> 12)     & 0xff;
