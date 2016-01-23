@@ -111,8 +111,7 @@ if test "${ac_cv_cpp_variadic_macros}" != "no"; then
     AC_DEFINE(HAVE_VARIADIC_MACROS, 1, Support for variadic macros)
 fi
 
-dnl Check for asprintf(). Systems with asprintf() must also have vasprintf(),
-dnl so it is not checked separately.
+dnl Check for asprintf().
 AC_CACHE_CHECK([for asprintf()],
     [ac_cv_asprintf],
     [AC_COMPILE_IFELSE([
@@ -129,8 +128,10 @@ AC_CACHE_CHECK([for asprintf()],
         ac_cv_asprintf=yes,
         ac_cv_asprintf=no)])
 if test "${ac_cv_asprintf}" != "no"; then
-    AC_DEFINE(HAVE_ASPRINTF, 1, [Support for asprintf() and vasprintf()])
+    AC_DEFINE(HAVE_ASPRINTF, 1, [Support for asprintf()])
 fi
+
+AC_CHECK_FUNCS([vasprintf])
 
 dnl
 dnl Generate Makefiles and other output files
